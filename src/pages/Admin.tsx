@@ -43,6 +43,7 @@ interface AdminComment {
 
 export function Admin() {
   const { email } = useStore();
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [activeTab, setActiveTab] = useState<'stories' | 'users' | 'comments' | 'messages' | 'stickers'>('stories');
   
@@ -92,14 +93,32 @@ export function Admin() {
   const editStickerFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (email === 'cucnau01@gmail.com') {
+    const checkAdminStatus = async () => {
+      if (!email) {
+        setIsAdmin(false);
+        return;
+      }
+      try {
+        const userDoc = await getDoc(doc(db, 'users', email));
+        const userData = userDoc.data();
+        setIsAdmin(userData?.isAdmin === true || userData?.role === 'admin');
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        setIsAdmin(false);
+      }
+    };
+    checkAdminStatus();
+  }, [email]);
+
+  useEffect(() => {
+    if (isAdmin) {
       fetchStories();
       fetchUsers();
       fetchComments();
       fetchMessages();
       fetchStickers();
     }
-  }, [email]);
+  }, [isAdmin]);
 
   const fetchStories = async () => {
     try {
@@ -613,7 +632,7 @@ export function Admin() {
     });
   };
 
-  if (email !== 'cucnau01@gmail.com') {
+  if (!isAdmin) {
     return <div className="p-8 text-center text-red-500 font-bold">Không có quyền truy cập.</div>;
   }
 
