@@ -1,0 +1,6 @@
+{
+  "name": "Truyện Edit - Nền tảng Đọc truyện",
+  "description": "Nền tảng đọc truyện online với nhiệm vụ kiếm choco, điểm danh, cửa hàng và chat trực tuyến.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

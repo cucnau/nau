@@ -1,0 +1,148 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and currency",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "choco": { "type": "number" },
+        "goldenChoco": { "type": "number" },
+        "checkInStreak": { "type": "number" },
+        "lastCheckInDate": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" },
+        "unlockedAchievements": { "type": "array" },
+        "claimedAchievements": { "type": "array" },
+        "totalEarnedChoco": { "type": "number" },
+        "totalEarnedGChoco": { "type": "number" },
+        "totalSpentChoco": { "type": "number" },
+        "totalCheckIns": { "type": "number" },
+        "perfectDailyDates": { "type": "array" },
+        "sentMessagesCount": { "type": "number" },
+        "genresRead": { "type": "array" },
+        "activePoints": { "type": "number" },
+        "lastActiveWeek": { "type": "string" },
+        "prevActivePoints": { "type": "number" },
+        "prevActiveWeek": { "type": "string" },
+        "equippedSticker": { "type": "string" },
+        "stickerPosition": { "type": "string" },
+        "ownedStickers": { "type": "array" }
+      },
+      "required": ["uid", "choco", "goldenChoco", "createdAt"]
+    },
+    "Story": {
+      "title": "Story",
+      "description": "Story metadata",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "author": { "type": "string" },
+        "coverUrl": { "type": "string" },
+        "genres": { "type": "array" },
+        "chapterCount": { "type": "number" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["title", "author", "createdAt"]
+    },
+    "Chapter": {
+      "title": "Chapter",
+      "description": "Story chapter",
+      "type": "object",
+      "properties": {
+        "storyId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "order": { "type": "number" },
+        "isPasswordProtected": { "type": "boolean" }
+      },
+      "required": ["storyId", "title", "content", "order"]
+    },
+    "ChatMessage": {
+      "title": "Chat Message",
+      "description": "Global chat message",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["uid", "displayName", "content", "createdAt"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "Comment on a story or chapter",
+      "type": "object",
+      "properties": {
+        "targetId": { "type": "string" },
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "content": { "type": "string" },
+        "type": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["targetId", "uid", "content", "type", "createdAt"]
+    },
+    "UserTask": {
+      "title": "User Task Progress",
+      "description": "Tracks daily/weekly reading and checking in",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "date": { "type": "string" },
+        "chaptersRead": { "type": "number" },
+        "commentsMade": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["uid", "date", "updatedAt"]
+    },
+    "AvatarSticker": {
+      "title": "AvatarSticker",
+      "description": "Avatar sticker item for purchase in store",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "type": { "type": "string" },
+        "url": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["name", "description", "price", "type", "url"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "stories/{storyId}": {
+      "schema": { "$ref": "#/entities/Story" },
+      "description": "Public stories"
+    },
+    "stories/{storyId}/chapters/{chapterId}": {
+      "schema": { "$ref": "#/entities/Chapter" },
+      "description": "Story chapters"
+    },
+    "chatMessages/{messageId}": {
+      "schema": { "$ref": "#/entities/ChatMessage" },
+      "description": "Global chat"
+    },
+    "comments/{commentId}": {
+      "schema": { "$ref": "#/entities/Comment" },
+      "description": "Story/chapter comments"
+    },
+    "userTasks/{taskId}": {
+      "schema": { "$ref": "#/entities/UserTask" },
+      "description": "User task tracking"
+    },
+    "store_stickers/{stickerId}": {
+      "schema": { "$ref": "#/entities/AvatarSticker" },
+      "description": "Collectible avatar stickers"
+    }
+  }
+}
