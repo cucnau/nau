@@ -8,7 +8,7 @@ import {
 import { useStore } from '../store';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
 import { getDocs, collection } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST, getWeeklyId, getPreviousWeeklyId } from '../types/achievements';
@@ -55,7 +55,8 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   const navigate = useNavigate();
   const { 
     isLoggedIn, email, missions,
-    setStoreOpen, setMissionsOpen, setAchievementsOpen
+    setStoreOpen, setMissionsOpen, setAchievementsOpen,
+    firebaseUser
   } = useStore();
 
   if (!isOpen) return null;
@@ -63,9 +64,37 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   const handleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (error) {
+      const isInIframe = window.self !== window.top;
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isInIframe) {
+        await signInWithPopup(auth, provider);
+      } else if (isMobile) {
+        await signInWithRedirect(auth, provider);
+      } else {
+        try {
+          await signInWithPopup(auth, provider);
+        } catch (popupError: any) {
+          if (popupError?.code === 'auth/popup-blocked' || popupError?.code === 'auth/cancelled-popup-request') {
+            await signInWithRedirect(auth, provider);
+          } else {
+            throw popupError;
+          }
+        }
+      }
+    } catch (error: any) {
       console.error('Login failed', error);
+      if (error?.code === 'auth/unauthorized-domain') {
+        alert(
+          'Lỗi: Tên miền này chưa được cấp phép đăng ký/đăng nhập trong Firebase Auth!\n\n' +
+          'Bạn cần thêm "nau-self.vercel.app" vào danh sách "Authorized domains" trong Firebase Console:\n' +
+          '1. Truy cập: https://console.firebase.google.com/project/valued-year-b4wsx/authentication/providers\n' +
+          '2. Chọn tab Settings (Cấu hình) -> Authorized domains (Miền được ủy quyền).\n' +
+          '3. Nhấp "Thêm miền" và nhập đúng: nau-self.vercel.app'
+        );
+      } else {
+        alert('Đăng nhập thất bại: ' + (error?.message || String(error)));
+      }
     }
   };
 
@@ -186,7 +215,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
              </button>
 
              {/* Quản Trị (Optional) */}
-             {isLoggedIn && email === 'cucnau01@gmail.com' && (
+             {isLoggedIn && (email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') && (
                 <button 
                    onClick={() => { onClose(); navigate('/admin'); }}
                    className="bg-[#E2E8F0] hover:bg-[#CBD5E1] text-[#1E293B] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-slate-300 shadow-sm group"
@@ -377,16 +406,44 @@ export function AppLayout() {
     isLoggedIn, uid, displayName, avatarUrl, equippedSticker, stickerPosition, choco, goldenChoco, email, level,
     isStoreOpen, isMissionsOpen, isAchievementsOpen,
     setStoreOpen, setMissionsOpen, setAchievementsOpen,
-    isQuotaExceeded
+    isQuotaExceeded, firebaseUser
   } = useStore();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-    } catch (error) {
+      const isInIframe = window.self !== window.top;
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isInIframe) {
+        await signInWithPopup(auth, provider);
+      } else if (isMobile) {
+        await signInWithRedirect(auth, provider);
+      } else {
+        try {
+          await signInWithPopup(auth, provider);
+        } catch (popupError: any) {
+          if (popupError?.code === 'auth/popup-blocked' || popupError?.code === 'auth/cancelled-popup-request') {
+            await signInWithRedirect(auth, provider);
+          } else {
+            throw popupError;
+          }
+        }
+      }
+    } catch (error: any) {
       console.error('Login failed', error);
+      if (error?.code === 'auth/unauthorized-domain') {
+        alert(
+          'Lỗi: Tên miền này chưa được cấp phép đăng ký/đăng nhập trong Firebase Auth!\n\n' +
+          'Bạn cần thêm "nau-self.vercel.app" vào danh sách "Authorized domains" trong Firebase Console:\n' +
+          '1. Truy cập: https://console.firebase.google.com/project/valued-year-b4wsx/authentication/providers\n' +
+          '2. Chọn tab Settings (Cấu hình) -> Authorized domains (Miền được ủy quyền).\n' +
+          '3. Nhấp "Thêm miền" và nhập đúng: nau-self.vercel.app'
+        );
+      } else {
+        alert('Đăng nhập thất bại: ' + (error?.message || String(error)));
+      }
     }
   };
 
@@ -432,8 +489,8 @@ export function AppLayout() {
             <div className="flex items-center gap-4">
               <div className="hidden md:flex items-center gap-3 text-sm font-medium">
                 <span className="bg-[#8D6E63] text-[#FDF6EC] px-2.5 py-1 rounded-full text-xs font-bold border border-[#A1887F]/30 shadow-inner">Lv. {level || 1}</span>
-                <span className="bg-[#5D4037] px-3 py-1 rounded-full text-[#FDF6EC] border border-[#8D6E63] text-sm">{email === 'cucnau01@gmail.com' ? '∞' : choco} Choco</span>
-                <span className="bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/50 px-3 py-1 rounded-full text-sm">{email === 'cucnau01@gmail.com' ? '∞' : goldenChoco} Gchoco</span>
+                <span className="bg-[#5D4037] px-3 py-1 rounded-full text-[#FDF6EC] border border-[#8D6E63] text-sm">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco} Choco</span>
+                <span className="bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/50 px-3 py-1 rounded-full text-sm">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : goldenChoco} Gchoco</span>
               </div>
               <div className="relative group cursor-pointer">
                 <div className="flex items-center gap-2 hover:bg-white/10 px-3 py-1.5 rounded-full transition-colors relative group">
@@ -469,7 +526,7 @@ export function AppLayout() {
                      <User className="w-4 h-4" />
                      <span>Hồ sơ & Cài đặt</span>
                    </button>
-                   {useStore.getState().email === 'cucnau01@gmail.com' && (
+                   {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') && (
                      <button className="flex items-center gap-2 px-4 py-2 hover:bg-[#F5E6D3] text-left text-blue-800" onClick={() => navigate('/admin')}>
                        <Key className="w-4 h-4" />
                        <span>Quản lý Truyện</span>
