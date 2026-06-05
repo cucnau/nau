@@ -520,7 +520,7 @@ export function Admin() {
         price: stPrice,
         type: stType,
         url: stUrl,
-        createdAt: Date.now()
+        createdAt: serverTimestamp()
       });
       setStName('');
       setStDesc('');
