@@ -5,7 +5,11 @@ import { doc, updateDoc, collection, addDoc, serverTimestamp, query, orderBy, on
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 
 export function Account() {
-  const { isLoggedIn, uid, displayName, email, avatarUrl, equippedSticker, stickerPosition, choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, ownedStickers, equipSticker, setStickerPosition, firebaseUser } = useStore();
+  const { 
+    isLoggedIn, uid, displayName, email, avatarUrl, equippedSticker, stickerPosition, 
+    choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, 
+    ownedStickers, equipSticker, setStickerPosition, firebaseUser, updateUserDoc 
+  } = useStore();
   const nextLevelExp = (level || 1) * 100;
   const currentExp = exp || 0;
   const percent = Math.min(100, Math.round((currentExp / nextLevelExp) * 100));
@@ -30,7 +34,7 @@ export function Account() {
 
   useEffect(() => {
     if (displayName && !name) setName(displayName);
-    if (avatarUrl && !avatar) setAvatar(avatarUrl);
+    if (avatarUrl && avatar !== avatarUrl) setAvatar(avatarUrl);
   }, [displayName, avatarUrl]);
 
   useEffect(() => {
@@ -82,14 +86,16 @@ export function Account() {
     e.preventDefault();
     if (!uid) return;
     setSaving(true);
+    console.log('Saving profile...', { name, avatar });
     try {
-      await updateDoc(doc(db, 'users', uid), {
+      await updateUserDoc({
         displayName: name,
         avatarUrl: avatar,
       });
-      useStore.getState().syncFromFirebase({ displayName: name, avatarUrl: avatar });
+      console.log('Firestore and Store updated.');
       alert('Đã cập nhật hồ sơ thành công!');
     } catch(err) {
+      console.error('Error saving profile:', err);
       handleFirestoreError(err, OperationType.UPDATE, `users/${uid}`);
     } finally {
       setSaving(false);
