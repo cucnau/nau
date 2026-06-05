@@ -50,16 +50,12 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow get: if true;
-      allow list: if true;
-      allow create: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming()) && incoming().uid == userId && incoming().choco == 0 && incoming().goldenChoco == 0 && incoming().createdAt == request.time;
-      allow update: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming()) && incoming().uid == existing().uid && incoming().createdAt == existing().createdAt;
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId;
       
-      match /reviews/{reviewId} {
+      match /reviews/{reviewId=**} {
         allow read: if true;
-        allow create: if isSignedIn() && request.auth.uid == userId && incoming().uid == userId && incoming().content is string && incoming().createdAt is timestamp && incoming().createdAt == request.time;
-        allow update: if isSignedIn() && request.auth.uid == userId && incoming().uid == userId && incoming().content is string && incoming().updatedAt is timestamp && incoming().updatedAt == request.time;
-        allow delete: if isSignedIn() && request.auth.uid == userId;
+        allow write: if isSignedIn() && request.auth.uid == userId;
       }
     }
 
