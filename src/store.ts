@@ -332,6 +332,17 @@ export const useStore = create<UserState>()(
       updateUserDoc: async (updates: any) => {
          const { uid } = get();
          if (uid) {
+            // Optimistically update local state
+            set((state) => {
+               const newState: any = {};
+               Object.keys(updates).forEach(key => {
+                  if (key in state) {
+                     newState[key] = updates[key];
+                  }
+               });
+               return newState;
+            });
+
             try {
                await updateDoc(doc(db, 'users', uid), updates);
             } catch (err) {
