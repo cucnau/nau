@@ -28,13 +28,13 @@ export function Home() {
 
     const qUsers = query(collection(db, 'users'), orderBy('choco', 'desc'), limit(15));
     const unsubUsers = onSnapshot(qUsers, (snap) => {
-      const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((u: any) => u.email !== 'cucnau01@gmail.com');
+      const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((u: any) => u.email?.toLowerCase() !== 'cucnau01@gmail.com');
       setTopUsers(users.slice(0, 10));
     });
 
     const qActiveUsers = query(collection(db, 'users'), orderBy('activePoints', 'desc'), limit(15));
     const unsubActiveUsers = onSnapshot(qActiveUsers, (snap) => {
-      const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((u: any) => u.email !== 'cucnau01@gmail.com');
+      const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((u: any) => u.email?.toLowerCase() !== 'cucnau01@gmail.com');
       setTopActiveUsers(users.slice(0, 10));
     });
 
