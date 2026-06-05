@@ -5,7 +5,7 @@ import { doc, updateDoc, collection, addDoc, serverTimestamp, query, orderBy, on
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 
 export function Account() {
-  const { isLoggedIn, uid, displayName, email, avatarUrl, equippedSticker, stickerPosition, choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, ownedStickers, equipSticker, setStickerPosition } = useStore();
+  const { isLoggedIn, uid, displayName, email, avatarUrl, equippedSticker, stickerPosition, choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, ownedStickers, equipSticker, setStickerPosition, firebaseUser } = useStore();
   const nextLevelExp = (level || 1) * 100;
   const currentExp = exp || 0;
   const percent = Math.min(100, Math.round((currentExp / nextLevelExp) * 100));
@@ -283,12 +283,12 @@ export function Account() {
               <div className="w-full bg-[#FDF6EC] rounded-xl p-4 border border-[#D7CCC8] flex items-center justify-between">
                  <div className="flex flex-col items-center flex-1">
                     <span className="text-[10px] uppercase font-bold tracking-widest text-[#8D6E63] mb-1">Choco</span>
-                    <span className="font-bold text-[#3E2723] text-lg">{email === 'cucnau01@gmail.com' ? '∞' : choco}</span>
+                    <span className="font-bold text-[#3E2723] text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}</span>
                  </div>
                  <div className="w-px h-8 bg-[#D7CCC8]"></div>
                  <div className="flex flex-col items-center flex-1">
                     <span className="text-[10px] uppercase font-bold tracking-widest text-[#D4AF37] mb-1">Gchoco</span>
-                    <span className="font-bold text-[#D4AF37] text-lg">{email === 'cucnau01@gmail.com' ? '∞' : goldenChoco}</span>
+                    <span className="font-bold text-[#D4AF37] text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : goldenChoco}</span>
                   </div>
                </div>
 
