@@ -120,8 +120,9 @@ export function Admin() {
         });
       });
       setStories(list);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Lỗi tải danh sách truyện:', err);
+      alert('Không thể tải danh sách truyện. Lỗi: ' + (err.message || err));
     }
   };
 
@@ -141,8 +142,9 @@ export function Admin() {
         });
       });
       setUsers(list);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Lỗi tải danh sách người dùng:', err);
+      alert('Không thể tải danh sách người dùng. Lỗi: ' + (err.message || err));
     }
   };
 
@@ -164,8 +166,9 @@ export function Admin() {
         });
       });
       setComments(list);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Lỗi tải bình luận:', err);
+      alert('Không thể tải bình luận. Lỗi: ' + (err.message || err));
     }
   };
 
@@ -185,8 +188,9 @@ export function Admin() {
         });
       });
       setMessages(list);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Lỗi tải tin nhắn:', err);
+      alert('Không thể tải tin nhắn. Lỗi: ' + (err.message || err));
     }
   };
 
@@ -307,8 +311,13 @@ export function Admin() {
       setGenres('');
       if (fileInputRef.current) fileInputRef.current.value = '';
       fetchStories();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      if (err?.code === 'resource-exhausted') {
+        alert('Lỗi: Firebase đã hết tài nguyên viết miễn phí hôm nay (Quota Limit Exceeded). Không thể thêm truyện.');
+      } else {
+        alert('Lỗi thêm truyện: ' + err.message);
+      }
     }
   };
 
@@ -427,8 +436,13 @@ export function Admin() {
       setCContent('');
       fetchChaptersForAdmin(managingStoryChapters);
       fetchStories();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      if (err?.code === 'resource-exhausted') {
+        alert('Lỗi: Đã hết tài nguyên viết Firebase miễn phí hôm nay.');
+      } else {
+        alert('Lỗi khi lưu chương: ' + err.message);
+      }
     }
   };
 
@@ -529,8 +543,13 @@ export function Admin() {
       setStUrl('');
       if (stickerFileInputRef.current) stickerFileInputRef.current.value = '';
       fetchStickers();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error creating sticker:', err);
+      if (err?.code === 'resource-exhausted') {
+        alert('Lỗi: Đã vượt quá hạn mức ghi dữ liệu của máy chủ Firebase hôm nay (Quota Exceeded).');
+      } else {
+        alert('Lỗi: ' + err.message);
+      }
     }
   };
 
@@ -548,8 +567,13 @@ export function Admin() {
       setEditingSticker(null);
       if (editStickerFileInputRef.current) editStickerFileInputRef.current.value = '';
       fetchStickers();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating sticker:', err);
+      if (err?.code === 'resource-exhausted') {
+        alert('Lỗi: Đã vượt quá hạn mức dữ liệu của máy chủ Firebase hôm nay.');
+      } else {
+        alert('Lỗi: ' + err.message);
+      }
     }
   };
 
