@@ -1,6 +1,6 @@
 {
-  "name": "Truyện Edit - Nền tảng Đọc truyện",
-  "description": "Nền tảng đọc truyện online với nhiệm vụ kiếm choco, điểm danh, cửa hàng và chat trực tuyến.",
+  "name": "Chocoatl - Cục Gì Đó Màu Nâu",
+  "description": "Vừa ăng choco vừa đọc triện.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
