@@ -51,24 +51,16 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if true;
-      allow write: if isSignedIn() && request.auth.uid == userId;
+      allow write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
       
-      match /reviews/{reviewId=**} {
+      match /{allSubcollections=**} {
         allow read: if true;
-        allow write: if isSignedIn() && request.auth.uid == userId;
+        allow write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
       }
     }
 
     function isValidStory(data) {
-      return data.keys().hasAll(['title', 'author', 'createdAt']) &&
-             data.title is string && data.title.size() <= 200 &&
-             data.author is string && data.author.size() <= 128 &&
-             data.createdAt is timestamp &&
-             (!('coverUrl' in data) || (data.coverUrl is string && data.coverUrl.size() <= 1000000)) &&
-             (!('description' in data) || (data.description is string && data.description.size() <= 50000)) &&
-             (!('genres' in data) || data.genres is list) &&
-             (!('chapterCount' in data) || data.chapterCount is number) &&
-             (!('viewCount' in data) || data.viewCount is number);
+      return data.keys().hasAll(['title', 'author', 'createdAt']);
     }
 
     match /stories/{storyId} {
@@ -91,7 +83,8 @@ service cloud.firestore {
 
     match /chatMessages/{messageId} {
       allow read: if true;
-      allow create: if isSignedIn() && request.auth.uid == incoming().uid && isValidChatMessage(incoming()) && incoming().createdAt == request.time;
+      allow create: if isSignedIn() && request.auth.uid == incoming().uid;
+      allow delete: if isAdmin();
     }
 
     function isValidComment(data) {
@@ -105,7 +98,8 @@ service cloud.firestore {
 
     match /comments/{commentId} {
       allow read: if true;
-      allow create: if isSignedIn() && request.auth.uid == incoming().uid && isValidComment(incoming()) && incoming().createdAt == request.time;
+      allow create: if isSignedIn() && request.auth.uid == incoming().uid;
+      allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == existing().uid);
     }
     
     function isValidUserTask(data) {
