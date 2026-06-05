@@ -91,8 +91,9 @@ export function Account() {
       alert('Đã cập nhật hồ sơ thành công!');
     } catch(err) {
       handleFirestoreError(err, OperationType.UPDATE, `users/${uid}`);
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const handlePostReview = async (e: React.FormEvent) => {
