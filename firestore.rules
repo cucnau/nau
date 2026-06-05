@@ -1,84 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    function isSignedIn() {
-      return request.auth != null;
-    }
+    function isSignedIn() { return request.auth != null; }
     
     function isAdmin() {
-      return isSignedIn() && (request.auth.token.email == 'cucnau01@gmail.com' || request.auth.token.email == 'cucnau01@gmail.com');
-    }
-
-    function isValidId(id) {
-      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
-    }
-
-    function incoming() { return request.resource.data; }
-    function existing() { return resource.data; }
-
-    function isValidUser(data) {
-      return (data.uid is string && data.uid.size() <= 128) &&
-             (!('choco' in data) || data.choco is number) &&
-             (!('goldenChoco' in data) || data.goldenChoco is number) &&
-             (!('createdAt' in data) || (data.createdAt is timestamp || data.createdAt is number)) &&
-             (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 128)) &&
-             (!('email' in data) || (data.email is string && data.email.size() <= 128)) &&
-             (!('avatarUrl' in data) || (data.avatarUrl is string && data.avatarUrl.size() <= 1000000)) &&
-             (!('checkInStreak' in data) || data.checkInStreak is number) &&
-             (!('lastCheckInDate' in data) || data.lastCheckInDate is string) &&
-             (!('unlockedAchievements' in data) || data.unlockedAchievements is list) &&
-             (!('claimedAchievements' in data) || data.claimedAchievements is list) &&
-             (!('totalEarnedChoco' in data) || data.totalEarnedChoco is number) &&
-             (!('totalEarnedGChoco' in data) || data.totalEarnedGChoco is number) &&
-             (!('totalSpentChoco' in data) || data.totalSpentChoco is number) &&
-             (!('totalCheckIns' in data) || data.totalCheckIns is number) &&
-             (!('perfectDailyDates' in data) || data.perfectDailyDates is list) &&
-             (!('sentMessagesCount' in data) || data.sentMessagesCount is number) &&
-             (!('genresRead' in data) || data.genresRead is list) &&
-             (!('activePoints' in data) || data.activePoints is number) &&
-             (!('lastActiveWeek' in data) || data.lastActiveWeek is string) &&
-             (!('prevActivePoints' in data) || data.prevActivePoints is number) &&
-             (!('prevActiveWeek' in data) || data.prevActiveWeek is string) &&
-             (!('equippedSticker' in data) || (data.equippedSticker is string || data.equippedSticker == null)) &&
-             (!('stickerPosition' in data) || (data.stickerPosition is string || data.stickerPosition == null)) &&
-             (!('ownedStickers' in data) || data.ownedStickers is list) &&
-             (!('savedStories' in data) || data.savedStories is list);
+      // Thay đổi email nếu bạn dùng email admin khác trên Vercel
+      return isSignedIn() && (request.auth.token.email == 'cucnau01@gmail.com');
     }
 
     match /users/{userId} {
       allow read: if true;
       allow write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
-      
       match /{allSubcollections=**} {
         allow read: if true;
         allow write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
       }
     }
 
-    function isValidStory(data) {
-      return data.keys().hasAll(['title', 'author', 'createdAt']);
-    }
-
     match /stories/{storyId} {
       allow read: if true;
       allow write: if isAdmin();
-      
       match /chapters/{chapterId} {
         allow read: if true;
         allow write: if isAdmin();
       }
-    }
-
-    function isValidChatMessage(data) {
-      return data.keys().hasAll(['uid', 'displayName', 'content', 'createdAt']) &&
-             data.uid is string && data.uid.size() <= 128 &&
-             data.displayName is string && data.displayName.size() <= 128 &&
-             data.content is string && data.content.size() > 0 && data.content.size() <= 1000 &&
-             data.createdAt is timestamp;
     }
 
     match /chatMessages/{messageId} {
@@ -87,32 +32,15 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    function isValidComment(data) {
-       return data.keys().hasAll(['targetId', 'uid', 'content', 'type', 'createdAt']) &&
-              data.targetId is string && data.targetId.size() <= 128 &&
-              data.uid is string && data.uid.size() <= 128 &&
-              data.content is string && data.content.size() > 0 && data.content.size() <= 2000 &&
-              data.type is string && data.type.size() <= 64 &&
-              data.createdAt is timestamp;
-    }
-
     match /comments/{commentId} {
       allow read: if true;
       allow create: if isSignedIn() && request.auth.uid == incoming().uid;
       allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == existing().uid);
     }
-    
-    function isValidUserTask(data) {
-      return data.keys().hasAll(['uid', 'date', 'updatedAt']) &&
-             data.uid is string && data.uid.size() <= 128 &&
-             data.date is string && data.date.size() <= 64 &&
-             data.updatedAt is timestamp;
-    }
 
     match /userTasks/{taskId} {
       allow read: if isSignedIn() && existing().uid == request.auth.uid;
-      allow create: if isSignedIn() && incoming().uid == request.auth.uid && isValidUserTask(incoming()) && incoming().updatedAt == request.time;
-      allow update: if isSignedIn() && existing().uid == request.auth.uid && incoming().uid == existing().uid && isValidUserTask(incoming()) && incoming().updatedAt == request.time;
+      allow write: if isSignedIn() && incoming().uid == request.auth.uid;
     }
 
     match /store_stickers/{stickerId} {
