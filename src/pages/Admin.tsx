@@ -42,7 +42,7 @@ interface AdminComment {
 }
 
 export function Admin() {
-  const { email } = useStore();
+  const { email, firebaseUser } = useStore();
 
   const [activeTab, setActiveTab] = useState<'stories' | 'users' | 'comments' | 'messages' | 'stickers'>('stories');
   
@@ -92,14 +92,15 @@ export function Admin() {
   const editStickerFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (email === 'cucnau01@gmail.com') {
+    const isReady = email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com';
+    if (isReady) {
       fetchStories();
       fetchUsers();
       fetchComments();
       fetchMessages();
       fetchStickers();
     }
-  }, [email]);
+  }, [email, firebaseUser]);
 
   const fetchStories = async () => {
     try {
@@ -613,8 +614,9 @@ export function Admin() {
     });
   };
 
-  if (email !== 'cucnau01@gmail.com') {
-    return <div className="p-8 text-center text-red-500 font-bold">Không có quyền truy cập.</div>;
+  const isAdmin = email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com';
+  if (!isAdmin) {
+    return <div className="p-8 text-center text-red-500 font-bold">Không có quyền truy cập. ({email || firebaseUser?.email || 'Chưa đăng nhập'})</div>;
   }
 
   return (
