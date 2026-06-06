@@ -350,6 +350,7 @@ export const useStore = create<UserState>()(
                if (checkIfQuotaError(err)) {
                   set({ isQuotaExceeded: true });
                }
+               throw err;
             }
          }
       },
