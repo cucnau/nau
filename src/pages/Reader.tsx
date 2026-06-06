@@ -87,7 +87,11 @@ export function Reader() {
     const qComments = query(collection(db, 'comments'), where('targetId', '==', currentChapter.id));
     const unsub = onSnapshot(qComments, (snap) => {
       const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      data.sort((a: any, b: any) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+      data.sort((a: any, b: any) => {
+        const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
+        const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis?.() || 0);
+        return timeB - timeA;
+      });
       setComments(data);
     });
     return () => unsub();
