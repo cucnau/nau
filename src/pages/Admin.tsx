@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store';
-import { collection, getDocs, doc, addDoc, updateDoc, deleteDoc, getDoc, query, where, orderBy, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, doc, addDoc, updateDoc, deleteDoc, getDoc, query, where, orderBy, writeBatch, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Trash2, Plus, Edit, ShieldAlert, CheckCircle, Smile, BookOpen, Users, Save, MessageSquare } from 'lucide-react';
 
@@ -102,12 +102,10 @@ export function Admin() {
     }
   }, [email, firebaseUser, activeTab]);
 
-  const fetchStories = async () => {
-    try {
-      const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
+  useEffect(() => {
+    const unsubStories = onSnapshot(query(collection(db, 'stories'), orderBy('createdAt', 'desc')), (snap) => {
       const list: Book[] = [];
-      querySnapshot.forEach((docSnap) => {
+      snap.forEach((docSnap) => {
         const data = docSnap.data();
         list.push({
           id: docSnap.id,
@@ -120,10 +118,17 @@ export function Admin() {
         });
       });
       setStories(list);
-    } catch (err: any) {
-      console.error('Lỗi tải danh sách truyện:', err);
-      alert('Không thể tải danh sách truyện. Lỗi: ' + (err.message || err));
-    }
+    }, (err) => {
+      console.error('Lỗi tải danh sách truyện realtime:', err);
+    });
+
+    return () => {
+      unsubStories();
+    };
+  }, []);
+
+  const fetchStories = async () => {
+    // Legacy function kept for references, but data is now fetched via onSnapshot above
   };
 
   const fetchUsers = async () => {
@@ -194,12 +199,10 @@ export function Admin() {
     }
   };
 
-  const fetchStickers = async () => {
-    try {
-      const q = query(collection(db, 'store_stickers'), orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
+  useEffect(() => {
+    const unsubStickers = onSnapshot(query(collection(db, 'store_stickers'), orderBy('createdAt', 'desc')), (snap) => {
       const list: any[] = [];
-      querySnapshot.forEach((docSnap) => {
+      snap.forEach((docSnap) => {
         const data = docSnap.data();
         list.push({
           id: docSnap.id,
@@ -207,9 +210,17 @@ export function Admin() {
         });
       });
       setStickers(list);
-    } catch (err) {
-      console.error('Error fetching stickers:', err);
-    }
+    }, (err) => {
+      console.error('Error fetching stickers realtime:', err);
+    });
+
+    return () => {
+      unsubStickers();
+    };
+  }, []);
+
+  const fetchStickers = async () => {
+    // Legacy function kept for references, but data is now fetched via onSnapshot above
   };
 
   const handleImageResize = (file: File): Promise<string> => {
@@ -260,6 +271,13 @@ export function Admin() {
       base64Data = await handleImageResize(file);
     }
 
+    if (base64Data.length > 500000) {
+      alert('Ảnh quá lớn! Vui lòng chọn ảnh dung lượng nhỏ hơn (dưới ~350KB).');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (editFileInputRef.current) editFileInputRef.current.value = '';
+      return;
+    }
+
     if (isEditing && editingStory) {
       setEditingStory({ ...editingStory, coverUrl: base64Data });
     } else {
@@ -284,6 +302,13 @@ export function Admin() {
       base64Data = await handleImageResize(file);
     }
 
+    if (base64Data.length > 500000) {
+      alert('Ảnh sticker quá lớn! Vui lòng chọn ảnh dung lượng nhỏ hơn (dưới ~350KB).');
+      if (stickerFileInputRef.current) stickerFileInputRef.current.value = '';
+      if (editStickerFileInputRef.current) editStickerFileInputRef.current.value = '';
+      return;
+    }
+
     if (isEditing && editingSticker) {
       setEditingSticker({ ...editingSticker, url: base64Data });
     } else {
@@ -302,7 +327,7 @@ export function Admin() {
         description,
         genres: genreArray,
         chapterCount: 0,
-        createdAt: Date.now(),
+        createdAt: serverTimestamp(),
       });
       setTitle('');
       setAuthor('');
@@ -310,7 +335,6 @@ export function Admin() {
       setDescription('');
       setGenres('');
       if (fileInputRef.current) fileInputRef.current.value = '';
-      fetchStories();
     } catch (err: any) {
       console.error(err);
       if (err?.code === 'resource-exhausted') {
@@ -534,7 +558,7 @@ export function Admin() {
         price: stPrice,
         type: stType,
         url: stUrl,
-        createdAt: Date.now()
+        createdAt: serverTimestamp()
       });
       setStName('');
       setStDesc('');
@@ -542,7 +566,6 @@ export function Admin() {
       setStType('choco');
       setStUrl('');
       if (stickerFileInputRef.current) stickerFileInputRef.current.value = '';
-      fetchStickers();
     } catch (err: any) {
       console.error('Error creating sticker:', err);
       if (err?.code === 'resource-exhausted') {
