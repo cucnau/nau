@@ -100,7 +100,7 @@ export function Admin() {
       fetchMessages();
       fetchStickers();
     }
-  }, [email, firebaseUser]);
+  }, [email, firebaseUser, activeTab]);
 
   const fetchStories = async () => {
     try {
@@ -302,7 +302,7 @@ export function Admin() {
         description,
         genres: genreArray,
         chapterCount: 0,
-        createdAt: serverTimestamp(),
+        createdAt: Date.now(),
       });
       setTitle('');
       setAuthor('');
@@ -534,7 +534,7 @@ export function Admin() {
         price: stPrice,
         type: stType,
         url: stUrl,
-        createdAt: serverTimestamp()
+        createdAt: Date.now()
       });
       setStName('');
       setStDesc('');
