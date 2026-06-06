@@ -56,6 +56,10 @@ export function Account() {
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
       if (file.type === 'image/gif') {
+         if (dataUrl.length > 500000) {
+             alert('Ảnh GIF quá lớn! Vui lòng chọn file dung lượng nhỏ hơn (dưới ~350KB) để hệ thống có thể lưu.');
+             return;
+         }
          setAvatar(dataUrl);
          return;
       }
