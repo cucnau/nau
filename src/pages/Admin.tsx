@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store';
 import { collection, getDocs, doc, addDoc, updateDoc, deleteDoc, getDoc, query, where, orderBy, writeBatch, serverTimestamp, onSnapshot } from 'firebase/firestore';
-import { db, storage } from '../lib/firebase';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { db } from '../lib/firebase';
 import { Trash2, Plus, Edit, ShieldAlert, CheckCircle, Smile, BookOpen, Users, Save, MessageSquare } from 'lucide-react';
 
 interface Book {
@@ -179,8 +178,25 @@ export function Admin() {
   };
 
   const fetchMessages = async () => {
-    // Legacy function - messages are now fetched via onSnapshot realtime listener above
-    console.log('fetchMessages called - using realtime listener instead');
+    try {
+      const q = query(collection(db, 'chatMessages'), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const list: any[] = [];
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({
+          id: docSnap.id,
+          uid: data.uid,
+          displayName: data.displayName || 'Vô danh',
+          content: data.content,
+          createdAt: data.createdAt,
+        });
+      });
+      setMessages(list);
+    } catch (err: any) {
+      console.error('Lỗi tải tin nhắn:', err);
+      alert('Không thể tải tin nhắn. Lỗi: ' + (err.message || err));
+    }
   };
 
   useEffect(() => {
@@ -200,30 +216,6 @@ export function Admin() {
 
     return () => {
       unsubStickers();
-    };
-  }, []);
-
-  useEffect(() => {
-    const unsubMessages = onSnapshot(query(collection(db, 'chatMessages'), orderBy('createdAt', 'desc')), (snap) => {
-      const list: any[] = [];
-      snap.forEach((docSnap) => {
-        const data = docSnap.data();
-        list.push({
-          id: docSnap.id,
-          uid: data.uid,
-          displayName: data.displayName || 'Vô danh',
-          content: data.content,
-          createdAt: data.createdAt,
-        });
-      });
-      setMessages(list);
-      console.log('Messages updated realtime:', list.length, 'messages');
-    }, (err) => {
-      console.error('Error fetching messages realtime:', err);
-    });
-
-    return () => {
-      unsubMessages();
     };
   }, []);
 
@@ -254,7 +246,7 @@ export function Admin() {
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           if (ctx) ctx.drawImage(img, 0, 0, width, height);
-          resolve(canvas.toDataURL('image/png'));
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
         };
         img.src = event.target?.result as string;
       };
@@ -326,39 +318,17 @@ export function Admin() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('handleCreate called with:', { title, author, description, genres, coverUrl: coverUrl ? 'image' : 'no image' });
-    
-    if (!title.trim() || !author.trim()) {
-      alert('Vui lòng điền đầy đủ tên truyện và tác giả!');
-      return;
-    }
-    
     try {
-      let finalCoverUrl = coverUrl;
-      
-      // Upload cover image to Storage if it's base64
-      if (coverUrl && coverUrl.startsWith('data:image/')) {
-        console.log('Uploading cover to Storage...');
-        const timestamp = Date.now();
-        const coverRef = ref(storage, `covers/${timestamp}-${title}.png`);
-        await uploadString(coverRef, coverUrl, 'data_url');
-        finalCoverUrl = await getDownloadURL(coverRef);
-        console.log('Cover uploaded to Storage:', finalCoverUrl);
-      }
-      
-      console.log('Adding story to Firestore...');
       const genreArray = genres.split(',').map((g) => g.trim()).filter(Boolean);
       await addDoc(collection(db, 'stories'), {
         title,
         author,
-        coverUrl: finalCoverUrl,
+        coverUrl,
         description,
         genres: genreArray,
         chapterCount: 0,
         createdAt: serverTimestamp(),
       });
-      console.log('Story added successfully!');
-      alert('Đã thêm truyện thành công!');
       setTitle('');
       setAuthor('');
       setCoverUrl('');
@@ -366,12 +336,11 @@ export function Admin() {
       setGenres('');
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (err: any) {
-      console.error('Error adding story:', err);
-      const errorMsg = err?.message || String(err);
+      console.error(err);
       if (err?.code === 'resource-exhausted') {
         alert('Lỗi: Firebase đã hết tài nguyên viết miễn phí hôm nay (Quota Limit Exceeded). Không thể thêm truyện.');
       } else {
-        alert('Lỗi thêm truyện: ' + errorMsg);
+        alert('Lỗi thêm truyện: ' + err.message);
       }
     }
   };
@@ -379,42 +348,23 @@ export function Admin() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingStory) return;
-    console.log('handleUpdate called with:', editingStory);
-    
     try {
-      let finalCoverUrl = editingStory.coverUrl;
-      
-      // Upload cover image to Storage if it's new base64
-      if (editingStory.coverUrl && editingStory.coverUrl.startsWith('data:image/')) {
-        console.log('Uploading story cover update to Storage...');
-        const timestamp = Date.now();
-        const coverRef = ref(storage, `covers/${timestamp}-${editingStory.title}.png`);
-        await uploadString(coverRef, editingStory.coverUrl, 'data_url');
-        finalCoverUrl = await getDownloadURL(coverRef);
-        console.log('Cover updated in Storage:', finalCoverUrl);
-      }
-      
       const genreArray = typeof editingStory.genres === 'string'
         ? (editingStory.genres as string).split(',').map((g: string) => g.trim()).filter(Boolean)
         : editingStory.genres;
 
-      console.log('Updating story in Firestore...');
       await updateDoc(doc(db, 'stories', editingStory.id), {
         title: editingStory.title,
         author: editingStory.author,
-        coverUrl: finalCoverUrl,
+        coverUrl: editingStory.coverUrl,
         description: editingStory.description || '',
         genres: genreArray,
       });
-      console.log('Story updated successfully!');
-      alert('Đã cập nhật truyện thành công!');
       setEditingStory(null);
       if (editFileInputRef.current) editFileInputRef.current.value = '';
       fetchStories();
     } catch (err) {
-      console.error('Error updating story:', err);
-      const errorMsg = err instanceof Error ? err.message : String(err);
-      alert('Lỗi cập nhật truyện: ' + errorMsg);
+      console.error(err);
     }
   };
 
@@ -594,44 +544,22 @@ export function Admin() {
     });
   };
 
+  // Sticker handlers
   const handleCreateSticker = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('handleCreateSticker called with:', { stName, stDesc, stPrice, stType, stUrl: stUrl ? 'image' : 'no image' });
-    
     if (!stUrl) {
       alert('Vui lòng chọn ảnh sticker!');
       return;
     }
-    
-    if (!stName.trim() || !stDesc.trim()) {
-      alert('Vui lòng điền đầy đủ tên và mô tả sticker!');
-      return;
-    }
-    
     try {
-      let finalStickerUrl = stUrl;
-      
-      // Upload sticker image to Firebase Storage
-      if (stUrl && stUrl.startsWith('data:image/')) {
-        console.log('Uploading sticker to Storage...');
-        const timestamp = Date.now();
-        const stickerRef = ref(storage, `stickers/${timestamp}-${stName}.png`);
-        await uploadString(stickerRef, stUrl, 'data_url');
-        finalStickerUrl = await getDownloadURL(stickerRef);
-        console.log('Sticker uploaded to Storage:', finalStickerUrl);
-      }
-      
-      console.log('Adding sticker to Firestore...');
       await addDoc(collection(db, 'store_stickers'), {
         name: stName,
         description: stDesc,
         price: stPrice,
         type: stType,
-        url: finalStickerUrl,
+        url: stUrl,
         createdAt: serverTimestamp()
       });
-      console.log('Sticker added successfully!');
-      alert('Đã tạo sticker thành công!');
       setStName('');
       setStDesc('');
       setStPrice(0);
@@ -640,11 +568,10 @@ export function Admin() {
       if (stickerFileInputRef.current) stickerFileInputRef.current.value = '';
     } catch (err: any) {
       console.error('Error creating sticker:', err);
-      const errorMsg = err?.message || String(err);
       if (err?.code === 'resource-exhausted') {
         alert('Lỗi: Đã vượt quá hạn mức ghi dữ liệu của máy chủ Firebase hôm nay (Quota Exceeded).');
       } else {
-        alert('Lỗi tạo sticker: ' + errorMsg);
+        alert('Lỗi: ' + err.message);
       }
     }
   };
@@ -652,41 +579,23 @@ export function Admin() {
   const handleUpdateSticker = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingSticker) return;
-    console.log('handleUpdateSticker called with:', editingSticker);
-    
     try {
-      let finalUrl = editingSticker.url;
-      
-      // If the URL is new base64 data, upload to Storage
-      if (editingSticker.url && editingSticker.url.startsWith('data:image/')) {
-        console.log('Uploading sticker update to Storage...');
-        const timestamp = Date.now();
-        const stickerRef = ref(storage, `stickers/${timestamp}-${editingSticker.name}.png`);
-        await uploadString(stickerRef, editingSticker.url, 'data_url');
-        finalUrl = await getDownloadURL(stickerRef);
-        console.log('Sticker updated in Storage:', finalUrl);
-      }
-      
-      console.log('Updating sticker in Firestore...');
       await updateDoc(doc(db, 'store_stickers', editingSticker.id), {
         name: editingSticker.name,
         description: editingSticker.description,
         price: Number(editingSticker.price),
         type: editingSticker.type,
-        url: finalUrl
+        url: editingSticker.url
       });
-      console.log('Sticker updated successfully!');
-      alert('Đã cập nhật sticker thành công!');
       setEditingSticker(null);
       if (editStickerFileInputRef.current) editStickerFileInputRef.current.value = '';
       fetchStickers();
     } catch (err: any) {
       console.error('Error updating sticker:', err);
-      const errorMsg = err?.message || String(err);
       if (err?.code === 'resource-exhausted') {
         alert('Lỗi: Đã vượt quá hạn mức dữ liệu của máy chủ Firebase hôm nay.');
       } else {
-        alert('Lỗi cập nhật sticker: ' + errorMsg);
+        alert('Lỗi: ' + err.message);
       }
     }
   };
