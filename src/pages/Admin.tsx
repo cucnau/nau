@@ -179,25 +179,8 @@ export function Admin() {
   };
 
   const fetchMessages = async () => {
-    try {
-      const q = query(collection(db, 'chatMessages'), orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
-      const list: any[] = [];
-      querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        list.push({
-          id: docSnap.id,
-          uid: data.uid,
-          displayName: data.displayName || 'Vô danh',
-          content: data.content,
-          createdAt: data.createdAt,
-        });
-      });
-      setMessages(list);
-    } catch (err: any) {
-      console.error('Lỗi tải tin nhắn:', err);
-      alert('Không thể tải tin nhắn. Lỗi: ' + (err.message || err));
-    }
+    // Legacy function - messages are now fetched via onSnapshot realtime listener above
+    console.log('fetchMessages called - using realtime listener instead');
   };
 
   useEffect(() => {
@@ -217,6 +200,30 @@ export function Admin() {
 
     return () => {
       unsubStickers();
+    };
+  }, []);
+
+  useEffect(() => {
+    const unsubMessages = onSnapshot(query(collection(db, 'chatMessages'), orderBy('createdAt', 'desc')), (snap) => {
+      const list: any[] = [];
+      snap.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({
+          id: docSnap.id,
+          uid: data.uid,
+          displayName: data.displayName || 'Vô danh',
+          content: data.content,
+          createdAt: data.createdAt,
+        });
+      });
+      setMessages(list);
+      console.log('Messages updated realtime:', list.length, 'messages');
+    }, (err) => {
+      console.error('Error fetching messages realtime:', err);
+    });
+
+    return () => {
+      unsubMessages();
     };
   }, []);
 
