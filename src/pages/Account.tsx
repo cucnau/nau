@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store';
 import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
 import { doc, updateDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from 'firebase/firestore';
+import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 
 export function Account() {
@@ -90,11 +91,22 @@ export function Account() {
     e.preventDefault();
     if (!uid) return;
     setSaving(true);
-    console.log('Saving profile...', { name, avatar });
+    console.log('Saving profile...', { name, avatar: avatar ? 'avatar image' : 'no avatar' });
     try {
+      let avatarUrl = avatar;
+      
+      // If avatar is a new base64 image, upload to Firebase Storage
+      if (avatar && avatar.startsWith('data:image/')) {
+        const storage = getStorage();
+        const avatarRef = ref(storage, `avatars/${uid}/profile.jpg`);
+        await uploadString(avatarRef, avatar, 'data_url');
+        avatarUrl = await getDownloadURL(avatarRef);
+        console.log('Avatar uploaded to Storage:', avatarUrl);
+      }
+      
       await updateUserDoc({
         displayName: name,
-        avatarUrl: avatar,
+        avatarUrl: avatarUrl,
       });
       console.log('Firestore and Store updated.');
       alert('Đã cập nhật hồ sơ thành công!');

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store';
 import { collection, getDocs, doc, addDoc, updateDoc, deleteDoc, getDoc, query, where, orderBy, writeBatch, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { Trash2, Plus, Edit, ShieldAlert, CheckCircle, Smile, BookOpen, Users, Save, MessageSquare } from 'lucide-react';
 
 interface Book {
@@ -319,16 +320,29 @@ export function Admin() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      let finalCoverUrl = coverUrl;
+      
+      // Upload cover image to Storage if it's base64
+      if (coverUrl && coverUrl.startsWith('data:image/')) {
+        const storage = getStorage();
+        const timestamp = Date.now();
+        const coverRef = ref(storage, `covers/${timestamp}-${title}.png`);
+        await uploadString(coverRef, coverUrl, 'data_url');
+        finalCoverUrl = await getDownloadURL(coverRef);
+        console.log('Cover uploaded to Storage:', finalCoverUrl);
+      }
+      
       const genreArray = genres.split(',').map((g) => g.trim()).filter(Boolean);
       await addDoc(collection(db, 'stories'), {
         title,
         author,
-        coverUrl,
+        coverUrl: finalCoverUrl,
         description,
         genres: genreArray,
         chapterCount: 0,
         createdAt: serverTimestamp(),
       });
+      alert('Đã thêm truyện thành công!');
       setTitle('');
       setAuthor('');
       setCoverUrl('');
@@ -349,6 +363,18 @@ export function Admin() {
     e.preventDefault();
     if (!editingStory) return;
     try {
+      let finalCoverUrl = editingStory.coverUrl;
+      
+      // Upload cover image to Storage if it's new base64
+      if (editingStory.coverUrl && editingStory.coverUrl.startsWith('data:image/')) {
+        const storage = getStorage();
+        const timestamp = Date.now();
+        const coverRef = ref(storage, `covers/${timestamp}-${editingStory.title}.png`);
+        await uploadString(coverRef, editingStory.coverUrl, 'data_url');
+        finalCoverUrl = await getDownloadURL(coverRef);
+        console.log('Cover updated in Storage:', finalCoverUrl);
+      }
+      
       const genreArray = typeof editingStory.genres === 'string'
         ? (editingStory.genres as string).split(',').map((g: string) => g.trim()).filter(Boolean)
         : editingStory.genres;
@@ -356,15 +382,17 @@ export function Admin() {
       await updateDoc(doc(db, 'stories', editingStory.id), {
         title: editingStory.title,
         author: editingStory.author,
-        coverUrl: editingStory.coverUrl,
+        coverUrl: finalCoverUrl,
         description: editingStory.description || '',
         genres: genreArray,
       });
+      alert('Đã cập nhật truyện thành công!');
       setEditingStory(null);
       if (editFileInputRef.current) editFileInputRef.current.value = '';
       fetchStories();
     } catch (err) {
       console.error(err);
+      alert('Lỗi cập nhật truyện: ' + ((err as any)?.message || String(err)));
     }
   };
 
@@ -552,14 +580,27 @@ export function Admin() {
       return;
     }
     try {
+      let finalStickerUrl = stUrl;
+      
+      // Upload sticker image to Firebase Storage
+      if (stUrl && stUrl.startsWith('data:image/')) {
+        const storage = getStorage();
+        const timestamp = Date.now();
+        const stickerRef = ref(storage, `stickers/${timestamp}-${stName}.png`);
+        await uploadString(stickerRef, stUrl, 'data_url');
+        finalStickerUrl = await getDownloadURL(stickerRef);
+        console.log('Sticker uploaded to Storage:', finalStickerUrl);
+      }
+      
       await addDoc(collection(db, 'store_stickers'), {
         name: stName,
         description: stDesc,
         price: stPrice,
         type: stType,
-        url: stUrl,
+        url: finalStickerUrl,
         createdAt: serverTimestamp()
       });
+      alert('Đã tạo sticker thành công!');
       setStName('');
       setStDesc('');
       setStPrice(0);
@@ -580,13 +621,26 @@ export function Admin() {
     e.preventDefault();
     if (!editingSticker) return;
     try {
+      let finalUrl = editingSticker.url;
+      
+      // If the URL is new base64 data, upload to Storage
+      if (editingSticker.url && editingSticker.url.startsWith('data:image/')) {
+        const storage = getStorage();
+        const timestamp = Date.now();
+        const stickerRef = ref(storage, `stickers/${timestamp}-${editingSticker.name}.png`);
+        await uploadString(stickerRef, editingSticker.url, 'data_url');
+        finalUrl = await getDownloadURL(stickerRef);
+        console.log('Sticker updated in Storage:', finalUrl);
+      }
+      
       await updateDoc(doc(db, 'store_stickers', editingSticker.id), {
         name: editingSticker.name,
         description: editingSticker.description,
         price: Number(editingSticker.price),
         type: editingSticker.type,
-        url: editingSticker.url
+        url: finalUrl
       });
+      alert('Đã cập nhật sticker thành công!');
       setEditingSticker(null);
       if (editStickerFileInputRef.current) editStickerFileInputRef.current.value = '';
       fetchStickers();
