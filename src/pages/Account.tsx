@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store';
-import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
+import { db, handleFirestoreError, OperationType, auth, storage } from '../lib/firebase';
 import { doc, updateDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from 'firebase/firestore';
-import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 
 export function Account() {
@@ -97,13 +97,14 @@ export function Account() {
       
       // If avatar is a new base64 image, upload to Firebase Storage
       if (avatar && avatar.startsWith('data:image/')) {
-        const storage = getStorage();
+        console.log('Uploading avatar to Storage...');
         const avatarRef = ref(storage, `avatars/${uid}/profile.jpg`);
         await uploadString(avatarRef, avatar, 'data_url');
         avatarUrl = await getDownloadURL(avatarRef);
         console.log('Avatar uploaded to Storage:', avatarUrl);
       }
       
+      console.log('Updating user doc with avatarUrl:', avatarUrl);
       await updateUserDoc({
         displayName: name,
         avatarUrl: avatarUrl,
@@ -112,7 +113,7 @@ export function Account() {
       alert('Đã cập nhật hồ sơ thành công!');
     } catch(err) {
       console.error('Error saving profile:', err);
-      handleFirestoreError(err, OperationType.UPDATE, `users/${uid}`);
+      alert('Lỗi cập nhật hồ sơ: ' + (err instanceof Error ? err.message : String(err)));
     } finally {
       setSaving(false);
     }

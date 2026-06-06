@@ -17,10 +17,13 @@ const config = {
   firestoreDatabaseId: (import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID as string) || firebaseConfig.firestoreDatabaseId
 };
 
+import { getStorage } from 'firebase/storage';
+
 export const app = initializeApp(config);
 console.log('Firebase App initialized with Project ID:', config.projectId);
 export const db = getFirestore(app, config.firestoreDatabaseId);
 export const auth = getAuth(app);
+export const storage = getStorage(app);
 
 export enum OperationType {
   CREATE = 'create',
