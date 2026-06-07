@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store';
-import { db, handleFirestoreError, OperationType, auth, storage } from '../lib/firebase';
+import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
 import { doc, updateDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from 'firebase/firestore';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 
 export function Account() {
@@ -28,6 +27,7 @@ export function Account() {
   const [avatar, setAvatar] = useState(avatarUrl || '');
   const [pass, setPass] = useState('');
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   
   const [review, setReview] = useState('');
   const [reviews, setReviews] = useState<any[]>([]);
@@ -58,7 +58,8 @@ export function Account() {
       const dataUrl = event.target?.result as string;
       if (file.type === 'image/gif') {
          if (dataUrl.length > 500000) {
-             alert('Ảnh GIF quá lớn! Vui lòng chọn file dung lượng nhỏ hơn (dưới ~350KB) để hệ thống có thể lưu.');
+             console.error('Ảnh GIF quá lớn!');
+             // alert('Ảnh GIF quá lớn! Vui lòng chọn file dung lượng nhỏ hơn (dưới ~350KB) để hệ thống có thể lưu.');
              return;
          }
          setAvatar(dataUrl);
@@ -91,29 +92,20 @@ export function Account() {
     e.preventDefault();
     if (!uid) return;
     setSaving(true);
-    console.log('Saving profile...', { name, avatar: avatar ? 'avatar image' : 'no avatar' });
+    console.log('Saving profile...', { name, avatar });
     try {
-      let avatarUrl = avatar;
-      
-      // If avatar is a new base64 image, upload to Firebase Storage
-      if (avatar && avatar.startsWith('data:image/')) {
-        console.log('Uploading avatar to Storage...');
-        const avatarRef = ref(storage, `avatars/${uid}/profile.jpg`);
-        await uploadString(avatarRef, avatar, 'data_url');
-        avatarUrl = await getDownloadURL(avatarRef);
-        console.log('Avatar uploaded to Storage:', avatarUrl);
-      }
-      
-      console.log('Updating user doc with avatarUrl:', avatarUrl);
       await updateUserDoc({
         displayName: name,
-        avatarUrl: avatarUrl,
+        avatarUrl: avatar,
       });
       console.log('Firestore and Store updated.');
-      alert('Đã cập nhật hồ sơ thành công!');
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+      // Remove alert to fix the hanging problem in iframe
+      // alert('Đã cập nhật hồ sơ thành công!');
     } catch(err) {
       console.error('Error saving profile:', err);
-      alert('Lỗi cập nhật hồ sơ: ' + (err instanceof Error ? err.message : String(err)));
+      handleFirestoreError(err, OperationType.UPDATE, `users/${uid}`);
     } finally {
       setSaving(false);
     }
@@ -249,8 +241,8 @@ export function Account() {
               <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Đổi mật khẩu</label>
               <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="Nhập để đổi mật khẩu (Chưa hỗ trợ)" disabled className="w-full px-4 py-2 rounded-lg border border-[#D7CCC8] bg-gray-100 italic text-sm" />
             </div>
-            <button type="submit" disabled={saving} className="w-full py-2.5 bg-[#3E2723] text-[#FDF6EC] rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-[#5D4037] transition-colors mt-2">
-              {saving ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+            <button type="submit" disabled={saving || saveSuccess} className="w-full py-2.5 bg-[#3E2723] text-[#FDF6EC] rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-[#5D4037] transition-colors mt-2 disabled:bg-[#8D6E63] disabled:cursor-not-allowed">
+              {saving ? 'Đang lưu...' : saveSuccess ? 'Đã Lưu Thành Công ✓' : 'Lưu Thay Đổi'}
             </button>
           </form>
         </div>
