@@ -119,8 +119,14 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
   }
 ];
 
-export const getWeeklyId = (): string => {
+export const getGMT7Date = (): Date => {
   const d = new Date();
+  const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+  return new Date(utc + (3600000 * 7));
+};
+
+export const getWeeklyId = (): string => {
+  const d = getGMT7Date();
   d.setHours(0, 0, 0, 0);
   d.setDate(d.getDate() + 4 - (d.getDay() || 7));
   const yearStart = new Date(d.getFullYear(), 0, 1);
@@ -129,7 +135,7 @@ export const getWeeklyId = (): string => {
 };
 
 export const getPreviousWeeklyId = (): string => {
-  const d = new Date();
+  const d = getGMT7Date();
   d.setDate(d.getDate() - 7);
   d.setHours(0, 0, 0, 0);
   d.setDate(d.getDate() + 4 - (d.getDay() || 7));
