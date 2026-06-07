@@ -67,6 +67,8 @@ export function Admin() {
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null);
   const [cTitle, setCTitle] = useState('');
   const [cContent, setCContent] = useState('');
+  const [cRequiresPass, setCRequiresPass] = useState(false);
+  const [cRequiresEarlyAccess, setCRequiresEarlyAccess] = useState(false);
 
   // Users Management
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -417,6 +419,8 @@ export function Admin() {
     setEditingChapter(null);
     setCTitle('');
     setCContent('');
+    setCRequiresPass(false);
+    setCRequiresEarlyAccess(false);
   };
 
   const openEditChapter = (storyId: string, chapter: Chapter) => {
@@ -425,6 +429,8 @@ export function Admin() {
     setEditingChapter(chapter);
     setCTitle(chapter.title);
     setCContent(chapter.content);
+    setCRequiresPass(chapter.requiresPass || false);
+    setCRequiresEarlyAccess(chapter.requiresEarlyAccess || false);
   };
 
   const submitChapter = async (e: React.FormEvent) => {
@@ -439,6 +445,9 @@ export function Admin() {
           content: cContent,
           order: nextOrder,
           storyId: managingStoryChapters,
+          requiresPass: cRequiresPass,
+          requiresEarlyAccess: cRequiresEarlyAccess,
+          createdAt: Date.now()
         });
         // Update chapter count on story
         const storyRef = doc(db, 'stories', managingStoryChapters);
@@ -451,6 +460,8 @@ export function Admin() {
         await updateDoc(doc(db, 'stories', managingStoryChapters, 'chapters', editingChapter.id), {
           title: cTitle,
           content: cContent,
+          requiresPass: cRequiresPass,
+          requiresEarlyAccess: cRequiresEarlyAccess,
         });
       }
 
@@ -939,6 +950,16 @@ export function Admin() {
              <h2 className="text-xl font-bold text-[#3E2723]">{chapterModalMode === 'add' ? 'Thêm Chương Mới' : 'Sửa Chương'}</h2>
              <input type="text" value={cTitle} onChange={e => setCTitle(e.target.value)} placeholder="Tên chương" required className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
              <textarea value={cContent} onChange={e => setCContent(e.target.value)} placeholder="Nội dung chương" required className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] min-h-[200px]" />
+             <div className="flex gap-4 items-center">
+                 <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={cRequiresPass} onChange={e => setCRequiresPass(e.target.checked)} className="rounded text-[#8D6E63] focus:ring-[#8D6E63]" />
+                    <span className="text-sm font-medium">Yêu cầu vé pass truyện</span>
+                 </label>
+                 <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={cRequiresEarlyAccess} onChange={e => setCRequiresEarlyAccess(e.target.checked)} className="rounded text-[#8D6E63] focus:ring-[#8D6E63]" />
+                    <span className="text-sm font-medium">Yêu cầu vé đọc sớm</span>
+                 </label>
+             </div>
              <div className="flex gap-2 justify-end mt-2">
                <button type="button" onClick={() => setChapterModalMode(null)} className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300">Hủy</button>
                <button type="submit" className="px-4 py-2 bg-[#8D6E63] text-white font-bold rounded-lg hover:bg-[#5D4037]">{chapterModalMode === 'add' ? 'Đăng Chương' : 'Lưu Chương'}</button>
