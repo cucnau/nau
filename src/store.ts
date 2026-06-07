@@ -27,6 +27,8 @@ interface UserState {
   equippedSticker: string | null;
   stickerPosition: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   ownedStickers: string[];
+  ownedPassTickets: number;
+  ownedPriorityTickets: number;
   choco: number;
   goldenChoco: number;
   level: number;
@@ -71,9 +73,11 @@ interface UserState {
   isStoreOpen: boolean;
   isMissionsOpen: boolean;
   isAchievementsOpen: boolean;
+  isInventoryOpen: boolean;
   setStoreOpen: (open: boolean) => void;
   setMissionsOpen: (open: boolean) => void;
   setAchievementsOpen: (open: boolean) => void;
+  setInventoryOpen: (open: boolean) => void;
 
   login: (name: string) => void;
   logout: () => void;
@@ -84,6 +88,7 @@ interface UserState {
   gainExp: (amount: number) => void;
   addChoco: (amount: number) => void;
   addGoldenChoco: (amount: number) => void;
+  buyTicket: (type: 'pass' | 'priority', amount?: number) => void;
   spendChoco: (amount: number) => boolean;
   spendGoldenChoco: (amount: number) => boolean;
   
@@ -137,6 +142,8 @@ export const useStore = create<UserState>()(
       equippedSticker: null,
       stickerPosition: 'top-right',
       ownedStickers: [],
+      ownedPassTickets: 0,
+      ownedPriorityTickets: 0,
       choco: 0,
       goldenChoco: 0,
       level: 1,
@@ -182,9 +189,11 @@ export const useStore = create<UserState>()(
       isStoreOpen: false,
       isMissionsOpen: false,
       isAchievementsOpen: false,
+      isInventoryOpen: false,
       setStoreOpen: (open) => set({ isStoreOpen: open }),
       setMissionsOpen: (open) => set({ isMissionsOpen: open }),
       setAchievementsOpen: (open) => set({ isAchievementsOpen: open }),
+      setInventoryOpen: (open) => set({ isInventoryOpen: open }),
       
       login: (name: string) => set({ isLoggedIn: true, displayName: name }),
       logout: () => set({ 
@@ -197,6 +206,8 @@ export const useStore = create<UserState>()(
         equippedSticker: null,
         stickerPosition: 'top-right',
         ownedStickers: [],
+        ownedPassTickets: 0,
+        ownedPriorityTickets: 0,
         choco: 0,
         goldenChoco: 0,
         level: 1,
@@ -254,6 +265,8 @@ export const useStore = create<UserState>()(
                readHistoryList: userHistory,
                savedStories: userSaved,
                ownedStickers: userOwnedStickers,
+               ownedPassTickets: user.ownedPassTickets || 0,
+               ownedPriorityTickets: user.ownedPriorityTickets || 0,
                unlockedAchievements: userUnlocked,
                claimedAchievements: userClaimed
             });
@@ -267,6 +280,8 @@ export const useStore = create<UserState>()(
                readHistoryList: [],
                savedStories: [],
                ownedStickers: [],
+               ownedPassTickets: 0,
+               ownedPriorityTickets: 0,
                unlockedAchievements: [],
                claimedAchievements: []
             });
@@ -286,6 +301,8 @@ export const useStore = create<UserState>()(
          equippedSticker: data.equippedSticker !== undefined ? data.equippedSticker : state.equippedSticker,
          stickerPosition: data.stickerPosition !== undefined ? data.stickerPosition : state.stickerPosition,
          ownedStickers: data.ownedStickers !== undefined ? data.ownedStickers : state.ownedStickers,
+         ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
+         ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
          savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
 
          unlockedAchievements: data.unlockedAchievements !== undefined ? data.unlockedAchievements : state.unlockedAchievements,
@@ -670,6 +687,19 @@ export const useStore = create<UserState>()(
           }, 50);
       },
       
+      buyTicket: (type: 'pass' | 'priority', amount: number = 1) => {
+         const state = get();
+         if (!state.isLoggedIn) return;
+         if (type === 'pass') {
+             const newVal = (state.ownedPassTickets || 0) + amount;
+             set({ ownedPassTickets: newVal });
+             get().updateUserDoc({ ownedPassTickets: newVal });
+         } else if (type === 'priority') {
+             const newVal = (state.ownedPriorityTickets || 0) + amount;
+             set({ ownedPriorityTickets: newVal });
+             get().updateUserDoc({ ownedPriorityTickets: newVal });
+         }
+      },
       addOwnedSticker: (stickerUrl: string) => {
          const state = get();
          if (!state.isLoggedIn || !state.uid) return;
