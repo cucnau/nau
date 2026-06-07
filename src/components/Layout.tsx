@@ -64,22 +64,13 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   const handleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      const isInIframe = window.self !== window.top;
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isInIframe) {
+      try {
         await signInWithPopup(auth, provider);
-      } else if (isMobile) {
-        await signInWithRedirect(auth, provider);
-      } else {
-        try {
-          await signInWithPopup(auth, provider);
-        } catch (popupError: any) {
-          if (popupError?.code === 'auth/popup-blocked' || popupError?.code === 'auth/cancelled-popup-request') {
-            await signInWithRedirect(auth, provider);
-          } else {
-            throw popupError;
-          }
+      } catch (popupError: any) {
+        if (popupError?.code === 'auth/popup-blocked' || popupError?.code === 'auth/cancelled-popup-request') {
+          await signInWithRedirect(auth, provider);
+        } else {
+          throw popupError;
         }
       }
     } catch (error: any) {
@@ -413,22 +404,13 @@ export function AppLayout() {
   const handleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      const isInIframe = window.self !== window.top;
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isInIframe) {
+      try {
         await signInWithPopup(auth, provider);
-      } else if (isMobile) {
-        await signInWithRedirect(auth, provider);
-      } else {
-        try {
-          await signInWithPopup(auth, provider);
-        } catch (popupError: any) {
-          if (popupError?.code === 'auth/popup-blocked' || popupError?.code === 'auth/cancelled-popup-request') {
-            await signInWithRedirect(auth, provider);
-          } else {
-            throw popupError;
-          }
+      } catch (popupError: any) {
+        if (popupError?.code === 'auth/popup-blocked' || popupError?.code === 'auth/cancelled-popup-request') {
+          await signInWithRedirect(auth, provider);
+        } else {
+          throw popupError;
         }
       }
     } catch (error: any) {
