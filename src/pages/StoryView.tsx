@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
-import { BookOpen, Users, Lock, ChevronRight, Bookmark, Gift, Heart, Sparkles, Send, MessageSquare } from 'lucide-react';
+import { BookOpen, Users, Lock, Unlock, Zap, ChevronRight, Bookmark, Gift, Heart, Sparkles, Send, MessageSquare } from 'lucide-react';
 import { cn } from '../components/Layout';
 import React, { useEffect, useState } from 'react';
 import { db, checkIfQuotaError } from '../lib/firebase';
@@ -18,7 +18,9 @@ export function StoryView() {
     choco, 
     uid, 
     displayName, 
-    avatarUrl 
+    avatarUrl,
+    unlockedPassChapters,
+    unlockedEarlyAccessChapters
   } = useStore();
 
   const [story, setStory] = useState<any>(null);
@@ -291,6 +293,14 @@ export function StoryView() {
             <div className="flex flex-col">
                {chapters.map(chap => {
                   const isRead = chap.order <= progressOrder;
+                  const isPassRequired = chap.requiresPass;
+                  const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
+                  
+                  const isEarlyAccess = chap.requiresEarlyAccess;
+                  const chapTime = chap.createdAt?.toMillis ? chap.createdAt.toMillis() : (typeof chap.createdAt === 'number' ? chap.createdAt : 0);
+                  const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+                  const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(chap.id);
+
                   return (
                      <button 
                         key={chap.id}
@@ -306,7 +316,10 @@ export function StoryView() {
                            </span>
                         </div>
                         <div className="flex items-center gap-3">
-                            {chap.isPasswordProtected && <Lock className="w-4 h-4 text-[#8D6E63]" title="Cần vé Pass" />}
+                            {isPassRequired && (hasPassUnlocked ? <Unlock className="w-4 h-4 text-[#8D6E63]" title="Đã mở khóa Pass" /> : <Lock className="w-4 h-4 text-[#8D6E63]" title="Cần vé Pass" />)}
+                            {(isEarlyAccess && isStillEarlyAccess) && (hasEarlyAccessUnlocked ? <Zap className="w-4 h-4 text-gray-400" title="Đã đọc sớm" /> : <Zap className="w-4 h-4 text-[#D4AF37] fill-yellow-100" title="Cần vé Ưu Tiên" />)}
+                            {(isEarlyAccess && !isStillEarlyAccess) && <Zap className="w-4 h-4 text-gray-400" title="Đã chuyển sang đọc miễn phí" />}
+                            
                             {isRead && <span className="text-[10px] uppercase font-bold tracking-wider bg-[#F5E6D3] text-[#8D6E63] px-2 py-0.5 rounded-full">Đã đọc</span>}
                             <ChevronRight className={cn("w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity", !isRead && "text-[#8D6E63]")} />
                         </div>
