@@ -6,7 +6,17 @@ export interface Achievement {
   chocoReward: number;
   goldenReward: number;
   progressTarget: number;
+  category: string;
 }
+
+export const ACHIEVEMENT_CATEGORIES = [
+  { id: 'all', name: 'Tất Cả' },
+  { id: 'reading', name: 'Đọc Truyện' },
+  { id: 'community', name: 'Cộng Đồng' },
+  { id: 'collection', name: 'Cửa Hàng & Sưu Tầm' },
+  { id: 'challenge', name: 'Điểm Danh & Nhiệm Vụ' },
+  { id: 'legend', name: 'Huyền Thoại & Tài Sản' }
+];
 
 export const ACHIEVEMENTS_LIST: Achievement[] = [
   {
@@ -16,7 +26,8 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     rewardText: '+1 Choco',
     chocoReward: 1,
     goldenReward: 0,
-    progressTarget: 1
+    progressTarget: 1,
+    category: 'reading'
   },
   {
     id: 'midnight_read',
@@ -25,7 +36,28 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     rewardText: '+3 Choco',
     chocoReward: 3,
     goldenReward: 0,
-    progressTarget: 1
+    progressTarget: 1,
+    category: 'reading'
+  },
+  {
+    id: 'early_morning_read',
+    name: 'Ăn Choco Sáng Sớm',
+    description: 'Đọc truyện vào khung giờ sáng sớm giúp kích thích não bộ (từ 05:00h - 08:00h sáng).',
+    rewardText: '+3 Choco',
+    chocoReward: 3,
+    goldenReward: 0,
+    progressTarget: 1,
+    category: 'reading'
+  },
+  {
+    id: 'read_100_chapters',
+    name: 'Vừa Ăn Choco Vừa Đọc',
+    description: 'Tích lũy đọc tổng cộng 100 chương truyện.',
+    rewardText: '+10 Choco & +1 GChoco',
+    chocoReward: 10,
+    goldenReward: 1,
+    progressTarget: 100,
+    category: 'reading'
   },
   {
     id: 'multi_genre',
@@ -34,7 +66,8 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     rewardText: '+5 Choco',
     chocoReward: 5,
     goldenReward: 0,
-    progressTarget: 5
+    progressTarget: 5,
+    category: 'reading'
   },
   {
     id: 'collector',
@@ -43,25 +76,18 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     rewardText: '+10 Choco',
     chocoReward: 10,
     goldenReward: 0,
-    progressTarget: 10
+    progressTarget: 10,
+    category: 'collection'
   },
   {
-    id: 'choco_king',
-    name: 'Vua Choco',
-    description: 'Tích lũy đạt mốc 10,000 Choco đầu tiên.',
-    rewardText: '+100 Choco',
-    chocoReward: 100,
+    id: 'sticker_collector',
+    name: 'Choco Thích Thú',
+    description: 'Mua và sở hữu thành công 30 Sticker trang trí hồ sơ trong Cửa Hàng.',
+    rewardText: '+30 Choco',
+    chocoReward: 30,
     goldenReward: 0,
-    progressTarget: 10000
-  },
-  {
-    id: 'gchoco_king',
-    name: 'Bố Choco',
-    description: 'Tích lũy đạt mốc 10,000 Gchoco đầu tiên.',
-    rewardText: '+100 Gchoco',
-    chocoReward: 0,
-    goldenReward: 100,
-    progressTarget: 10000
+    progressTarget: 30,
+    category: 'collection'
   },
   {
     id: 'big_spender',
@@ -70,34 +96,38 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     rewardText: '+100 Choco',
     chocoReward: 100,
     goldenReward: 0,
-    progressTarget: 10000
+    progressTarget: 10000,
+    category: 'collection'
   },
   {
-    id: 'streak_7',
-    name: 'Ăn Choco Xuyên Tuần',
-    description: 'Hoàn thành điểm danh liên tiếp 7 ngày.',
-    rewardText: '+7 Choco',
-    chocoReward: 7,
+    id: 'blogger_choco_new',
+    name: 'Blogger Choco Mới',
+    description: 'Đăng tải bài viết đầu tiên lên Bản tin Choco trên Hồ sơ cá nhân.',
+    rewardText: '+5 Choco',
+    chocoReward: 5,
     goldenReward: 0,
-    progressTarget: 7
+    progressTarget: 1,
+    category: 'community'
   },
   {
-    id: 'monthly_checkin',
-    name: 'Ăn Choco Cả Tháng',
-    description: 'Hoàn thành điểm danh mốc 30 ngày (không cần liên tiếp).',
-    rewardText: '+30 Choco',
-    chocoReward: 30,
-    goldenReward: 0,
-    progressTarget: 30
-  },
-  {
-    id: 'weekly_missions_perfect',
-    name: 'Chăm Ăn Choco Cả Tuần',
-    description: 'Hoàn thành đầy đủ tất cả nhiệm vụ ngày trong suốt 1 tuần (gồm 7 ngày hoàn thành trọn vẹn).',
-    rewardText: '+10 Choco',
+    id: 'commenter_choco',
+    name: 'Bình Luận Viên Choco',
+    description: 'Viết tổng cộng 100 bình luận hoặc phản hồi các chương truyện bất kỳ.',
+    rewardText: '+10 Choco & +1 GChoco',
     chocoReward: 10,
+    goldenReward: 1,
+    progressTarget: 100,
+    category: 'community'
+  },
+  {
+    id: 'chatty_lounge',
+    name: 'Khách Quen Lounge',
+    description: 'Hoàn thành gửi 100 tin nhắn trò chuyện tại góc Choco Lounge.',
+    rewardText: '+5 Choco',
+    chocoReward: 5,
     goldenReward: 0,
-    progressTarget: 7
+    progressTarget: 100,
+    category: 'community'
   },
   {
     id: 'chatty',
@@ -106,7 +136,68 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     rewardText: '+50 Choco',
     chocoReward: 50,
     goldenReward: 0,
-    progressTarget: 5000
+    progressTarget: 5000,
+    category: 'community'
+  },
+  {
+    id: 'streak_7',
+    name: 'Ăn Choco Xuyên Tuần',
+    description: 'Hoàn thành điểm danh liên tiếp 7 ngày.',
+    rewardText: '+7 Choco',
+    chocoReward: 7,
+    goldenReward: 0,
+    progressTarget: 7,
+    category: 'challenge'
+  },
+  {
+    id: 'monthly_checkin',
+    name: 'Ăn Choco Cả Tháng',
+    description: 'Hoàn thành điểm danh mốc 30 ngày (không cần liên tiếp).',
+    rewardText: '+30 Choco',
+    chocoReward: 30,
+    goldenReward: 0,
+    progressTarget: 30,
+    category: 'challenge'
+  },
+  {
+    id: 'weekly_missions_perfect',
+    name: 'Chăm Ăn Choco Cả Tuần',
+    description: 'Hoàn thành đầy đủ tất cả nhiệm vụ ngày trong suốt 1 tuần (gồm 7 ngày hoàn thành trọn vẹn).',
+    rewardText: '+10 Choco',
+    chocoReward: 10,
+    goldenReward: 0,
+    progressTarget: 7,
+    category: 'challenge'
+  },
+  {
+    id: 'generous_donor',
+    name: 'Choco Hào Phóng',
+    description: 'Tặng Choco cho truyện bạn yêu thích lần đầu tiên.',
+    rewardText: '+5 Choco',
+    chocoReward: 5,
+    goldenReward: 0,
+    progressTarget: 1,
+    category: 'legend'
+  },
+  {
+    id: 'choco_king',
+    name: 'Vua Choco',
+    description: 'Tích lũy đạt mốc 10,000 Choco đầu tiên.',
+    rewardText: '+100 Choco',
+    chocoReward: 100,
+    goldenReward: 0,
+    progressTarget: 10000,
+    category: 'legend'
+  },
+  {
+    id: 'gchoco_king',
+    name: 'Bố Choco',
+    description: 'Tích lũy đạt mốc 10,000 Gchoco đầu tiên.',
+    rewardText: '+100 Gchoco',
+    chocoReward: 0,
+    goldenReward: 100,
+    progressTarget: 10000,
+    category: 'legend'
   },
   {
     id: 'choco_cute',
@@ -115,7 +206,8 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     rewardText: '+100 Choco',
     chocoReward: 100,
     goldenReward: 0,
-    progressTarget: 1
+    progressTarget: 1,
+    category: 'legend'
   }
 ];
 
