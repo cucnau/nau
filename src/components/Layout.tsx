@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   Menu, Search, User, Key, LogOut, X, Trophy, BookOpen, Zap, Flame, ShieldCheck, 
@@ -11,7 +11,7 @@ import { twMerge } from 'tailwind-merge';
 import { signInWithPopup, signInWithRedirect, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
 import { getDocs, collection, query, where, orderBy, onSnapshot, updateDoc, doc, writeBatch } from 'firebase/firestore';
-import { ACHIEVEMENTS_LIST, getWeeklyId, getPreviousWeeklyId } from '../types/achievements';
+import { ACHIEVEMENTS_LIST, getWeeklyId, getPreviousWeeklyId, ACHIEVEMENT_CATEGORIES } from '../types/achievements';
 import { Store } from '../pages/Store';
 import { Missions } from '../pages/Missions';
 import { Inventory } from '../pages/Inventory';
@@ -264,8 +264,17 @@ function AchievementsModal() {
     isLoggedIn, uid, unlockedAchievements, claimedAchievements,
     totalEarnedChoco, totalEarnedGChoco, totalSpentChoco, totalCheckIns,
     perfectDailyDates, sentMessagesCount, genresRead, checkInStreak,
-    claimAchievement, savedStories
+    claimAchievement, savedStories, totalChaptersRead, totalCommentsCount, ownedStickers
   } = useStore();
+
+  const [activeCategory, setActiveCategory] = useState('all');
+  const listContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (listContainerRef.current) {
+      listContainerRef.current.scrollTop = 0;
+    }
+  }, [activeCategory]);
 
   const getProgress = (id: string) => {
     switch(id) {
@@ -273,24 +282,38 @@ function AchievementsModal() {
         return unlockedAchievements.includes('first_chapter') ? 1 : 0;
       case 'midnight_read':
         return unlockedAchievements.includes('midnight_read') ? 1 : 0;
+      case 'early_morning_read':
+        return unlockedAchievements.includes('early_morning_read') ? 1 : 0;
+      case 'read_100_chapters':
+        return totalChaptersRead || 0;
       case 'multi_genre':
         return (genresRead || []).length;
       case 'collector':
         return (savedStories || []).length;
-      case 'choco_king':
-        return totalEarnedChoco || 0;
-      case 'gchoco_king':
-        return totalEarnedGChoco || 0;
+      case 'sticker_collector':
+        return (ownedStickers || []).length;
       case 'big_spender':
         return totalSpentChoco || 0;
+      case 'blogger_choco_new':
+        return unlockedAchievements.includes('blogger_choco_new') ? 1 : 0;
+      case 'commenter_choco':
+        return totalCommentsCount || 0;
+      case 'chatty_lounge':
+        return sentMessagesCount || 0;
+      case 'chatty':
+        return sentMessagesCount || 0;
       case 'streak_7':
         return checkInStreak || 0;
       case 'monthly_checkin':
         return totalCheckIns || 0;
       case 'weekly_missions_perfect':
         return (perfectDailyDates || []).length;
-      case 'chatty':
-        return sentMessagesCount || 0;
+      case 'generous_donor':
+        return unlockedAchievements.includes('generous_donor') ? 1 : 0;
+      case 'choco_king':
+        return totalEarnedChoco || 0;
+      case 'gchoco_king':
+        return totalEarnedGChoco || 0;
       case 'choco_cute':
         return unlockedAchievements.includes('choco_cute') ? 1 : 0;
       default:
@@ -298,105 +321,140 @@ function AchievementsModal() {
     }
   };
 
+  const filteredAchievements = ACHIEVEMENTS_LIST.filter(
+    (ach) => activeCategory === 'all' || ach.category === activeCategory
+  );
+
   return (
     <div className="text-[#3E2723] flex-1 flex flex-col h-full">
       {/* Title Header */}
-      <div className="mb-4 text-center border-b border-[#D7CCC8]/60 pb-3 w-full">
+      <div className="mb-4 text-center border-b border-[#D7CCC8]/60 pb-3 w-full shrink-0">
          <Trophy className="w-10 h-10 text-yellow-500 mx-auto mb-1 drop-shadow" />
          <h2 className="text-xl font-bold uppercase tracking-tight font-sans">Khu Thành Tựu</h2>
-         <p className="text-xs text-[#6D4C41] mt-1">Đạt các cột mốc danh giá để nhận quà tặng và tích lũy phần thưởng ({unlockedAchievements.length}/12)</p>
+         <p className="text-xs text-[#6D4C41] mt-1">
+           Đạt các cột mốc danh giá để nhận quà tặng ({unlockedAchievements.length}/{ACHIEVEMENTS_LIST.length})
+         </p>
+      </div>
+
+      {/* Category Carousel / Tabs */}
+      <div className="flex gap-1.5 overflow-x-auto pb-3 mb-3 border-b border-[#D7CCC8]/30 max-w-full scrollbar-none shrink-0 scroll-smooth">
+        {ACHIEVEMENT_CATEGORIES.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveCategory(cat.id)}
+            className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap border shrink-0",
+              activeCategory === cat.id
+                ? "bg-[#5D4037] text-white border-[#5D4037] shadow-sm scale-105"
+                : "bg-white text-[#5D4037] border-[#D7CCC8]/80 hover:bg-[#EFEBE9]/40"
+            )}
+          >
+            {cat.name}
+          </button>
+        ))}
       </div>
 
       {/* Achievements List */}
-      <div className="flex-1 overflow-y-auto pr-1 space-y-3 max-h-[60vh]">
-        {ACHIEVEMENTS_LIST.map((ach) => {
-          const isUnlocked = unlockedAchievements.includes(ach.id);
-          const isClaimed = claimedAchievements.includes(ach.id);
-          const progress = getProgress(ach.id);
-          const percent = Math.min(100, Math.floor((progress / ach.progressTarget) * 100));
+      <div ref={listContainerRef} className="flex-1 overflow-y-auto pr-1 space-y-3 max-h-[50vh]">
+        {filteredAchievements.length === 0 ? (
+          <div className="text-center py-10 text-stone-400 text-xs">
+            Chưa có thành tựu nào thuộc mục này.
+          </div>
+        ) : (
+          filteredAchievements.map((ach) => {
+            const isUnlocked = unlockedAchievements.includes(ach.id);
+            const isClaimed = claimedAchievements.includes(ach.id);
+            const progress = getProgress(ach.id);
+            const percent = Math.min(100, Math.floor((progress / ach.progressTarget) * 100));
 
-          return (
-            <div 
-              key={ach.id} 
-              className={cn(
-                "p-4 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-3",
-                isClaimed 
-                  ? "bg-[#EFEBE9]/60 border-[#D7CCC8]/60 opacity-75"
-                  : isUnlocked 
-                    ? "bg-white border-yellow-400 shadow-md ring-1 ring-yellow-200" 
-                    : "bg-white border-[#D7CCC8]/80 hover:shadow-sm"
-              )}
-            >
-              {/* Background Sparkle for Unlocked */}
-              {isUnlocked && !isClaimed && (
-                <div className="absolute top-0 right-0 p-1 bg-yellow-400/20 text-yellow-600 rounded-bl-xl">
-                  <Sparkles className="w-4 h-4 animate-pulse" />
-                </div>
-              )}
-
-              <div className="flex-1 space-y-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={cn(
-                    "p-1 rounded-lg text-white",
-                    isClaimed ? "bg-stone-400" : isUnlocked ? "bg-yellow-500" : "bg-[#A1887F]"
-                  )}>
-                    {isClaimed ? <CheckCircle className="w-3.5 h-3.5" /> : isUnlocked ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-                  </span>
-                  <h4 className="font-extrabold text-sm text-[#4E342E]">{ach.name}</h4>
-                  
-                  {/* Rewards badge */}
-                  <span className={cn(
-                    "px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider",
-                    ach.goldenReward > 0 ? "bg-yellow-101 text-yellow-700" : "bg-[#EFEBE9] text-[#5D4037]"
-                  )}>
-                    {ach.rewardText}
-                  </span>
-                </div>
-                <p className="text-xs text-[#5D4037]">{ach.description}</p>
-
-                {/* Progress bar */}
-                <div className="pt-2">
-                  <div className="flex justify-between text-[10px] text-stone-500 mb-1">
-                    <span>Tiến trình</span>
-                    <span className="font-bold font-mono">{progress} / {ach.progressTarget} ({percent}%)</span>
-                  </div>
-                  <div className="w-full bg-[#EFEBE9] h-2 rounded-full overflow-hidden border border-[#D7CCC8]/30">
-                    <div 
-                      className={cn(
-                        "h-full rounded-full transition-all duration-500",
-                        isUnlocked ? "bg-gradient-to-r from-yellow-400 to-amber-500" : "bg-gradient-to-r from-[#A1887F] to-[#8D6E63]"
-                      )}
-                      style={{ width: `${percent}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Area Action Button */}
-              <div className="flex items-center shrink-0 min-w-[90px] justify-end">
-                {isClaimed ? (
-                  <span className="text-xs font-bold text-stone-400 flex items-center gap-1">
-                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                    Đã nhận
-                  </span>
-                ) : isUnlocked ? (
-                  <button
-                    onClick={() => claimAchievement(ach.id)}
-                    className="w-full md:w-auto bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 text-white font-extrabold text-xs py-2 px-4 rounded-xl shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1.5"
-                  >
-                    <Gift className="w-3.5 h-3.5" />
-                    Nhận Quà
-                  </button>
-                ) : (
-                  <span className="text-xs font-bold text-stone-400 flex items-center gap-1">
-                    <Lock className="w-3.5 h-3.5" />
-                    Chưa mở
-                  </span>
+            return (
+              <div 
+                key={ach.id} 
+                onClick={() => {
+                  if (activeCategory !== ach.category) {
+                    setActiveCategory(ach.category);
+                  }
+                }}
+                className={cn(
+                  "p-4 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer",
+                  isClaimed 
+                    ? "bg-[#EFEBE9]/60 border-[#D7CCC8]/60 opacity-75"
+                    : isUnlocked 
+                      ? "bg-white border-yellow-400 shadow-md ring-1 ring-yellow-200" 
+                      : "bg-white border-[#D7CCC8]/80 hover:shadow-sm"
                 )}
+              >
+                {/* Background Sparkle for Unlocked */}
+                {isUnlocked && !isClaimed && (
+                  <div className="absolute top-0 right-0 p-1 bg-yellow-400/20 text-yellow-600 rounded-bl-xl">
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                  </div>
+                )}
+
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={cn(
+                      "p-1 rounded-lg text-white",
+                      isClaimed ? "bg-stone-400" : isUnlocked ? "bg-yellow-500" : "bg-[#A1887F]"
+                    )}>
+                      {isClaimed ? <CheckCircle className="w-3.5 h-3.5" /> : isUnlocked ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+                    </span>
+                    <h4 className="font-extrabold text-sm text-[#4E342E]">{ach.name}</h4>
+                    
+                    {/* Rewards badge */}
+                    <span className={cn(
+                      "px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider",
+                      ach.goldenReward > 0 ? "bg-yellow-100 text-yellow-700 border border-yellow-200" : "bg-[#EFEBE9] text-[#5D4037]"
+                    )}>
+                      {ach.rewardText}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#5D4037]">{ach.description}</p>
+
+                  {/* Progress bar */}
+                  <div className="pt-2">
+                    <div className="flex justify-between text-[10px] text-stone-500 mb-1">
+                      <span>Tiến trình</span>
+                      <span className="font-bold font-mono">{progress} / {ach.progressTarget} ({percent}%)</span>
+                    </div>
+                    <div className="w-full bg-[#EFEBE9] h-2 rounded-full overflow-hidden border border-[#D7CCC8]/30">
+                      <div 
+                        className={cn(
+                          "h-full rounded-full transition-all duration-500",
+                          isUnlocked ? "bg-gradient-to-r from-yellow-400 to-amber-500" : "bg-gradient-to-r from-[#A1887F] to-[#8D6E63]"
+                        )}
+                        style={{ width: `${percent}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Area Action Button */}
+                <div className="flex items-center shrink-0 min-w-[90px] justify-end" onClick={(e) => e.stopPropagation()}>
+                  {isClaimed ? (
+                    <span className="text-xs font-bold text-stone-400 flex items-center gap-1">
+                      <CheckCircle className="w-4 h-4 text-emerald-500" />
+                      Đã nhận
+                    </span>
+                  ) : isUnlocked ? (
+                    <button
+                      onClick={() => claimAchievement(ach.id)}
+                      className="w-full md:w-auto bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 text-white font-extrabold text-xs py-2 px-4 rounded-xl shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <Gift className="w-3.5 h-3.5" />
+                      Nhận Quà
+                    </button>
+                  ) : (
+                    <span className="text-xs font-bold text-stone-400 flex items-center gap-1">
+                      <Lock className="w-3.5 h-3.5" />
+                      Chưa mở
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );
