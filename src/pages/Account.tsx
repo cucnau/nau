@@ -151,7 +151,9 @@ export function Account() {
         avatarUrl: avatarUrl || null,
         activeTitle: activeTitle || null,
         content: review,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        equippedSticker: useStore.getState().equippedSticker || null,
+        stickerPosition: useStore.getState().stickerPosition || 'top-right'
       });
 
       unlockAchievement('blogger_choco_new');
