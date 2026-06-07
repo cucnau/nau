@@ -127,7 +127,9 @@ export function Reader() {
              type,
              activeTitle: useStore.getState().activeTitle || null,
              paragraphIdx: paragraphIdx ?? null,
-             createdAt: serverTimestamp()
+             createdAt: serverTimestamp(),
+             equippedSticker: useStore.getState().equippedSticker || null,
+             stickerPosition: useStore.getState().stickerPosition || 'top-right'
          });
          addCommentProgress();
      } catch (err) {
@@ -175,6 +177,8 @@ export function Reader() {
            activeTitle: useStore.getState().activeTitle || null,
            giftAmount: 0,
            paragraphIdx: parentComment.paragraphIdx !== undefined ? parentComment.paragraphIdx : null,
+            equippedSticker: useStore.getState().equippedSticker || null,
+            stickerPosition: useStore.getState().stickerPosition || 'top-right',
            createdAt: serverTimestamp()
         });
 
@@ -388,7 +392,23 @@ export function Reader() {
                                            pComments.map(c => (
                                                <div key={c.id} className="flex flex-col gap-1 w-full border-b border-gray-100/15 pb-3 last:border-0 last:pb-0">
                                                    <div className="flex gap-3">
-                                                       <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                                                       <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="hidden" />
+                                                        <div className="w-8 h-8 shrink-0 relative bg-gray-200 rounded-full">
+                                                            <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-full h-full rounded-full object-cover" />
+                                                            {c.equippedSticker && (
+                                                                <img 
+                                                                    src={c.equippedSticker} 
+                                                                    alt="Sticker" 
+                                                                    className={cn(
+                                                                        "absolute w-3.5 h-3.5 object-contain pointer-events-none z-10 animate-pulse",
+                                                                        c.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
+                                                                        c.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
+                                                                        c.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
+                                                                        c.stickerPosition === 'bottom-right' && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                                                                    )} 
+                                                                />
+                                                            )}
+                                                        </div>
                                                        <div className="flex-1 min-w-0">
                                                            <div className="text-xs font-bold mb-0.5 flex items-center gap-1">
                                                                {c.displayName}
@@ -546,9 +566,31 @@ export function Reader() {
                        <p className="text-center italic opacity-50">Chưa có bình luận nào cho chương này.</p>
                    ) : (
                        chapterComments.map(c => (
-                           <div key={c.id} className={cn("p-5 rounded-2xl border", isDark ? "bg-gray-800/80 border-gray-700" : "bg-white border-[#D7CCC8] shadow-sm")}>
+                           <div key={c.id} className={cn("p-5 rounded-2xl border", isDark ? "bg-gray-800/80 border-gray-700" : "bg-white border-[#D7CCC8] shadow-sm relative overflow-visible pr-8")}>
                                <div className="flex items-center gap-3 mb-3">
-                                   <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#D7CCC8]" />
+                                   {c.equippedSticker && (
+                                       <img 
+                                           src={c.equippedSticker} 
+                                           alt="Decor sticker" 
+                                           className="absolute right-3 bottom-3 w-8 h-8 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:4s] z-10" 
+                                       />
+                                   )}
+                                   <div className="w-10 h-10 shrink-0 relative">
+                                       <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-full h-full rounded-full object-cover border border-[#D7CCC8]" />
+                                       {c.equippedSticker && (
+                                           <img 
+                                               src={c.equippedSticker} 
+                                               alt="Sticker" 
+                                               className={cn(
+                                                   "absolute w-4.5 h-4.5 object-contain pointer-events-none z-10 animate-pulse",
+                                                   c.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
+                                                   c.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
+                                                   c.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
+                                                   c.stickerPosition === 'bottom-right' && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                                               )} 
+                                           />
+                                       )}
+                                   </div>
                                    <div>
                                        <div className="font-bold text-sm tracking-wide flex items-center gap-1.5">
                                            {c.displayName}
