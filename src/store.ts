@@ -39,6 +39,8 @@ interface UserState {
   storyProgress: Record<string, number>; // storyId -> maxChapterRead
   readHistoryList: string[]; // storyIds
   savedStories: string[]; // saved storyIds
+  unlockedPassChapters: string[]; // chapterIds
+  unlockedEarlyAccessChapters: string[]; // chapterIds
   firebaseUser: FirebaseUser | null;
   
   isQuotaExceeded: boolean;
@@ -89,6 +91,8 @@ interface UserState {
   addChoco: (amount: number) => void;
   addGoldenChoco: (amount: number) => void;
   buyTicket: (type: 'pass' | 'priority', amount?: number) => void;
+  consumePassTicket: (chapterId: string) => boolean;
+  consumePriorityTicket: (chapterId: string) => boolean;
   spendChoco: (amount: number) => boolean;
   spendGoldenChoco: (amount: number) => boolean;
   
@@ -154,6 +158,8 @@ export const useStore = create<UserState>()(
       storyProgress: {},
       readHistoryList: [],
       savedStories: [],
+      unlockedPassChapters: [],
+      unlockedEarlyAccessChapters: [],
       firebaseUser: null,
       
       isQuotaExceeded: false,
@@ -218,6 +224,8 @@ export const useStore = create<UserState>()(
         storyProgress: {},
         readHistoryList: [],
         savedStories: [],
+        unlockedPassChapters: [],
+        unlockedEarlyAccessChapters: [],
         unlockedAchievements: [],
         claimedAchievements: [],
         totalEarnedChoco: 0,
@@ -264,6 +272,8 @@ export const useStore = create<UserState>()(
                storyProgress: userProgress,
                readHistoryList: userHistory,
                savedStories: userSaved,
+               unlockedPassChapters: user.unlockedPassChapters || [],
+               unlockedEarlyAccessChapters: user.unlockedEarlyAccessChapters || [],
                ownedStickers: userOwnedStickers,
                ownedPassTickets: user.ownedPassTickets || 0,
                ownedPriorityTickets: user.ownedPriorityTickets || 0,
@@ -279,6 +289,8 @@ export const useStore = create<UserState>()(
                storyProgress: {},
                readHistoryList: [],
                savedStories: [],
+               unlockedPassChapters: [],
+               unlockedEarlyAccessChapters: [],
                ownedStickers: [],
                ownedPassTickets: 0,
                ownedPriorityTickets: 0,
@@ -304,6 +316,8 @@ export const useStore = create<UserState>()(
          ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
          ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
          savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
+         unlockedPassChapters: data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters,
+         unlockedEarlyAccessChapters: data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters,
 
          unlockedAchievements: data.unlockedAchievements !== undefined ? data.unlockedAchievements : state.unlockedAchievements,
          claimedAchievements: data.claimedAchievements !== undefined ? data.claimedAchievements : state.claimedAchievements,
@@ -700,6 +714,31 @@ export const useStore = create<UserState>()(
              get().updateUserDoc({ ownedPriorityTickets: newVal });
          }
       },
+      
+      consumePassTicket: (chapterId: string) => {
+          const state = get();
+          if (!state.isLoggedIn || (state.ownedPassTickets || 0) < 1) return false;
+          if ((state.unlockedPassChapters || []).includes(chapterId)) return true; // Already unlocked
+
+          const newVal = (state.ownedPassTickets || 0) - 1;
+          const newUnlocked = [...(state.unlockedPassChapters || []), chapterId];
+          set({ ownedPassTickets: newVal, unlockedPassChapters: newUnlocked });
+          get().updateUserDoc({ ownedPassTickets: newVal, unlockedPassChapters: newUnlocked });
+          return true;
+      },
+
+      consumePriorityTicket: (chapterId: string) => {
+          const state = get();
+          if (!state.isLoggedIn || (state.ownedPriorityTickets || 0) < 1) return false;
+          if ((state.unlockedEarlyAccessChapters || []).includes(chapterId)) return true; // Already unlocked
+
+          const newVal = (state.ownedPriorityTickets || 0) - 1;
+          const newUnlocked = [...(state.unlockedEarlyAccessChapters || []), chapterId];
+          set({ ownedPriorityTickets: newVal, unlockedEarlyAccessChapters: newUnlocked });
+          get().updateUserDoc({ ownedPriorityTickets: newVal, unlockedEarlyAccessChapters: newUnlocked });
+          return true;
+      },
+      
       addOwnedSticker: (stickerUrl: string) => {
          const state = get();
          if (!state.isLoggedIn || !state.uid) return;
