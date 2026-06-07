@@ -37,6 +37,11 @@ export function StoryView() {
   // Comment input state
   const [commentText, setCommentText] = useState<string>('');
   const [submittingComment, setSubmittingComment] = useState(false);
+  
+  // Reply comment states
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState<string>('');
+  const [submittingReply, setSubmittingReply] = useState<boolean>(false);
 
   useEffect(() => {
     if (!id) return;
@@ -136,6 +141,56 @@ export function StoryView() {
     } else {
        alert("Có lỗi xảy ra khi thực hiện tặng Choco.");
     }
+  };
+
+  const handleSendReply = async (parentComment: any) => {
+     if (!isLoggedIn) {
+        alert("Bạn cần đăng nhập để trả lời bình luận!");
+        return;
+     }
+     if (!replyText.trim()) return;
+     setSubmittingReply(true);
+     try {
+        await addDoc(collection(db, 'comments'), {
+           targetId: story.id,
+           uid,
+           displayName: displayName || 'Nhà lữ hành ẩn danh',
+           avatarUrl: avatarUrl || '',
+           content: replyText.trim(),
+           type: 'comment_reply',
+           parentId: parentComment.id,
+           activeTitle: useStore.getState().activeTitle || null,
+           giftAmount: 0,
+           paragraphIdx: parentComment.paragraphIdx || null,
+           createdAt: serverTimestamp()
+        });
+
+        if (parentComment.uid && parentComment.uid !== uid) {
+           await addDoc(collection(db, 'notifications'), {
+              userId: parentComment.uid,
+              storyId: story.id,
+              chapterId: null,
+              storyTitle: story.title || 'Truyện',
+              chapterTitle: null,
+              replierName: displayName || 'Nhà lữ hành ẩn danh',
+              isRead: false,
+              createdAt: Date.now(),
+              type: 'comment_reply'
+           });
+        }
+
+        setReplyText('');
+        setReplyingToId(null);
+     } catch (err) {
+        console.error(err);
+        if (checkIfQuotaError(err)) {
+           alert("Hệ thống đạt giới hạn lưu trữ đám mây hôm nay.");
+        } else {
+           alert("Gặp sự cố khi trả lời bình luận.");
+        }
+     } finally {
+        setSubmittingReply(false);
+     }
   };
 
   const handleSendComment = async (e: React.FormEvent) => {
@@ -351,12 +406,12 @@ export function StoryView() {
 
                {/* Comments List */}
                <div className="space-y-4">
-                  {comments.length === 0 ? (
+                  {comments.filter(c => !c.parentId).length === 0 ? (
                      <div className="py-10 text-center text-gray-400 text-sm italic">
                         Chưa có cuộc thảo luận hoặc quà tặng nào cho tác phẩm này. Hãy là người đầu tiên tiếp sức!
                      </div>
                   ) : (
-                     comments.map((comment) => {
+                     comments.filter(c => !c.parentId).map((comment) => {
                         const isGift = comment.type === 'choco_gift';
                         return (
                            <div 
@@ -408,6 +463,103 @@ export function StoryView() {
                                  )}>
                                     {comment.content}
                                  </p>
+
+                                 {/* Reply panel button */}
+                                 {isLoggedIn && (
+                                    <div className="flex items-center gap-4 mt-2">
+                                       <button 
+                                          onClick={() => {
+                                             if (replyingToId === comment.id) {
+                                                setReplyingToId(null);
+                                             } else {
+                                                setReplyingToId(comment.id);
+                                                setReplyText('');
+                                             }
+                                          }}
+                                          className="text-xs text-[#8D6E63] hover:text-[#5D4037] font-extrabold flex items-center gap-1 cursor-pointer transition-colors"
+                                       >
+                                          <MessageSquare className="w-3.5 h-3.5" />
+                                          Trả lời
+                                       </button>
+                                    </div>
+                                 )}
+
+                                 {/* Dynamic inline reply input */}
+                                 {replyingToId === comment.id && (
+                                    <div className="mt-3 flex gap-2 animate-fade-in pl-1">
+                                       <input 
+                                          type="text"
+                                          placeholder={`Trả lời bình luận của ${comment.displayName}...`}
+                                          value={replyText}
+                                          disabled={submittingReply}
+                                          onChange={(e) => setReplyText(e.target.value)}
+                                          className="flex-1 bg-[#FDF6EC] border border-[#D7CCC8]/80 text-[#3E2723] focus:border-[#8D6E63] focus:outline-none focus:ring-1 focus:ring-[#8D6E63] rounded-xl px-3.5 py-1.5 placeholder-gray-400 text-xs sm:text-sm"
+                                          onKeyDown={(e) => {
+                                             if (e.key === 'Enter' && replyText.trim() && !submittingReply) {
+                                                handleSendReply(comment);
+                                             }
+                                          }}
+                                       />
+                                       <button 
+                                          onClick={() => handleSendReply(comment)}
+                                          disabled={submittingReply || !replyText.trim()}
+                                          className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-gray-300 disabled:text-gray-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
+                                       >
+                                          {submittingReply ? 'Gửi...' : 'Gửi'}
+                                       </button>
+                                       <button 
+                                          onClick={() => setReplyingToId(null)}
+                                          className="text-gray-400 hover:text-gray-500 border border-gray-200 px-2 rounded-xl text-xs"
+                                       >
+                                          Hủy
+                                       </button>
+                                    </div>
+                                 )}
+
+                                 {/* Nested Thread Replies list */}
+                                 {(() => {
+                                    const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
+                                       const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0));
+                                       const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0));
+                                       return timeA - timeB;
+                                    });
+                                    if (replies.length === 0) return null;
+                                    return (
+                                       <div className="mt-4 pl-3.5 border-l-2 border-[#D7CCC8]/40 space-y-3 ml-1">
+                                          {replies.map((reply: any) => (
+                                             <div key={reply.id} className="flex gap-2.5 items-start bg-gray-50/40 p-2.5 rounded-xl border border-gray-100">
+                                                {reply.avatarUrl ? (
+                                                   <img src={reply.avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 border border-gray-200" referrerPolicy="no-referrer" />
+                                                ) : (
+                                                   <div className="w-7 h-7 rounded-full bg-[#8D6E63] text-[#FDF6EC] flex items-center justify-center shrink-0 font-bold text-[10px] uppercase shadow-inner">
+                                                      {reply.displayName?.substring(0, 2)}
+                                                   </div>
+                                                )}
+                                                <div className="flex-1 min-w-0">
+                                                   <div className="flex items-center justify-between gap-2 mb-0.5">
+                                                      <span className="font-bold text-[#3E2723] text-xs">
+                                                         {reply.displayName}
+                                                         {reply.activeTitle && (
+                                                            <span className="px-1 py-0.5 bg-yellow-101 text-yellow-800 text-[8px] font-black rounded uppercase ml-1 shadow-sm border border-yellow-250 inline-block align-middle">
+                                                               🏆 {reply.activeTitle}
+                                                            </span>
+                                                         )}
+                                                      </span>
+                                                      <span className="text-[9px] text-gray-400 font-mono">
+                                                         {reply.createdAt?.toDate 
+                                                            ? new Date(reply.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
+                                                            : 'Vừa xong'}
+                                                      </span>
+                                                   </div>
+                                                   <p className="text-xs text-gray-700 break-words leading-relaxed">
+                                                      {reply.content}
+                                                   </p>
+                                                </div>
+                                             </div>
+                                          ))}
+                                       </div>
+                                    );
+                                 })()}
                               </div>
                            </div>
                         );
