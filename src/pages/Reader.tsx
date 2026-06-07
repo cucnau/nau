@@ -21,7 +21,8 @@ export function Reader() {
   const [commentText, setCommentText] = useState('');
   const [activeParagraphIndex, setActiveParagraphIndex] = useState<number | null>(null);
   const [paragraphCommentText, setParagraphCommentText] = useState('');
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isPassUnlockedLocal, setIsPassUnlockedLocal] = useState(false);
+  const [isEarlyAccessUnlockedLocal, setIsEarlyAccessUnlockedLocal] = useState(false);
   
   const [story, setStory] = useState<any>(null);
   const [chapters, setChapters] = useState<any[]>([]);
@@ -46,7 +47,8 @@ export function Reader() {
   }, [lastScrollY]);
 
   useEffect(() => {
-    setIsUnlocked(false);
+    setIsPassUnlockedLocal(false);
+    setIsEarlyAccessUnlockedLocal(false);
     window.scrollTo(0, 0);
   }, [chapterId]);
 
@@ -191,7 +193,7 @@ export function Reader() {
   const handleUnlockPass = () => {
      if (!isLoggedIn) { alert("Vui lòng đăng nhập!"); return; }
      if (consumePassTicket(currentChapter.id)) {
-         setIsUnlocked(true); // force re-render/local optimistic
+         setIsPassUnlockedLocal(true);
          alert("Đã mở khoá chương bằng Vé Pass Truyện!");
      } else {
          alert("Bạn không đủ Vé Pass Truyện. Hãy mua thêm trong Cửa Hàng.");
@@ -202,7 +204,7 @@ export function Reader() {
   const handleUnlockEarlyAccess = () => {
      if (!isLoggedIn) { alert("Vui lòng đăng nhập!"); return; }
      if (consumePriorityTicket(currentChapter.id)) {
-         setIsUnlocked(true); // force re-render/local optimistic
+         setIsEarlyAccessUnlockedLocal(true);
          alert("Đã mở khoá chương bằng Vé Ưu Tiên!");
      } else {
          alert("Bạn không đủ Vé Ưu Tiên. Hãy mua thêm trong Cửa Hàng.");
@@ -215,13 +217,13 @@ export function Reader() {
 
   const isPassRequired = currentChapter.requiresPass;
   const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(currentChapter.id);
-  const needsPass = isPassRequired && !hasPassUnlocked && !isUnlocked;
+  const needsPass = isPassRequired && !hasPassUnlocked && !isPassUnlockedLocal;
 
   const isEarlyAccess = currentChapter.requiresEarlyAccess;
   const chapTime = currentChapter.createdAt?.toMillis ? currentChapter.createdAt.toMillis() : (typeof currentChapter.createdAt === 'number' ? currentChapter.createdAt : 0);
   const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
   const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(currentChapter.id);
-  const needsEarlyAccess = isStillEarlyAccess && !hasEarlyAccessUnlocked && !isUnlocked;
+  const needsEarlyAccess = isStillEarlyAccess && !hasEarlyAccessUnlocked && !isEarlyAccessUnlockedLocal;
 
   const isLocked = needsPass || needsEarlyAccess;
 
