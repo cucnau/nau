@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlobalChat } from '../components/GlobalChat';
+import { NewsFeed } from '../components/NewsFeed';
 import { useStore } from '../store';
 import { CalendarCheck, ClipboardList, ShoppingBag, Trophy, Star, BookOpen, Flame, User, PackageOpen, Library } from 'lucide-react';
 import { db } from '../lib/firebase';
@@ -236,6 +237,9 @@ export function Home() {
               </div>
            </div>
  
+           {/* News Feed */}
+           <NewsFeed />
+
            {/* Global Chat */}
            <div className="flex-1 flex flex-col min-h-[400px]">
               <GlobalChat />
