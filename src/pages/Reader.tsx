@@ -24,6 +24,11 @@ export function Reader() {
   const [isPassUnlockedLocal, setIsPassUnlockedLocal] = useState(false);
   const [isEarlyAccessUnlockedLocal, setIsEarlyAccessUnlockedLocal] = useState(false);
   
+  // Trả lời bình luận chương
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState<string>('');
+  const [submittingReply, setSubmittingReply] = useState<boolean>(false);
+  
   const [story, setStory] = useState<any>(null);
   const [chapters, setChapters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -151,8 +156,58 @@ export function Reader() {
      setActiveParagraphIndex(null);
   }
 
+  const handleSendReply = async (parentComment: any) => {
+     if (!isLoggedIn) {
+        alert("Bạn cần đăng nhập để trả lời bình luận!");
+        return;
+     }
+     if (!replyText.trim()) return;
+     setSubmittingReply(true);
+     try {
+        await addDoc(collection(db, 'comments'), {
+           targetId: currentChapter.id,
+           uid,
+           displayName: displayName || 'Nhà lữ hành ẩn danh',
+           avatarUrl: avatarUrl || '',
+           content: replyText.trim(),
+           type: 'comment_reply',
+           parentId: parentComment.id,
+           activeTitle: useStore.getState().activeTitle || null,
+           giftAmount: 0,
+           paragraphIdx: parentComment.paragraphIdx !== undefined ? parentComment.paragraphIdx : null,
+           createdAt: serverTimestamp()
+        });
+
+        if (parentComment.uid && parentComment.uid !== uid) {
+           await addDoc(collection(db, 'notifications'), {
+              userId: parentComment.uid,
+              storyId: storyId,
+              chapterId: currentChapter.id,
+              storyTitle: story?.title || 'Truyện',
+              chapterTitle: currentChapter?.title || 'Chương',
+              replierName: displayName || 'Nhà lữ hành ẩn danh',
+              isRead: false,
+              createdAt: Date.now(),
+              type: 'comment_reply'
+           });
+        }
+
+        setReplyText('');
+        setReplyingToId(null);
+     } catch (err) {
+        console.error(err);
+        if (checkIfQuotaError(err)) {
+           alert("Hệ thống đạt giới hạn lưu trữ đám mây hôm nay.");
+        } else {
+           alert("Gặp sự cố khi trả lời bình luận.");
+        }
+     } finally {
+        setSubmittingReply(false);
+     }
+  };
+
   const paragraphs = currentChapter?.content?.split?.('\n')?.filter?.((p: string) => p.trim() !== '') || [];
-  const chapterComments = comments.filter(c => c.type === 'chapter');
+  const chapterComments = comments.filter(c => c.type === 'chapter' && !c.parentId);
 
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => {
@@ -301,7 +356,7 @@ export function Reader() {
                   style={{ fontSize: `${fontSize}px` }}
               >
                  {paragraphs.map((p: string, idx: number) => {
-                    const pComments = comments.filter(c => c.type === 'paragraph' && c.paragraphIdx === idx);
+                    const pComments = comments.filter(c => c.type === 'paragraph' && c.paragraphIdx === idx && !c.parentId);
                     return (
                         <div key={idx} className="relative group/para">
                            <p className="relative w-full cursor-pointer md:cursor-auto" onClick={() => {
@@ -331,20 +386,99 @@ export function Reader() {
                                            <div className="text-center italic text-sm opacity-50 py-2">Chưa có bình luận. Hãy là người đầu tiên!</div>
                                        ) : (
                                            pComments.map(c => (
-                                               <div key={c.id} className="flex gap-3">
-                                                   <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-8 h-8 rounded-full object-cover shrink-0" />
-                                                   <div>
-                                                       <div className="text-xs font-bold mb-0.5 flex items-center gap-1">
-                                                           {c.displayName}
-                                                           {c.activeTitle && (
-                                                               <span className="px-1.5 py-0.5 bg-yellow-100/80 text-yellow-800 text-[8px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200">
-                                                                   🏆 {c.activeTitle}
-                                                               </span>
+                                               <div key={c.id} className="flex flex-col gap-1 w-full border-b border-gray-100/15 pb-3 last:border-0 last:pb-0">
+                                                   <div className="flex gap-3">
+                                                       <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                                                       <div className="flex-1 min-w-0">
+                                                           <div className="text-xs font-bold mb-0.5 flex items-center gap-1">
+                                                               {c.displayName}
+                                                               {c.activeTitle && (
+                                                                   <span className="px-1.5 py-0.5 bg-yellow-100/80 text-yellow-800 text-[8px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200">
+                                                                       🏆 {c.activeTitle}
+                                                                   </span>
+                                                               )}
+                                                           </div>
+                                                           <div className="text-sm break-words">{c.content}</div>
+                                                           
+                                                           {isLoggedIn && (
+                                                              <button 
+                                                                 type="button"
+                                                                 onClick={() => {
+                                                                    if (replyingToId === c.id) {
+                                                                       setReplyingToId(null);
+                                                                    } else {
+                                                                       setReplyingToId(c.id);
+                                                                       setReplyText('');
+                                                                    }
+                                                                 }}
+                                                                 className="text-xs text-[#8D6E63] hover:text-[#5D4037] mt-1 font-bold block hover:underline"
+                                                              >
+                                                                 Trả lời
+                                                              </button>
                                                            )}
                                                        </div>
-                                                       <div className="text-sm">{c.content}</div>
                                                    </div>
-                                               </div>
+
+                                                   {/* Input trả lời */}
+                                                   {replyingToId === c.id && (
+                                                      <div className="mt-2 pl-11 flex gap-2">
+                                                         <input 
+                                                            type="text" 
+                                                            placeholder={`Trả lời ${c.displayName}...`}
+                                                            value={replyText}
+                                                            disabled={submittingReply}
+                                                            onChange={(e) => setReplyText(e.target.value)}
+                                                            className={cn("flex-1 px-2.5 py-1 text-xs rounded-lg border focus:outline-none focus:border-[#8D6E63] bg-transparent", isDark ? "border-gray-700 text-white" : "border-[#D7CCC8] text-[#3E2723]")}
+                                                            onKeyDown={(e) => {
+                                                               if (e.key === 'Enter') {
+                                                                  e.preventDefault();
+                                                                  if (replyText.trim() && !submittingReply) {
+                                                                     handleSendReply(c);
+                                                                  }
+                                                               }
+                                                            }}
+                                                         />
+                                                         <button 
+                                                            type="button"
+                                                            onClick={() => handleSendReply(c)}
+                                                            disabled={submittingReply || !replyText.trim()}
+                                                            className="bg-[#8D6E63] text-white px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors hover:bg-[#5D4037] disabled:opacity-50"
+                                                         >
+                                                            Gửi
+                                                         </button>
+                                                      </div>
+                                                   )}
+
+                                                   {/* Các phản hồi lồng nhau */}
+                                                   {(() => {
+                                                      const subReplies = comments.filter(r => r.parentId === c.id).sort((a: any, b: any) => {
+                                                         const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
+                                                         const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis?.() || 0);
+                                                         return timeA - timeB;
+                                                      });
+                                                      if (subReplies.length === 0) return null;
+                                                      return (
+                                                         <div className="mt-2 pl-11 space-y-2 border-l border-[#D7CCC8]/40">
+                                                            {subReplies.map(reply => (
+                                                               <div key={reply.id} className={cn("flex gap-2 p-2 rounded-lg", isDark ? "bg-gray-800/40" : "bg-gray-50/50")}>
+                                                                  <img src={reply.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-6 h-6 rounded-full object-cover shrink-0" />
+                                                                  <div className="flex-1 min-w-0">
+                                                                     <div className="text-[11px] font-bold mb-0.5 flex items-center gap-1">
+                                                                        {reply.displayName}
+                                                                        {reply.activeTitle && (
+                                                                           <span className="px-1 py-0.5 bg-yellow-100 text-yellow-850 text-[7px] font-extrabold rounded">
+                                                                              🏆 {reply.activeTitle}
+                                                                           </span>
+                                                                        )}
+                                                                     </div>
+                                                                     <div className="text-xs text-gray-700 break-words">{reply.content}</div>
+                                                                  </div>
+                                                               </div>
+                                                            ))}
+                                                         </div>
+                                                      );
+                                                   })()}
+                                                </div>
                                            ))
                                        )}
                                    </div>
@@ -427,7 +561,104 @@ export function Reader() {
                                        <div className="text-[10px] opacity-60 uppercase tracking-widest">{c.createdAt?.toDate ? c.createdAt.toDate().toLocaleString() : 'Vừa xong'}</div>
                                    </div>
                                </div>
-                               <div className="text-sm leading-relaxed whitespace-pre-wrap">{c.content}</div>
+                               <div className="text-sm leading-relaxed whitespace-pre-wrap text-justify">{c.content}</div>
+
+                               {/* Phản hồi bình luận chương */}
+                               {isLoggedIn && (
+                                    <div className="flex items-center gap-4 border-t border-dashed border-[#D7CCC8]/40 pt-2">
+                                       <button 
+                                          type="button"
+                                          onClick={() => {
+                                             if (replyingToId === c.id) {
+                                                setReplyingToId(null);
+                                             } else {
+                                                setReplyingToId(c.id);
+                                                setReplyText('');
+                                             }
+                                          }}
+                                          className="text-xs text-[#8D6E63] hover:text-[#5D4037] font-extrabold flex items-center gap-1 cursor-pointer transition-colors"
+                                       >
+                                          <MessageSquare className="w-3.5 h-3.5" />
+                                          Trả lời
+                                       </button>
+                                    </div>
+                                )}
+
+                               {/* Khung nhập phản hồi inline */}
+                               {replyingToId === c.id && (
+                                    <div className="mt-1 flex gap-2 pl-1.5">
+                                       <input 
+                                          type="text"
+                                          placeholder={`Trả lời bình luận của ${c.displayName}...`}
+                                          value={replyText}
+                                          disabled={submittingReply}
+                                          onChange={(e) => setReplyText(e.target.value)}
+                                          className={cn("flex-1 px-3 py-1.5 rounded-xl border text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#8D6E63]", isDark ? "bg-gray-900 border-gray-700 text-white focus:border-[#8D6E63]" : "bg-[#FDF6EC] border-[#D7CCC8]/80 text-[#3E2723] focus:border-[#8D6E63]")}
+                                          onKeyDown={(e) => {
+                                             if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                if (replyText.trim() && !submittingReply) {
+                                                   handleSendReply(c);
+                                                }
+                                             }
+                                          }}
+                                       />
+                                       <button 
+                                          type="button"
+                                          onClick={() => handleSendReply(c)}
+                                          disabled={submittingReply || !replyText.trim()}
+                                          className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-gray-300 disabled:text-gray-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
+                                       >
+                                          Gửi
+                                       </button>
+                                       <button 
+                                          type="button"
+                                          onClick={() => setReplyingToId(null)}
+                                          className="text-gray-400 hover:text-gray-500 border border-gray-200 px-2 rounded-xl text-xs"
+                                       >
+                                          Hủy
+                                       </button>
+                                    </div>
+                                )}
+
+                               {/* Danh sách các phản hồi phụ lồng lùi lề */}
+                               {(() => {
+                                    const replies = comments.filter(r => r.parentId === c.id).sort((a: any, b: any) => {
+                                       const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0));
+                                       const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0));
+                                       return timeA - timeB;
+                                    });
+                                    if (replies.length === 0) return null;
+                                    return (
+                                       <div className="mt-2 pl-3.5 border-l-2 border-[#D7CCC8]/40 space-y-3">
+                                          {replies.map((reply: any) => (
+                                             <div key={reply.id} className={cn("flex gap-2.5 items-start p-3 rounded-xl border", isDark ? "bg-gray-900/40 border-gray-800" : "bg-gray-50/40 border-gray-100")}>
+                                                <img src={reply.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 border border-gray-200" referrerPolicy="no-referrer" />
+                                                <div className="flex-1 min-w-0">
+                                                   <div className="flex items-center justify-between gap-2 mb-0.5">
+                                                      <span className="font-bold text-xs">
+                                                         {reply.displayName}
+                                                         {reply.activeTitle && (
+                                                            <span className="px-1 py-0.5 bg-yellow-101 text-yellow-800 text-[8px] font-black rounded uppercase ml-1 shadow-sm border border-yellow-250 inline-block align-middle">
+                                                               🏆 {reply.activeTitle}
+                                                            </span>
+                                                         )}
+                                                      </span>
+                                                      <span className="text-[9px] text-gray-400 font-mono">
+                                                         {reply.createdAt?.toDate 
+                                                            ? new Date(reply.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
+                                                            : 'Vừa xong'}
+                                                      </span>
+                                                   </div>
+                                                   <p className="text-xs text-gray-700 break-words leading-relaxed text-justify">
+                                                      {reply.content}
+                                                   </p>
+                                                </div>
+                                             </div>
+                                          ))}
+                                       </div>
+                                    );
+                                })()}
                            </div>
                        ))
                    )}
