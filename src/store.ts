@@ -35,6 +35,8 @@ interface UserState {
   exp: number;
   checkInStreak: number;
   lastCheckInDate: string | null;
+  lastDailyResetDate: string | null;
+  lastWeeklyResetId: string | null;
   missions: Mission[];
   storyProgress: Record<string, number>; // storyId -> maxChapterRead
   readHistoryList: string[]; // storyIds
@@ -117,6 +119,7 @@ interface UserState {
   _ensureActiveWeekCalculations: () => Promise<void>;
   _triggerCountAchievementsCheck: () => void;
   _checkPerfectDailyDay: () => void;
+  _checkResetMissions: () => void;
 }
 
 const getDailyMissions = (): Mission[] => [
@@ -156,6 +159,8 @@ export const useStore = create<UserState>()(
       exp: 0,
       checkInStreak: 0,
       lastCheckInDate: null,
+      lastDailyResetDate: null,
+      lastWeeklyResetId: null,
       missions: [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()],
       storyProgress: {},
       readHistoryList: [],
@@ -224,6 +229,8 @@ export const useStore = create<UserState>()(
         exp: 0,
         checkInStreak: 0,
         lastCheckInDate: null,
+        lastDailyResetDate: null,
+        lastWeeklyResetId: null,
         missions: [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()],
         storyProgress: {},
         readHistoryList: [],
@@ -305,44 +312,49 @@ export const useStore = create<UserState>()(
             });
          }
       },
-      syncFromFirebase: (data) => set((state) => {
-         return {
-         choco: data.choco !== undefined ? data.choco : state.choco,
-         goldenChoco: data.goldenChoco !== undefined ? data.goldenChoco : state.goldenChoco,
-         level: data.level !== undefined ? data.level : state.level,
-         exp: data.exp !== undefined ? data.exp : state.exp,
-         checkInStreak: data.checkInStreak !== undefined ? data.checkInStreak : state.checkInStreak,
-         lastCheckInDate: data.lastCheckInDate !== undefined ? data.lastCheckInDate : state.lastCheckInDate,
-         displayName: data.displayName !== undefined ? data.displayName : state.displayName,
-         email: data.email !== undefined ? data.email : state.email,
-         avatarUrl: data.avatarUrl !== undefined ? data.avatarUrl : state.avatarUrl,
-         equippedSticker: data.equippedSticker !== undefined ? data.equippedSticker : state.equippedSticker,
-         stickerPosition: data.stickerPosition !== undefined ? data.stickerPosition : state.stickerPosition,
-         ownedStickers: data.ownedStickers !== undefined ? data.ownedStickers : state.ownedStickers,
-         ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
-         ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
-         savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
-         unlockedPassChapters: data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters,
-         unlockedEarlyAccessChapters: data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters,
+      syncFromFirebase: (data) => {
+         set((state) => {
+            return {
+            choco: data.choco !== undefined ? data.choco : state.choco,
+            goldenChoco: data.goldenChoco !== undefined ? data.goldenChoco : state.goldenChoco,
+            level: data.level !== undefined ? data.level : state.level,
+            exp: data.exp !== undefined ? data.exp : state.exp,
+            checkInStreak: data.checkInStreak !== undefined ? data.checkInStreak : state.checkInStreak,
+            lastCheckInDate: data.lastCheckInDate !== undefined ? data.lastCheckInDate : state.lastCheckInDate,
+            lastDailyResetDate: data.lastDailyResetDate !== undefined ? data.lastDailyResetDate : state.lastDailyResetDate,
+            lastWeeklyResetId: data.lastWeeklyResetId !== undefined ? data.lastWeeklyResetId : state.lastWeeklyResetId,
+            displayName: data.displayName !== undefined ? data.displayName : state.displayName,
+            email: data.email !== undefined ? data.email : state.email,
+            avatarUrl: data.avatarUrl !== undefined ? data.avatarUrl : state.avatarUrl,
+            equippedSticker: data.equippedSticker !== undefined ? data.equippedSticker : state.equippedSticker,
+            stickerPosition: data.stickerPosition !== undefined ? data.stickerPosition : state.stickerPosition,
+            ownedStickers: data.ownedStickers !== undefined ? data.ownedStickers : state.ownedStickers,
+            ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
+            ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
+            savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
+            unlockedPassChapters: data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters,
+            unlockedEarlyAccessChapters: data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters,
 
-         unlockedAchievements: data.unlockedAchievements !== undefined ? data.unlockedAchievements : state.unlockedAchievements,
-         claimedAchievements: data.claimedAchievements !== undefined ? data.claimedAchievements : state.claimedAchievements,
-         totalEarnedChoco: data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco,
-         totalEarnedGChoco: data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco,
-         totalSpentChoco: data.totalSpentChoco !== undefined ? data.totalSpentChoco : state.totalSpentChoco,
-         totalCheckIns: data.totalCheckIns !== undefined ? data.totalCheckIns : state.totalCheckIns,
-         perfectDailyDates: data.perfectDailyDates !== undefined ? data.perfectDailyDates : state.perfectDailyDates,
-         sentMessagesCount: data.sentMessagesCount !== undefined ? data.sentMessagesCount : state.sentMessagesCount,
-         totalChaptersRead: data.totalChaptersRead !== undefined ? data.totalChaptersRead : state.totalChaptersRead,
-         totalCommentsCount: data.totalCommentsCount !== undefined ? data.totalCommentsCount : state.totalCommentsCount,
-         genresRead: data.genresRead !== undefined ? data.genresRead : state.genresRead,
-         activePoints: data.activePoints !== undefined ? data.activePoints : state.activePoints,
-         lastActiveWeek: data.lastActiveWeek !== undefined ? data.lastActiveWeek : state.lastActiveWeek,
-         prevActivePoints: data.prevActivePoints !== undefined ? data.prevActivePoints : state.prevActivePoints,
-         prevActiveWeek: data.prevActiveWeek !== undefined ? data.prevActiveWeek : state.prevActiveWeek,
-         activeTitle: data.activeTitle !== undefined ? data.activeTitle : state.activeTitle,
-         };
-      }),
+            unlockedAchievements: data.unlockedAchievements !== undefined ? data.unlockedAchievements : state.unlockedAchievements,
+            claimedAchievements: data.claimedAchievements !== undefined ? data.claimedAchievements : state.claimedAchievements,
+            totalEarnedChoco: data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco,
+            totalEarnedGChoco: data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco,
+            totalSpentChoco: data.totalSpentChoco !== undefined ? data.totalSpentChoco : state.totalSpentChoco,
+            totalCheckIns: data.totalCheckIns !== undefined ? data.totalCheckIns : state.totalCheckIns,
+            perfectDailyDates: data.perfectDailyDates !== undefined ? data.perfectDailyDates : state.perfectDailyDates,
+            sentMessagesCount: data.sentMessagesCount !== undefined ? data.sentMessagesCount : state.sentMessagesCount,
+            totalChaptersRead: data.totalChaptersRead !== undefined ? data.totalChaptersRead : state.totalChaptersRead,
+            totalCommentsCount: data.totalCommentsCount !== undefined ? data.totalCommentsCount : state.totalCommentsCount,
+            genresRead: data.genresRead !== undefined ? data.genresRead : state.genresRead,
+            activePoints: data.activePoints !== undefined ? data.activePoints : state.activePoints,
+            lastActiveWeek: data.lastActiveWeek !== undefined ? data.lastActiveWeek : state.lastActiveWeek,
+            prevActivePoints: data.prevActivePoints !== undefined ? data.prevActivePoints : state.prevActivePoints,
+            prevActiveWeek: data.prevActiveWeek !== undefined ? data.prevActiveWeek : state.prevActiveWeek,
+            activeTitle: data.activeTitle !== undefined ? data.activeTitle : state.activeTitle,
+            };
+         });
+         get()._checkResetMissions();
+      },
 
       gainExp: (amount: number) => {
          const state = get();
@@ -395,6 +407,7 @@ export const useStore = create<UserState>()(
       },
       
       checkIn: () => {
+        get()._checkResetMissions();
         const state = get();
         if (!state.isLoggedIn) return;
         
@@ -518,6 +531,7 @@ export const useStore = create<UserState>()(
       },
       
       markStoryRead: (storyId, chapterOrder, genres) => {
+        get()._checkResetMissions();
         const state = get();
         if (!state.isLoggedIn) return;
         
@@ -607,6 +621,7 @@ export const useStore = create<UserState>()(
       },
       
       addCommentProgress: () => {
+         get()._checkResetMissions();
          const state = get();
          if (!state.isLoggedIn) return;
          const ms = [...state.missions];
@@ -1027,6 +1042,65 @@ export const useStore = create<UserState>()(
                   get().unlockAchievement('weekly_missions_perfect');
                }
             }
+         }
+      },
+
+      _checkResetMissions: () => {
+         const state = get();
+         if (!state.isLoggedIn || !state.uid) return;
+
+         const todayStr = format(new Date(), 'yyyy-MM-dd');
+         const currentWeekId = getWeeklyId();
+
+         let changed = false;
+         let nextMissions = [...(state.missions || [])];
+         let nextDailyResetDate = state.lastDailyResetDate || null;
+         let nextWeeklyResetId = state.lastWeeklyResetId || null;
+
+         // 1. Check Daily Reset (00:00 every day)
+         if (!state.lastDailyResetDate || state.lastDailyResetDate !== todayStr) {
+            console.log('Daily reset triggered, resetting daily missions');
+            nextMissions = nextMissions.map(m => {
+               if (m.type === 'daily') {
+                  return { ...m, progress: 0, completed: false, claimed: false };
+               }
+               return m;
+            });
+            nextDailyResetDate = todayStr;
+            changed = true;
+         }
+
+         // 2. Check Weekly Reset (00:00 Sunday -> Monday)
+         if (!state.lastWeeklyResetId || state.lastWeeklyResetId !== currentWeekId) {
+            console.log('Weekly reset triggered, resetting weekly missions');
+            nextMissions = nextMissions.map(m => {
+               if (m.type === 'weekly') {
+                  return { ...m, progress: 0, completed: false, claimed: false };
+               }
+               return m;
+            });
+            nextWeeklyResetId = currentWeekId;
+            changed = true;
+         }
+
+         if (changed) {
+            const uid = state.uid;
+            const allMs = { ...(state.allUsersMissions || {}) };
+            if (uid) {
+               allMs[uid] = nextMissions;
+            }
+
+            set({
+               missions: nextMissions,
+               lastDailyResetDate: nextDailyResetDate,
+               lastWeeklyResetId: nextWeeklyResetId,
+               allUsersMissions: allMs
+            });
+
+            get().updateUserDoc({
+               lastDailyResetDate: nextDailyResetDate,
+               lastWeeklyResetId: nextWeeklyResetId
+            });
          }
       }
     }),
