@@ -3,14 +3,14 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   Menu, Search, User, Key, LogOut, X, Trophy, BookOpen, Zap, Flame, ShieldCheck, 
   Camera, Calendar, Mail, Clock, Settings, Copy, Home, ClipboardList, ShoppingBag, List, Edit2, Library,
-  Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift
+  Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { signInWithPopup, signInWithRedirect, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
-import { getDocs, collection } from 'firebase/firestore';
+import { getDocs, collection, query, where, orderBy, onSnapshot, updateDoc, doc, writeBatch } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST, getWeeklyId, getPreviousWeeklyId } from '../types/achievements';
 import { Store } from '../pages/Store';
 import { Missions } from '../pages/Missions';
@@ -18,6 +18,17 @@ import { Inventory } from '../pages/Inventory';
 
 export function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
+}
+
+function formatRelativeTime(timestamp: number) {
+  const diff = Date.now() - timestamp;
+  if (diff < 60000) return 'Vừa xong';
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins} phút trước`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} giờ trước`;
+  const days = Math.floor(hours / 24);
+  return `${days} ngày trước`;
 }
 
 export function PaimonLogo({ className }: { className?: string }) {
@@ -402,6 +413,64 @@ export function AppLayout() {
   } = useStore();
   const navigate = useNavigate();
 
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+
+  useEffect(() => {
+    if (!uid) {
+      setNotifications([]);
+      return;
+    }
+    const q = query(
+      collection(db, 'notifications'),
+      where('userId', '==', uid),
+      orderBy('createdAt', 'desc')
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const notifs: any[] = [];
+      snapshot.forEach((doc) => {
+        notifs.push({ id: doc.id, ...doc.data() });
+      });
+      setNotifications(notifs);
+    }, (error) => {
+      console.error("Lỗi khi fetch notifications:", error);
+    });
+    return () => unsubscribe();
+  }, [uid]);
+
+  const hasUnreadNotifs = notifications.some(n => !n.isRead);
+
+  const markAllAsRead = async () => {
+    const unread = notifications.filter(n => !n.isRead);
+    if (unread.length === 0) return;
+    try {
+      const batch = writeBatch(db);
+      unread.forEach(n => {
+        const notifRef = doc(db, 'notifications', n.id);
+        batch.update(notifRef, { isRead: true });
+      });
+      await batch.commit();
+    } catch (err) {
+      console.error("Lỗi khi Đánh dấu đã đọc tất cả:", err);
+    }
+  };
+
+  const handleNotifClick = async (notif: any) => {
+    try {
+      if (!notif.isRead) {
+        await updateDoc(doc(db, 'notifications', notif.id), { isRead: true });
+      }
+      setShowNotifDropdown(false);
+      if (notif.chapterId) {
+        navigate(`/doc/${notif.storyId}/${notif.chapterId}`);
+      } else {
+        navigate(`/truyen/${notif.storyId}`);
+      }
+    } catch (err) {
+      console.error("Lỗi khi click notification:", err);
+    }
+  };
+
   const handleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
@@ -475,6 +544,73 @@ export function AppLayout() {
                 <span className="bg-[#5D4037] px-3 py-1 rounded-full text-[#FDF6EC] border border-[#8D6E63] text-sm">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco} Choco</span>
                 <span className="bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/50 px-3 py-1 rounded-full text-sm">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : goldenChoco} Gchoco</span>
               </div>
+
+              {/* Notification Bell */}
+              <div className="relative">
+                <button 
+                  onClick={() => setShowNotifDropdown(!showNotifDropdown)}
+                  className="relative p-2 text-white hover:bg-white/10 rounded-full transition-colors flex items-center justify-center cursor-pointer outline-none"
+                  title="Thông báo"
+                >
+                  <Bell className="w-[22px] h-[22px]" />
+                  {hasUnreadNotifs && (
+                    <span className="absolute top-[5px] right-[5px] w-2.5 h-2.5 bg-red-500 rounded-full border border-[#3E2723] animate-pulse" />
+                  )}
+                </button>
+
+                {showNotifDropdown && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowNotifDropdown(false)} />
+                    <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-[#FDF6EC] text-[#3E2723] rounded-2xl shadow-2xl border border-[#D7CCC8]/60 z-50 flex flex-col overflow-hidden max-h-[450px]">
+                      <div className="p-4 border-b border-[#D7CCC8]/60 bg-[#F5E6D3]/40 flex items-center justify-between">
+                        <span className="font-extrabold text-xs uppercase tracking-wider text-[#3E2723]">Thông báo ({notifications.filter(n => !n.isRead).length})</span>
+                        {hasUnreadNotifs && (
+                          <button 
+                            onClick={markAllAsRead} 
+                            className="text-xs hover:underline flex items-center gap-1 font-bold text-[#8D6E63] hover:text-[#5D4037] transition-colors"
+                          >
+                            <CheckCheck className="w-3.5 h-3.5" />
+                            Đọc tất cả
+                          </button>
+                        )}
+                      </div>
+                      <div className="overflow-y-auto flex-1 divide-y divide-[#D7CCC8]/30 max-h-80">
+                        {notifications.length === 0 ? (
+                          <div className="p-8 text-center text-sm text-gray-400 italic">
+                             Không có thông báo nào.
+                          </div>
+                        ) : (
+                          notifications.map((notif) => (
+                            <div 
+                              key={notif.id}
+                              onClick={() => handleNotifClick(notif)}
+                              className={cn(
+                                "p-3.5 hover:bg-[#F5E6D3]/30 transition-colors cursor-pointer flex gap-3 items-start text-xs sm:text-sm text-left font-normal",
+                                !notif.isRead ? "bg-[#FDF6EC] font-semibold text-[#3E2723]" : "bg-[#FDF6EC]/60 opacity-80 text-gray-600"
+                              )}
+                            >
+                              <div className="w-2 h-2 rounded-full shrink-0 mt-1.5 bg-red-500 opacity-95" style={{ visibility: notif.isRead ? 'hidden' : 'visible' }} />
+                              <div className="flex-1">
+                                {notif.type === 'comment_reply' ? (
+                                  <p className="leading-relaxed text-[#3E2723]">
+                                     <span className="font-bold text-[#5D4037]">{notif.replierName}</span> đã trả lời bình luận của bạn trong truyện <span className="font-bold text-[#5D4037]">{notif.storyTitle}</span>{notif.chapterTitle ? ` (Chương: ${notif.chapterTitle})` : ''}
+                                  </p>
+                                ) : (
+                                  <p className="leading-relaxed">
+                                     Truyện <span className="font-bold text-[#5D4037]">{notif.storyTitle}</span> vừa có chương mới: <span className="italic text-[#8D6E63]">{notif.chapterTitle}</span>
+                                  </p>
+                                )}
+                                <span className="text-[10px] text-gray-400 font-mono block mt-1">{formatRelativeTime(notif.createdAt)}</span>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
               <div className="relative group cursor-pointer">
                 <div className="flex items-center gap-2 hover:bg-white/10 px-3 py-1.5 rounded-full transition-colors relative group">
                    <div className="w-6 h-6 relative shrink-0">
