@@ -8,7 +8,7 @@ export function Account() {
   const { 
     isLoggedIn, uid, displayName, email, avatarUrl, equippedSticker, stickerPosition, 
     choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, 
-    ownedStickers, equipSticker, setStickerPosition, firebaseUser, updateUserDoc 
+    ownedStickers, equipSticker, setStickerPosition, firebaseUser, updateUserDoc, unlockAchievement 
   } = useStore();
   const nextLevelExp = (level || 1) * 100;
   const currentExp = exp || 0;
@@ -154,6 +154,7 @@ export function Account() {
         createdAt: serverTimestamp()
       });
 
+      unlockAchievement('blogger_choco_new');
       setReview('');
     } catch(err) {
       handleFirestoreError(err, OperationType.CREATE, `users/${uid}/reviews`);
