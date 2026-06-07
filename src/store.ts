@@ -518,11 +518,11 @@ export const useStore = create<UserState>()(
            get().unlockAchievement('midnight_read');
         }
 
-        // 3. Multi Genre: 5 unique genres read
+        // 3. Multi Genre: 5 unique genres read AND at least 5 stories read
         let uniqueGenres = state.genresRead || [];
         if (genres && genres.length > 0) {
            uniqueGenres = Array.from(new Set([...uniqueGenres, ...genres]));
-           if (uniqueGenres.length >= 5) {
+           if (uniqueGenres.length >= 5 && newHistory.length >= 5) {
               get().unlockAchievement('multi_genre');
            }
         }
