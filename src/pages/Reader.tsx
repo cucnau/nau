@@ -43,6 +43,7 @@ export function Reader() {
 
   useEffect(() => {
     setIsUnlocked(false);
+    window.scrollTo(0, 0);
   }, [chapterId]);
 
   useEffect(() => {
