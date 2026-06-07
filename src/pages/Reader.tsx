@@ -256,14 +256,18 @@ export function Reader() {
                     const pComments = comments.filter(c => c.type === 'paragraph' && c.paragraphIdx === idx);
                     return (
                         <div key={idx} className="relative group/para">
-                           <p className="relative inline-block w-full">
+                           <p className="relative w-full cursor-pointer md:cursor-auto" onClick={() => {
+                               if (window.getSelection()?.toString().length === 0) {
+                                  setActiveParagraphIndex(activeParagraphIndex === idx ? null : idx);
+                               }
+                           }}>
                                {p}
                                <button 
-                                   onClick={() => setActiveParagraphIndex(activeParagraphIndex === idx ? null : idx)} 
-                                   className={cn("absolute -right-12 top-1 opacity-0 group-hover/para:opacity-100 transition-opacity hover:text-[#8D6E63] flex flex-col items-center gap-1", pComments.length > 0 && "opacity-100")}
+                                   onClick={(e) => { e.stopPropagation(); setActiveParagraphIndex(activeParagraphIndex === idx ? null : idx); }} 
+                                   className={cn("inline-flex ml-3 items-center justify-center opacity-40 md:opacity-0 md:group-hover/para:opacity-100 transition-opacity hover:opacity-100 hover:text-[#8D6E63] align-baseline", pComments.length > 0 && "opacity-100 md:opacity-100 text-[#8D6E63]")}
                                >
-                                  <MessageSquare className="w-5 h-5" />
-                                  {pComments.length > 0 && <span className="text-[10px] font-bold">{pComments.length}</span>}
+                                  <MessageSquare className="w-[1.2em] h-[1.2em] inline-block -translate-y-[0.15em]" />
+                                  {pComments.length > 0 && <span className="text-[0.65em] font-bold ml-1 -translate-y-[0.3em]">{pComments.length}</span>}
                                </button>
                            </p>
 
