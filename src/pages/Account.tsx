@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store';
 import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
-import { doc, updateDoc, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, where } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc, setDoc, serverTimestamp, query, orderBy, onSnapshot, where } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 
 export function Account() {
@@ -49,6 +49,28 @@ export function Account() {
     });
     return () => unsubscribe();
   }, [uid]);
+
+  // Tự động đồng bộ các bài viết cũ của user sang newsFeed toàn cục bằng cách so khớp ID
+  useEffect(() => {
+    if (!uid || reviews.length === 0) return;
+    const syncExistingReviews = async () => {
+      try {
+        for (const r of reviews) {
+          await setDoc(doc(db, 'newsFeed', r.id), {
+            uid: uid,
+            displayName: displayName || 'Nhà lữ hành ẩn danh',
+            avatarUrl: avatarUrl || null,
+            activeTitle: activeTitle || null,
+            content: r.content,
+            createdAt: r.createdAt || serverTimestamp()
+          }, { merge: true });
+        }
+      } catch (err) {
+        console.error("Error syncing existing reviews:", err);
+      }
+    };
+    syncExistingReviews();
+  }, [uid, reviews, displayName, avatarUrl, activeTitle]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -115,11 +137,23 @@ export function Account() {
     e.preventDefault();
     if (!uid || !review.trim()) return;
     try {
-      await addDoc(collection(db, `users/${uid}/reviews`), {
+      // Post to user's local record
+      const reviewRef = await addDoc(collection(db, `users/${uid}/reviews`), {
         uid,
         content: review,
         createdAt: serverTimestamp()
       });
+      
+      // Post to the shared global news feed with the same ID
+      await setDoc(doc(db, 'newsFeed', reviewRef.id), {
+        uid,
+        displayName: displayName || 'Nhà lữ hành ẩn danh',
+        avatarUrl: avatarUrl || null,
+        activeTitle: activeTitle || null,
+        content: review,
+        createdAt: serverTimestamp()
+      });
+
       setReview('');
     } catch(err) {
       handleFirestoreError(err, OperationType.CREATE, `users/${uid}/reviews`);
