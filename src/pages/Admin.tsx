@@ -20,6 +20,8 @@ interface Chapter {
   content: string;
   order: number;
   isPasswordProtected?: boolean;
+  requiresPass?: boolean;
+  requiresEarlyAccess?: boolean;
 }
 
 interface AdminUser {
@@ -440,7 +442,7 @@ export function Admin() {
     try {
       if (chapterModalMode === 'add') {
         const nextOrder = chapters.length > 0 ? Math.max(...chapters.map((c) => c.order)) + 1 : 1;
-        await addDoc(collection(db, 'stories', managingStoryChapters, 'chapters'), {
+        const newChapterDoc = await addDoc(collection(db, 'stories', managingStoryChapters, 'chapters'), {
           title: cTitle,
           content: cContent,
           order: nextOrder,
@@ -455,6 +457,28 @@ export function Admin() {
         if (storySnap.exists()) {
           const currentCount = storySnap.data().chapterCount || 0;
           await updateDoc(storyRef, { chapterCount: currentCount + 1 });
+
+          // Send notifications to users who have saved this story
+          const storyData = storySnap.data();
+          const storyTitle = storyData.title || 'Truyện';
+          try {
+             const usersQuery = query(collection(db, 'users'), where('savedStories', 'array-contains', managingStoryChapters));
+             const usersSnap = await getDocs(usersQuery);
+             const notifyPromises = usersSnap.docs.map(userDoc => {
+                return addDoc(collection(db, 'notifications'), {
+                   userId: userDoc.id,
+                   storyId: managingStoryChapters,
+                   chapterId: newChapterDoc.id,
+                   storyTitle: storyTitle,
+                   chapterTitle: cTitle,
+                   isRead: false,
+                   createdAt: Date.now()
+                });
+             });
+             await Promise.all(notifyPromises);
+          } catch (notifErr) {
+             console.error('Lỗi gửi thông báo:', notifErr);
+          }
         }
       } else if (chapterModalMode === 'edit' && editingChapter) {
         await updateDoc(doc(db, 'stories', managingStoryChapters, 'chapters', editingChapter.id), {
