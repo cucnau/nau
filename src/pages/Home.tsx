@@ -45,19 +45,8 @@ export function Home() {
     };
   }, []);
 
-  // Auto award Choco Đáng Yêu achievement to Top 3 active users at the end of the week
-  useEffect(() => {
-    const now = new Date();
-    // Sunday is 0. Only award at the end of the week.
-    if (now.getDay() === 0) {
-      if (isLoggedIn && uid && topActiveUsers.length > 0) {
-        const top3Uids = topActiveUsers.slice(0, 3).map(u => u.id);
-        if (top3Uids.includes(uid) && !unlockedAchievements.includes('choco_cute')) {
-          unlockAchievement('choco_cute');
-        }
-      }
-    }
-  }, [topActiveUsers, isLoggedIn, uid, unlockedAchievements, unlockAchievement]);
+  // Auto award Choco Đáng Yêu achievement is now handled centrally in _ensureActiveWeekCalculations
+  // when week physically transitions.
 
   const handleCheckIn = () => {
     if (!isLoggedIn) {
