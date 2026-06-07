@@ -6,7 +6,7 @@ import { db } from '../lib/firebase';
 import { collection, query, getDocs, orderBy } from 'firebase/firestore';
 
 export function Store() {
-  const { choco, goldenChoco, spendChoco, spendGoldenChoco, addGoldenChoco, isLoggedIn, email, updateUserDoc, ownedStickers, addOwnedSticker, equipSticker, firebaseUser } = useStore();
+  const { choco, goldenChoco, spendChoco, spendGoldenChoco, addGoldenChoco, isLoggedIn, email, buyTicket, updateUserDoc, ownedStickers, addOwnedSticker, equipSticker, firebaseUser } = useStore();
   const [storeStickers, setStoreStickers] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'items' | 'stickers'>('items');
 
@@ -123,7 +123,7 @@ export function Store() {
                 <Lock className="w-12 h-12 text-[#D4AF37] mb-4 group-hover:-translate-y-1 transition-transform" />
                 <h3 className="text-lg font-bold mb-2 uppercase text-[#3E2723]">Vé Pass Truyện</h3>
                 <p className="text-gray-500 text-sm mb-6 italic">Dùng để mở khoá 1 chương truyện bị set password.</p>
-                <button onClick={() => handleBuyItem('Vé Pass Truyện', 5, 'golden')} className="bg-[#D4AF37] text-white px-6 py-2.5 rounded-full font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex items-center justify-center gap-2 uppercase text-sm tracking-widest shadow-md">
+                <button onClick={() => handleBuyItem('Vé Pass Truyện', 5, 'golden', () => buyTicket('pass'))} className="bg-[#D4AF37] text-white px-6 py-2.5 rounded-full font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex items-center justify-center gap-2 uppercase text-sm tracking-widest shadow-md">
                    Mua <span className="bg-black/10 px-2 py-0.5 rounded-full text-[10px]">5 Gchoco</span>
                 </button>
              </div>
@@ -132,7 +132,7 @@ export function Store() {
                 <Zap className="w-12 h-12 text-[#D4AF37] mb-4 group-hover:scale-110 transition-transform" />
                 <h3 className="text-lg font-bold mb-2 uppercase text-[#3E2723]">Vé Ưu Tiên</h3>
                 <p className="text-gray-500 text-sm mb-6 italic">Đọc sớm nhất các chương truyện vừa đăng.</p>
-                <button onClick={() => handleBuyItem('Vé Ưu Tiên', 3, 'golden')} className="bg-[#D4AF37] text-white px-6 py-2.5 rounded-full font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex items-center justify-center gap-2 uppercase text-sm tracking-widest shadow-md">
+                <button onClick={() => handleBuyItem('Vé Ưu Tiên', 3, 'golden', () => buyTicket('priority'))} className="bg-[#D4AF37] text-white px-6 py-2.5 rounded-full font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex items-center justify-center gap-2 uppercase text-sm tracking-widest shadow-md">
                    Mua <span className="bg-black/10 px-2 py-0.5 rounded-full text-[10px]">3 Gchoco</span>
                 </button>
              </div>
