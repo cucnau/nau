@@ -113,6 +113,21 @@
         "createdAt": { "type": "number" }
       },
       "required": ["name", "description", "price", "type", "url"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User notification for new audiobook/story chapters",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "storyId": { "type": "string" },
+        "chapterId": { "type": "string" },
+        "storyTitle": { "type": "string" },
+        "chapterTitle": { "type": "string" },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["userId", "storyId", "chapterId", "storyTitle", "chapterTitle", "isRead", "createdAt"]
     }
   },
   "firestore": {
@@ -143,6 +158,10 @@
     "store_stickers/{stickerId}": {
       "schema": { "$ref": "#/entities/AvatarSticker" },
       "description": "Collectible avatar stickers"
+    },
+    "notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "User notifications"
     }
   }
 }
