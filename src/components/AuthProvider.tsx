@@ -48,6 +48,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               avatarUrl: user.photoURL || '',
               checkInStreak: 0,
               lastCheckInDate: '',
+              lastDailyResetDate: '',
+              lastWeeklyResetId: '',
               
               // Initializing Achievements and Active Points fields
               unlockedAchievements: [],
