@@ -64,6 +64,8 @@ interface UserState {
   totalCheckIns: number;
   perfectDailyDates: string[];
   sentMessagesCount: number;
+  totalChaptersRead: number;
+  totalCommentsCount: number;
   genresRead: string[];
   activePoints: number;
   lastActiveWeek: string;
@@ -181,6 +183,8 @@ export const useStore = create<UserState>()(
       totalCheckIns: 0,
       perfectDailyDates: [],
       sentMessagesCount: 0,
+      totalChaptersRead: 0,
+      totalCommentsCount: 0,
       genresRead: [],
       activePoints: 0,
       lastActiveWeek: '',
@@ -234,6 +238,8 @@ export const useStore = create<UserState>()(
         totalCheckIns: 0,
         perfectDailyDates: [],
         sentMessagesCount: 0,
+        totalChaptersRead: 0,
+        totalCommentsCount: 0,
         genresRead: [],
         activePoints: 0,
         lastActiveWeek: '',
@@ -327,6 +333,8 @@ export const useStore = create<UserState>()(
          totalCheckIns: data.totalCheckIns !== undefined ? data.totalCheckIns : state.totalCheckIns,
          perfectDailyDates: data.perfectDailyDates !== undefined ? data.perfectDailyDates : state.perfectDailyDates,
          sentMessagesCount: data.sentMessagesCount !== undefined ? data.sentMessagesCount : state.sentMessagesCount,
+         totalChaptersRead: data.totalChaptersRead !== undefined ? data.totalChaptersRead : state.totalChaptersRead,
+         totalCommentsCount: data.totalCommentsCount !== undefined ? data.totalCommentsCount : state.totalCommentsCount,
          genresRead: data.genresRead !== undefined ? data.genresRead : state.genresRead,
          activePoints: data.activePoints !== undefined ? data.activePoints : state.activePoints,
          lastActiveWeek: data.lastActiveWeek !== undefined ? data.lastActiveWeek : state.lastActiveWeek,
@@ -523,6 +531,7 @@ export const useStore = create<UserState>()(
         const newProgress = { ...state.storyProgress, [storyId]: Math.max(currentProgress, chapterOrder) };
         const newHistory = Array.from(new Set([storyId, ...state.readHistoryList]));
         
+        let newTotalChaptersRead = state.totalChaptersRead || 0;
         const ms = [...state.missions];
         if (isNewChapter) {
             const dRead = ms.find(m => m.id === 'd2');
@@ -532,6 +541,7 @@ export const useStore = create<UserState>()(
             if (wRead && !wRead.completed) { wRead.progress += 1; if(wRead.progress >= wRead.target) wRead.completed = true;}
             
             get().gainExp(3);
+            newTotalChaptersRead += 1;
         }
 
         // Active points addition (continuous, no weekly reset)
@@ -547,6 +557,11 @@ export const useStore = create<UserState>()(
         const hour = new Date().getHours();
         if (hour >= 0 && hour < 3) {
            get().unlockAchievement('midnight_read');
+        }
+
+        // 2b. Early Morning Read: hour 05:00 - 08:00
+        if (hour >= 5 && hour < 8) {
+           get().unlockAchievement('early_morning_read');
         }
 
         // 3. Multi Genre: 5 unique genres read AND at least 5 stories read
@@ -573,6 +588,7 @@ export const useStore = create<UserState>()(
           storyProgress: newProgress,
           readHistoryList: newHistory,
           missions: ms,
+          totalChaptersRead: newTotalChaptersRead,
           genresRead: uniqueGenres,
           activePoints: finalActivePoints,
           allUsersStoryProgress: allSp,
@@ -583,6 +599,7 @@ export const useStore = create<UserState>()(
         get().updateUserDoc({
           genresRead: uniqueGenres,
           activePoints: finalActivePoints,
+          totalChaptersRead: newTotalChaptersRead,
         });
 
         get()._checkPerfectDailyDay();
@@ -607,6 +624,7 @@ export const useStore = create<UserState>()(
          }
 
          const finalActivePoints = (state.activePoints || 0) + 1;
+         const newCommentsCount = (state.totalCommentsCount || 0) + 1;
 
          const rewardChoco = 1; // +1 choco for completing comment action in store code originally was +1
          const newChoco = (state.choco || 0) + rewardChoco;
@@ -616,6 +634,7 @@ export const useStore = create<UserState>()(
            missions: ms, 
            choco: newChoco,
            totalEarnedChoco: newTotalEarned,
+           totalCommentsCount: newCommentsCount,
            activePoints: finalActivePoints,
            allUsersMissions: allMs
          });
@@ -623,6 +642,7 @@ export const useStore = create<UserState>()(
          get().updateUserDoc({ 
            choco: newChoco, 
            totalEarnedChoco: newTotalEarned,
+           totalCommentsCount: newCommentsCount,
            activePoints: finalActivePoints,
          });
 
@@ -790,6 +810,9 @@ export const useStore = create<UserState>()(
             choco: newChoco,
             activePoints: finalActivePoints,
           });
+
+          // Unlock generous_donor (gifting choco first time)
+          get().unlockAchievement('generous_donor');
 
           get()._checkPerfectDailyDay();
           get()._triggerCountAchievementsCheck();
@@ -964,6 +987,26 @@ export const useStore = create<UserState>()(
          // 11. Chatty: sentMessagesCount >= 5000
          if (!currentUnlocked.includes('chatty') && (state.sentMessagesCount || 0) >= 5000) {
             get().unlockAchievement('chatty');
+         }
+
+         // 12. Bình Luận Viên Choco: totalCommentsCount >= 100
+         if (!currentUnlocked.includes('commenter_choco') && (state.totalCommentsCount || 0) >= 100) {
+            get().unlockAchievement('commenter_choco');
+         }
+
+         // 13. Khách Quen Lounge: sentMessagesCount >= 100
+         if (!currentUnlocked.includes('chatty_lounge') && (state.sentMessagesCount || 0) >= 100) {
+            get().unlockAchievement('chatty_lounge');
+         }
+
+         // 14. Vừa Ăn Choco Vừa Đọc: totalChaptersRead >= 100
+         if (!currentUnlocked.includes('read_100_chapters') && (state.totalChaptersRead || 0) >= 100) {
+            get().unlockAchievement('read_100_chapters');
+         }
+
+         // 15. Choco Thích Thú: ownedStickers.length >= 30
+         if (!currentUnlocked.includes('sticker_collector') && (state.ownedStickers || []).length >= 30) {
+            get().unlockAchievement('sticker_collector');
          }
       },
 
