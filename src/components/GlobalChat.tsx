@@ -60,7 +60,9 @@ export function GlobalChat() {
         avatarUrl: avatarUrl || null,
         content: text,
         activeTitle: activeTitle || null,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        equippedSticker: useStore.getState().equippedSticker || null,
+        stickerPosition: useStore.getState().stickerPosition || 'top-right'
       });
       incrementSentMessages();
     } catch (e) {
@@ -68,7 +70,10 @@ export function GlobalChat() {
       setInput(text); // reset input if failed
       if (checkIfQuotaError(e)) {
         (window as any).__setQuotaExceeded?.(true);
-        alert("Hệ thống đạt giới hạn lưu trữ đám mây hôm nay. Bạn vẫn xem được tin nhắn cũ nhưng gửi tin nhắn mới tạm thời chưa lưu trữ được.");
+        alert("Hệ thống đạt giới hạn lưu trữ đám mây (Quota Exceeded) hôm nay. Gửi tin nhắn mới tạm thời chưa lưu trữ được.");
+      } else {
+         const errMsg = e instanceof Error ? e.message : String(e);
+         alert("Lỗi nhắn tin: " + errMsg);
       }
     }
   };
@@ -90,13 +95,27 @@ export function GlobalChat() {
           return (
              <div key={msg.id || i} className="flex flex-col w-full text-white items-start">
                 <div className="flex items-end gap-2 pr-1 pl-1 max-w-[85%] flex-row">
-                   <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden border border-[#D7CCC8]/30 mb-0.5 bg-[#5D4037] flex items-center justify-center">
+                   <div className="flex-shrink-0 w-8 h-8 rounded-full border border-[#D7CCC8]/30 mb-0.5 bg-[#5D4037] flex items-center justify-center relative"><div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
                       {msg.avatarUrl ? (
                          <img src={msg.avatarUrl} alt="" className="w-full h-full object-cover" />
                       ) : (
                          <User className="w-4 h-4 text-[#A1887F]" />
                       )}
                    </div>
+                   {msg.equippedSticker && (
+                     <img 
+                       src={msg.equippedSticker} 
+                       alt="Sticker" 
+                       className={cn(
+                         "absolute w-4 h-4 object-contain pointer-events-none z-10 animate-pulse",
+                         msg.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
+                         msg.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
+                         msg.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
+                         msg.stickerPosition === 'bottom-right' && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                       )} 
+                     />
+                   )}
+                </div>
                    <div className="flex flex-col gap-1 items-start">
                       <div className="flex items-center gap-1.5 px-1 flex-wrap">
                          <span className="font-bold text-[10px] text-[#A1887F] whitespace-nowrap">
@@ -109,8 +128,15 @@ export function GlobalChat() {
                          )}
                       </div>
                       
-                      <div className={cn("p-2.5 rounded-2xl relative text-[13px] leading-relaxed shadow-sm min-w-10 break-words text-white rounded-tl-sm", isMe ? "bg-[#8D6E63]" : "bg-[#5D4037]")}>
+                      <div className={cn("p-2.5 rounded-2xl relative text-[13px] leading-relaxed shadow-sm min-w-10 break-words text-white rounded-tl-sm pr-7 overflow-visible", isMe ? "bg-[#8D6E63]" : "bg-[#5D4037]")}>
                           <p>{msg.content}</p>
+                          {msg.equippedSticker && (
+                             <img 
+                               src={msg.equippedSticker} 
+                               alt="Bouncing sticker" 
+                               className="absolute right-1.5 -bottom-2 w-5 h-5 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:3.5s] z-10" 
+                             />
+                          )}
                       </div>
                    </div>
                 </div>
