@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlobalChat } from '../components/GlobalChat';
 import { useStore } from '../store';
-import { CalendarCheck, ClipboardList, ShoppingBag, Trophy, Star, BookOpen, Flame, User } from 'lucide-react';
+import { CalendarCheck, ClipboardList, ShoppingBag, Trophy, Star, BookOpen, Flame, User, PackageOpen, Library } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 
 export function Home() {
   const navigate = useNavigate();
-  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, lastCheckInDate } = useStore();
+  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate } = useStore();
   
   const todayStr = new Date().toISOString().split('T')[0];
   const isCheckedInToday = lastCheckInDate === todayStr;
@@ -189,7 +189,7 @@ export function Home() {
               <h2 className="font-bold text-sm border-l-4 border-[#8D6E63] pl-2.5 mb-4 text-[#3E2723] uppercase tracking-wider">
                  Hộp Công Cụ
               </h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                  <button onClick={handleCheckIn} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
                     <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center mb-1.5 border border-orange-100/40 group-hover:scale-105 transition-transform">
                        <CalendarCheck className="w-5 h-5 text-[#8D6E63]" />
@@ -218,6 +218,20 @@ export function Home() {
                        {hasUnclaimedAchievements && <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />}
                     </div>
                     <span className="font-extrabold text-[11px] text-[#3E2723] uppercase tracking-tight group-hover:text-[#8D6E63] transition-colors">Thành tựu</span>
+                 </button>
+
+                 <button onClick={() => navigate('/thu-vien')} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
+                    <div className="w-12 h-12 rounded-2xl bg-stone-50 flex items-center justify-center mb-1.5 border border-stone-200/40 group-hover:scale-105 transition-transform">
+                       <Library className="w-5 h-5 text-[#8D6E63]" />
+                    </div>
+                    <span className="font-extrabold text-[11px] text-[#3E2723] uppercase tracking-tight group-hover:text-[#8D6E63] transition-colors">Thư viện</span>
+                 </button>
+
+                 <button onClick={() => setInventoryOpen(true)} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
+                    <div className="w-12 h-12 rounded-2xl bg-zinc-50 flex items-center justify-center mb-1.5 border border-zinc-200/40 group-hover:scale-105 transition-transform">
+                       <PackageOpen className="w-5 h-5 text-[#8D6E63]" />
+                    </div>
+                    <span className="font-extrabold text-[11px] text-[#3E2723] uppercase tracking-tight group-hover:text-[#8D6E63] transition-colors">Túi đồ</span>
                  </button>
               </div>
            </div>
