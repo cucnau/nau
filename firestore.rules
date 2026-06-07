@@ -1,16 +1,25 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isSignedIn() { return request.auth != null; }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
     
     function isAdmin() {
-      // Thay đổi email nếu bạn dùng email admin khác trên Vercel
       return isSignedIn() && (request.auth.token.email == 'cucnau01@gmail.com');
     }
+
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
 
     match /users/{userId} {
       allow read: if true;
       allow write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
+      
       match /{allSubcollections=**} {
         allow read: if true;
         allow write: if (isSignedIn() && request.auth.uid == userId) || isAdmin();
@@ -20,6 +29,7 @@ service cloud.firestore {
     match /stories/{storyId} {
       allow read: if true;
       allow write: if isAdmin();
+      
       match /chapters/{chapterId} {
         allow read: if true;
         allow write: if isAdmin();
@@ -37,10 +47,11 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.auth.uid == incoming().uid;
       allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == existing().uid);
     }
-
+    
     match /userTasks/{taskId} {
       allow read: if isSignedIn() && existing().uid == request.auth.uid;
-      allow write: if isSignedIn() && incoming().uid == request.auth.uid;
+      allow create: if isSignedIn() && incoming().uid == request.auth.uid;
+      allow update: if isSignedIn() && existing().uid == request.auth.uid && incoming().uid == existing().uid;
     }
 
     match /store_stickers/{stickerId} {
