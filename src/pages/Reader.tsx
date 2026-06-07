@@ -2,14 +2,18 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import { cn } from '../components/Layout';
-import { Settings2, ArrowLeft, ArrowRight, List, Lock, MessageSquare } from 'lucide-react';
+import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare } from 'lucide-react';
 import { db, checkIfQuotaError } from '../lib/firebase';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 
 export function Reader() {
   const { storyId, chapterId } = useParams();
   const navigate = useNavigate();
-  const { markStoryRead, isLoggedIn, addCommentProgress, uid, displayName, avatarUrl, spendGoldenChoco } = useStore();
+  const { 
+    markStoryRead, isLoggedIn, addCommentProgress, uid, displayName, avatarUrl, 
+    unlockedPassChapters, unlockedEarlyAccessChapters, consumePassTicket, consumePriorityTicket,
+    ownedPassTickets, ownedPriorityTickets, setStoreOpen
+  } = useStore();
   
   const [showSettings, setShowSettings] = useState(false);
   const [fontSize, setFontSize] = useState(18);
@@ -184,18 +188,42 @@ export function Reader() {
     };
   }, []);
 
-  const handleUnlockChapter = () => {
+  const handleUnlockPass = () => {
      if (!isLoggedIn) { alert("Vui lòng đăng nhập!"); return; }
-     if (spendGoldenChoco(5)) {
-         setIsUnlocked(true);
-         alert("Đã mở khoá chương truyện thành công!");
+     if (consumePassTicket(currentChapter.id)) {
+         setIsUnlocked(true); // force re-render/local optimistic
+         alert("Đã mở khoá chương bằng Vé Pass Truyện!");
      } else {
-         alert("Không đủ Gchoco! (Cần 5 Gchoco để mở khoá chương này)");
+         alert("Bạn không đủ Vé Pass Truyện. Hãy mua thêm trong Cửa Hàng.");
+         setStoreOpen(true);
+     }
+  };
+
+  const handleUnlockEarlyAccess = () => {
+     if (!isLoggedIn) { alert("Vui lòng đăng nhập!"); return; }
+     if (consumePriorityTicket(currentChapter.id)) {
+         setIsUnlocked(true); // force re-render/local optimistic
+         alert("Đã mở khoá chương bằng Vé Ưu Tiên!");
+     } else {
+         alert("Bạn không đủ Vé Ưu Tiên. Hãy mua thêm trong Cửa Hàng.");
+         setStoreOpen(true);
      }
   };
 
   if (loading) return <div className="p-10 text-center">Đang tải...</div>;
   if (!story || !currentChapter) return <div className="p-10 text-center">Không tìm thấy chương</div>;
+
+  const isPassRequired = currentChapter.requiresPass;
+  const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(currentChapter.id);
+  const needsPass = isPassRequired && !hasPassUnlocked && !isUnlocked;
+
+  const isEarlyAccess = currentChapter.requiresEarlyAccess;
+  const chapTime = currentChapter.createdAt?.toMillis ? currentChapter.createdAt.toMillis() : (typeof currentChapter.createdAt === 'number' ? currentChapter.createdAt : 0);
+  const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+  const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(currentChapter.id);
+  const needsEarlyAccess = isStillEarlyAccess && !hasEarlyAccessUnlocked && !isUnlocked;
+
+  const isLocked = needsPass || needsEarlyAccess;
 
   return (
     <div className={cn("min-h-screen flex flex-col transition-colors duration-300", isDark ? "bg-gray-900 text-gray-300" : "bg-[#FDF6EC] text-[#3E2723]")}>
@@ -239,14 +267,31 @@ export function Reader() {
 
        {/* Content */}
        <main className="flex-1 w-full max-w-3xl mx-auto p-6 sm:p-8 md:p-12">
-           {currentChapter.isPasswordProtected && !isUnlocked ? (
-              <div className={cn("flex flex-col items-center justify-center p-12 text-center rounded-3xl border-2", isDark ? "border-gray-800 bg-gray-800/50" : "border-[#D4AF37] bg-[#FDF6EC]")}>
-                 <Lock className="w-12 h-12 mb-4 text-[#D4AF37] animate-bounce" />
-                 <h2 className="text-xl font-bold mb-2 uppercase tracking-tighter">Chương có khoá password</h2>
-                 <p className="opacity-70 mb-6 italic text-[#5D4037]">Bạn cần dùng "Vé Pass Truyện" để đọc chương này.</p>
-                 <button onClick={handleUnlockChapter} className="bg-[#D4AF37] hover:bg-[#B5952F] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors border-2 border-white uppercase text-sm tracking-widest flex items-center gap-2">
-                    Dùng vé <span className="bg-black/15 px-2.5 py-0.5 rounded-full text-xs">5 Gchoco</span>
-                 </button>
+           {isLocked ? (
+              <div className="flex flex-col gap-6">
+                  {needsPass && (
+                    <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-gray-800 bg-gray-800/50" : "border-[#8D6E63] bg-[#FDF6EC]")}>
+                       <Lock className="w-12 h-12 mb-4 text-[#8D6E63] animate-bounce" />
+                       <h2 className="text-xl font-bold mb-2 uppercase tracking-tighter">Chương có khoá Pass</h2>
+                       <p className="opacity-70 mb-4 italic text-[#5D4037]">Bạn cần dùng "Vé Pass Truyện" để đọc vĩnh viễn chương này.</p>
+                       <p className="text-sm font-bold mb-6 text-[#3E2723]">Bạn đang có: {ownedPassTickets || 0} Vé</p>
+                       <button onClick={handleUnlockPass} className="bg-[#3E2723] hover:bg-[#2D1B19] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2">
+                          Mở khoá bằng 1 Vé Pass
+                       </button>
+                    </div>
+                  )}
+
+                  {needsEarlyAccess && (
+                    <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#D4AF37] bg-gray-800/50" : "border-[#D4AF37] bg-[#FFFDE7]")}>
+                       <Zap className="w-12 h-12 mb-4 text-[#D4AF37] animate-pulse fill-yellow-100" />
+                       <h2 className="text-xl font-bold mb-2 uppercase tracking-tighter text-[#827717]">Chương Đọc Sớm</h2>
+                       <p className="opacity-70 mb-4 italic text-[#827717]">Bạn cần dùng "Vé Ưu Tiên" để đọc ngay, hoặc chờ hết 24h.</p>
+                       <p className="text-sm font-bold mb-6 text-[#827717]">Bạn đang có: {ownedPriorityTickets || 0} Vé</p>
+                       <button onClick={handleUnlockEarlyAccess} className="bg-[#D4AF37] hover:bg-[#B5952F] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2">
+                          Mở khoá bằng 1 Vé Ưu Tiên
+                       </button>
+                    </div>
+                  )}
               </div>
            ) : (
               <div 
