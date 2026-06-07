@@ -272,11 +272,11 @@ export const useStore = create<UserState>()(
                storyProgress: userProgress,
                readHistoryList: userHistory,
                savedStories: userSaved,
-               unlockedPassChapters: user.unlockedPassChapters || [],
-               unlockedEarlyAccessChapters: user.unlockedEarlyAccessChapters || [],
+               unlockedPassChapters: (user as any).unlockedPassChapters || [],
+               unlockedEarlyAccessChapters: (user as any).unlockedEarlyAccessChapters || [],
                ownedStickers: userOwnedStickers,
-               ownedPassTickets: user.ownedPassTickets || 0,
-               ownedPriorityTickets: user.ownedPriorityTickets || 0,
+               ownedPassTickets: (user as any).ownedPassTickets || 0,
+               ownedPriorityTickets: (user as any).ownedPriorityTickets || 0,
                unlockedAchievements: userUnlocked,
                claimedAchievements: userClaimed
             });
