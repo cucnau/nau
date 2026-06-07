@@ -14,6 +14,7 @@ import { getDocs, collection } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST, getWeeklyId, getPreviousWeeklyId } from '../types/achievements';
 import { Store } from '../pages/Store';
 import { Missions } from '../pages/Missions';
+import { Inventory } from '../pages/Inventory';
 
 export function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -395,8 +396,8 @@ export function AppLayout() {
   const [showQuotaWarning, setShowQuotaWarning] = useState(true);
   const { 
     isLoggedIn, uid, displayName, avatarUrl, equippedSticker, stickerPosition, choco, goldenChoco, email, level,
-    isStoreOpen, isMissionsOpen, isAchievementsOpen,
-    setStoreOpen, setMissionsOpen, setAchievementsOpen,
+    isStoreOpen, isMissionsOpen, isAchievementsOpen, isInventoryOpen,
+    setStoreOpen, setMissionsOpen, setAchievementsOpen, setInventoryOpen,
     isQuotaExceeded, firebaseUser
   } = useStore();
   const navigate = useNavigate();
@@ -582,6 +583,24 @@ export function AppLayout() {
               <X className="w-5 h-5" />
             </button>
             <AchievementsModal />
+          </div>
+        </div>
+      )}
+
+      {/* Modal Túi đồ */}
+      {isInventoryOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setInventoryOpen(false)} />
+          <div className="relative bg-[#FDF6EC] w-full max-w-4xl h-[85vh] rounded-3xl overflow-y-auto border-4 border-[#8D6E63] shadow-2xl flex flex-col z-10 transition-all">
+            <button 
+              onClick={() => setInventoryOpen(false)} 
+              className="absolute top-4 right-4 p-2 bg-[#3E2723] hover:bg-[#2D1B19] text-white rounded-full transition-colors z-20 shadow"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="p-2 sm:p-4 flex-1">
+              <Inventory />
+            </div>
           </div>
         </div>
       )}
