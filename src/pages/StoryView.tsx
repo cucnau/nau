@@ -20,7 +20,8 @@ export function StoryView() {
     displayName, 
     avatarUrl,
     unlockedPassChapters,
-    unlockedEarlyAccessChapters
+    unlockedEarlyAccessChapters,
+    getTitleColor
   } = useStore();
 
   const [story, setStory] = useState<any>(null);
@@ -434,7 +435,7 @@ export function StoryView() {
                               <div className="flex-1 min-w-0">
                                  <div className="flex items-center justify-between gap-2 mb-1">
                                     <div className="flex items-center gap-1.5 flex-wrap">
-                                       <span className="font-extrabold text-[#3E2723] text-sm shrink-0">
+                                       <span className="font-extrabold text-sm shrink-0" style={{ color: getTitleColor(comment.activeTitle) || '#3E2723' }}>
                                           {comment.displayName}
                                           {comment.activeTitle && (
                                              <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-800 text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200 ml-1.5 inline-block align-middle">
@@ -537,7 +538,7 @@ export function StoryView() {
                                                 )}
                                                 <div className="flex-1 min-w-0">
                                                    <div className="flex items-center justify-between gap-2 mb-0.5">
-                                                      <span className="font-bold text-[#3E2723] text-xs">
+                                                      <span className="font-bold text-xs" style={{ color: getTitleColor(reply.activeTitle) || '#3E2723' }}>
                                                          {reply.displayName}
                                                          {reply.activeTitle && (
                                                             <span className="px-1 py-0.5 bg-yellow-101 text-yellow-800 text-[8px] font-black rounded uppercase ml-1 shadow-sm border border-yellow-250 inline-block align-middle">
