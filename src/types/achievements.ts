@@ -208,6 +208,16 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     goldenReward: 0,
     progressTarget: 1,
     category: 'legend'
+  },
+  {
+    id: 'choco_high_level',
+    name: 'Choco Cấp Cao',
+    description: 'Đạt Level 100.',
+    rewardText: '+100 Choco',
+    chocoReward: 100,
+    goldenReward: 0,
+    progressTarget: 100,
+    category: 'legend'
   }
 ];
 
