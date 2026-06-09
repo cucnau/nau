@@ -147,6 +147,9 @@ export function Admin() {
   const [achievementColors, setAchievementColors] = useState<Record<string, string>>({});
   const [newTitleName, setNewTitleName] = useState('');
   const [newTitleColor, setNewTitleColor] = useState('#8D6E63');
+  const [editingTitleId, setEditingTitleId] = useState<string | null>(null);
+  const [editingTitleName, setEditingTitleName] = useState('');
+  const [editingTitleColor, setEditingTitleColor] = useState('');
   const [assigningTitleUser, setAssigningTitleUser] = useState<AdminUser | null>(null);
   const [selectedTitleIdToAssign, setSelectedTitleIdToAssign] = useState<string>('');
   const [viewingTitleUsers, setViewingTitleUsers] = useState<{ id: string, name: string, isAchievement: boolean } | null>(null);
@@ -240,6 +243,49 @@ export function Admin() {
       fetchGlobalTitles();
       alert('Đã tạo danh hiệu mới');
     } catch(err: any) { alert('Lỗi: ' + err.message); }
+  };
+
+  const handleStartEditTitle = (t: CustomTitle) => {
+     setEditingTitleId(t.id);
+     setEditingTitleName(t.name);
+     setEditingTitleColor(t.color);
+  };
+
+  const handleSaveEditTitle = async () => {
+     if (!editingTitleId || !editingTitleName.trim()) return;
+     try {
+        await updateDoc(doc(db, 'custom_titles', editingTitleId), {
+           name: editingTitleName.trim(),
+           color: editingTitleColor
+        });
+        
+        const usersSnapshot = await getDocs(collection(db, 'users'));
+        const batch = writeBatch(db);
+        let count = 0;
+        usersSnapshot.forEach(userDoc => {
+            const userData = userDoc.data();
+            if (userData.customTitles && userData.customTitles.length > 0) {
+               const hasTitle = userData.customTitles.find((ct: any) => ct.id === editingTitleId);
+               if (hasTitle) {
+                  const updatedTitles = userData.customTitles.map((ct: any) => 
+                     ct.id === editingTitleId ? { ...ct, name: editingTitleName.trim(), color: editingTitleColor } : ct
+                  );
+                  batch.update(userDoc.ref, { customTitles: updatedTitles });
+                  count++;
+               }
+            }
+        });
+        if (count > 0) await batch.commit();
+
+        setEditingTitleId(null);
+        fetchGlobalTitles();
+        fetchUsers();
+        alert('Đã cập nhật danh hiệu');
+     } catch (err: any) { alert('Lỗi sửa danh hiệu: ' + err.message); }
+  };
+
+  const handleCancelEditTitle = () => {
+     setEditingTitleId(null);
   };
 
   const handleDeleteTitle = async (id: string) => {
@@ -1231,12 +1277,24 @@ export function Admin() {
               <h2 className="text-xl font-bold text-[#3E2723]">Danh Hiệu Tự Tạo ({globalTitles.length})</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                  {globalTitles.map(t => (
-                   <div key={t.id} className="p-4 border rounded-xl flex items-center justify-between" style={{ borderColor: t.color }}>
-                      <span className="font-bold text-lg" style={{ color: t.color }}>{t.name}</span>
-                      <div className="flex items-center gap-2">
-                         <button onClick={() => setViewingTitleUsers({ id: t.id, name: t.name, isAchievement: false })} className="text-[#8D6E63] hover:text-[#5D4037] p-2 rounded-lg hover:bg-orange-50 transition-colors" title="Xem người sở hữu"><Users className="w-5 h-5"/></button>
-                         <button onClick={() => handleDeleteTitle(t.id)} className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors" title="Xóa danh hiệu"><Trash2 className="w-5 h-5"/></button>
-                      </div>
+                   <div key={t.id} className="p-4 border rounded-xl flex items-center justify-between gap-4" style={{ borderColor: t.color }}>
+                      {editingTitleId === t.id ? (
+                         <div className="flex-1 flex gap-2 w-full">
+                           <input type="text" value={editingTitleName} onChange={e => setEditingTitleName(e.target.value)} className="flex-1 px-2 py-1 border rounded min-w-0" />
+                           <input type="color" value={editingTitleColor} onChange={e => setEditingTitleColor(e.target.value)} className="w-8 h-8 shrink-0 rounded border" />
+                           <button onClick={handleSaveEditTitle} className="p-1.5 bg-[#8D6E63] text-white rounded hover:bg-[#5D4037]"><Save className="w-4 h-4"/></button>
+                           <button onClick={handleCancelEditTitle} className="p-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">X</button>
+                         </div>
+                      ) : (
+                         <>
+                           <span className="font-bold text-lg truncate" style={{ color: t.color }}>{t.name}</span>
+                           <div className="flex items-center shrink-0">
+                              <button onClick={() => setViewingTitleUsers({ id: t.id, name: t.name, isAchievement: false })} className="text-[#8D6E63] hover:text-[#5D4037] p-2 rounded-lg hover:bg-orange-50 transition-colors" title="Xem người sở hữu"><Users className="w-5 h-5"/></button>
+                              <button onClick={() => handleStartEditTitle(t)} className="text-[#8D6E63] hover:text-[#5D4037] p-2 rounded-lg hover:bg-orange-50 transition-colors" title="Sửa danh hiệu"><Edit className="w-5 h-5"/></button>
+                              <button onClick={() => handleDeleteTitle(t.id)} className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors" title="Xóa danh hiệu"><Trash2 className="w-5 h-5"/></button>
+                           </div>
+                         </>
+                      )}
                    </div>
                  ))}
                  {globalTitles.length === 0 && <p className="text-gray-500 text-sm py-4 col-span-full">Chưa có danh hiệu nào.</p>}
