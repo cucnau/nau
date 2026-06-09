@@ -6,7 +6,10 @@ import { ACHIEVEMENTS_LIST } from '../types/achievements';
 
 export function Account() {
   const { 
-    isLoggedIn, uid, displayName, email, avatarUrl, equippedSticker, stickerPosition, 
+    isLoggedIn, uid, displayName, email, avatarUrl,
+    equippedStickerAvatar, stickerPositionAvatar,
+    equippedStickerChat,
+    equippedStickerPost, stickerPositionPost,
     choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, 
     ownedStickers, equipSticker, setStickerPosition, firebaseUser, updateUserDoc, unlockAchievement 
   } = useStore();
@@ -28,6 +31,7 @@ export function Account() {
   const [pass, setPass] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [activeStickerTab, setActiveStickerTab] = useState<'avatar' | 'chat' | 'post'>('avatar');
   
   const [review, setReview] = useState('');
   const [reviews, setReviews] = useState<any[]>([]);
@@ -152,8 +156,10 @@ export function Account() {
         activeTitle: activeTitle || null,
         content: review,
         createdAt: serverTimestamp(),
-        equippedSticker: useStore.getState().equippedSticker || null,
-        stickerPosition: useStore.getState().stickerPosition || 'top-right'
+        equippedStickerAvatar: useStore.getState().equippedStickerAvatar || null,
+        stickerPositionAvatar: useStore.getState().stickerPositionAvatar || 'top-right',
+        equippedStickerPost: useStore.getState().equippedStickerPost || null,
+        stickerPositionPost: useStore.getState().stickerPositionPost || 'top-right'
       });
 
       unlockAchievement('blogger_choco_new');
@@ -193,14 +199,14 @@ export function Account() {
                  <div className="w-full h-full overflow-hidden bg-gray-200 border border-[#D7CCC8] rounded-full">
                     {avatar ? <img src={avatar} alt="Avatar" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-2 leading-none">Chưa có ảnh</div>}
                  </div>
-                 {equippedSticker && (
+                 {equippedStickerAvatar && (
                     <img 
-                      src={equippedSticker} 
+                      src={equippedStickerAvatar} 
                       alt="Sticker" 
                       className={`absolute w-8 h-8 object-contain pointer-events-none z-10 ${
-                        stickerPosition === 'top-left' ? 'left-0 top-0 -translate-x-1/4 -translate-y-1/4' :
-                        stickerPosition === 'top-right' ? 'right-0 top-0 translate-x-1/4 -translate-y-1/4' :
-                        stickerPosition === 'bottom-left' ? 'left-0 bottom-0 -translate-x-1/4 translate-y-1/4' :
+                        stickerPositionAvatar === 'top-left' ? 'left-0 top-0 -translate-x-1/4 -translate-y-1/4' :
+                        stickerPositionAvatar === 'top-right' ? 'right-0 top-0 translate-x-1/4 -translate-y-1/4' :
+                        stickerPositionAvatar === 'bottom-left' ? 'left-0 bottom-0 -translate-x-1/4 translate-y-1/4' :
                         'right-0 bottom-0 translate-x-1/4 translate-y-1/4'
                       }`} 
                     />
@@ -225,49 +231,64 @@ export function Account() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2 text-[#5D4037]">Sticker đại diện</label>
+              <label className="block text-sm font-semibold mb-2 text-[#5D4037]">Cài đặt Sticker</label>
               {(ownedStickers || []).length === 0 ? (
                  <p className="text-xs text-gray-500 italic bg-gray-50 p-3 rounded-lg border">Bạn chưa sở hữu sticker nào. Hãy vào Cửa hàng để mua!</p>
               ) : (
                 <div className="space-y-4">
+                  <div className="flex border-b border-[#D7CCC8]">
+                     <button type="button" onClick={() => setActiveStickerTab('avatar')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'avatar' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}>Avatar</button>
+                     <button type="button" onClick={() => setActiveStickerTab('chat')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'chat' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}>Chat Bubble</button>
+                     <button type="button" onClick={() => setActiveStickerTab('post')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'post' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}>Bài Đăng</button>
+                  </div>
+                  
+                  {/* Common sticker picker based on active tab */}
                   <div className="flex flex-wrap gap-4 p-4 bg-gray-50 border rounded-lg">
                     <div 
-                       onClick={() => equipSticker(null)} 
+                       onClick={() => equipSticker(activeStickerTab, null)} 
                        title="Tháo sticker"
-                       className={`w-14 h-14 cursor-pointer flex items-center justify-center border-2 border-dashed transition-all rounded-xl ${!equippedSticker ? 'border-[#8D6E63] bg-[#8D6E63]/10 shadow-sm' : 'border-gray-300 hover:border-gray-400 bg-white'}`}
+                       className={`w-14 h-14 cursor-pointer flex items-center justify-center border-2 border-dashed transition-all rounded-xl ${
+                          !(activeStickerTab === 'avatar' ? equippedStickerAvatar : activeStickerTab === 'chat' ? equippedStickerChat : equippedStickerPost) 
+                          ? 'border-[#8D6E63] bg-[#8D6E63]/10 shadow-sm' : 'border-gray-300 hover:border-gray-400 bg-white'}`}
                     >
                        <span className="text-xs font-bold text-gray-500">Trống</span>
                     </div>
-                    {(ownedStickers || []).map(url => (
-                       <div 
-                         key={url} 
-                         onClick={() => equipSticker(url)}
-                         className={`w-14 h-14 cursor-pointer relative p-1 transition-all rounded-xl border flex items-center justify-center ${equippedSticker === url ? 'ring-2 ring-offset-2 ring-[#8D6E63] bg-white border-transparent' : 'hover:scale-105 bg-white shadow-sm'}`}
-                        >
-                          <img src={url} alt="Sticker preview" className="w-10 h-10 object-contain pointer-events-none" />
-                       </div>
-                    ))}
+                    {(ownedStickers || []).map(url => {
+                       const isEquipped = (activeStickerTab === 'avatar' ? equippedStickerAvatar : activeStickerTab === 'chat' ? equippedStickerChat : equippedStickerPost) === url;
+                       return (
+                          <div 
+                            key={url} 
+                            onClick={() => equipSticker(activeStickerTab, url)}
+                            className={`w-14 h-14 cursor-pointer relative p-1 transition-all rounded-xl border flex items-center justify-center ${isEquipped ? 'ring-2 ring-offset-2 ring-[#8D6E63] bg-white border-transparent' : 'hover:scale-105 bg-white shadow-sm'}`}
+                           >
+                             <img src={url} alt="Sticker preview" className="w-10 h-10 object-contain pointer-events-none" />
+                          </div>
+                       )
+                    })}
                   </div>
 
-                  {equippedSticker && (
+                  {(activeStickerTab === 'avatar' || activeStickerTab === 'post') && (activeStickerTab === 'avatar' ? equippedStickerAvatar : equippedStickerPost) && (
                     <div>
-                      <label className="block text-xs font-bold mb-1.5 text-[#5D4037] uppercase tracking-wider">Vị trí gắn Sticker</label>
+                      <label className="block text-xs font-bold mb-1.5 text-[#5D4037] uppercase tracking-wider">Vị trí gắn Sticker cho {activeStickerTab === 'avatar' ? 'Avatar' : 'Bài Đăng'}</label>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         {[
                           { id: 'top-left', label: 'Trên - Trái' },
                           { id: 'top-right', label: 'Trên - Phải' },
                           { id: 'bottom-left', label: 'Dưới - Trái' },
                           { id: 'bottom-right', label: 'Dưới - Phải' }
-                        ].map(pos => (
-                          <button
-                            key={pos.id}
-                            type="button"
-                            onClick={() => setStickerPosition(pos.id as any)}
-                            className={`py-1.5 px-3 rounded-lg border text-xs font-bold transition-all ${stickerPosition === pos.id ? 'bg-[#8D6E63] text-white border-[#8D6E63]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
-                          >
-                            {pos.label}
-                          </button>
-                        ))}
+                        ].map(pos => {
+                          const isPosActive = (activeStickerTab === 'avatar' ? stickerPositionAvatar : stickerPositionPost) === pos.id;
+                          return (
+                            <button
+                              key={pos.id}
+                              type="button"
+                              onClick={() => setStickerPosition(activeStickerTab as 'avatar' | 'post', pos.id as any)}
+                              className={`py-1.5 px-3 rounded-lg border text-xs font-bold transition-all ${isPosActive ? 'bg-[#8D6E63] text-white border-[#8D6E63]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                            >
+                              {pos.label}
+                            </button>
+                          )
+                        })}
                       </div>
                     </div>
                   )}
@@ -292,14 +313,14 @@ export function Account() {
                  <div className="w-full h-full overflow-hidden bg-gray-200 border-4 border-[#FDF6EC] shadow-sm rounded-full">
                     {avatarUrl ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400">Trống</div>}
                  </div>
-                 {equippedSticker && (
+                 {equippedStickerAvatar && (
                     <img 
-                      src={equippedSticker} 
+                      src={equippedStickerAvatar} 
                       alt="Sticker" 
                       className={`absolute w-12 h-12 object-contain pointer-events-none z-10 ${
-                        stickerPosition === 'top-left' ? 'left-0 top-0 -translate-x-1/4 -translate-y-1/4' :
-                        stickerPosition === 'top-right' ? 'right-0 top-0 translate-x-1/4 -translate-y-1/4' :
-                        stickerPosition === 'bottom-left' ? 'left-0 bottom-0 -translate-x-1/4 translate-y-1/4' :
+                        stickerPositionAvatar === 'top-left' ? 'left-0 top-0 -translate-x-1/4 -translate-y-1/4' :
+                        stickerPositionAvatar === 'top-right' ? 'right-0 top-0 translate-x-1/4 -translate-y-1/4' :
+                        stickerPositionAvatar === 'bottom-left' ? 'left-0 bottom-0 -translate-x-1/4 translate-y-1/4' :
                         'right-0 bottom-0 translate-x-1/4 translate-y-1/4'
                       }`} 
                     />
