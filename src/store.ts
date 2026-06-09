@@ -24,8 +24,11 @@ interface UserState {
   displayName: string | null;
   email: string | null;
   avatarUrl: string | null;
-  equippedSticker: string | null;
-  stickerPosition: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  equippedStickerAvatar: string | null;
+  stickerPositionAvatar: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  equippedStickerChat: string | null;
+  equippedStickerPost: string | null;
+  stickerPositionPost: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   ownedStickers: string[];
   ownedPassTickets: number;
   ownedPriorityTickets: number;
@@ -105,8 +108,8 @@ interface UserState {
   toggleSaveStory: (storyId: string) => void;
   giftChoco: (storyId: string, amount: number) => boolean;
   addOwnedSticker: (stickerUrl: string) => void;
-  equipSticker: (stickerUrl: string | null) => void;
-  setStickerPosition: (pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => void;
+  equipSticker: (type: 'avatar' | 'chat' | 'post', stickerUrl: string | null) => void;
+  setStickerPosition: (type: 'avatar' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => void;
   
   claimMission: (id: string) => void;
   updateUserDoc: (updates: any) => Promise<void>;
@@ -148,8 +151,11 @@ export const useStore = create<UserState>()(
       displayName: null,
       email: null,
       avatarUrl: null,
-      equippedSticker: null,
-      stickerPosition: 'top-right',
+      equippedStickerAvatar: null,
+      stickerPositionAvatar: 'top-right',
+      equippedStickerChat: null,
+      equippedStickerPost: null,
+      stickerPositionPost: 'top-right',
       ownedStickers: [],
       ownedPassTickets: 0,
       ownedPriorityTickets: 0,
@@ -218,8 +224,11 @@ export const useStore = create<UserState>()(
         firebaseUser: null, 
         email: null, 
         avatarUrl: null,
-        equippedSticker: null,
-        stickerPosition: 'top-right',
+        equippedStickerAvatar: null,
+        stickerPositionAvatar: 'top-right',
+        equippedStickerChat: null,
+        equippedStickerPost: null,
+        stickerPositionPost: 'top-right',
         ownedStickers: [],
         ownedPassTickets: 0,
         ownedPriorityTickets: 0,
@@ -326,8 +335,11 @@ export const useStore = create<UserState>()(
             displayName: data.displayName !== undefined ? data.displayName : state.displayName,
             email: data.email !== undefined ? data.email : state.email,
             avatarUrl: data.avatarUrl !== undefined ? data.avatarUrl : state.avatarUrl,
-            equippedSticker: data.equippedSticker !== undefined ? data.equippedSticker : state.equippedSticker,
-            stickerPosition: data.stickerPosition !== undefined ? data.stickerPosition : state.stickerPosition,
+            equippedStickerAvatar: data.equippedStickerAvatar !== undefined ? data.equippedStickerAvatar : state.equippedStickerAvatar,
+            stickerPositionAvatar: data.stickerPositionAvatar !== undefined ? data.stickerPositionAvatar : state.stickerPositionAvatar,
+            equippedStickerChat: data.equippedStickerChat !== undefined ? data.equippedStickerChat : state.equippedStickerChat,
+            equippedStickerPost: data.equippedStickerPost !== undefined ? data.equippedStickerPost : state.equippedStickerPost,
+            stickerPositionPost: data.stickerPositionPost !== undefined ? data.stickerPositionPost : state.stickerPositionPost,
             ownedStickers: data.ownedStickers !== undefined ? data.ownedStickers : state.ownedStickers,
             ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
             ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
@@ -792,20 +804,22 @@ export const useStore = create<UserState>()(
          get().updateUserDoc({ ownedStickers: newOwned });
       },
       
-      equipSticker: (stickerUrl: string | null) => {
+      equipSticker: (type: 'avatar' | 'chat' | 'post', stickerUrl: string | null) => {
          const state = get();
          if (!state.isLoggedIn) return;
          
-         set({ equippedSticker: stickerUrl });
-         get().updateUserDoc({ equippedSticker: stickerUrl });
+         const key = type === 'avatar' ? 'equippedStickerAvatar' : type === 'chat' ? 'equippedStickerChat' : 'equippedStickerPost';
+         set({ [key]: stickerUrl });
+         get().updateUserDoc({ [key]: stickerUrl });
       },
 
-      setStickerPosition: (pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
+      setStickerPosition: (type: 'avatar' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
          const state = get();
          if (!state.isLoggedIn) return;
          
-         set({ stickerPosition: pos });
-         get().updateUserDoc({ stickerPosition: pos });
+         const key = type === 'avatar' ? 'stickerPositionAvatar' : 'stickerPositionPost';
+         set({ [key]: pos });
+         get().updateUserDoc({ [key]: pos });
       },
 
       giftChoco: (storyId: string, amount: number) => {
