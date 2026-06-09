@@ -5,6 +5,7 @@ import { collection, query, orderBy, limit, onSnapshot, doc, deleteDoc } from 'f
 import { Newspaper, Trash2, User, ExternalLink, MessageSquareQuote } from 'lucide-react';
 import { cn } from './Layout';
 import { useNavigate } from 'react-router-dom';
+import { UserAvatar } from './UserAvatar';
 
 interface FeedPost {
   id: string;
@@ -20,7 +21,7 @@ interface FeedPost {
 
 export function NewsFeed() {
   const [posts, setPosts] = useState<FeedPost[]>([]);
-  const { isLoggedIn, uid, email } = useStore();
+  const { isLoggedIn, uid, email, getTitleColor } = useStore();
   const navigate = useNavigate();
   const isAdmin = email?.toLowerCase() === 'cucnau01@gmail.com';
 
@@ -102,33 +103,18 @@ export function NewsFeed() {
                     )} 
                   />
                 )}
-                <div className="flex-shrink-0 w-8 h-8 rounded-full border border-[#D7CCC8]/30 bg-[#5D4037] flex items-center justify-center relative">
-                  <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
-                    {post.avatarUrl ? (
-                      <img src={post.avatarUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                    ) : (
-                      <User className="w-4 h-4 text-[#A1887F]" />
-                    )}
-                  </div>
-                  {(post.equippedStickerAvatar || post.equippedSticker) && (
-                    <img 
-                      src={post.equippedStickerAvatar || post.equippedSticker} 
-                      alt="Sticker" 
-                      className={cn(
-                        "absolute w-4 h-4 object-contain pointer-events-none z-10 animate-pulse",
-                        (post.stickerPositionAvatar || post.stickerPosition) === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-                        (post.stickerPositionAvatar || post.stickerPosition) === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-                        (post.stickerPositionAvatar || post.stickerPosition) === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-                        ((post.stickerPositionAvatar || post.stickerPosition) === 'bottom-right' || !(post.stickerPositionAvatar || post.stickerPosition)) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
-                      )} 
-                    />
-                  )}
-                </div>
+                <UserAvatar 
+                  avatarUrl={post.avatarUrl} 
+                  equippedSticker={post.equippedStickerAvatar || post.equippedSticker} 
+                  stickerPosition={post.stickerPositionAvatar || post.stickerPosition} 
+                  className="w-8 h-8" 
+                  fallbackIconSizeClass="w-4 h-4" 
+                />
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-extrabold text-xs text-[#5D4037]">
+                      <span className="font-extrabold text-xs" style={{ color: getTitleColor(post.activeTitle) || '#5D4037' }}>
                         {post.displayName}
                       </span>
                       {post.activeTitle && (
