@@ -56,7 +56,6 @@ export function StoryList() {
             <List className="w-6 h-6 text-[#8D6E63]" />
             Danh Sách Truyện
           </h1>
-          <p className="text-[#8D6E63] text-xs font-medium mt-1">Khám phá tất cả các tựa truyện hiện có</p>
         </div>
         
         {/* Search & Filter */}
