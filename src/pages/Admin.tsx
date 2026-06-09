@@ -1223,12 +1223,12 @@ export function Admin() {
                     const tColor = achievementColors[ach.id] || '#8D6E63';
                     return (
                        <div key={ach.id} className="p-4 border rounded-xl flex flex-col gap-3" style={{ borderColor: tColor }}>
-                          <div className="flex items-center justify-between">
-                             <div className="flex flex-col">
-                               <span className="font-bold text-sm" style={{ color: tColor }}>{ach.name}</span>
-                               <span className="text-[10px] text-gray-500 truncate" title={ach.description}>{ach.description}</span>
+                          <div className="flex items-start justify-between gap-2">
+                             <div className="flex flex-col flex-1 min-w-0">
+                               <span className="font-bold text-sm truncate" style={{ color: tColor }} title={ach.name}>{ach.name}</span>
+                               <span className="text-[10px] text-gray-500 line-clamp-2" title={ach.description}>{ach.description}</span>
                              </div>
-                             <button onClick={() => setViewingTitleUsers({ id: ach.id, name: ach.name, isAchievement: true })} className="text-[#8D6E63] hover:text-[#5D4037] p-2 rounded-lg hover:bg-orange-50 transition-colors" title="Xem người sở hữu"><Users className="w-5 h-5"/></button>
+                             <button onClick={() => setViewingTitleUsers({ id: ach.id, name: ach.name, isAchievement: true })} className="text-[#8D6E63] hover:text-[#5D4037] p-2 rounded-lg hover:bg-orange-50 transition-colors flex-shrink-0" title="Xem người sở hữu"><Users className="w-5 h-5"/></button>
                           </div>
                           <div className="flex items-center justify-between gap-2 border-t pt-2">
                              <span className="text-xs font-semibold text-gray-600">Đổi màu:</span>
