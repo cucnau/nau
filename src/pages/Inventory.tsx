@@ -56,21 +56,12 @@ export function Inventory() {
           <div className="bg-white border border-[#D7CCC8] rounded-2xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden group">
              <CalendarCheck className="w-12 h-12 text-[#8D6E63] mb-4" />
              <h3 className="text-lg font-bold mb-2 uppercase text-[#3E2723]">Vé Giữ Chuỗi</h3>
-             <p className="text-gray-500 text-sm mb-6 italic">Sử dụng để bảo vệ chuỗi điểm danh, giữ chuỗi nếu lỡ quên điểm danh 1 ngày.</p>
-             <div className="mt-auto flex flex-col gap-2 w-full">
-                <div className="bg-[#FDF6EC] px-6 py-2 border border-[#8D6E63] rounded-full">
-                   <span className="font-bold text-[#3E2723]">Sở hữu: {useStore().ownedStreakTickets || 0}</span>
+             <p className="text-gray-500 text-sm mb-6 italic">Tự động tiêu hao để bảo vệ chuỗi nếu lỡ quên điểm danh.</p>
+             <div className="flex flex-col gap-3 w-full mt-auto">
+                <div className="bg-[#FDF6EC] px-6 py-2 border border-[#8D6E63] rounded-full text-xs font-bold text-[#3E2723] self-center">
+                   Sở hữu: {useStore().ownedStreakTickets || 0}
                 </div>
-                {(useStore().ownedStreakTickets || 0) > 0 && !useStore().activeStreakProtection ? (
-                   <button onClick={() => {
-                        if(useStore().useStreakTicket()) alert('Đã kích hoạt bảo vệ chuỗi điểm danh!');
-                        else alert('Không thể dùng vé bảo vệ lúc này!');
-                    }} className="w-full bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] px-6 py-2 rounded-full font-bold uppercase cursor-pointer transition-colors text-xs tracking-widest">
-                       Sử dụng
-                   </button>
-                ) : useStore().activeStreakProtection ? (
-                   <div className="w-full bg-green-100 text-green-700 px-6 py-2 rounded-full font-bold uppercase text-xs tracking-widest">Đang được bảo vệ</div>
-                ) : null}
+                <div className="w-full bg-gray-100 text-gray-500 px-6 py-2.5 rounded-full font-black uppercase text-sm tracking-wide shadow-md shrink-0 self-center text-center">Tự động sử dụng</div>
              </div>
           </div>
 
