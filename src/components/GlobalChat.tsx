@@ -4,6 +4,7 @@ import { cn } from './Layout';
 import { MessageSquare, Send, User } from 'lucide-react';
 import { db, checkIfQuotaError } from '../lib/firebase';
 import { collection, query, orderBy, limit, addDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { UserAvatar } from './UserAvatar';
 
 interface ChatMessage {
   id: string;
@@ -18,7 +19,7 @@ interface ChatMessage {
 export function GlobalChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const { isLoggedIn, uid, displayName, avatarUrl, incrementSentMessages, activeTitle } = useStore();
+  const { isLoggedIn, uid, displayName, avatarUrl, incrementSentMessages, activeTitle, getTitleColor } = useStore();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -96,30 +97,16 @@ export function GlobalChat() {
           return (
              <div key={msg.id || i} className="flex flex-col w-full text-white items-start">
                 <div className="flex items-end gap-2 pr-1 pl-1 max-w-[85%] flex-row">
-                   <div className="flex-shrink-0 w-8 h-8 rounded-full border border-[#D7CCC8]/30 mb-0.5 bg-[#5D4037] flex items-center justify-center relative"><div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center">
-                      {msg.avatarUrl ? (
-                         <img src={msg.avatarUrl} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                         <User className="w-4 h-4 text-[#A1887F]" />
-                      )}
-                   </div>
-                   {(msg.equippedStickerAvatar || msg.equippedSticker) && (
-                     <img 
-                       src={msg.equippedStickerAvatar || msg.equippedSticker} 
-                       alt="Sticker" 
-                       className={cn(
-                         "absolute w-4 h-4 object-contain pointer-events-none z-10 animate-pulse",
-                         (msg.stickerPositionAvatar || msg.stickerPosition) === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-                         (msg.stickerPositionAvatar || msg.stickerPosition) === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-                         (msg.stickerPositionAvatar || msg.stickerPosition) === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-                         (msg.stickerPositionAvatar || msg.stickerPosition) === 'bottom-right' && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
-                       )} 
-                     />
-                   )}
-                </div>
+                   <UserAvatar 
+                     avatarUrl={msg.avatarUrl} 
+                     equippedSticker={msg.equippedStickerAvatar || msg.equippedSticker} 
+                     stickerPosition={msg.stickerPositionAvatar || msg.stickerPosition} 
+                     className="w-8 h-8 mb-0.5" 
+                     fallbackIconSizeClass="w-4 h-4" 
+                   />
                    <div className="flex flex-col gap-1 items-start">
                       <div className="flex items-center gap-1.5 px-1 flex-wrap">
-                         <span className="font-bold text-[10px] text-[#A1887F] whitespace-nowrap">
+                         <span className="font-bold text-[10px] whitespace-nowrap" style={{ color: getTitleColor(msg.activeTitle) || '#A1887F' }}>
                             {msg.displayName}
                          </span>
                          {msg.activeTitle && (
