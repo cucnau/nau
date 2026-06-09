@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { onAuthStateChanged, getRedirectResult } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, collection } from 'firebase/firestore';
+import { ACHIEVEMENTS_LIST } from '../types/achievements';
 import { auth, db } from '../lib/firebase';
 import { useStore } from '../store';
 
@@ -125,6 +126,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => unsubscribe();
   }, [login, logout, setFirebaseUser, syncFromFirebase]);
+
+  useEffect(() => {
+    // 1. Subscribe to custom titles
+    const unsubCustoms = onSnapshot(collection(db, 'custom_titles'), (snapshot) => {
+      const customsMap: Record<string, string> = {};
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        if (data.name && data.color) {
+          customsMap[data.name] = data.color;
+        }
+      });
+      useStore.getState().setCustomTitleColors(customsMap);
+    }, (err) => {
+      console.error('Error fetching custom titles colors:', err);
+    });
+
+    // 2. Subscribe to achievement colors
+    const unsubAchColors = onSnapshot(doc(db, 'settings', 'achievement_colors'), (docSnap) => {
+      const achColorsMap: Record<string, string> = {};
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        Object.entries(data).forEach(([achId, color]) => {
+          const ach = ACHIEVEMENTS_LIST.find(a => a.id === achId);
+          if (ach) {
+            achColorsMap[ach.name] = color as string;
+          }
+        });
+      }
+      useStore.getState().setAchievementColors(achColorsMap);
+    }, (err) => {
+      console.error('Error fetching achievement colors:', err);
+    });
+
+    return () => {
+      unsubCustoms();
+      unsubAchColors();
+    };
+  }, []);
 
   return <>{children}</>;
 }
