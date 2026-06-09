@@ -107,63 +107,63 @@ export function Store() {
        </div>
 
        {activeTab === 'items' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
              {/* Exchange Card */}
-             <div className="bg-white border-2 border-[#D7CCC8] rounded-2xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
-                <div className="absolute top-0 right-0 bg-[#3E2723] text-[#FDF6EC] text-[10px] uppercase font-bold tracking-widest px-4 py-1.5 rounded-bl-xl shadow-sm">Quy đổi</div>
-                <Shuffle className="w-12 h-12 text-[#8D6E63] mb-4 group-hover:rotate-180 transition-transform duration-500" />
-                <h3 className="text-lg font-bold mb-2 text-[#3E2723]">Đổi Gchoco</h3>
-                <p className="text-gray-500 text-sm mb-6 italic">Sử dụng 5 Choco để đổi lấy 1 Gchoco.</p>
-                <button onClick={handleExchange} className="bg-[#FDF6EC] text-[#3E2723] border border-[#8D6E63] px-6 py-2.5 rounded-full font-bold hover:bg-[#3E2723] hover:text-[#FDF6EC] transition-colors w-full mt-auto uppercase text-sm tracking-widest">
-                   Đổi ngay
+             <div className="bg-white border-2 border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
+                <div className="absolute top-0 right-0 bg-[#3E2723] text-[#FDF6EC] text-[8px] sm:text-[10px] uppercase font-bold tracking-widest px-2 sm:px-3 py-1 rounded-bl-xl shadow-sm">Quy đổi</div>
+                <Shuffle className="w-8 h-8 sm:w-10 sm:h-10 text-[#8D6E63] mt-2 mb-2 sm:mb-4 group-hover:rotate-180 transition-transform duration-500" />
+                <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 text-[#3E2723]">Đổi Gchoco</h3>
+                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">5 Choco = 1 Gchoco.</p>
+                <button onClick={handleExchange} className="bg-[#FDF6EC] text-[#3E2723] border border-[#8D6E63] p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#3E2723] hover:text-[#FDF6EC] transition-colors w-full mt-auto uppercase text-[10px] sm:text-xs tracking-widest">
+                   Đổi
                 </button>
              </div>
 
-             <div className="bg-white border border-[#D7CCC8] rounded-2xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#D4AF37] transition-colors">
-                <Lock className="w-12 h-12 text-[#D4AF37] mb-4 group-hover:-translate-y-1 transition-transform" />
-                <h3 className="text-lg font-bold mb-2 uppercase text-[#3E2723]">Vé Pass Truyện</h3>
-                <p className="text-gray-500 text-sm mb-6 italic">Dùng để mở khoá 1 chương truyện bị set password.</p>
-                <button onClick={() => handleBuyItem('Vé Pass Truyện', 5, 'golden', () => buyTicket('pass'))} className="bg-[#D4AF37] text-white px-6 py-2.5 rounded-full font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex items-center justify-center gap-2 uppercase text-sm tracking-widest shadow-md">
-                   Mua <span className="bg-black/10 px-2 py-0.5 rounded-full text-[10px]">5 Gchoco</span>
+             <div className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#D4AF37] transition-colors">
+                <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-[#D4AF37] mb-2 sm:mb-4 group-hover:-translate-y-1 transition-transform" />
+                <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Pass Truyện</h3>
+                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Mở khoá 1 chương truyện bị đặt password.</p>
+                <button onClick={() => handleBuyItem('Vé Pass Truyện', 5, 'golden', () => buyTicket('pass'))} className="bg-[#D4AF37] text-white p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
+                   <span>Mua</span> <span className="bg-black/10 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">5 Gchoco</span>
                 </button>
              </div>
 
-             <div className="bg-white border border-[#D7CCC8] rounded-2xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#D4AF37] transition-colors">
-                <Zap className="w-12 h-12 text-[#D4AF37] mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-lg font-bold mb-2 uppercase text-[#3E2723]">Vé Ưu Tiên</h3>
-                <p className="text-gray-500 text-sm mb-6 italic">Đọc sớm nhất các chương truyện vừa đăng.</p>
-                <button onClick={() => handleBuyItem('Vé Ưu Tiên', 3, 'golden', () => buyTicket('priority'))} className="bg-[#D4AF37] text-white px-6 py-2.5 rounded-full font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex items-center justify-center gap-2 uppercase text-sm tracking-widest shadow-md">
-                   Mua <span className="bg-black/10 px-2 py-0.5 rounded-full text-[10px]">3 Gchoco</span>
+             <div className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#D4AF37] transition-colors">
+                <Zap className="w-8 h-8 sm:w-10 sm:h-10 text-[#D4AF37] mb-2 sm:mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Ưu Tiên</h3>
+                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Đọc sớm các chương truyện vừa đăng.</p>
+                <button onClick={() => handleBuyItem('Vé Ưu Tiên', 3, 'golden', () => buyTicket('priority'))} className="bg-[#D4AF37] text-white p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
+                   <span>Mua</span> <span className="bg-black/10 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">3 Gchoco</span>
                 </button>
              </div>
           </div>
        )}
 
        {activeTab === 'stickers' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
              {storeStickers.length === 0 && (
-                <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center text-gray-500 py-8 italic border border-dashed border-[#D7CCC8] rounded-2xl">
+                <div className="col-span-full text-center text-gray-500 py-8 italic border border-dashed border-[#D7CCC8] rounded-2xl">
                    Cửa hàng hiện chưa có sticker nào.
                 </div>
              )}
              {storeStickers.map((sticker, i) => (
-                <div key={sticker.id} className="bg-white border border-[#D7CCC8] rounded-2xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
-                   <div className="w-16 h-16 relative mb-4 p-2 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center shrink-0">
+                <div key={sticker.id} className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
+                   <div className="w-12 h-12 sm:w-14 sm:h-14 relative mb-2 sm:mb-4 p-1 sm:p-2 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center shrink-0">
                       {sticker.url ? (
-                        <img src={sticker.url} alt="Sticker" className="w-12 h-12 object-contain pointer-events-none" />
+                        <img src={sticker.url} alt="Sticker" className="w-10 h-10 sm:w-12 sm:h-12 object-contain pointer-events-none" />
                       ) : (
-                        <Smile className="w-8 h-8 text-[#A1887F]" />
+                        <Smile className="w-6 h-6 sm:w-8 sm:h-8 text-[#A1887F]" />
                       )}
                    </div>
-                   <h3 className="text-lg font-bold mb-2 uppercase text-[#3E2723]">{sticker.name}</h3>
-                   <p className="text-gray-500 text-sm mb-6 italic">{sticker.description}</p>
+                   <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">{sticker.name}</h3>
+                   <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">{sticker.description}</p>
                    {ownedStickers?.includes(sticker.url) ? (
-                      <button disabled className="px-6 py-2.5 rounded-full font-bold w-full mt-auto flex items-center justify-center gap-2 uppercase text-sm tracking-widest bg-gray-300 text-gray-500 cursor-not-allowed">
-                         Đã sở hữu
+                      <button disabled className="p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest bg-gray-300 text-gray-500 cursor-not-allowed">
+                         Đã có
                       </button>
                    ) : (
-                      <button onClick={() => buySticker(sticker)} className={cn("px-6 py-2.5 rounded-full font-bold transition-colors w-full mt-auto flex items-center justify-center gap-2 uppercase text-sm tracking-widest shadow-md", sticker.type === 'golden' ? "bg-[#D4AF37] text-white hover:bg-[#B5952F]" : "bg-[#3E2723] text-[#FDF6EC] hover:bg-[#2D1B19]")}>
-                         Mua <span className={cn("px-2 py-0.5 rounded-full text-[10px]", sticker.type === 'golden' ? "bg-black/10" : "bg-[#FDF6EC]/20")}>{sticker.price} {sticker.type === 'golden' ? 'Gchoco' : 'Choco'}</span>
+                      <button onClick={() => buySticker(sticker)} className={cn("p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md", sticker.type === 'golden' ? "bg-[#D4AF37] text-white hover:bg-[#B5952F]" : "bg-[#3E2723] text-[#FDF6EC] hover:bg-[#2D1B19]")}>
+                         <span>Mua</span> <span className={cn("px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap", sticker.type === 'golden' ? "bg-black/10" : "bg-[#FDF6EC]/20")}>{sticker.price} {sticker.type === 'golden' ? 'GChoco' : 'Choco'}</span>
                       </button>
                    )}
                 </div>
