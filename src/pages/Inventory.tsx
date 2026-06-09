@@ -103,7 +103,7 @@ export function Inventory() {
                   onClick={() => setWonSticker(null)}
                   className="w-full bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] px-6 py-2.5 rounded-full font-bold text-sm uppercase tracking-wider cursor-pointer transition-colors"
                >
-                  Tuyệt vời!
+                  Xác nhận
                </button>
             </div>
          </div>
