@@ -25,12 +25,47 @@ export function Store() {
 
   const handleExchange = () => {
     if (!isLoggedIn) { alert("Vui lòng đăng nhập!"); return; }
-    if (spendChoco(3)) {
-       addGoldenChoco(1);
-       alert("Đổi thành công 1 Gchoco!");
-    } else {
-       alert("Không đủ Choco (Cần 3)!");
+    const input = prompt("Nhập số lượng Gchoco muốn đổi (3 Choco = 1 Gchoco):", "1");
+    if (input === null) return;
+    const amount = parseInt(input, 10);
+    if (isNaN(amount) || amount <= 0) {
+       alert("Số lượng không hợp lệ!");
+       return;
     }
+    const cost = amount * 3;
+    if (spendChoco(cost)) {
+       addGoldenChoco(amount);
+       alert(`Đổi thành công ${amount} Gchoco!`);
+    } else {
+       alert(`Không đủ Choco (Cần ${cost} Choco để đổi ${amount} Gchoco)!`);
+    }
+  };
+
+  const buyTicketWithQuantity = (name: string, pricePerUnit: number, currencyType: 'choco' | 'golden', ticketType: 'pass' | 'priority' | 'streak') => {
+     if (!isLoggedIn) { alert("Vui lòng đăng nhập!"); return; }
+     const input = prompt(`Nhập số lượng ${name} muốn mua:`, "1");
+     if (input === null) return;
+     const qty = parseInt(input, 10);
+     if (isNaN(qty) || qty <= 0) {
+        alert("Số lượng mua không hợp lệ!");
+        return;
+     }
+     const totalPrice = pricePerUnit * qty;
+     if (currencyType === 'choco') {
+         if (spendChoco(totalPrice)) {
+            buyTicket(ticketType, qty);
+            alert(`Đã mua thành công ${qty} ${name}!`);
+         } else {
+            alert(`Không đủ Choco (Cần ${totalPrice} Choco để mua ${qty} vé)`);
+         }
+     } else {
+         if (spendGoldenChoco(totalPrice)) {
+            buyTicket(ticketType, qty);
+            alert(`Đã mua thành công ${qty} ${name}!`);
+         } else {
+            alert(`Không đủ Gchoco (Cần ${totalPrice} Gchoco để mua ${qty} vé)`);
+         }
+     }
   };
 
   const handleBuyItem = (name: string, price: number, type: 'choco' | 'golden', effect?: () => void) => {
@@ -123,7 +158,7 @@ export function Store() {
                 <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-[#D4AF37] mb-2 sm:mb-4 group-hover:-translate-y-1 transition-transform" />
                 <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Pass Truyện</h3>
                 <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Mở khoá 1 chương truyện bị đặt password.</p>
-                <button onClick={() => handleBuyItem('Vé Pass Truyện', 5, 'golden', () => buyTicket('pass'))} className="bg-[#D4AF37] text-white p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
+                <button onClick={() => buyTicketWithQuantity('Vé Pass Truyện', 5, 'golden', 'pass')} className="bg-[#D4AF37] text-white p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
                    <span>Mua</span> <span className="bg-black/10 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">5 Gchoco</span>
                 </button>
              </div>
@@ -132,7 +167,7 @@ export function Store() {
                 <Zap className="w-8 h-8 sm:w-10 sm:h-10 text-[#D4AF37] mb-2 sm:mb-4 group-hover:scale-110 transition-transform" />
                 <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Ưu Tiên</h3>
                 <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Đọc sớm các chương truyện vừa đăng.</p>
-                <button onClick={() => handleBuyItem('Vé Ưu Tiên', 3, 'golden', () => buyTicket('priority'))} className="bg-[#D4AF37] text-white p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
+                <button onClick={() => buyTicketWithQuantity('Vé Ưu Tiên', 3, 'golden', 'priority')} className="bg-[#D4AF37] text-white p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
                    <span>Mua</span> <span className="bg-black/10 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">3 Gchoco</span>
                 </button>
              </div>
@@ -141,7 +176,7 @@ export function Store() {
                 <CalendarCheck className="w-8 h-8 sm:w-10 sm:h-10 text-[#8D6E63] mb-2 sm:mb-4 group-hover:-translate-y-1 transition-transform" />
                 <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Giữ Chuỗi</h3>
                 <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Tự động tiêu hao để bảo vệ chuỗi khi quên điểm danh.</p>
-                <button onClick={() => handleBuyItem('Vé Giữ Chuỗi', 5, 'choco', () => buyTicket('streak'))} className="bg-[#3E2723] text-[#FDF6EC] p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#2D1B19] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
+                <button onClick={() => buyTicketWithQuantity('Vé Giữ Chuỗi', 5, 'choco', 'streak')} className="bg-[#3E2723] text-[#FDF6EC] p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#2D1B19] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
                    <span>Mua</span> <span className="bg-[#FDF6EC]/20 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">5 Choco</span>
                 </button>
              </div>
