@@ -267,9 +267,14 @@ export function Home() {
                  {topUsers.length === 0 && <p className="text-gray-400 italic text-sm text-center py-4">Chưa có dữ liệu.</p>}
                  {topUsers.map((u, i) => (
                     <div key={u.id} className="flex items-center gap-3 bg-[#FDF6EC] p-3 rounded-xl border border-[#F5E6D3]">
-                       <div className="w-10 h-10 rounded-full bg-[#3E2723] text-white flex items-center justify-center overflow-hidden shrink-0">
-                          u.avatarUrl ? <img src={u.avatarUrl} alt="" className="w-full h-full object-cover" /> : <User className="w-5 h-5" />
-                       </div>
+                        <UserAvatar 
+                           avatarUrl={u.avatarUrl} 
+                           equippedSticker={u.equippedStickerAvatar} 
+                           stickerPosition={u.stickerPositionAvatar} 
+                           className="w-10 h-10" 
+                           fallbackIconSizeClass="w-5 h-5 text-amber-200" 
+                           borderClass="border border-[#F5E6D3]"
+                        />
                        <div className="flex-1 min-w-0">
                           <div className="text-xs font-bold truncate" style={{ color: getTitleColor(u.activeTitle) || '#3E2723' }}>Top {i + 1}: {u.displayName}</div>
                           <div className="text-[10px] text-[#A1887F] font-semibold">{u.choco?.toLocaleString()} Choco</div>
