@@ -140,7 +140,7 @@ export function Store() {
              <div className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
                 <CalendarCheck className="w-8 h-8 sm:w-10 sm:h-10 text-[#8D6E63] mb-2 sm:mb-4 group-hover:-translate-y-1 transition-transform" />
                 <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Giữ Chuỗi</h3>
-                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Giữ chuỗi không bị đứt 1 ngày quên điểm danh.</p>
+                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Tự động tiêu hao để bảo vệ chuỗi khi quên điểm danh.</p>
                 <button onClick={() => handleBuyItem('Vé Giữ Chuỗi', 5, 'choco', () => buyTicket('streak'))} className="bg-[#3E2723] text-[#FDF6EC] p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#2D1B19] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
                    <span>Mua</span> <span className="bg-[#FDF6EC]/20 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">5 Choco</span>
                 </button>
