@@ -12,7 +12,7 @@ export function Reader() {
   const { 
     markStoryRead, isLoggedIn, addCommentProgress, uid, displayName, avatarUrl, 
     unlockedPassChapters, unlockedEarlyAccessChapters, consumePassTicket, consumePriorityTicket,
-    ownedPassTickets, ownedPriorityTickets, setStoreOpen
+    ownedPassTickets, ownedPriorityTickets, setStoreOpen, getTitleColor
   } = useStore();
   
   const [showSettings, setShowSettings] = useState(false);
@@ -128,8 +128,8 @@ export function Reader() {
              activeTitle: useStore.getState().activeTitle || null,
              paragraphIdx: paragraphIdx ?? null,
              createdAt: serverTimestamp(),
-             equippedSticker: useStore.getState().equippedSticker || null,
-             stickerPosition: useStore.getState().stickerPosition || 'top-right'
+             equippedSticker: useStore.getState().equippedStickerAvatar || null,
+             stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right'
          });
          addCommentProgress();
      } catch (err) {
@@ -177,8 +177,8 @@ export function Reader() {
            activeTitle: useStore.getState().activeTitle || null,
            giftAmount: 0,
            paragraphIdx: parentComment.paragraphIdx !== undefined ? parentComment.paragraphIdx : null,
-            equippedSticker: useStore.getState().equippedSticker || null,
-            stickerPosition: useStore.getState().stickerPosition || 'top-right',
+            equippedSticker: useStore.getState().equippedStickerAvatar || null,
+            stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right',
            createdAt: serverTimestamp()
         });
 
@@ -410,7 +410,7 @@ export function Reader() {
                                                             )}
                                                         </div>
                                                        <div className="flex-1 min-w-0">
-                                                           <div className="text-xs font-bold mb-0.5 flex items-center gap-1">
+                                                           <div className="text-xs font-bold mb-0.5 flex items-center gap-1" style={{ color: getTitleColor(c.activeTitle) || undefined }}>
                                                                {c.displayName}
                                                                {c.activeTitle && (
                                                                    <span className="px-1.5 py-0.5 bg-yellow-100/80 text-yellow-800 text-[8px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200">
@@ -483,7 +483,7 @@ export function Reader() {
                                                                <div key={reply.id} className={cn("flex gap-2 p-2 rounded-lg", isDark ? "bg-gray-800/40" : "bg-gray-50/50")}>
                                                                   <img src={reply.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-6 h-6 rounded-full object-cover shrink-0" />
                                                                   <div className="flex-1 min-w-0">
-                                                                     <div className="text-[11px] font-bold mb-0.5 flex items-center gap-1">
+                                                                     <div className="text-[11px] font-bold mb-0.5 flex items-center gap-1" style={{ color: getTitleColor(reply.activeTitle) || undefined }}>
                                                                         {reply.displayName}
                                                                         {reply.activeTitle && (
                                                                            <span className="px-1 py-0.5 bg-yellow-100 text-yellow-850 text-[7px] font-extrabold rounded">
@@ -592,7 +592,7 @@ export function Reader() {
                                        )}
                                    </div>
                                    <div>
-                                       <div className="font-bold text-sm tracking-wide flex items-center gap-1.5">
+                                       <div className="font-bold text-sm tracking-wide flex items-center gap-1.5" style={{ color: getTitleColor(c.activeTitle) || undefined }}>
                                            {c.displayName}
                                            {c.activeTitle && (
                                                <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-800 text-[8px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200">
@@ -678,7 +678,7 @@ export function Reader() {
                                                 <img src={reply.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 border border-gray-200" referrerPolicy="no-referrer" />
                                                 <div className="flex-1 min-w-0">
                                                    <div className="flex items-center justify-between gap-2 mb-0.5">
-                                                      <span className="font-bold text-xs">
+                                                      <span className="font-bold text-xs" style={{ color: getTitleColor(reply.activeTitle) || undefined }}>
                                                          {reply.displayName}
                                                          {reply.activeTitle && (
                                                             <span className="px-1 py-0.5 bg-yellow-101 text-yellow-800 text-[8px] font-black rounded uppercase ml-1 shadow-sm border border-yellow-250 inline-block align-middle">
