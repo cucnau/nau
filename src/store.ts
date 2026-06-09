@@ -438,10 +438,16 @@ export const useStore = create<UserState>()(
         
         // Calculate choco
         let dailyChoco = 1;
-        if (newStreak >= 2 && newStreak <= 3) dailyChoco = 2;
+        if (newStreak === 1) dailyChoco = 1;
+        else if (newStreak >= 2 && newStreak <= 3) dailyChoco = 2;
         else if (newStreak >= 4 && newStreak <= 6) dailyChoco = 3;
         else if (newStreak >= 7 && newStreak <= 10) dailyChoco = 4;
-        else if (newStreak > 10) dailyChoco = 5;
+        else if (newStreak >= 11 && newStreak <= 15) dailyChoco = 5;
+        else if (newStreak >= 16 && newStreak <= 21) dailyChoco = 6;
+        else if (newStreak >= 22 && newStreak <= 28) dailyChoco = 7;
+        else if (newStreak >= 29 && newStreak <= 36) dailyChoco = 8;
+        else if (newStreak >= 37 && newStreak <= 45) dailyChoco = 9;
+        else if (newStreak >= 46) dailyChoco = 10;
 
         // Update missions
         const ms = [...state.missions];
