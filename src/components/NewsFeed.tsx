@@ -72,7 +72,7 @@ export function NewsFeed() {
         )}
       </div>
 
-      <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1">
+      <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1 px-2 pt-3 pb-2 -mx-2">
         {posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 bg-[#FDF6EC]/40 rounded-2xl border border-dashed border-[#D7CCC8]/50 text-center">
             <MessageSquareQuote className="w-8 h-8 text-[#D7CCC8] mb-1 opacity-70" />
