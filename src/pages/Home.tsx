@@ -9,7 +9,7 @@ import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestor
 
 export function Home() {
   const navigate = useNavigate();
-  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate } = useStore();
+  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak } = useStore();
   
   const todayStr = new Date().toISOString().split('T')[0];
   const isCheckedInToday = lastCheckInDate === todayStr;
@@ -20,6 +20,7 @@ export function Home() {
   const [stories, setStories] = useState<any[]>([]);
   const [topUsers, setTopUsers] = useState<any[]>([]);
   const [topActiveUsers, setTopActiveUsers] = useState<any[]>([]);
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
 
   useEffect(() => {
     const qStories = query(collection(db, 'stories'), orderBy('createdAt', 'desc'), limit(10));
@@ -49,17 +50,136 @@ export function Home() {
   // Auto award Choco Đáng Yêu achievement is now handled centrally in _ensureActiveWeekCalculations
   // when week physically transitions.
 
-  const handleCheckIn = () => {
+  const handleCheckInBtnClick = () => {
     if (!isLoggedIn) {
       alert("Bạn cần đăng nhập để điểm danh!");
       return;
     }
+    setShowCheckInModal(true);
+  };
+
+  const performCheckIn = () => {
     checkIn();
     alert("Điểm danh thành công! Kiểm tra nhiệm vụ để xem phần thưởng.");
   };
 
   return (
-    <div className="flex-1 p-4 sm:p-6 flex flex-col gap-6">
+    <div className="flex-1 p-4 sm:p-6 flex flex-col gap-6 relative">
+      {/* Check-In Modal Overlay */}
+      {showCheckInModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl relative border-4 border-[#FDF6EC] flex flex-col items-center animate-in fade-in zoom-in duration-200">
+            <button onClick={() => setShowCheckInModal(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-full transition-colors font-bold text-lg">×</button>
+            <div className="w-16 h-16 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center mb-4 transform -rotate-6">
+              <CalendarCheck className="w-8 h-8" />
+            </div>
+            <h2 className="text-xl font-black text-[#3E2723] uppercase tracking-tight mb-2 text-center">Điểm Danh Hàng Ngày</h2>
+            <p className="text-sm text-gray-600 font-medium text-center mb-6">Hãy điểm danh mỗi ngày để nhận <strong className="text-[#8D6E63]">Choco</strong>!</p>
+            
+            {/* Streak Bar */}
+            {(() => {
+              const phases = [
+                { min: 1, max: 1, reward: 1 },
+                { min: 2, max: 3, reward: 2 },
+                { min: 4, max: 6, reward: 3 },
+                { min: 7, max: 10, reward: 4 },
+                { min: 11, max: 15, reward: 5 },
+                { min: 16, max: 21, reward: 6 },
+                { min: 22, max: 28, reward: 7 },
+                { min: 29, max: 36, reward: 8 },
+                { min: 37, max: 45, reward: 9 },
+                { min: 46, max: Infinity, reward: 10 }
+              ];
+              
+              const activeStreak = checkInStreak || 0;
+              let nextCheckInStreak = isCheckedInToday ? activeStreak : activeStreak + 1;
+              
+              // Check if broken
+              let isBroken = false;
+              if (!isCheckedInToday && lastCheckInDate) {
+                const today = new Date(todayStr);
+                const last = new Date(lastCheckInDate);
+                const diffDays = Math.ceil(Math.abs(today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
+                if (diffDays > 1) isBroken = true;
+              }
+              
+              if (isBroken) nextCheckInStreak = 1;
+
+              const currentPhaseIndex = phases.findIndex(p => nextCheckInStreak >= p.min && nextCheckInStreak <= p.max);
+              const currentPhase = currentPhaseIndex >= 0 ? phases[currentPhaseIndex] : phases[phases.length - 1];
+              
+              let nextPhase = phases[phases.length - 1];
+              if (currentPhaseIndex < phases.length - 1) {
+                nextPhase = phases[currentPhaseIndex + 1];
+              }
+
+              const progressStart = currentPhase.min;
+              const progressEnd = currentPhase.max === Infinity ? nextCheckInStreak + 1 : currentPhase.max; 
+              const currentProgress = nextCheckInStreak;
+              
+              const segments = progressEnd - progressStart + 1;
+              const filledSegments = currentProgress - progressStart + 1;
+
+              return (
+                <div className="w-full bg-[#FDF6EC] p-4 rounded-2xl border border-[#F5E6D3] mb-6 flex flex-col gap-3">
+                  <div className="flex justify-between items-end mb-1">
+                      <span className="text-xs font-bold text-[#8D6E63] uppercase tracking-wider">Chuỗi: <span className="text-xl font-black text-[#3E2723]">{activeStreak}</span> ngày</span>
+                      {isBroken && activeStreak > 0 && <span className="text-[10px] font-bold text-red-500 animate-pulse">Chuỗi đã đứt!</span>}
+                  </div>
+
+                  <div className="bg-white p-3 rounded-xl border border-[#EFDCD5] shadow-inner mb-1 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 p-2 opacity-10">
+                          <CalendarCheck className="w-12 h-12" />
+                      </div>
+                      <p className="text-xs text-gray-500 font-bold mb-1">{isCheckedInToday ? 'Hôm Nay Nhận:' : 'Nếu Điểm Danh Hôm Nay:'}</p>
+                      <p className="text-2xl font-black text-[#8D6E63]">+{currentPhase.reward} <span className="text-sm font-bold text-[#3E2723]">Choco</span></p>
+                      
+                      {currentPhase.max !== Infinity ? (
+                          <div className="mt-3 flex flex-col gap-1">
+                            <div className="flex justify-between text-[10px] text-gray-500 font-bold">
+                              <span>Giai đoạn: {currentPhase.min} - {currentPhase.max} ngày</span>
+                              <span>{filledSegments} / {segments}</span>
+                            </div>
+                            <div className="flex-1 flex gap-1 h-2">
+                              {[...Array(Math.min(segments, 15))].map((_, i) => (
+                                  <div key={i} className={`flex-1 rounded-full ${i < filledSegments ? 'bg-[#8D6E63]' : 'bg-[#D7CCC8]/30'}`} />
+                              ))}
+                            </div>
+                          </div>
+                      ) : (
+                          <div className="mt-3 text-[10px] text-[#8D6E63] font-bold">Mức thưởng tối đa!</div>
+                      )}
+                  </div>
+
+                  {currentPhase.max !== Infinity && (
+                    <div className="flex justify-center items-center">
+                        <span className="text-[11px] font-bold text-[#8D6E63] bg-[#F5E6D3] px-3 py-1 rounded-full">
+                          Mục Tiêu Tiếp Theo: Ngày {nextPhase.min} (+{nextPhase.reward} Choco)
+                        </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            <button 
+              onClick={performCheckIn}
+              disabled={isCheckedInToday}
+              className={`w-full py-3.5 rounded-xl font-black uppercase tracking-widest transition-all ${
+                isCheckedInToday 
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed hidden' 
+                : 'bg-[#8D6E63] text-white shadow-lg hover:shadow-xl hover:-translate-y-1 hover:bg-[#5D4037]'
+              }`}
+            >
+              {isCheckedInToday ? 'Đã Điểm Danh' : 'Điểm Danh Ngay'}
+            </button>
+            {isCheckedInToday && (
+              <p className="text-sm font-bold text-green-600 mt-2 bg-green-50 px-4 py-2 rounded-lg border border-green-200 w-full text-center">Bạn đã điểm danh hôm nay!</p>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left Column: Rankings and Top Rich Users */}
         <section className="flex-[1.5] flex flex-col gap-6">
@@ -191,7 +311,7 @@ export function Home() {
                  Hộp Công Cụ
               </h2>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                 <button onClick={handleCheckIn} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
+                 <button onClick={handleCheckInBtnClick} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
                     <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center mb-1.5 border border-orange-100/40 group-hover:scale-105 transition-transform">
                        <CalendarCheck className="w-5 h-5 text-[#8D6E63]" />
                     </div>
