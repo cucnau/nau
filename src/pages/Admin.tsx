@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store';
 import { collection, getDocs, doc, addDoc, updateDoc, deleteDoc, getDoc, query, where, orderBy, writeBatch, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Trash2, Plus, Edit, ShieldAlert, CheckCircle, Smile, BookOpen, Users, Save, MessageSquare } from 'lucide-react';
+import { Trash2, Plus, Edit, ShieldAlert, CheckCircle, Smile, BookOpen, Users, Save, MessageSquare, Award } from 'lucide-react';
+import { ACHIEVEMENTS_LIST } from '../types/achievements';
 
 interface Book {
   id: string;
@@ -24,6 +25,12 @@ interface Chapter {
   requiresEarlyAccess?: boolean;
 }
 
+interface CustomTitle {
+  id: string;
+  name: string;
+  color: string;
+}
+
 interface AdminUser {
   id: string;
   uid: string;
@@ -33,6 +40,8 @@ interface AdminUser {
   goldenChoco: number;
   isBanned?: boolean;
   banExpiresAt?: number | null;
+  customTitles?: CustomTitle[];
+  claimedAchievements?: string[];
 }
 
 interface AdminComment {
@@ -48,7 +57,7 @@ interface AdminComment {
 export function Admin() {
   const { email, firebaseUser } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'stories' | 'users' | 'comments' | 'messages' | 'stickers' | 'posts'>('stories');
+  const [activeTab, setActiveTab] = useState<'stories' | 'users' | 'comments' | 'messages' | 'stickers' | 'posts' | 'titles'>('stories');
   
   // Custom Confirmation Dialog
   const [confirmDialog, setConfirmDialog] = useState<{ text: string; action: () => void } | null>(null);
@@ -132,6 +141,15 @@ export function Admin() {
   // Posts Management
   const [posts, setPosts] = useState<any[]>([]);
 
+  // Titles Management
+  const [globalTitles, setGlobalTitles] = useState<CustomTitle[]>([]);
+  const [achievementColors, setAchievementColors] = useState<Record<string, string>>({});
+  const [newTitleName, setNewTitleName] = useState('');
+  const [newTitleColor, setNewTitleColor] = useState('#8D6E63');
+  const [assigningTitleUser, setAssigningTitleUser] = useState<AdminUser | null>(null);
+  const [selectedTitleIdToAssign, setSelectedTitleIdToAssign] = useState<string>('');
+  const [viewingTitleUsers, setViewingTitleUsers] = useState<{ id: string, name: string, isAchievement: boolean } | null>(null);
+
   useEffect(() => {
     const isReady = email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com';
     if (isReady) {
@@ -141,8 +159,19 @@ export function Admin() {
       fetchMessages();
       fetchStickers();
       fetchPosts();
+      fetchGlobalTitles();
+      fetchAchievementColors();
     }
   }, [email, firebaseUser, activeTab]);
+
+  const fetchAchievementColors = async () => {
+    try {
+      const docSnap = await getDoc(doc(db, 'settings', 'achievement_colors'));
+      if (docSnap.exists()) {
+         setAchievementColors(docSnap.data() as Record<string, string>);
+      }
+    } catch(err) { console.log(err); }
+  };
 
   useEffect(() => {
     const unsubStories = onSnapshot(query(collection(db, 'stories'), orderBy('createdAt', 'desc')), (snap) => {
@@ -173,6 +202,98 @@ export function Admin() {
     // Legacy function kept for references, but data is now fetched via onSnapshot above
   };
 
+  const fetchGlobalTitles = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'custom_titles'));
+      const list: CustomTitle[] = [];
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({
+          id: docSnap.id,
+          name: data.name || '',
+          color: data.color || '#8D6E63',
+        });
+      });
+      setGlobalTitles(list);
+    } catch (err: any) {
+      console.error('Lỗi tải danh hiệu:', err);
+    }
+  };
+
+  const handleSaveAchievementColor = async (achievementId: string, color: string) => {
+    try {
+      const newColors = { ...achievementColors, [achievementId]: color };
+      const { setDoc } = await import('firebase/firestore');
+      await setDoc(doc(db, 'settings', 'achievement_colors'), newColors, { merge: true });
+      setAchievementColors(newColors);
+    } catch(err) { console.error('Failed to save achievement color', err); }
+  };
+
+  const handleCreateTitle = async () => {
+    if (!newTitleName.trim()) return;
+    try {
+      await addDoc(collection(db, 'custom_titles'), {
+        name: newTitleName.trim(),
+        color: newTitleColor,
+        createdAt: serverTimestamp(),
+      });
+      setNewTitleName('');
+      fetchGlobalTitles();
+      alert('Đã tạo danh hiệu mới');
+    } catch(err: any) { alert('Lỗi: ' + err.message); }
+  };
+
+  const handleDeleteTitle = async (id: string) => {
+    setConfirmDialog({
+      text: 'Bạn có chắc chắn muốn xóa danh hiệu này?',
+      action: async () => {
+        try {
+          await deleteDoc(doc(db, 'custom_titles', id));
+          fetchGlobalTitles();
+        } catch(err: any) { alert('Lỗi: ' + err.message); }
+      }
+    });
+  };
+
+  const handleAssignTitle = async () => {
+    if (!assigningTitleUser || !selectedTitleIdToAssign) return;
+    const titleObj = globalTitles.find(t => t.id === selectedTitleIdToAssign);
+    if (!titleObj) return;
+
+    try {
+      const currentTitles = assigningTitleUser.customTitles || [];
+      if (currentTitles.find(t => t.id === titleObj.id)) {
+        alert('Người dùng đã có danh hiệu này');
+        return;
+      }
+      
+      const newTitles = [...currentTitles, titleObj];
+      await updateDoc(doc(db, 'users', assigningTitleUser.id), {
+        customTitles: newTitles
+      });
+      setAssigningTitleUser(null);
+      setSelectedTitleIdToAssign('');
+      fetchUsers();
+    } catch(err: any) { alert('Lỗi: ' + err.message); }
+  };
+
+  const handleRemoveUserTitle = async (userId: string, titleId: string) => {
+     setConfirmDialog({
+       text: 'Gỡ danh hiệu của người dùng này?',
+       action: async () => {
+         try {
+           const user = users.find(u => u.id === userId);
+           if (!user) return;
+           const newTitles = (user.customTitles || []).filter(t => t.id !== titleId);
+           await updateDoc(doc(db, 'users', userId), {
+             customTitles: newTitles
+           });
+           fetchUsers();
+         } catch(err: any) { alert('Lỗi: ' + err.message); }
+       }
+     });
+  };
+
   const fetchUsers = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'users'));
@@ -188,6 +309,8 @@ export function Admin() {
           goldenChoco: data.goldenChoco || 0,
           isBanned: data.isBanned || false,
           banExpiresAt: data.banExpiresAt || null,
+          customTitles: data.customTitles || [],
+          claimedAchievements: data.claimedAchievements || [],
         });
       });
       setUsers(list);
@@ -796,6 +919,9 @@ export function Admin() {
          <button onClick={() => setActiveTab('posts')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'posts' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
             <MessageSquare className="w-4 h-4" /> Bài đăng
          </button>
+         <button onClick={() => setActiveTab('titles')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'titles' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
+            <Award className="w-4 h-4" /> Danh hiệu
+         </button>
       </div>
 
       {activeTab === 'stickers' && (
@@ -975,8 +1101,21 @@ export function Admin() {
                            <span className="font-semibold text-amber-700">Choco: {u.choco}</span>
                            <span className="font-semibold text-yellow-600">Golden Choco: {u.goldenChoco}</span>
                         </div>
+                        {u.customTitles && u.customTitles.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                             {u.customTitles.map(t => (
+                               <span key={t.id} style={{ color: t.color, borderColor: t.color }} className="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-white/50 flex items-center gap-1">
+                                 {t.name}
+                                 <button onClick={() => handleRemoveUserTitle(u.id, t.id)} className="text-gray-400 hover:text-red-500 ml-1"><Trash2 className="w-3 h-3" /></button>
+                               </span>
+                             ))}
+                          </div>
+                        )}
                      </div>
                      <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 w-full sm:w-auto">
+                        <div className="flex items-center gap-2">
+                           <button onClick={() => setAssigningTitleUser(u)} className="px-3 py-1 bg-[#FDF6EC] border border-[#8D6E63] text-[#8D6E63] text-xs font-bold rounded hover:bg-white transition-colors whitespace-nowrap">Trao Danh hiệu</button>
+                        </div>
                         <div className="flex items-center gap-2">
                            <input type="number" placeholder="Choco" value={givingChoco || ''} onChange={e => setGivingChoco(Number(e.target.value))} className="w-20 px-2 py-1 text-xs border rounded focus:outline-none" />
                            <input type="number" placeholder="GChoco" value={givingGChoco || ''} onChange={e => setGivingGChoco(Number(e.target.value))} className="w-20 px-2 py-1 text-xs border rounded focus:outline-none" />
@@ -1045,6 +1184,125 @@ export function Admin() {
               ))}
               {posts.length === 0 && <p className="text-center text-gray-500 py-4">Chưa có bài đăng nào.</p>}
             </div>
+         </div>
+      )}
+
+      {activeTab === 'titles' && (
+         <div className="flex flex-col gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
+              <h2 className="text-xl font-bold text-[#3E2723]">Tạo Danh Hiệu Mới</h2>
+              <div className="flex flex-col md:flex-row gap-4">
+                <input type="text" value={newTitleName} onChange={e => setNewTitleName(e.target.value)} placeholder="Tên danh hiệu (VD: Người Nổi Tiếng)" className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-gray-600">Màu viền/chữ:</span>
+                  <input type="color" value={newTitleColor} onChange={e => setNewTitleColor(e.target.value)} className="w-10 h-10 rounded border" />
+                </div>
+                <button onClick={handleCreateTitle} className="bg-[#8D6E63] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#5D4037] transition-colors whitespace-nowrap">Tạo Danh Hiệu</button>
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
+              <h2 className="text-xl font-bold text-[#3E2723]">Danh Hiệu Tự Tạo ({globalTitles.length})</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                 {globalTitles.map(t => (
+                   <div key={t.id} className="p-4 border rounded-xl flex items-center justify-between" style={{ borderColor: t.color }}>
+                      <span className="font-bold text-lg" style={{ color: t.color }}>{t.name}</span>
+                      <div className="flex items-center gap-2">
+                         <button onClick={() => setViewingTitleUsers({ id: t.id, name: t.name, isAchievement: false })} className="text-[#8D6E63] hover:text-[#5D4037] p-2 rounded-lg hover:bg-orange-50 transition-colors" title="Xem người sở hữu"><Users className="w-5 h-5"/></button>
+                         <button onClick={() => handleDeleteTitle(t.id)} className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors" title="Xóa danh hiệu"><Trash2 className="w-5 h-5"/></button>
+                      </div>
+                   </div>
+                 ))}
+                 {globalTitles.length === 0 && <p className="text-gray-500 text-sm py-4 col-span-full">Chưa có danh hiệu nào.</p>}
+              </div>
+
+              <h2 className="text-xl font-bold text-[#3E2723] mt-6 border-t pt-6">Danh Hiệu Thành Tựu ({ACHIEVEMENTS_LIST.length})</h2>
+              <p className="text-xs text-gray-500 mb-2">Thành tựu người dùng đạt được cũng có thể được hiển thị như một danh hiệu. Bạn có thể đổi màu cho chúng tại đây.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                 {ACHIEVEMENTS_LIST.map(ach => {
+                    const tColor = achievementColors[ach.id] || '#8D6E63';
+                    return (
+                       <div key={ach.id} className="p-4 border rounded-xl flex flex-col gap-3" style={{ borderColor: tColor }}>
+                          <div className="flex items-center justify-between">
+                             <div className="flex flex-col">
+                               <span className="font-bold text-sm" style={{ color: tColor }}>{ach.name}</span>
+                               <span className="text-[10px] text-gray-500 truncate" title={ach.description}>{ach.description}</span>
+                             </div>
+                             <button onClick={() => setViewingTitleUsers({ id: ach.id, name: ach.name, isAchievement: true })} className="text-[#8D6E63] hover:text-[#5D4037] p-2 rounded-lg hover:bg-orange-50 transition-colors" title="Xem người sở hữu"><Users className="w-5 h-5"/></button>
+                          </div>
+                          <div className="flex items-center justify-between gap-2 border-t pt-2">
+                             <span className="text-xs font-semibold text-gray-600">Đổi màu:</span>
+                             <input type="color" value={tColor} onChange={(e) => handleSaveAchievementColor(ach.id, e.target.value)} className="w-8 h-8 rounded border" />
+                          </div>
+                       </div>
+                    );
+                 })}
+              </div>
+            </div>
+         </div>
+      )}
+
+      {assigningTitleUser && (
+         <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
+           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl flex flex-col gap-4">
+             <h2 className="text-xl font-bold text-[#3E2723]">Trao Danh Hiệu</h2>
+             <p className="text-sm">Trao danh hiệu cho <strong>{assigningTitleUser.displayName}</strong></p>
+             <div>
+               <label className="block text-sm font-semibold mb-2">Chọn danh hiệu</label>
+               <select value={selectedTitleIdToAssign} onChange={e => setSelectedTitleIdToAssign(e.target.value)} className="w-full px-4 py-2 border rounded-lg">
+                  <option value="">-- Chọn danh hiệu --</option>
+                  {globalTitles.map(t => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+               </select>
+             </div>
+             <div className="flex justify-end gap-2 mt-2">
+               <button onClick={() => { setAssigningTitleUser(null); setSelectedTitleIdToAssign(''); }} className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300">Hủy</button>
+               <button onClick={handleAssignTitle} className="px-4 py-2 bg-[#8D6E63] text-white font-bold rounded-lg hover:bg-[#5D4037]">Xác nhận</button>
+             </div>
+           </div>
+         </div>
+      )}
+
+      {viewingTitleUsers && (
+         <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
+           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl flex flex-col gap-4 max-h-[80vh]">
+             <div className="flex justify-between items-center border-b pb-3">
+               <h2 className="text-lg font-bold text-[#3E2723]">Thành viên có danh hiệu: {viewingTitleUsers.name}</h2>
+               <button onClick={() => setViewingTitleUsers(null)} className="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
+             </div>
+             <div className="overflow-y-auto flex-1 flex flex-col gap-2">
+                {(() => {
+                   const titleId = viewingTitleUsers.id;
+                   const filteredUsers = users.filter(u => {
+                      if (viewingTitleUsers.isAchievement) {
+                         return u.claimedAchievements && u.claimedAchievements.includes(titleId);
+                      } else {
+                         return u.customTitles && u.customTitles.some(t => t.id === titleId);
+                      }
+                   });
+
+                   if (filteredUsers.length === 0) {
+                      return <p className="text-sm text-gray-500 text-center py-4">Chưa có ai sở hữu danh hiệu này.</p>;
+                   }
+
+                   return filteredUsers.map(u => (
+                      <div key={u.id} className="flex justify-between items-center p-3 border rounded-lg bg-gray-50">
+                         <div>
+                            <p className="font-bold text-sm text-[#3E2723]">{u.displayName}</p>
+                            <p className="text-xs text-gray-500">{u.email}</p>
+                         </div>
+                         {!viewingTitleUsers.isAchievement && (
+                            <button onClick={() => {
+                                handleRemoveUserTitle(u.id, titleId)
+                                setViewingTitleUsers(null);
+                            }} className="text-xs bg-red-100 text-red-600 px-3 py-1 rounded hover:bg-red-200 font-bold">Gỡ</button>
+                         )}
+                      </div>
+                   ));
+                })()}
+             </div>
+           </div>
          </div>
       )}
 
