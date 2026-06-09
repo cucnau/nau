@@ -32,6 +32,8 @@ interface UserState {
   ownedStickers: string[];
   ownedPassTickets: number;
   ownedPriorityTickets: number;
+  ownedMysteryBoxes: number;
+  lastClaimedRewardLevel: number;
   choco: number;
   goldenChoco: number;
   level: number;
@@ -119,6 +121,7 @@ interface UserState {
   
   claimMission: (id: string) => void;
   updateUserDoc: (updates: any) => Promise<void>;
+  useMysteryBox: () => Promise<any | null>;
 
   // Achievements Actions
   unlockAchievement: (id: string) => void;
@@ -165,6 +168,8 @@ export const useStore = create<UserState>()(
       ownedStickers: [],
       ownedPassTickets: 0,
       ownedPriorityTickets: 0,
+      ownedMysteryBoxes: 0,
+      lastClaimedRewardLevel: 1,
       choco: 0,
       goldenChoco: 0,
       level: 1,
@@ -248,6 +253,8 @@ export const useStore = create<UserState>()(
         ownedStickers: [],
         ownedPassTickets: 0,
         ownedPriorityTickets: 0,
+        ownedMysteryBoxes: 0,
+        lastClaimedRewardLevel: 1,
         choco: 0,
         goldenChoco: 0,
         level: 1,
@@ -360,6 +367,8 @@ export const useStore = create<UserState>()(
             ownedStickers: data.ownedStickers !== undefined ? data.ownedStickers : state.ownedStickers,
             ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
             ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
+            ownedMysteryBoxes: data.ownedMysteryBoxes !== undefined ? data.ownedMysteryBoxes : state.ownedMysteryBoxes,
+            lastClaimedRewardLevel: data.lastClaimedRewardLevel !== undefined ? data.lastClaimedRewardLevel : state.lastClaimedRewardLevel,
             savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
             unlockedPassChapters: data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters,
             unlockedEarlyAccessChapters: data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters,
@@ -433,6 +442,51 @@ export const useStore = create<UserState>()(
                }
                throw err;
             }
+         }
+      },
+      
+      useMysteryBox: async () => {
+         const state = get();
+         if (!state.isLoggedIn || !state.uid) {
+            alert("Vui lòng đăng nhập!");
+            return null;
+         }
+         if ((state.ownedMysteryBoxes || 0) <= 0) {
+            alert("Bạn không có Hộp Quà Sticker Bí Ẩn nào!");
+            return null;
+         }
+         try {
+            // Tải danh sách tất cả sticker từ cửa hàng
+            const q = query(collection(db, 'store_stickers'), orderBy('createdAt', 'desc'));
+            const snap = await getDocs(q);
+            const allStickers = snap.docs.map(doc => ({ id: doc.id, ...doc.data() as any }));
+            
+            // Lọc ra các sticker mà người dùng CHƯA sở hữu
+            const unowned = allStickers.filter(s => s.url && !state.ownedStickers?.includes(s.url));
+            if (unowned.length === 0) {
+               alert("Bạn đã sở hữu toàn bộ sticker có trong cửa hàng rồi!");
+               return null;
+            }
+            
+            // Chọn ngẫu nhiên 1 sticker chưa sở hữu
+            const randomIndex = Math.floor(Math.random() * unowned.length);
+            const chosenSticker = unowned[randomIndex];
+            
+            // Cập nhật state cục bộ và Firestore
+            const newBoxes = (state.ownedMysteryBoxes || 0) - 1;
+            const newStickers = [...(state.ownedStickers || []), chosenSticker.url];
+            
+            // Cập nhật thông qua updateUserDoc để lưu đồng nhất
+            await get().updateUserDoc({
+               ownedMysteryBoxes: newBoxes,
+               ownedStickers: newStickers
+            });
+            
+            return chosenSticker;
+         } catch (err: any) {
+            console.error("Lỗi khi dùng Hộp Quà Sticker Bí Ẩn:", err);
+            alert("Đã xảy ra lỗi: " + err.message);
+            return null;
          }
       },
       
