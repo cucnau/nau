@@ -27,8 +27,11 @@
         "lastActiveWeek": { "type": "string" },
         "prevActivePoints": { "type": "number" },
         "prevActiveWeek": { "type": "string" },
-        "equippedSticker": { "type": "string" },
-        "stickerPosition": { "type": "string" },
+        "equippedStickerAvatar": { "type": "string" },
+        "stickerPositionAvatar": { "type": "string" },
+        "equippedStickerChat": { "type": "string" },
+        "equippedStickerPost": { "type": "string" },
+        "stickerPositionPost": { "type": "string" },
         "ownedStickers": { "type": "array" }
       },
       "required": ["uid", "choco", "goldenChoco", "createdAt"]
