@@ -61,8 +61,9 @@ export function GlobalChat() {
         content: text,
         activeTitle: activeTitle || null,
         createdAt: serverTimestamp(),
-        equippedSticker: useStore.getState().equippedSticker || null,
-        stickerPosition: useStore.getState().stickerPosition || 'top-right'
+        equippedStickerAvatar: useStore.getState().equippedStickerAvatar || null,
+        stickerPositionAvatar: useStore.getState().stickerPositionAvatar || 'top-right',
+        equippedStickerChat: useStore.getState().equippedStickerChat || null
       });
       incrementSentMessages();
     } catch (e) {
@@ -102,16 +103,16 @@ export function GlobalChat() {
                          <User className="w-4 h-4 text-[#A1887F]" />
                       )}
                    </div>
-                   {msg.equippedSticker && (
+                   {(msg.equippedStickerAvatar || msg.equippedSticker) && (
                      <img 
-                       src={msg.equippedSticker} 
+                       src={msg.equippedStickerAvatar || msg.equippedSticker} 
                        alt="Sticker" 
                        className={cn(
                          "absolute w-4 h-4 object-contain pointer-events-none z-10 animate-pulse",
-                         msg.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-                         msg.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-                         msg.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-                         msg.stickerPosition === 'bottom-right' && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                         (msg.stickerPositionAvatar || msg.stickerPosition) === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
+                         (msg.stickerPositionAvatar || msg.stickerPosition) === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
+                         (msg.stickerPositionAvatar || msg.stickerPosition) === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
+                         (msg.stickerPositionAvatar || msg.stickerPosition) === 'bottom-right' && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
                        )} 
                      />
                    )}
@@ -130,9 +131,9 @@ export function GlobalChat() {
                       
                       <div className={cn("p-2.5 rounded-2xl relative text-[13px] leading-relaxed shadow-sm min-w-10 break-words text-white rounded-tl-sm pr-7 overflow-visible", isMe ? "bg-[#8D6E63]" : "bg-[#5D4037]")}>
                           <p>{msg.content}</p>
-                          {msg.equippedSticker && (
+                          {(msg.equippedStickerChat || msg.equippedSticker) && (
                              <img 
-                               src={msg.equippedSticker} 
+                               src={msg.equippedStickerChat || msg.equippedSticker} 
                                alt="Bouncing sticker" 
                                className="absolute right-1.5 -bottom-2 w-5 h-5 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:3.5s] z-10" 
                              />
