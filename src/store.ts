@@ -33,6 +33,9 @@ interface UserState {
   ownedPassTickets: number;
   ownedPriorityTickets: number;
   ownedMysteryBoxes: number;
+  ownedStreakTickets?: number;
+  activeStreakProtection?: boolean;
+  lastFreeStreakRecoveryMonth?: string | null;
   lastClaimedRewardLevel: number;
   choco: number;
   goldenChoco: number;
@@ -105,9 +108,10 @@ interface UserState {
   gainExp: (amount: number) => void;
   addChoco: (amount: number) => void;
   addGoldenChoco: (amount: number) => void;
-  buyTicket: (type: 'pass' | 'priority', amount?: number) => void;
+  buyTicket: (type: 'pass' | 'priority' | 'streak', amount?: number) => void;
   consumePassTicket: (chapterId: string) => boolean;
   consumePriorityTicket: (chapterId: string) => boolean;
+  useStreakTicket: () => boolean;
   spendChoco: (amount: number) => boolean;
   spendGoldenChoco: (amount: number) => boolean;
   
@@ -169,6 +173,9 @@ export const useStore = create<UserState>()(
       ownedPassTickets: 0,
       ownedPriorityTickets: 0,
       ownedMysteryBoxes: 0,
+      ownedStreakTickets: 0,
+      activeStreakProtection: false,
+      lastFreeStreakRecoveryMonth: null,
       lastClaimedRewardLevel: 1,
       choco: 0,
       goldenChoco: 0,
@@ -254,6 +261,9 @@ export const useStore = create<UserState>()(
         ownedPassTickets: 0,
         ownedPriorityTickets: 0,
         ownedMysteryBoxes: 0,
+        ownedStreakTickets: 0,
+        activeStreakProtection: false,
+        lastFreeStreakRecoveryMonth: null,
         lastClaimedRewardLevel: 1,
         choco: 0,
         goldenChoco: 0,
@@ -368,6 +378,9 @@ export const useStore = create<UserState>()(
             ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
             ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
             ownedMysteryBoxes: data.ownedMysteryBoxes !== undefined ? data.ownedMysteryBoxes : state.ownedMysteryBoxes,
+            ownedStreakTickets: data.ownedStreakTickets !== undefined ? data.ownedStreakTickets : state.ownedStreakTickets,
+            activeStreakProtection: data.activeStreakProtection !== undefined ? data.activeStreakProtection : state.activeStreakProtection,
+            lastFreeStreakRecoveryMonth: data.lastFreeStreakRecoveryMonth !== undefined ? data.lastFreeStreakRecoveryMonth : state.lastFreeStreakRecoveryMonth,
             lastClaimedRewardLevel: data.lastClaimedRewardLevel !== undefined ? data.lastClaimedRewardLevel : state.lastClaimedRewardLevel,
             savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
             unlockedPassChapters: data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters,
@@ -499,11 +512,28 @@ export const useStore = create<UserState>()(
         if (state.lastCheckInDate === todayStr) return; // Already checked in
         
         let newStreak = 1;
+        let updateStreakRecoveryStats: any = {};
         if (state.lastCheckInDate) {
            const daysDiff = Math.round(Math.abs(new Date(todayStr).getTime() - new Date(state.lastCheckInDate).getTime()) / (1000 * 60 * 60 * 24));
            if (daysDiff === 1) {
                newStreak = state.checkInStreak + 1;
+           } else if (daysDiff === 2) {
+               // Missed exactly one day
+               const currentMonth = format(new Date(), 'yyyy-MM');
+               if (state.lastFreeStreakRecoveryMonth !== currentMonth) {
+                   // Use free monthly recovery
+                   newStreak = state.checkInStreak + 1;
+                   updateStreakRecoveryStats.lastFreeStreakRecoveryMonth = currentMonth;
+               } else if (state.activeStreakProtection) {
+                   // Use active streak ticket
+                   newStreak = state.checkInStreak + 1;
+                   updateStreakRecoveryStats.activeStreakProtection = false;
+               } else {
+                   newStreak = 1;
+               }
            } else {
+               // Missed more than 1 day in a row (daysDiff >= 3)
+               // Streak protection only guards 1 missed day
                newStreak = 1;
            }
         }
@@ -552,7 +582,8 @@ export const useStore = create<UserState>()(
             totalEarnedChoco: newTotalEarnedChoco,
             totalCheckIns: newTotalCheckins,
             missions: ms,
-            allUsersMissions: allMs
+            allUsersMissions: allMs,
+            ...updateStreakRecoveryStats
         });
         
         get().updateUserDoc({
@@ -561,6 +592,7 @@ export const useStore = create<UserState>()(
             choco: newChoco,
             totalEarnedChoco: newTotalEarnedChoco,
             totalCheckIns: newTotalCheckins,
+            ...updateStreakRecoveryStats
         });
         
         get().gainExp(10);
@@ -826,7 +858,7 @@ export const useStore = create<UserState>()(
           }, 50);
       },
       
-      buyTicket: (type: 'pass' | 'priority', amount: number = 1) => {
+      buyTicket: (type: 'pass' | 'priority' | 'streak', amount: number = 1) => {
          const state = get();
          if (!state.isLoggedIn) return;
          if (type === 'pass') {
@@ -837,7 +869,22 @@ export const useStore = create<UserState>()(
              const newVal = (state.ownedPriorityTickets || 0) + amount;
              set({ ownedPriorityTickets: newVal });
              get().updateUserDoc({ ownedPriorityTickets: newVal });
+         } else if (type === 'streak') {
+             const newVal = (state.ownedStreakTickets || 0) + amount;
+             set({ ownedStreakTickets: newVal });
+             get().updateUserDoc({ ownedStreakTickets: newVal });
          }
+      },
+      
+      useStreakTicket: () => {
+          const state = get();
+          if (!state.isLoggedIn || (state.ownedStreakTickets || 0) < 1) return false;
+          if (state.activeStreakProtection) return false; // already active
+          
+          const newVal = (state.ownedStreakTickets || 0) - 1;
+          set({ ownedStreakTickets: newVal, activeStreakProtection: true });
+          get().updateUserDoc({ ownedStreakTickets: newVal, activeStreakProtection: true });
+          return true;
       },
       
       consumePassTicket: (chapterId: string) => {
