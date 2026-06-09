@@ -884,12 +884,16 @@ export function Admin() {
             await Promise.all(batchPromises);
 
             // Đồng thời cập nhật trạng thái trong bộ nhớ cục bộ (Zustand store) nếu người dùng hiện tại đang đeo sticker này
-            const { ownedStickers, equippedSticker, syncFromFirebase } = useStore.getState();
+            const { ownedStickers, equippedStickerAvatar, equippedStickerChat, equippedStickerPost, syncFromFirebase } = useStore.getState();
             const newOwned = (ownedStickers || []).filter((u: string) => u !== stickerUrl);
-            const newEquipped = equippedSticker === stickerUrl ? null : equippedSticker;
+            const newEquippedAvatar = equippedStickerAvatar === stickerUrl ? null : equippedStickerAvatar;
+            const newEquippedChat = equippedStickerChat === stickerUrl ? null : equippedStickerChat;
+            const newEquippedPost = equippedStickerPost === stickerUrl ? null : equippedStickerPost;
             syncFromFirebase({
               ownedStickers: newOwned,
-              equippedSticker: newEquipped
+              equippedStickerAvatar: newEquippedAvatar,
+              equippedStickerChat: newEquippedChat,
+              equippedStickerPost: newEquippedPost,
             });
           }
 
