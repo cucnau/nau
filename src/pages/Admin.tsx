@@ -13,6 +13,7 @@ interface Book {
   description?: string;
   genres: string[];
   chapterCount: number;
+  completed?: boolean;
 }
 
 interface Chapter {
@@ -70,6 +71,7 @@ export function Admin() {
   const [coverUrl, setCoverUrl] = useState('');
   const [description, setDescription] = useState('');
   const [genres, setGenres] = useState('');
+  const [completed, setCompleted] = useState(false);
   const [editingStory, setEditingStory] = useState<Book | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
@@ -594,6 +596,7 @@ export function Admin() {
         description,
         genres: genreArray,
         chapterCount: 0,
+        completed,
         createdAt: serverTimestamp(),
       });
       setTitle('');
@@ -601,6 +604,7 @@ export function Admin() {
       setCoverUrl('');
       setDescription('');
       setGenres('');
+      setCompleted(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (err: any) {
       console.error(err);
@@ -626,6 +630,7 @@ export function Admin() {
         coverUrl: editingStory.coverUrl,
         description: editingStory.description || '',
         genres: genreArray,
+        completed: editingStory.completed || false,
       });
       setEditingStory(null);
       if (editFileInputRef.current) editFileInputRef.current.value = '';
@@ -1095,6 +1100,10 @@ export function Admin() {
              <input type="text" value={editingStory.author} onChange={e => setEditingStory({...editingStory, author: e.target.value})} placeholder="Tác giả" required className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
              <input type="text" value={Array.isArray(editingStory.genres) ? editingStory.genres.join(', ') : editingStory.genres} onChange={e => setEditingStory({...editingStory, genres: e.target.value})} placeholder="Thể loại (cách nhau dấu phẩy)" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
              <textarea value={editingStory.description || ''} onChange={e => setEditingStory({...editingStory, description: e.target.value})} placeholder="Giới thiệu" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] min-h-[100px]" />
+             <label className="flex items-center gap-2 cursor-pointer w-max pl-1">
+                <input type="checkbox" checked={editingStory.completed || false} onChange={e => setEditingStory({...editingStory, completed: e.target.checked})} className="w-4 h-4 text-[#8D6E63] rounded border-gray-300 focus:ring-[#8D6E63]" />
+                <span className="text-sm font-semibold text-[#3E2723]">Đã hoàn thành</span>
+             </label>
              <div className="flex gap-2">
                 <button type="submit" className="bg-[#8D6E63] hover:bg-[#5D4037] text-white px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors"><Save className="w-4 h-4"/> Lưu Cập Nhật</button>
                 <button type="button" onClick={() => setEditingStory(null)} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-bold transition-colors">Hủy</button>
@@ -1116,6 +1125,10 @@ export function Admin() {
              <input type="text" value={author} onChange={e => setAuthor(e.target.value)} placeholder="Tác giả" required className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
              <input type="text" value={genres} onChange={e => setGenres(e.target.value)} placeholder="Thể loại (cách nhau dấu phẩy)" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
              <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Giới thiệu" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] min-h-[100px]" />
+             <label className="flex items-center gap-2 cursor-pointer w-max pl-1">
+                <input type="checkbox" checked={completed} onChange={e => setCompleted(e.target.checked)} className="w-4 h-4 text-[#8D6E63] rounded border-gray-300 focus:ring-[#8D6E63]" />
+                <span className="text-sm font-semibold text-[#3E2723]">Đã hoàn thành</span>
+             </label>
              <button type="submit" className="bg-[#8D6E63] hover:bg-[#5D4037] text-white py-2 rounded-lg font-bold transition-colors flex items-center justify-center gap-2">Thêm Truyện</button>
            </form>
          )}
@@ -1130,7 +1143,10 @@ export function Admin() {
                     </div>
                     <div className="flex-1 flex flex-col justify-between">
                        <div>
-                          <h3 className="font-bold text-[#3E2723] leading-snug">{s.title}</h3>
+                          <h3 className="font-bold text-[#3E2723] leading-snug">
+                             {s.title}
+                             {s.completed && <span className="inline-block text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase tracking-widest font-bold ml-1.5 align-middle">Full</span>}
+                          </h3>
                           <p className="text-xs text-gray-500 mt-1">Tác giả: {s.author}</p>
                           <div className="flex gap-1 flex-wrap mt-2">
                              {s.genres.map(g => (
