@@ -488,14 +488,15 @@ export function AppLayout() {
     }
     const q = query(
       collection(db, 'notifications'),
-      where('userId', '==', uid),
-      orderBy('createdAt', 'desc')
+      where('userId', '==', uid)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const notifs: any[] = [];
       snapshot.forEach((doc) => {
         notifs.push({ id: doc.id, ...doc.data() });
       });
+      // Sort in descending order by createdAt
+      notifs.sort((a, b) => b.createdAt - a.createdAt);
       setNotifications(notifs);
     }, (error) => {
       console.error("Lỗi khi fetch notifications:", error);
