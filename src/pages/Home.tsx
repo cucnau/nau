@@ -6,10 +6,11 @@ import { useStore } from '../store';
 import { CalendarCheck, ClipboardList, ShoppingBag, Trophy, Star, BookOpen, Flame, User, PackageOpen, Library } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { UserAvatar } from '../components/UserAvatar';
 
 export function Home() {
   const navigate = useNavigate();
-  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak } = useStore();
+  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak, getTitleColor } = useStore();
   
   const todayStr = new Date().toISOString().split('T')[0];
   const isCheckedInToday = lastCheckInDate === todayStr;
@@ -233,11 +234,16 @@ export function Home() {
                            }`}>
                               {i + 1}
                            </div>
-                           <div className="w-10 h-10 rounded-full bg-[#3E2723] text-white flex items-center justify-center overflow-hidden shrink-0 border border-orange-200">
-                              {u.avatarUrl ? <img src={u.avatarUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" /> : <User className="w-5 h-5 text-orange-200" />}
-                           </div>
+                            <UserAvatar 
+                               avatarUrl={u.avatarUrl} 
+                               equippedSticker={u.equippedStickerAvatar} 
+                               stickerPosition={u.stickerPositionAvatar} 
+                               className="w-10 h-10" 
+                               fallbackIconSizeClass="w-5 h-5 text-orange-200" 
+                               borderClass="border border-orange-200"
+                            />
                            <div className="flex-1 min-w-0">
-                              <div className="text-xs font-bold text-[#3E2723] truncate flex items-center gap-1">
+                              <div className="text-xs font-bold truncate flex items-center gap-1" style={{ color: getTitleColor(u.activeTitle) || '#3E2723' }}>
                                  {u.displayName}
                                  {isMe && <span className="text-[9px] text-orange-600 shrink-0">(Bạn)</span>}
                                  {/* Crown removed as requested */}
@@ -262,10 +268,10 @@ export function Home() {
                  {topUsers.map((u, i) => (
                     <div key={u.id} className="flex items-center gap-3 bg-[#FDF6EC] p-3 rounded-xl border border-[#F5E6D3]">
                        <div className="w-10 h-10 rounded-full bg-[#3E2723] text-white flex items-center justify-center overflow-hidden shrink-0">
-                          {u.avatarUrl ? <img src={u.avatarUrl} alt="" className="w-full h-full object-cover" /> : <User className="w-5 h-5" />}
+                          u.avatarUrl ? <img src={u.avatarUrl} alt="" className="w-full h-full object-cover" /> : <User className="w-5 h-5" />
                        </div>
                        <div className="flex-1 min-w-0">
-                          <div className="text-xs font-bold text-[#3E2723] truncate">Top {i + 1}: {u.displayName}</div>
+                          <div className="text-xs font-bold truncate" style={{ color: getTitleColor(u.activeTitle) || '#3E2723' }}>Top {i + 1}: {u.displayName}</div>
                           <div className="text-[10px] text-[#A1887F] font-semibold">{u.choco?.toLocaleString()} Choco</div>
                        </div>
                     </div>
