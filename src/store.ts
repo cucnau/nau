@@ -1060,6 +1060,10 @@ export const useStore = create<UserState>()(
          if (!currentUnlocked.includes('collector') && (state.savedStories || []).length >= 10) {
             get().unlockAchievement('collector');
          }
+
+         if (!currentUnlocked.includes('choco_high_level') && (state.level || 1) >= 100) {
+            get().unlockAchievement('choco_high_level');
+         }
          
          // 5. Vua Choco: total earned choco >= 10000
          if (!currentUnlocked.includes('choco_king') && (state.totalEarnedChoco || 0) >= 10000) {
