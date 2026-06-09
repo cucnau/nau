@@ -46,7 +46,7 @@ interface AdminComment {
 export function Admin() {
   const { email, firebaseUser } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'stories' | 'users' | 'comments' | 'messages' | 'stickers'>('stories');
+  const [activeTab, setActiveTab] = useState<'stories' | 'users' | 'comments' | 'messages' | 'stickers' | 'posts'>('stories');
   
   // Custom Confirmation Dialog
   const [confirmDialog, setConfirmDialog] = useState<{ text: string; action: () => void } | null>(null);
@@ -95,6 +95,9 @@ export function Admin() {
   const stickerFileInputRef = useRef<HTMLInputElement>(null);
   const editStickerFileInputRef = useRef<HTMLInputElement>(null);
 
+  // Posts Management
+  const [posts, setPosts] = useState<any[]>([]);
+
   useEffect(() => {
     const isReady = email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com';
     if (isReady) {
@@ -103,6 +106,7 @@ export function Admin() {
       fetchComments();
       fetchMessages();
       fetchStickers();
+      fetchPosts();
     }
   }, [email, firebaseUser, activeTab]);
 
@@ -225,6 +229,38 @@ export function Admin() {
 
   const fetchStickers = async () => {
     // Legacy function kept for references, but data is now fetched via onSnapshot above
+  };
+
+  const fetchPosts = async () => {
+    try {
+      const q = query(collection(db, 'newsFeed'), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const list: any[] = [];
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({
+          id: docSnap.id,
+          uid: data.uid,
+          displayName: data.displayName || 'Vô danh',
+          content: data.content,
+          createdAt: data.createdAt,
+        });
+      });
+      setPosts(list);
+    } catch (err: any) {
+      console.error('Lỗi tải bài đăng:', err);
+    }
+  };
+
+  const handleDeletePost = async (id: string) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa bài đăng này?')) return;
+    try {
+      await deleteDoc(doc(db, 'newsFeed', id));
+      setPosts(posts.filter(m => m.id !== id));
+      alert('Đã xóa bài đăng.');
+    } catch (err: any) {
+      alert('Không thể xóa. Lỗi: ' + (err.message || err));
+    }
   };
 
   const handleImageResize = (file: File): Promise<string> => {
@@ -719,7 +755,10 @@ export function Admin() {
             <MessageSquare className="w-4 h-4" /> Choco Lounge
          </button>
          <button onClick={() => setActiveTab('stickers')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'stickers' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
-            <Smile className="w-4 h-4" /> Sticker Avatar
+            <Smile className="w-4 h-4" /> Stickers
+         </button>
+         <button onClick={() => setActiveTab('posts')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'posts' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
+            <MessageSquare className="w-4 h-4" /> Bài đăng
          </button>
       </div>
 
@@ -935,6 +974,24 @@ export function Admin() {
                     <button onClick={() => deleteMessageItem(m.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 className="w-4 h-4" /></button>
                  </div>
               ))}
+            </div>
+         </div>
+      )}
+
+      {activeTab === 'posts' && (
+         <div className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
+            <h2 className="text-xl font-bold text-[#3E2723]">Bản tin Choco ({posts.length})</h2>
+            <div className="divide-y max-h-[500px] overflow-y-auto">
+              {posts.map(post => (
+                 <div key={post.id} className="py-3 flex justify-between items-center gap-4">
+                    <div className="space-y-1">
+                       <p className="text-xs text-gray-500 font-bold">{post.displayName}</p>
+                       <p className="text-sm text-gray-800">{post.content}</p>
+                    </div>
+                    <button onClick={() => handleDeletePost(post.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 className="w-4 h-4" /></button>
+                 </div>
+              ))}
+              {posts.length === 0 && <p className="text-center text-gray-500 py-4">Chưa có bài đăng nào.</p>}
             </div>
          </div>
       )}
