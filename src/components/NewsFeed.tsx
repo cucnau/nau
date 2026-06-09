@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useStore } from '../store';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
-import { Newspaper, Trash2, User, ExternalLink, MessageSquareQuote } from 'lucide-react';
+import { Newspaper, User, ExternalLink, MessageSquareQuote } from 'lucide-react';
 import { cn } from './Layout';
 import { useNavigate } from 'react-router-dom';
 import { UserAvatar } from './UserAvatar';
@@ -135,16 +135,7 @@ export function NewsFeed() {
                             }) 
                           : 'Vừa xong'}
                       </span>
-                      {canDelete && (
-                        <button 
-                          type="button"
-                          onClick={() => handleDeletePost(post.id)}
-                          className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1 rounded transition-all"
-                          title="Xóa bài viết"
-                        >
-                          <Trash2 className="w-3" />
-                        </button>
-                      )}
+
                     </div>
                   </div>
 
