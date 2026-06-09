@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store';
 import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
-import { doc, updateDoc, collection, addDoc, setDoc, serverTimestamp, query, orderBy, onSnapshot, where } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc, setDoc, serverTimestamp, query, orderBy, onSnapshot, where, deleteDoc } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 
 export function Account() {
@@ -167,6 +167,16 @@ export function Account() {
       setReview('');
     } catch(err) {
       handleFirestoreError(err, OperationType.CREATE, `users/${uid}/reviews`);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!window.confirm('Bạn có chắc muốn xóa bài viết này không?')) return;
+    try {
+      await deleteDoc(doc(db, `users/${uid}/reviews`, reviewId));
+      await deleteDoc(doc(db, 'newsFeed', reviewId));
+    } catch (err: any) {
+      console.error('Lỗi khi xóa bài viết:', err);
     }
   };
 
@@ -431,9 +441,18 @@ export function Account() {
              <div className="flex-1 overflow-y-auto space-y-4 pr-2">
                 {reviews.length === 0 ? <p className="text-gray-400 italic text-sm text-center py-8">Chưa có bài viết nào.</p> : null}
                 {reviews.map(r => (
-                  <div key={r.id} className="p-4 bg-[#F5E6D3]/30 rounded-xl border border-[#D7CCC8]/50">
-                    <p className="text-sm font-semibold whitespace-pre-wrap text-[#3E2723]">{r.content}</p>
-                    <p className="text-[10px] text-gray-500 mt-3 uppercase tracking-widest">{r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString() : ''}</p>
+                  <div key={r.id} className="p-4 bg-[#F5E6D3]/30 rounded-xl border border-[#D7CCC8]/50 flex justify-between items-start gap-4">
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold whitespace-pre-wrap text-[#3E2723]">{r.content}</p>
+                      <p className="text-[10px] text-gray-400 mt-3 uppercase tracking-widest">{r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString() : ''}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteReview(r.id)}
+                      className="text-red-500 text-[10px] font-bold uppercase tracking-wider hover:text-red-700 transition-colors shrink-0 bg-red-100/40 hover:bg-red-100/80 px-2 py-1 rounded shadow-xs"
+                    >
+                      Xóa
+                    </button>
                   </div>
                 ))}
              </div>
