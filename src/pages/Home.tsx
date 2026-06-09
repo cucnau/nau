@@ -7,12 +7,13 @@ import { CalendarCheck, ClipboardList, ShoppingBag, Trophy, Star, BookOpen, Flam
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { UserAvatar } from '../components/UserAvatar';
+import { format } from 'date-fns';
 
 export function Home() {
   const navigate = useNavigate();
   const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak, getTitleColor } = useStore();
   
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
   const isCheckedInToday = lastCheckInDate === todayStr;
   
   const hasUnclaimedMissions = isCheckedInToday && missions.some(m => m.completed && !m.claimed);
