@@ -464,10 +464,10 @@ export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showQuotaWarning, setShowQuotaWarning] = useState(true);
   const { 
-    isLoggedIn, uid, displayName, avatarUrl, equippedSticker, stickerPosition, choco, goldenChoco, email, level,
+    isLoggedIn, uid, displayName, avatarUrl, equippedStickerAvatar: equippedSticker, stickerPositionAvatar: stickerPosition, choco, goldenChoco, email, level,
     isStoreOpen, isMissionsOpen, isAchievementsOpen, isInventoryOpen,
     setStoreOpen, setMissionsOpen, setAchievementsOpen, setInventoryOpen,
-    isQuotaExceeded, firebaseUser
+    isQuotaExceeded, firebaseUser, activeTitle, getTitleColor
   } = useStore();
   const navigate = useNavigate();
 
@@ -689,12 +689,12 @@ export function AppLayout() {
                        />
                      )}
                    </div>
-                   <span className="hidden sm:inline font-medium">{displayName}</span>
+                   <span className="hidden sm:inline font-medium" style={{ color: getTitleColor(activeTitle) || undefined }}>{displayName}</span>
                 </div>
                 <div className="absolute right-0 top-full mt-2 w-48 bg-[#FDF6EC] text-[#3E2723] rounded-xl shadow-xl border border-[#D7CCC8] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden">
                    <div className="px-4 py-3 border-b border-[#D7CCC8] mb-1">
                       <div className="flex items-center gap-1.5 mb-0.5">
-                         <p className="font-semibold truncate">{displayName}</p>
+                         <p className="font-semibold truncate" style={{ color: getTitleColor(activeTitle) || undefined }}>{displayName}</p>
                          <span className="px-1.5 py-0.5 bg-[#8D6E63] text-white text-[9px] font-bold rounded">Lv. {level || 1}</span>
                       </div>
                       <p className="text-xs opacity-70 truncate">{uid}</p>
