@@ -11,7 +11,8 @@ export function Account() {
     equippedStickerChat,
     equippedStickerPost, stickerPositionPost,
     choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, 
-    ownedStickers, equipSticker, setStickerPosition, firebaseUser, updateUserDoc, unlockAchievement 
+    ownedStickers, equipSticker, setStickerPosition, firebaseUser, updateUserDoc, unlockAchievement,
+    customTitles, getTitleColor
   } = useStore();
   const nextLevelExp = (level || 1) * 100;
   const currentExp = exp || 0;
@@ -326,10 +327,10 @@ export function Account() {
                     />
                  )}
               </div>
-              <h2 className="text-xl font-bold text-[#3E2723] mb-1 flex items-center justify-center gap-1.5 flex-wrap">
+              <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-1.5 flex-wrap" style={{ color: getTitleColor(activeTitle) || '#3E2723' }}>
                  {displayName}
                  {activeTitle && (
-                    <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200">
+                    <span className="px-2 py-0.5 bg-yellow-105 text-yellow-800 text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200">
                        🏆 {activeTitle}
                     </span>
                  )}
@@ -371,8 +372,8 @@ export function Account() {
                   <div className="flex justify-between items-center mb-1.5">
                      <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037]">Danh hiệu của tôi</span>
                   </div>
-                  {unlockedAchievements.length === 0 ? (
-                     <p className="text-xs text-gray-400 italic">Chưa mở khóa thành tựu nào.</p>
+                  {unlockedAchievements.length === 0 && (!customTitles || customTitles.length === 0) ? (
+                     <p className="text-xs text-gray-400 italic">Chưa sở hữu danh hiệu nào.</p>
                   ) : (
                      <div className="space-y-2">
                         <select 
@@ -384,9 +385,12 @@ export function Account() {
                            {ACHIEVEMENTS_LIST.filter(a => unlockedAchievements.includes(a.id)).map(a => (
                               <option key={a.id} value={a.name}>{a.name}</option>
                            ))}
+                           {customTitles && customTitles.map((t, idx) => (
+                              <option key={t.id || idx} value={t.name}>{t.name}</option>
+                           ))}
                         </select>
                         <div className="text-[10px] text-[#8D6E63] font-medium leading-tight">
-                           Chọn danh hiệu để hiển thị cùng tên tài khoản khi bạn bình luận truyện!
+                           Chọn danh hiệu để hiển thị cùng tên tài khoản và đổi màu tên của bạn ở mọi nơi!
                         </div>
                      </div>
                   )}
