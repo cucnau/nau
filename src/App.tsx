@@ -7,6 +7,7 @@ import { AuthProvider } from './components/AuthProvider';
 import { Account } from './pages/Account';
 import { Admin } from './pages/Admin';
 import { Library } from './pages/Library';
+import { StoryList } from './pages/StoryList';
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -29,7 +30,7 @@ export default function App() {
             <Route path="tai-khoan" element={<Account />} />
             <Route path="admin" element={<Admin />} />
             
-            <Route path="danh-sach" element={<Placeholder title="Danh Sách Truyện" />} />
+            <Route path="danh-sach" element={<StoryList />} />
             <Route path="thu-vien" element={<Library />} />
           </Route>
         </Routes>
