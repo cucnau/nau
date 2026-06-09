@@ -134,6 +134,7 @@ export function Library() {
                 <div>
                   <h3 className="font-extrabold text-[#3E2723] text-sm sm:text-base leading-snug line-clamp-1 truncate uppercase tracking-tight">
                     {story.title}
+                    {story.completed && <span className="inline-block text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase tracking-widest font-bold ml-1.5 align-middle">Full</span>}
                   </h3>
                   <p className="text-xs text-gray-500 italic font-medium mb-1">Tác giả: {story.author}</p>
                   
