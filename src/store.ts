@@ -500,7 +500,7 @@ export const useStore = create<UserState>()(
         
         let newStreak = 1;
         if (state.lastCheckInDate) {
-           const daysDiff = differenceInDays(new Date(), new Date(state.lastCheckInDate));
+           const daysDiff = Math.round(Math.abs(new Date(todayStr).getTime() - new Date(state.lastCheckInDate).getTime()) / (1000 * 60 * 60 * 24));
            if (daysDiff === 1) {
                newStreak = state.checkInStreak + 1;
            } else {
