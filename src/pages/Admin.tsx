@@ -42,6 +42,7 @@ interface AdminUser {
   banExpiresAt?: number | null;
   customTitles?: CustomTitle[];
   claimedAchievements?: string[];
+  unlockedAchievements?: string[];
 }
 
 interface AdminComment {
@@ -222,10 +223,8 @@ export function Admin() {
 
   const handleSaveAchievementColor = async (achievementId: string, color: string) => {
     try {
-      const newColors = { ...achievementColors, [achievementId]: color };
       const { setDoc } = await import('firebase/firestore');
-      await setDoc(doc(db, 'settings', 'achievement_colors'), newColors, { merge: true });
-      setAchievementColors(newColors);
+      await setDoc(doc(db, 'settings', 'achievement_colors'), { [achievementId]: color }, { merge: true });
     } catch(err) { console.error('Failed to save achievement color', err); }
   };
 
@@ -294,6 +293,25 @@ export function Admin() {
      });
   };
 
+  const handleRemoveUserAchievement = async (userId: string, achievementId: string) => {
+     setConfirmDialog({
+       text: 'Gỡ danh hiệu thành tựu của người dùng này?',
+       action: async () => {
+         try {
+           const user = users.find(u => u.id === userId);
+           if (!user) return;
+           const newClaimed = (user.claimedAchievements || []).filter(id => id !== achievementId);
+           const newUnlocked = (user.unlockedAchievements || []).filter(id => id !== achievementId);
+           await updateDoc(doc(db, 'users', userId), {
+             claimedAchievements: newClaimed,
+             unlockedAchievements: newUnlocked
+           });
+           fetchUsers();
+         } catch(err: any) { alert('Lỗi: ' + err.message); }
+       }
+     });
+  };
+
   const fetchUsers = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'users'));
@@ -311,6 +329,7 @@ export function Admin() {
           banExpiresAt: data.banExpiresAt || null,
           customTitles: data.customTitles || [],
           claimedAchievements: data.claimedAchievements || [],
+          unlockedAchievements: data.unlockedAchievements || [],
         });
       });
       setUsers(list);
@@ -1232,7 +1251,13 @@ export function Admin() {
                           </div>
                           <div className="flex items-center justify-between gap-2 border-t pt-2">
                              <span className="text-xs font-semibold text-gray-600">Đổi màu:</span>
-                             <input type="color" value={tColor} onChange={(e) => handleSaveAchievementColor(ach.id, e.target.value)} className="w-8 h-8 rounded border" />
+                             <input 
+                                type="color" 
+                                value={tColor} 
+                                onChange={(e) => setAchievementColors(prev => ({...prev, [ach.id]: e.target.value}))} 
+                                onBlur={(e) => handleSaveAchievementColor(ach.id, e.target.value)}
+                                className="w-8 h-8 rounded border" 
+                             />
                           </div>
                        </div>
                     );
@@ -1292,13 +1317,14 @@ export function Admin() {
                             <p className="font-bold text-sm text-[#3E2723]">{u.displayName}</p>
                             <p className="text-xs text-gray-500">{u.email}</p>
                          </div>
-                         {!viewingTitleUsers.isAchievement && (
                             <button onClick={() => {
-                                handleRemoveUserTitle(u.id, titleId)
-                                setViewingTitleUsers(null);
+                                if (viewingTitleUsers.isAchievement) {
+                                    handleRemoveUserAchievement(u.id, titleId);
+                                } else {
+                                    handleRemoveUserTitle(u.id, titleId)
+                                }
                             }} className="text-xs bg-red-100 text-red-600 px-3 py-1 rounded hover:bg-red-200 font-bold">Gỡ</button>
-                         )}
-                      </div>
+                         </div>
                    ));
                 })()}
              </div>
