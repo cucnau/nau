@@ -89,11 +89,17 @@ export function NewsFeed() {
                 key={post.id} 
                 className="flex gap-3 p-3 bg-[#FDF6EC]/30 hover:bg-[#FDF6EC]/50 rounded-2xl border border-[#F5E6D3]/60 transition-colors relative overflow-visible pr-8"
               >
-                {post.equippedSticker && (
+                {(post.equippedStickerPost || post.equippedSticker) && (
                   <img 
-                    src={post.equippedSticker} 
+                    src={post.equippedStickerPost || post.equippedSticker} 
                     alt="Decor sticker" 
-                    className="absolute right-3 bottom-0.5 w-8 h-8 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:4s] z-10" 
+                    className={cn(
+                      "absolute w-8 h-8 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:4s] z-10",
+                      (post.stickerPositionPost || post.stickerPosition) === 'top-left' && "left-3 -top-2",
+                      (post.stickerPositionPost || post.stickerPosition) === 'bottom-left' && "left-3 -bottom-1",
+                      (post.stickerPositionPost || post.stickerPosition) === 'top-right' && "right-3 -top-2",
+                      ((post.stickerPositionPost || post.stickerPosition) === 'bottom-right' || !(post.stickerPositionPost || post.stickerPosition)) && "right-3 -bottom-1"
+                    )} 
                   />
                 )}
                 <div className="flex-shrink-0 w-8 h-8 rounded-full border border-[#D7CCC8]/30 bg-[#5D4037] flex items-center justify-center relative">
@@ -104,16 +110,16 @@ export function NewsFeed() {
                       <User className="w-4 h-4 text-[#A1887F]" />
                     )}
                   </div>
-                  {post.equippedSticker && (
+                  {(post.equippedStickerAvatar || post.equippedSticker) && (
                     <img 
-                      src={post.equippedSticker} 
+                      src={post.equippedStickerAvatar || post.equippedSticker} 
                       alt="Sticker" 
                       className={cn(
                         "absolute w-4 h-4 object-contain pointer-events-none z-10 animate-pulse",
-                        post.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-                        post.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-                        post.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-                        post.stickerPosition === 'bottom-right' && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                        (post.stickerPositionAvatar || post.stickerPosition) === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
+                        (post.stickerPositionAvatar || post.stickerPosition) === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
+                        (post.stickerPositionAvatar || post.stickerPosition) === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
+                        ((post.stickerPositionAvatar || post.stickerPosition) === 'bottom-right' || !(post.stickerPositionAvatar || post.stickerPosition)) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
                       )} 
                     />
                   )}
