@@ -238,7 +238,10 @@ export function StoryView() {
                 <img src={story.coverUrl} alt={story.title} className="w-48 md:w-full aspect-[2/3] object-cover rounded-xl shadow-lg border border-[#D7CCC8]/50" />
             </div>
             <div className="flex-1 flex flex-col">
-                <h1 className="text-2xl lg:text-4xl font-bold mb-2 text-[#3E2723] uppercase tracking-tighter">{story.title}</h1>
+                <h1 className="text-2xl lg:text-4xl font-bold mb-2 text-[#3E2723] uppercase tracking-tighter">
+                   {story.title}
+                   {story.completed && <span className="inline-block text-xs lg:text-sm bg-green-100 text-green-700 px-2 py-1 rounded uppercase tracking-widest font-bold ml-3 align-middle">Full</span>}
+                </h1>
                 <div className="text-gray-600 mb-4 flex items-center gap-2">
                     <Users className="w-4 h-4" />
                     <span className="font-medium italic">{story.author}</span>
