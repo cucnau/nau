@@ -64,7 +64,7 @@ export function Store() {
 
      handleBuyItem(sticker.name, sticker.price, sticker.type, () => {
         addOwnedSticker(sticker.url);
-        equipSticker(sticker.url);
+        equipSticker(sticker.type as any, sticker.url);
         alert(`Bạn đã mua và tự động trang bị ${sticker.name}!`);
      });
   };
