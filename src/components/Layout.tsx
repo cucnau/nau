@@ -66,7 +66,7 @@ export function PaimonLogo({ className }: { className?: string }) {
 function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const navigate = useNavigate();
   const { 
-    isLoggedIn, email, missions,
+    isLoggedIn, email, missions, level, lastClaimedRewardLevel,
     setStoreOpen, setMissionsOpen, setAchievementsOpen,
     firebaseUser
   } = useStore();
@@ -110,6 +110,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   };
 
   const claimableMissions = missions.filter(m => m.completed && !m.claimed).length;
+  const hasLevelUpRewards = isLoggedIn && (level || 1) > (lastClaimedRewardLevel || 1);
 
   return (
     <>
@@ -206,16 +207,22 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                 <span className="text-xs font-bold leading-normal">Thành Tựu</span>
               </button>
 
-             {/* Tài Khoản */}
-             <button 
-                onClick={() => { onClose(); navigate('/tai-khoan'); }}
-                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] shadow-sm group"
-             >
-                <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
-                   <User className="w-5 h-5 text-[#8D6E63]" />
-                </div>
-                <span className="text-xs font-bold leading-normal">Hồ Sơ</span>
-             </button>
+              {/* Tài Khoản */}
+              <button 
+                 onClick={() => { onClose(); navigate('/tai-khoan'); }}
+                 className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] shadow-sm relative group"
+              >
+                 <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <User className="w-5 h-5 text-[#8D6E63]" />
+                 </div>
+                 <span className="text-xs font-bold leading-normal">Hồ Sơ</span>
+                 {hasLevelUpRewards && (
+                    <span className="absolute top-2 right-2 flex h-2 w-2">
+                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                       <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                 )}
+              </button>
 
              {/* Quản Trị (Optional) */}
              {isLoggedIn && (email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') && (
@@ -464,7 +471,7 @@ export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showQuotaWarning, setShowQuotaWarning] = useState(true);
   const { 
-    isLoggedIn, uid, displayName, avatarUrl, equippedStickerAvatar: equippedSticker, stickerPositionAvatar: stickerPosition, choco, goldenChoco, email, level,
+    isLoggedIn, uid, displayName, avatarUrl, equippedStickerAvatar: equippedSticker, stickerPositionAvatar: stickerPosition, choco, goldenChoco, email, level, lastClaimedRewardLevel, missions,
     isStoreOpen, isMissionsOpen, isAchievementsOpen, isInventoryOpen,
     setStoreOpen, setMissionsOpen, setAchievementsOpen, setInventoryOpen,
     isQuotaExceeded, firebaseUser, activeTitle, getTitleColor
@@ -565,6 +572,10 @@ export function AppLayout() {
     }
   };
 
+  const claimableMissionsInLayout = (missions || []).filter(m => m.completed && !m.claimed).length;
+  const hasLevelUpRewardsInLayout = isLoggedIn && (level || 1) > (lastClaimedRewardLevel || 1);
+  const utilityMenuHasRedDot = claimableMissionsInLayout > 0 || hasLevelUpRewardsInLayout;
+
   return (
     <div className="min-h-screen bg-[#FDF6EC] text-[#3E2723] flex flex-col font-sans">
       {isQuotaExceeded && showQuotaWarning && (
@@ -583,10 +594,16 @@ export function AppLayout() {
         <div className="flex items-center gap-4">
           <button 
             onClick={() => setSidebarOpen(true)} 
-            className="flex items-center justify-center w-11 h-11 rounded-full bg-[#5D4037] hover:bg-[#8D6E63] hover:scale-110 active:scale-95 transition-all outline-none border border-[#8D6E63] shadow-md text-white"
+            className="flex items-center justify-center w-11 h-11 rounded-full bg-[#5D4037] hover:bg-[#8D6E63] hover:scale-110 active:scale-95 transition-all outline-none border border-[#8D6E63] shadow-md text-white relative"
             title="Menu Tiện Ích"
           >
             <Menu className="w-5 h-5" />
+            {utilityMenuHasRedDot && (
+              <span className="absolute top-[3px] right-[3px] flex h-2.5 w-2.5">
+                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border border-[#3E2723]"></span>
+              </span>
+            )}
           </button>
         </div>
 
