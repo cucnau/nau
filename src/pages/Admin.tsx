@@ -430,10 +430,13 @@ export function Admin() {
     }
   };
 
-  const handleDeletePost = async (id: string) => {
+  const handleDeletePost = async (id: string, postUid?: string) => {
     if (!window.confirm('Bạn có chắc chắn muốn xóa bài đăng này?')) return;
     try {
       await deleteDoc(doc(db, 'newsFeed', id));
+      if (postUid) {
+        await deleteDoc(doc(db, `users/${postUid}/reviews`, id));
+      }
       setPosts(posts.filter(m => m.id !== id));
       alert('Đã xóa bài đăng.');
     } catch (err: any) {
@@ -1202,7 +1205,7 @@ export function Admin() {
                        <p className="text-xs text-gray-500 font-bold">{post.displayName}</p>
                        <p className="text-sm text-gray-800">{post.content}</p>
                     </div>
-                    <button onClick={() => handleDeletePost(post.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => handleDeletePost(post.id, post.uid)} className="text-red-500 hover:text-red-700 p-1"><Trash2 className="w-4 h-4" /></button>
                  </div>
               ))}
               {posts.length === 0 && <p className="text-center text-gray-500 py-4">Chưa có bài đăng nào.</p>}
