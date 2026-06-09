@@ -78,6 +78,12 @@ interface UserState {
   prevActiveWeek: string;
   activeTitle: string | null;
   setActiveTitle: (title: string | null) => void;
+  customTitles: any[];
+  customTitleColors: Record<string, string>;
+  achTitleColors: Record<string, string>;
+  setCustomTitleColors: (colors: Record<string, string>) => void;
+  setAchievementColors: (colors: Record<string, string>) => void;
+  getTitleColor: (title: string | null) => string | undefined;
   
   isStoreOpen: boolean;
   isMissionsOpen: boolean;
@@ -206,6 +212,16 @@ export const useStore = create<UserState>()(
          set({ activeTitle: title });
          get().updateUserDoc({ activeTitle: title });
       },
+      customTitles: [],
+      customTitleColors: {},
+      achTitleColors: {},
+      setCustomTitleColors: (colors) => set({ customTitleColors: colors }),
+      setAchievementColors: (colors) => set({ achTitleColors: colors }),
+      getTitleColor: (title) => {
+         if (!title) return undefined;
+         const state = get();
+         return state.customTitleColors[title] || state.achTitleColors[title] || undefined;
+      },
       
       isStoreOpen: false,
       isMissionsOpen: false,
@@ -248,6 +264,7 @@ export const useStore = create<UserState>()(
         unlockedEarlyAccessChapters: [],
         unlockedAchievements: [],
         claimedAchievements: [],
+        customTitles: [],
         totalEarnedChoco: 0,
         totalEarnedGChoco: 0,
         totalSpentChoco: 0,
@@ -363,6 +380,7 @@ export const useStore = create<UserState>()(
             prevActivePoints: data.prevActivePoints !== undefined ? data.prevActivePoints : state.prevActivePoints,
             prevActiveWeek: data.prevActiveWeek !== undefined ? data.prevActiveWeek : state.prevActiveWeek,
             activeTitle: data.activeTitle !== undefined ? data.activeTitle : state.activeTitle,
+            customTitles: data.customTitles !== undefined ? data.customTitles : state.customTitles,
             };
          });
          get()._checkResetMissions();
