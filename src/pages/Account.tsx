@@ -3,6 +3,7 @@ import { useStore } from '../store';
 import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
 import { doc, updateDoc, collection, addDoc, setDoc, serverTimestamp, query, orderBy, onSnapshot, where, deleteDoc } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
+import { Gift } from 'lucide-react';
 
 export function Account() {
   const { 
@@ -12,7 +13,7 @@ export function Account() {
     equippedStickerPost, stickerPositionPost,
     choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, 
     ownedStickers, equipSticker, setStickerPosition, firebaseUser, updateUserDoc, unlockAchievement,
-    customTitles, getTitleColor
+    customTitles, getTitleColor, lastClaimedRewardLevel, ownedMysteryBoxes
   } = useStore();
   const nextLevelExp = (level || 1) * 100;
   const currentExp = exp || 0;
@@ -25,6 +26,44 @@ export function Account() {
     }, 100);
     return () => clearTimeout(timer);
   }, [percent]);
+
+  const [rewardClaimInfo, setRewardClaimInfo] = useState<{ gchoco: number; boxes: number; unclaimedLevels: number[] } | null>(null);
+  const [claiming, setClaiming] = useState(false);
+
+  const unclaimedLevels: number[] = [];
+  const currentLvl = level || 1;
+  const lastClaimedLvl = lastClaimedRewardLevel || 1;
+
+  if (isLoggedIn && currentLvl > lastClaimedLvl) {
+    for (let l = lastClaimedLvl + 1; l <= currentLvl; l++) {
+      unclaimedLevels.push(l);
+    }
+  }
+
+  let totalGChoco = 0;
+  let totalBoxes = unclaimedLevels.length;
+  unclaimedLevels.forEach(lvl => {
+    totalGChoco += Math.floor((lvl - 1) / 5) + 1;
+  });
+
+  const handleClaimRewards = async () => {
+    if (!rewardClaimInfo) return;
+    setClaiming(true);
+    try {
+      await updateUserDoc({
+        goldenChoco: (goldenChoco || 0) + rewardClaimInfo.gchoco,
+        ownedMysteryBoxes: (ownedMysteryBoxes || 0) + rewardClaimInfo.boxes,
+        lastClaimedRewardLevel: level
+      });
+      alert(`Đã nhận thành công phần thưởng lên cấp gồm:\n- ${rewardClaimInfo.gchoco} Gchoco\n- ${rewardClaimInfo.boxes} Hộp Quà Sticker Bí Ẩn!\n\nHộp quà đã được chuyển vào Túi đồ của bạn.`);
+      setRewardClaimInfo(null);
+    } catch (err: any) {
+      console.error("Lỗi khi nhận phần thưởng:", err);
+      alert("Lỗi khi nhận thưởng: " + err.message);
+    } finally {
+      setClaiming(false);
+    }
+  };
 
   const [tab, setTab] = useState<'profile' | 'settings'>('profile');
   const [name, setName] = useState(displayName || '');
@@ -351,7 +390,19 @@ export function Account() {
               <div className="w-full mb-4 bg-[#F2E5D5]/40 p-4 rounded-xl border border-[#D7CCC8]/60 text-left">
                  <div className="flex justify-between items-center mb-1.5">
                     <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037]">Level</span>
-                    <span className="px-2 py-0.5 bg-[#8D6E63] text-[#FDF6EC] text-xs font-bold rounded-full shadow-sm">Lv. {level || 1}</span>
+                    <div className="flex items-center gap-2">
+                       {totalBoxes > 0 && (
+                          <button 
+                             onClick={() => setRewardClaimInfo({ gchoco: totalGChoco, boxes: totalBoxes, unclaimedLevels })}
+                             className="px-2.5 py-1 bg-[#D4AF37] hover:bg-[#B5952F] hover:scale-105 active:scale-95 text-white rounded-full text-[10px] font-black uppercase flex items-center justify-center gap-1 cursor-pointer shadow border border-[#E5C158] transition-all animate-bounce"
+                             title="Bấm để nhận quà lên cấp!"
+                          >
+                             <Gift className="w-3.5 h-3.5" />
+                             <span>Quà Lên Cấp</span>
+                          </button>
+                       )}
+                       <span className="px-2 py-0.5 bg-[#8D6E63] text-[#FDF6EC] text-xs font-bold rounded-full shadow-sm">Lv. {level || 1}</span>
+                    </div>
                  </div>
                  <div className="w-full bg-[#E0D4C5] rounded-full h-2.5 overflow-hidden shadow-inner relative mb-1 border border-[#D7CCC8]/20">
                     <div 
@@ -439,6 +490,46 @@ export function Account() {
              </form>
 
              <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+                {rewardClaimInfo && (
+                   <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                      <div className="bg-[#FDF6EC] border-4 border-[#3E2723] rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center transform scale-100 transition-all font-sans">
+                         <div className="w-16 h-16 bg-amber-100 border-2 border-[#8D6E63] rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                            <Gift className="w-8 h-8 text-amber-700" />
+                         </div>
+                         <h3 className="text-xl font-bold uppercase text-[#3E2723] mb-2 font-black tracking-tight">Phần Thưởng Lên Cấp!</h3>
+                         <p className="text-sm text-gray-600 mb-4">
+                            Chúc mừng bạn đã đạt cấp độ mới! Bạn có phần thưởng chưa nhận từ level <strong>{lastClaimedRewardLevel || 1}</strong> lên <strong>{level}</strong>:
+                         </p>
+                         <div className="bg-[#FAF0E6] rounded-2xl p-4 border border-[#D7CCC8]/80 mb-5 flex flex-col gap-2.5 shadow-inner">
+                            <div className="flex justify-between items-center text-sm font-bold text-[#5D4037]">
+                               <span>Gchoco:</span>
+                               <span className="bg-[#D4AF37]/15 text-[#D4AF37] px-3 py-1 rounded-full border border-[#D4AF37]/30">+{rewardClaimInfo.gchoco} Gchoco</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm font-bold text-[#5D4037]">
+                               <span>Hộp Quà Sticker Bí Ẩn:</span>
+                               <span className="bg-[#8D6E63]/15 text-[#8D6E63] px-3 py-1 rounded-full border border-[#8D6E63]/30">+{rewardClaimInfo.boxes} Hộp Quà</span>
+                            </div>
+                         </div>
+                         <div className="flex gap-3">
+                            <button 
+                               type="button"
+                               onClick={() => setRewardClaimInfo(null)}
+                               className="px-4 py-2 border border-[#8D6E63] text-[#3E2723] hover:bg-black/5 rounded-full text-xs font-bold flex-1 cursor-pointer transition-colors"
+                            >
+                               Đóng
+                            </button>
+                            <button 
+                               type="button"
+                               onClick={handleClaimRewards}
+                               disabled={claiming}
+                               className="px-4 py-2 bg-[#D4AF37] hover:bg-[#B5952F] text-white rounded-full text-xs font-black shadow-md flex-1 uppercase tracking-wider cursor-pointer transition-colors"
+                            >
+                               {claiming ? "Đang nhận..." : "Nhận ngay"}
+                            </button>
+                         </div>
+                      </div>
+                   </div>
+                )}
                 {reviews.length === 0 ? <p className="text-gray-400 italic text-sm text-center py-8">Chưa có bài viết nào.</p> : null}
                 {reviews.map(r => (
                   <div key={r.id} className="p-4 bg-[#F5E6D3]/30 rounded-xl border border-[#D7CCC8]/50 flex justify-between items-start gap-4">
