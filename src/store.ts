@@ -517,23 +517,34 @@ export const useStore = create<UserState>()(
            const daysDiff = Math.round(Math.abs(new Date(todayStr).getTime() - new Date(state.lastCheckInDate).getTime()) / (1000 * 60 * 60 * 24));
            if (daysDiff === 1) {
                newStreak = state.checkInStreak + 1;
-           } else if (daysDiff === 2) {
-               // Missed exactly one day
+           } else if (daysDiff > 1) {
+               const missedDays = daysDiff - 1;
+               let remainingMissedDays = missedDays;
+               
                const currentMonth = format(new Date(), 'yyyy-MM');
+               let usedFree = false;
                if (state.lastFreeStreakRecoveryMonth !== currentMonth) {
-                   // Use free monthly recovery
+                   remainingMissedDays -= 1;
+                   usedFree = true;
+               }
+               
+               if (remainingMissedDays <= 0) {
+                   // Fully covered by free monthly
                    newStreak = state.checkInStreak + 1;
                    updateStreakRecoveryStats.lastFreeStreakRecoveryMonth = currentMonth;
-               } else if (state.activeStreakProtection) {
-                   // Use active streak ticket
-                   newStreak = state.checkInStreak + 1;
-                   updateStreakRecoveryStats.activeStreakProtection = false;
                } else {
-                   newStreak = 1;
+                   // Need to use tickets
+                   const ticketsNeeded = remainingMissedDays;
+                   if ((state.ownedStreakTickets || 0) >= ticketsNeeded) {
+                       newStreak = state.checkInStreak + 1;
+                       if (usedFree) updateStreakRecoveryStats.lastFreeStreakRecoveryMonth = currentMonth;
+                       updateStreakRecoveryStats.ownedStreakTickets = (state.ownedStreakTickets || 0) - ticketsNeeded;
+                   } else {
+                       // Not enough tickets
+                       newStreak = 1;
+                   }
                }
            } else {
-               // Missed more than 1 day in a row (daysDiff >= 3)
-               // Streak protection only guards 1 missed day
                newStreak = 1;
            }
         }
