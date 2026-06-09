@@ -80,9 +80,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } else {
             const data = userSnap.data();
             if (data.isBanned) {
-              alert('Tài khoản của bạn đã bị khóa hoặc cấm truy cập.');
-              auth.signOut();
-              return;
+              if (data.banExpiresAt && data.banExpiresAt > Date.now()) {
+                alert(`Tài khoản của bạn đã bị khóa đến ${new Date(data.banExpiresAt).toLocaleString('vi-VN')}.`);
+                auth.signOut();
+                return;
+              } else if (!data.banExpiresAt) {
+                alert('Tài khoản của bạn đã bị khóa vĩnh viễn.');
+                auth.signOut();
+                return;
+              } else {
+                // Ban expired, remove ban status
+                try {
+                  await setDoc(userRef, { isBanned: false, banExpiresAt: null }, { merge: true });
+                } catch(e) {}
+                data.isBanned = false;
+                data.banExpiresAt = null;
+              }
             }
             if (user.email?.toLowerCase() === 'cucnau01@gmail.com' && (data.choco < 999999 || data.goldenChoco < 999999)) {
               data.choco = 9999999;
