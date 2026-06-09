@@ -31,6 +31,8 @@ interface AdminUser {
   email: string;
   choco: number;
   goldenChoco: number;
+  isBanned?: boolean;
+  banExpiresAt?: number | null;
 }
 
 interface AdminComment {
@@ -77,6 +79,38 @@ export function Admin() {
   const [searchEmail, setSearchEmail] = useState('');
   const [givingChoco, setGivingChoco] = useState<number>(0);
   const [givingGChoco, setGivingGChoco] = useState<number>(0);
+  const [banningUser, setBanningUser] = useState<AdminUser | null>(null);
+  const [banDurationHours, setBanDurationHours] = useState<number>(0); // 0 means permanent
+
+  const handleBanUser = async () => {
+    if (!banningUser) return;
+    try {
+      const banExpiresAt = banDurationHours > 0 ? Date.now() + banDurationHours * 60 * 60 * 1000 : null;
+      await updateDoc(doc(db, 'users', banningUser.id), {
+        isBanned: true,
+        banExpiresAt,
+      });
+      alert(`Đã cấm tài khoản ${banningUser.email} ${banDurationHours > 0 ? `trong ${banDurationHours} giờ` : 'vĩnh viễn'}.`);
+      setBanningUser(null);
+      setBanDurationHours(0);
+      fetchUsers();
+    } catch (err: any) {
+      alert('Không thể cấm tài khoản. Lỗi: ' + (err.message || err));
+    }
+  };
+
+  const handleUnbanUser = async (userId: string) => {
+    try {
+      await updateDoc(doc(db, 'users', userId), {
+        isBanned: false,
+        banExpiresAt: null,
+      });
+      alert('Đã gỡ cấm tài khoản.');
+      fetchUsers();
+    } catch (err: any) {
+      alert('Không thể gỡ cấm. Lỗi: ' + (err.message || err));
+    }
+  };
 
   // Comments Management
   const [comments, setComments] = useState<AdminComment[]>([]);
@@ -152,6 +186,8 @@ export function Admin() {
           email: data.email || '',
           choco: data.choco || 0,
           goldenChoco: data.goldenChoco || 0,
+          isBanned: data.isBanned || false,
+          banExpiresAt: data.banExpiresAt || null,
         });
       });
       setUsers(list);
@@ -926,17 +962,33 @@ export function Admin() {
                {users.filter(u => u.email.toLowerCase().includes(searchEmail.toLowerCase())).map(u => (
                   <div key={u.id} className="py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                      <div>
-                        <p className="font-bold text-[#3E2723]">{u.displayName}</p>
+                        <p className="font-bold text-[#3E2723]">
+                           {u.displayName}
+                           {u.isBanned && (
+                              <span className="ml-2 text-[10px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+                                {u.banExpiresAt ? `Khóa đến ${new Date(u.banExpiresAt).toLocaleString('vi-VN')}` : 'Khóa vĩnh viễn'}
+                              </span>
+                           )}
+                        </p>
                         <p className="text-xs text-gray-500">{u.email}</p>
                         <div className="flex gap-3 mt-2 text-xs">
                            <span className="font-semibold text-amber-700">Choco: {u.choco}</span>
                            <span className="font-semibold text-yellow-600">Golden Choco: {u.goldenChoco}</span>
                         </div>
                      </div>
-                     <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <input type="number" placeholder="Choco" value={givingChoco || ''} onChange={e => setGivingChoco(Number(e.target.value))} className="w-20 px-2 py-1 text-xs border rounded focus:outline-none" />
-                        <input type="number" placeholder="GChoco" value={givingGChoco || ''} onChange={e => setGivingGChoco(Number(e.target.value))} className="w-20 px-2 py-1 text-xs border rounded focus:outline-none" />
-                        <button onClick={() => handleGiveCurrency(u.id)} className="px-3 py-1 bg-[#8D6E63] text-white text-xs font-bold rounded hover:bg-[#5D4037] transition-colors">Tặng</button>
+                     <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 w-full sm:w-auto">
+                        <div className="flex items-center gap-2">
+                           <input type="number" placeholder="Choco" value={givingChoco || ''} onChange={e => setGivingChoco(Number(e.target.value))} className="w-20 px-2 py-1 text-xs border rounded focus:outline-none" />
+                           <input type="number" placeholder="GChoco" value={givingGChoco || ''} onChange={e => setGivingGChoco(Number(e.target.value))} className="w-20 px-2 py-1 text-xs border rounded focus:outline-none" />
+                           <button onClick={() => handleGiveCurrency(u.id)} className="px-3 py-1 bg-[#8D6E63] text-white text-xs font-bold rounded hover:bg-[#5D4037] transition-colors">Tặng</button>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                           {u.isBanned ? (
+                              <button onClick={() => handleUnbanUser(u.id)} className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded hover:bg-green-200 transition-colors whitespace-nowrap">Gỡ Ban</button>
+                           ) : (
+                              <button onClick={() => setBanningUser(u)} className="px-3 py-1 bg-red-100 text-red-600 text-xs font-bold rounded hover:bg-red-200 transition-colors whitespace-nowrap">Ban</button>
+                           )}
+                        </div>
                      </div>
                   </div>
                ))}
@@ -1046,6 +1098,24 @@ export function Admin() {
                <button type="submit" className="px-4 py-2 bg-[#8D6E63] text-white font-bold rounded-lg hover:bg-[#5D4037]">{chapterModalMode === 'add' ? 'Đăng Chương' : 'Lưu Chương'}</button>
              </div>
            </form>
+         </div>
+      )}
+
+      {banningUser && (
+         <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
+           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl flex flex-col gap-4">
+             <h2 className="text-xl font-bold text-red-600">Ban Thành Viên</h2>
+             <p className="text-sm">Bạn đang chuẩn bị ban <strong>{banningUser.email}</strong></p>
+             <div>
+               <label className="block text-sm font-semibold mb-2">Thời gian khóa (Giờ)</label>
+               <input type="number" min="0" value={banDurationHours} onChange={e => setBanDurationHours(Number(e.target.value))} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-red-500" />
+               <p className="text-xs text-gray-500 mt-1">Ghi chú: Để 0 = Khóa vĩnh viễn</p>
+             </div>
+             <div className="flex justify-end gap-2 mt-2">
+               <button onClick={() => { setBanningUser(null); setBanDurationHours(0); }} className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300">Hủy</button>
+               <button onClick={handleBanUser} className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">Xác nhận Khóa</button>
+             </div>
+           </div>
          </div>
       )}
 
