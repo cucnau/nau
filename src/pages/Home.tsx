@@ -296,7 +296,10 @@ export function Home() {
                        <img src={story.coverUrl} alt={story.title} className="w-12 h-16 object-cover rounded-xl shadow-xs border border-white/50 shrink-0 group-hover:scale-105 group-hover:border-[#8D6E63]/60 transition-all duration-300" />
                        <div className="flex flex-col justify-between min-w-0 flex-1 py-0.5">
                           <div>
-                             <p className="font-extrabold text-sm text-[#3E2723] hover:text-[#8D6E63] transition-colors truncate">{story.title}</p>
+                             <p className="font-extrabold text-sm text-[#3E2723] hover:text-[#8D6E63] transition-colors truncate">
+                                {story.title}
+                                {story.completed && <span className="inline-block text-[8px] bg-green-100 text-green-700 px-1 py-0.5 rounded uppercase tracking-widest font-bold ml-1.5 align-middle">Full</span>}
+                             </p>
                              <p className="text-[10px] text-gray-500 italic truncate mt-0.5">Tác giả: {story.author || 'Ẩn danh'}</p>
                           </div>
                           <div className="flex gap-1 items-center flex-wrap">
