@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../store';
-import { ShoppingBag, Key, Zap, Smile, Lock, Shuffle } from 'lucide-react';
+import { ShoppingBag, Key, Zap, Smile, Lock, Shuffle, CalendarCheck } from 'lucide-react';
 import { cn } from '../components/Layout';
 import { db } from '../lib/firebase';
 import { collection, query, getDocs, orderBy } from 'firebase/firestore';
@@ -25,11 +25,11 @@ export function Store() {
 
   const handleExchange = () => {
     if (!isLoggedIn) { alert("Vui lòng đăng nhập!"); return; }
-    if (spendChoco(5)) {
+    if (spendChoco(3)) {
        addGoldenChoco(1);
        alert("Đổi thành công 1 Gchoco!");
     } else {
-       alert("Không đủ Choco (Cần 5)!");
+       alert("Không đủ Choco (Cần 3)!");
     }
   };
 
@@ -113,7 +113,7 @@ export function Store() {
                 <div className="absolute top-0 right-0 bg-[#3E2723] text-[#FDF6EC] text-[8px] sm:text-[10px] uppercase font-bold tracking-widest px-2 sm:px-3 py-1 rounded-bl-xl shadow-sm">Quy đổi</div>
                 <Shuffle className="w-8 h-8 sm:w-10 sm:h-10 text-[#8D6E63] mt-2 mb-2 sm:mb-4 group-hover:rotate-180 transition-transform duration-500" />
                 <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 text-[#3E2723]">Đổi Gchoco</h3>
-                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">5 Choco = 1 Gchoco.</p>
+                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">3 Choco = 1 Gchoco.</p>
                 <button onClick={handleExchange} className="bg-[#FDF6EC] text-[#3E2723] border border-[#8D6E63] p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#3E2723] hover:text-[#FDF6EC] transition-colors w-full mt-auto uppercase text-[10px] sm:text-xs tracking-widest">
                    Đổi
                 </button>
@@ -134,6 +134,15 @@ export function Store() {
                 <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Đọc sớm các chương truyện vừa đăng.</p>
                 <button onClick={() => handleBuyItem('Vé Ưu Tiên', 3, 'golden', () => buyTicket('priority'))} className="bg-[#D4AF37] text-white p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
                    <span>Mua</span> <span className="bg-black/10 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">3 Gchoco</span>
+                </button>
+             </div>
+
+             <div className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
+                <CalendarCheck className="w-8 h-8 sm:w-10 sm:h-10 text-[#8D6E63] mb-2 sm:mb-4 group-hover:-translate-y-1 transition-transform" />
+                <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Giữ Chuỗi</h3>
+                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Giữ chuỗi không bị đứt 1 ngày quên điểm danh.</p>
+                <button onClick={() => handleBuyItem('Vé Giữ Chuỗi', 5, 'choco', () => buyTicket('streak'))} className="bg-[#3E2723] text-[#FDF6EC] p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#2D1B19] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
+                   <span>Mua</span> <span className="bg-[#FDF6EC]/20 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">5 Choco</span>
                 </button>
              </div>
           </div>
