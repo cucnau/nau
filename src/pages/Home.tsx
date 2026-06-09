@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 
 export function Home() {
   const navigate = useNavigate();
-  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak, getTitleColor, lastFreeStreakRecoveryMonth, activeStreakProtection } = useStore();
+  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak, getTitleColor, lastFreeStreakRecoveryMonth, activeStreakProtection, ownedStreakTickets } = useStore();
   
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const isCheckedInToday = lastCheckInDate === todayStr;
@@ -102,17 +102,20 @@ export function Home() {
               if (!isCheckedInToday && lastCheckInDate) {
                 const diffDays = Math.round(Math.abs(new Date(todayStr).getTime() - new Date(lastCheckInDate).getTime()) / (1000 * 60 * 60 * 24));
                 if (diffDays > 1) {
-                   if (diffDays === 2) {
-                       const currentMonth = format(new Date(), 'yyyy-MM');
-                       if (lastFreeStreakRecoveryMonth !== currentMonth) {
-                          isProtected = true; // Will use free recovery
-                       } else if (activeStreakProtection) {
-                          isProtected = true; // Will use ticket
-                       } else {
-                          isBroken = true;
-                       }
+                   const missedDays = diffDays - 1;
+                   let remaining = missedDays;
+                   const currentMonth = format(new Date(), 'yyyy-MM');
+                   
+                   if (lastFreeStreakRecoveryMonth !== currentMonth) {
+                      remaining -= 1;
+                   }
+                   
+                   if (remaining <= 0) {
+                      isProtected = true;
+                   } else if ((ownedStreakTickets || 0) >= remaining) {
+                      isProtected = true;
                    } else {
-                       isBroken = true;
+                      isBroken = true;
                    }
                 }
               }
