@@ -9,6 +9,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { login, logout, setFirebaseUser, syncFromFirebase } = useStore();
 
   useEffect(() => {
+    let unsubUserDoc: (() => void) | null = null;
+
     // Handle redirect result to catch any login errors on redirect-back (e.g. unauthorized-domain)
     getRedirectResult(auth).catch((error: any) => {
       console.error('Redirect auth error:', error);
@@ -26,6 +28,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (unsubUserDoc) {
+        unsubUserDoc();
+        unsubUserDoc = null;
+      }
+
       if (user) {
         setFirebaseUser(user);
         
@@ -94,21 +101,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 try {
                   await setDoc(userRef, { isBanned: false, banExpiresAt: null }, { merge: true });
                 } catch(e) {}
-                data.isBanned = false;
-                data.banExpiresAt = null;
               }
             }
             if (user.email?.toLowerCase() === 'cucnau01@gmail.com' && (data.choco < 999999 || data.goldenChoco < 999999)) {
-              data.choco = 9999999;
-              data.goldenChoco = 9999999;
               try {
                 await setDoc(userRef, { choco: 9999999, goldenChoco: 9999999 }, { merge: true });
               } catch (e) {
                 console.error('Error updating admin doc', e);
               }
             }
-            syncFromFirebase(data);
           }
+
+          // Register real-time reference updates for the user profile
+          unsubUserDoc = onSnapshot(userRef, (snapshot) => {
+            if (snapshot.exists()) {
+              const latestData = snapshot.data();
+              // Validate real-time account ban status
+              if (latestData.isBanned) {
+                if (latestData.banExpiresAt && latestData.banExpiresAt > Date.now()) {
+                  alert(`Tài khoản của bạn đã bị khóa đến ${new Date(latestData.banExpiresAt).toLocaleString('vi-VN')}.`);
+                  auth.signOut();
+                  return;
+                } else if (!latestData.banExpiresAt) {
+                  alert('Tài khoản của bạn đã bị khóa vĩnh viễn.');
+                  auth.signOut();
+                  return;
+                }
+              }
+              // Sync state to local Zustand store in real-time
+              syncFromFirebase(latestData);
+            }
+          }, (err) => {
+            console.error('Error listening to user document updates:', err);
+          });
+
         } catch (e) {
              console.error('Error fetching/processing user doc', e);
              if ((e as any)?.code === 'resource-exhausted') {
@@ -124,7 +150,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      if (unsubUserDoc) {
+        unsubUserDoc();
+      }
+    };
   }, [login, logout, setFirebaseUser, syncFromFirebase]);
 
   useEffect(() => {
