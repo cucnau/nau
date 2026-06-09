@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 
 export function Home() {
   const navigate = useNavigate();
-  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak, getTitleColor } = useStore();
+  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak, getTitleColor, lastFreeStreakRecoveryMonth, activeStreakProtection } = useStore();
   
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const isCheckedInToday = lastCheckInDate === todayStr;
@@ -98,11 +98,23 @@ export function Home() {
               
               // Check if broken
               let isBroken = false;
+              let isProtected = false;
               if (!isCheckedInToday && lastCheckInDate) {
-                const today = new Date(todayStr);
-                const last = new Date(lastCheckInDate);
-                const diffDays = Math.ceil(Math.abs(today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24));
-                if (diffDays > 1) isBroken = true;
+                const diffDays = Math.round(Math.abs(new Date(todayStr).getTime() - new Date(lastCheckInDate).getTime()) / (1000 * 60 * 60 * 24));
+                if (diffDays > 1) {
+                   if (diffDays === 2) {
+                       const currentMonth = format(new Date(), 'yyyy-MM');
+                       if (lastFreeStreakRecoveryMonth !== currentMonth) {
+                          isProtected = true; // Will use free recovery
+                       } else if (activeStreakProtection) {
+                          isProtected = true; // Will use ticket
+                       } else {
+                          isBroken = true;
+                       }
+                   } else {
+                       isBroken = true;
+                   }
+                }
               }
               
               if (isBroken) nextCheckInStreak = 1;
@@ -126,6 +138,7 @@ export function Home() {
                 <div className="w-full bg-[#FDF6EC] p-4 rounded-2xl border border-[#F5E6D3] mb-6 flex flex-col gap-3">
                   <div className="flex justify-between items-end mb-1">
                       <span className="text-xs font-bold text-[#8D6E63] uppercase tracking-wider">Chuỗi: <span className="text-xl font-black text-[#3E2723]">{activeStreak}</span> ngày</span>
+                      {isProtected && <span className="text-[10px] font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded px-2 animate-pulse uppercase tracking-widest">Đang giữ chuỗi</span>}
                       {isBroken && activeStreak > 0 && <span className="text-[10px] font-bold text-red-500 animate-pulse">Chuỗi đã đứt!</span>}
                   </div>
 
