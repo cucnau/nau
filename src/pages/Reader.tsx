@@ -17,7 +17,14 @@ export function Reader() {
   
   const [showSettings, setShowSettings] = useState(false);
   const [fontSize, setFontSize] = useState(18);
+  const [fontFamily, setFontFamily] = useState(() => {
+    return localStorage.getItem('reader-font-family') || 'font-reading-nunito';
+  });
   const [isDark, setIsDark] = useState(theme === 'dark');
+
+  useEffect(() => {
+    localStorage.setItem('reader-font-family', fontFamily);
+  }, [fontFamily]);
   const [commentText, setCommentText] = useState('');
   const [activeParagraphIndex, setActiveParagraphIndex] = useState<number | null>(null);
   const [paragraphCommentText, setParagraphCommentText] = useState('');
@@ -392,6 +399,26 @@ export function Reader() {
                 <div>
                    <label className={cn("text-xs font-bold uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")}>Cỡ chữ: {fontSize}px</label>
                    <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-[#3E2723]" />
+                 </div>
+                 <div>
+                    <label className={cn("text-xs font-bold uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")}>Phông chữ</label>
+                    <select 
+                      value={fontFamily} 
+                      onChange={(e) => setFontFamily(e.target.value)} 
+                      className={cn(
+                        "w-full px-3 py-2 text-sm rounded-lg border outline-none transition-colors",
+                        isDark 
+                          ? "bg-[#211B18] text-[#ECE5DC] border-[#3C2E27] focus:border-[#D4AF37]" 
+                          : "bg-white text-[#3E2723] border-[#D7CCC8] dark:border-[#D7CCC8] dark:bg-white dark:text-[#3E2723] focus:border-[#8D6E63]"
+                      )}
+                    >
+                      <option value="font-reading-nunito" className="font-reading-nunito">Nunito (Mặc định)</option>
+                      <option value="font-reading-garamond" className="font-reading-garamond">EB Garamond</option>
+                      <option value="font-reading-roboto" className="font-reading-roboto">Roboto</option>
+                      <option value="font-reading-patrick" className="font-reading-patrick">Patrick Hand</option>
+                      <option value="font-reading-iosevka" className="font-reading-iosevka">Iosevka Charon</option>
+                      <option value="font-reading-notoserif" className="font-reading-notoserif">Noto Serif</option>
+                    </select>
                 </div>
              </div>
           </div>
@@ -429,7 +456,7 @@ export function Reader() {
               </div>
            ) : (
               <div 
-                  className="leading-relaxed text-justify space-y-6 select-none"
+                  className={cn("leading-relaxed text-justify space-y-6 select-none", fontFamily)}
                   style={{ fontSize: `${fontSize}px` }}
               >
                  {paragraphs.map((p: string, idx: number) => {
