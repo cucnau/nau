@@ -13,6 +13,14 @@ export function Store() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const mainEl = document.querySelector('main') || document.querySelector('.overflow-y-auto') || document.getElementById('main-container');
+    if (mainEl) {
+      mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
     const fetchStickers = async () => {
       try {
         const q = query(collection(db, 'store_stickers'), orderBy('createdAt', 'desc'));
