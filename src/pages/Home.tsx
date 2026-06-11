@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 
 export function Home() {
   const navigate = useNavigate();
-  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak, getTitleColor, lastFreeStreakRecoveryMonth, activeStreakProtection, ownedStreakTickets } = useStore();
+  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak, getTitleColor, lastFreeStreakRecoveryMonth, activeStreakProtection, ownedStreakTickets, theme } = useStore();
   
   const todayStr = format(new Date(), 'yyyy-MM-dd');
   const isCheckedInToday = lastCheckInDate === todayStr;
@@ -228,9 +228,9 @@ export function Home() {
            </div>
 
             {/* Bảng Xếp Hạng Tích Cực */}
-            <div className="bg-[#FFFDF9] rounded-2xl shadow-sm border border-orange-200 p-5 ring-1 ring-orange-50">
+            <div className="bg-[#FFFDF9] dark:bg-[#211B18] rounded-2xl shadow-sm border border-orange-200 dark:border-[#3C2E27] p-5 ring-1 ring-orange-50 dark:ring-0">
                <div className="flex justify-between items-center mb-4">
-                  <h2 className="font-bold text-lg border-l-4 border-orange-500 pl-3 uppercase tracking-tighter flex items-center gap-2 text-[#3E2723]">
+                  <h2 className="font-bold text-lg border-l-4 border-orange-500 pl-3 uppercase tracking-tighter flex items-center gap-2 text-[#3E2723] dark:text-[#ECE5DC]">
                     <Flame className="w-5 h-5 text-orange-500 animate-pulse" />
                     Bảng Xếp Hạng Tích Cực
                   </h2>
@@ -242,7 +242,7 @@ export function Home() {
                      const isMe = u.id === uid;
                      const isTop3 = i < 3;
                      return (
-                        <div key={u.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${isMe ? 'bg-orange-50 border-orange-300' : 'bg-white border-[#F5E6D3] hover:border-orange-200'}`}>
+                        <div key={u.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${isMe ? 'bg-orange-50 border-orange-300 dark:bg-[#331D12]/60 dark:border-[#5C3A21]/40' : 'bg-white border-[#F5E6D3] hover:border-orange-200 dark:bg-[#1D1613] dark:border-[#3C2E27]/80 dark:hover:border-orange-950'}`}>
                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
                               i === 0 ? 'bg-yellow-400 text-yellow-950 ring-2 ring-yellow-200' :
                               i === 1 ? 'bg-slate-300 text-slate-950 ring-2 ring-slate-100' :
@@ -260,7 +260,7 @@ export function Home() {
                                borderClass="border border-orange-200"
                             />
                            <div className="flex-1 min-w-0">
-                              <div className="text-xs font-bold truncate flex items-center gap-1" style={{ color: getTitleColor(u.activeTitle) || '#3E2723' }}>
+                              <div className="text-xs font-bold truncate flex items-center gap-1" style={{ color: getTitleColor(u.activeTitle) || (theme === 'dark' ? '#ECE5DC' : '#3E2723') }}>
                                  {u.displayName}
                                  {isMe && <span className="text-[9px] text-orange-600 shrink-0">(Bạn)</span>}
                                  {/* Crown removed as requested */}
@@ -337,53 +337,53 @@ export function Home() {
         {/* Right Column: Toolbox & Global Chat side-by-side on desktop */}
         <section className="flex-1 flex flex-col gap-6">
            {/* Hộp Công Cụ (Toolbox widget styled exactly like HoyoLab's compact squares) */}
-           <div className="bg-white rounded-2xl border border-[#D7CCC8] p-5 shadow-sm">
-              <h2 className="font-bold text-sm border-l-4 border-[#8D6E63] pl-2.5 mb-4 text-[#3E2723] uppercase tracking-wider">
+           <div className="bg-white dark:bg-[#211B18] rounded-2xl border border-[#D7CCC8] dark:border-[#3C2E27] p-5 shadow-sm">
+              <h2 className="font-bold text-sm border-l-4 border-[#8D6E63] pl-2.5 mb-4 text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wider">
                  Hộp Công Cụ
               </h2>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                 <button onClick={handleCheckInBtnClick} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
-                    <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center mb-1.5 border border-orange-100/40 group-hover:scale-105 transition-transform">
+                 <button onClick={handleCheckInBtnClick} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] dark:hover:bg-[#2C221D] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40 dark:hover:border-[#3C2E27]/80">
+                    <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-950/40 flex items-center justify-center mb-1.5 border border-orange-100/40 dark:border-orange-900/30 group-hover:scale-105 transition-transform">
                        <CalendarCheck className="w-5 h-5 text-[#8D6E63]" />
                     </div>
-                    <span className="font-extrabold text-[11px] text-[#3E2723] uppercase tracking-tight group-hover:text-[#8D6E63] transition-colors">Điểm danh</span>
+                    <span className="font-extrabold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-tight group-hover:text-[#8D6E63] dark:group-hover:text-white transition-colors">Điểm danh</span>
                  </button>
  
-                 <button onClick={() => setMissionsOpen(true)} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
-                    <div className="relative w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center mb-1.5 border border-amber-100/40 group-hover:scale-105 transition-transform">
+                 <button onClick={() => setMissionsOpen(true)} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] dark:hover:bg-[#2C221D] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40 dark:hover:border-[#3C2E27]/80">
+                    <div className="relative w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center mb-1.5 border border-amber-100/40 dark:border-amber-900/30 group-hover:scale-105 transition-transform">
                        <ClipboardList className="w-5 h-5 text-[#8D6E63]" />
                        {hasUnclaimedMissions && <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />}
                     </div>
-                    <span className="font-extrabold text-[11px] text-[#3E2723] uppercase tracking-tight group-hover:text-[#8D6E63] transition-colors">Nhiệm vụ</span>
+                    <span className="font-extrabold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-tight group-hover:text-[#8D6E63] dark:group-hover:text-white transition-colors">Nhiệm vụ</span>
                  </button>
  
-                 <button onClick={() => setStoreOpen(true)} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
-                    <div className="w-12 h-12 rounded-2xl bg-[#FFF0F0] flex items-center justify-center mb-1.5 border border-red-100/40 group-hover:scale-105 transition-transform">
+                 <button onClick={() => setStoreOpen(true)} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] dark:hover:bg-[#2C221D] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40 dark:hover:border-[#3C2E27]/80">
+                    <div className="w-12 h-12 rounded-2xl bg-[#FFF0F0] dark:bg-red-950/40 flex items-center justify-center mb-1.5 border border-red-100/40 dark:border-red-900/30 group-hover:scale-105 transition-transform">
                        <ShoppingBag className="w-5 h-5 text-[#8D6E63]" />
                     </div>
-                    <span className="font-extrabold text-[11px] text-[#3E2723] uppercase tracking-tight group-hover:text-[#8D6E63] transition-colors">Cửa hàng</span>
+                    <span className="font-extrabold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-tight group-hover:text-[#8D6E63] dark:group-hover:text-white transition-colors">Cửa hàng</span>
                  </button>
  
-                 <button onClick={() => setAchievementsOpen(true)} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
-                    <div className="relative w-12 h-12 rounded-2xl bg-yellow-50 flex items-center justify-center mb-1.5 border border-yellow-100/40 group-hover:scale-105 transition-transform">
+                 <button onClick={() => setAchievementsOpen(true)} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] dark:hover:bg-[#2C221D] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40 dark:hover:border-[#3C2E27]/80">
+                    <div className="relative w-12 h-12 rounded-2xl bg-yellow-50 dark:bg-yellow-950/40 flex items-center justify-center mb-1.5 border border-yellow-100/40 dark:border-yellow-900/30 group-hover:scale-105 transition-transform">
                        <Trophy className="w-5 h-5 text-[#8D6E63]" />
                        {hasUnclaimedAchievements && <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />}
                     </div>
-                    <span className="font-extrabold text-[11px] text-[#3E2723] uppercase tracking-tight group-hover:text-[#8D6E63] transition-colors">Thành tựu</span>
+                    <span className="font-extrabold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-tight group-hover:text-[#8D6E63] dark:group-hover:text-white transition-colors">Thành tựu</span>
                  </button>
 
-                 <button onClick={() => navigate('/thu-vien')} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
-                    <div className="w-12 h-12 rounded-2xl bg-stone-50 flex items-center justify-center mb-1.5 border border-stone-200/40 group-hover:scale-105 transition-transform">
+                 <button onClick={() => navigate('/thu-vien')} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] dark:hover:bg-[#2C221D] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40 dark:hover:border-[#3C2E27]/80">
+                    <div className="w-12 h-12 rounded-2xl bg-stone-50 dark:bg-stone-900/40 flex items-center justify-center mb-1.5 border border-stone-200/40 dark:border-stone-800/30 group-hover:scale-105 transition-transform">
                        <Library className="w-5 h-5 text-[#8D6E63]" />
                     </div>
-                    <span className="font-extrabold text-[11px] text-[#3E2723] uppercase tracking-tight group-hover:text-[#8D6E63] transition-colors">Thư viện</span>
+                    <span className="font-extrabold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-tight group-hover:text-[#8D6E63] dark:group-hover:text-white transition-colors">Thư viện</span>
                  </button>
 
-                 <button onClick={() => setInventoryOpen(true)} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40">
-                    <div className="w-12 h-12 rounded-2xl bg-zinc-50 flex items-center justify-center mb-1.5 border border-zinc-200/40 group-hover:scale-105 transition-transform">
+                 <button onClick={() => setInventoryOpen(true)} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] dark:hover:bg-[#2C221D] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40 dark:hover:border-[#3C2E27]/80">
+                    <div className="w-12 h-12 rounded-2xl bg-zinc-50 dark:bg-zinc-900/40 flex items-center justify-center mb-1.5 border border-zinc-200/40 dark:border-zinc-800/30 group-hover:scale-105 transition-transform">
                        <PackageOpen className="w-5 h-5 text-[#8D6E63]" />
                     </div>
-                    <span className="font-extrabold text-[11px] text-[#3E2723] uppercase tracking-tight group-hover:text-[#8D6E63] transition-colors">Túi đồ</span>
+                    <span className="font-extrabold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-tight group-hover:text-[#8D6E63] dark:group-hover:text-white transition-colors">Túi đồ</span>
                  </button>
               </div>
            </div>
