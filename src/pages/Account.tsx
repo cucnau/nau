@@ -387,7 +387,7 @@ export function Account() {
               <p className="text-sm text-gray-500 mb-4">{email}</p>
               
               {/* Hệ thống level độc giả */}
-              <div className="w-full mb-4 bg-[#F2E5D5]/40 p-4 rounded-xl border border-[#D7CCC8]/60 text-left">
+              <div className="w-full mb-4 bg-[#F2E5D5]/40 dark:bg-[#251E1B]/80 p-4 rounded-xl border border-[#D7CCC8]/60 dark:border-[#3C2E27] text-left">
                  <div className="flex justify-between items-center mb-1.5">
                     <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037]">Level</span>
                     <div className="flex items-center gap-2">
@@ -404,10 +404,10 @@ export function Account() {
                        <span className="px-2 py-0.5 bg-[#8D6E63] text-[#FDF6EC] text-xs font-bold rounded-full shadow-sm">Lv. {level || 1}</span>
                     </div>
                  </div>
-                 <div className="w-full bg-[#E0D4C5] rounded-full h-2.5 overflow-hidden shadow-inner relative mb-1 border border-[#D7CCC8]/20">
+                 <div className="w-full bg-[#E0D4C5] dark:bg-[#1A1412] rounded-full h-2.5 overflow-hidden shadow-inner relative mb-1 border border-[#D7CCC8]/20 dark:border-[#3C2E27]/40">
                     <div 
                        style={{ width: `${barWidth}%` }}
-                       className="bg-gradient-to-r from-[#8D6E63] to-[#5D4037] h-full rounded-full transition-all duration-1000 ease-out"
+                       className="bg-gradient-to-r from-[#8D6E63] to-[#5D4037] dark:from-[#967C64] dark:to-[#836355] h-full rounded-full transition-all duration-1000 ease-out"
                     />
                  </div>
                  <div className="flex justify-between items-center text-[10px] text-gray-500 font-semibold tracking-tight">
@@ -416,7 +416,7 @@ export function Account() {
                  </div>
               </div>
 
-              <div className="w-full bg-[#FDF6EC] rounded-xl p-4 border border-[#D7CCC8] flex items-center justify-between">
+              <div className="w-full bg-[#FDF6EC] dark:bg-[#1E1815] rounded-xl p-4 border border-[#D7CCC8] dark:border-[#3C2E27] flex items-center justify-between">
                  <div className="flex flex-col items-center flex-1">
                     <span className="text-[10px] uppercase font-bold tracking-widest text-[#8D6E63] mb-1">Choco</span>
                     <span className="font-bold text-[#3E2723] text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}</span>
@@ -429,7 +429,7 @@ export function Account() {
                </div>
 
                {/* Trang bị danh hiệu */}
-               <div className="w-full mt-4 bg-orange-50/40 p-4 rounded-xl border border-orange-200/50 text-left animate-fade-in">
+               <div className="w-full mt-4 bg-orange-50/40 dark:bg-[#251E1B]/30 p-4 rounded-xl border border-orange-200/50 dark:border-orange-950/20 text-left animate-fade-in">
                   <div className="flex justify-between items-center mb-1.5">
                      <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037]">Danh hiệu của tôi</span>
                   </div>
@@ -440,7 +440,7 @@ export function Account() {
                         <select 
                            value={activeTitle || ''} 
                            onChange={(e) => setActiveTitle(e.target.value || null)}
-                           className="w-full text-xs font-bold border border-[#D7CCC8] rounded-lg p-2 bg-white text-[#3E2723] focus:outline-none focus:ring-1 focus:ring-[#8D6E63]"
+                           className="w-full text-xs font-bold border border-[#D7CCC8] dark:border-[#3C2E27] rounded-lg p-2 bg-white dark:bg-[#1C1613] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:ring-1 focus:ring-[#8D6E63]"
                         >
                            <option value="">-- Không trang bị --</option>
                            {ACHIEVEMENTS_LIST.filter(a => unlockedAchievements.includes(a.id)).map(a => (
@@ -458,14 +458,14 @@ export function Account() {
                </div>
 
                {/* Danh sách thành tựu đã nhận */}
-               <div className="w-full mt-3 bg-stone-50/50 p-4 rounded-xl border border-stone-200 text-left">
+               <div className="w-full mt-3 bg-stone-50/50 dark:bg-[#251E1B]/30 p-4 rounded-xl border border-stone-200 dark:border-[#3C2E27] text-left">
                   <span className="text-[11px] font-extrabold uppercase tracking-widest text-stone-500 block mb-2">Thành tựu đã nhận ({unlockedAchievements.length})</span>
                   {unlockedAchievements.length === 0 ? (
                      <p className="text-xs text-gray-400 italic">Chưa đạt thành tựu nào.</p>
                   ) : (
                      <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pr-1">
                         {ACHIEVEMENTS_LIST.filter(a => unlockedAchievements.includes(a.id)).map(a => (
-                           <span key={a.id} className="text-[10px] px-2 py-0.5 bg-[#8D6E63]/10 text-[#5D4037] font-bold rounded-md uppercase tracking-wide border border-[#8D6E63]/20">
+                           <span key={a.id} className="text-[10px] px-2 py-0.5 bg-[#8D6E63]/10 dark:bg-[#8D6E63]/20 text-[#5D4037] dark:text-[#D7CCC8]/90 font-bold rounded-md uppercase tracking-wide border border-[#8D6E63]/20 dark:border-[#3C2E27]">
                               🏆 {a.name}
                            </span>
                         ))}
@@ -480,10 +480,10 @@ export function Account() {
               </div>
            </div>
 
-           <div className="bg-white border border-[#D7CCC8] p-6 rounded-2xl shadow-sm flex flex-col min-h-[400px]">
-             <h2 className="text-xl font-bold text-[#3E2723] mb-4">Góc cá nhân / Bài viết</h2>
+           <div className="bg-white dark:bg-[#211B18] border border-[#D7CCC8] dark:border-[#3C2E27] p-6 rounded-2xl shadow-sm flex flex-col min-h-[400px]">
+             <h2 className="text-xl font-bold text-[#3E2723] dark:text-[#ECE5DC] mb-4">Góc cá nhân / Bài viết</h2>
              <form onSubmit={handlePostReview} className="mb-6 flex flex-col gap-2">
-               <textarea value={review} onChange={e => setReview(e.target.value)} placeholder="Chia sẻ suy nghĩ, review truyện..." className="w-full min-h-[100px] p-3 rounded-xl border border-[#D7CCC8] bg-[#FDF6EC]/50 resize-none text-sm focus:outline-none focus:border-[#8D6E63]" />
+               <textarea value={review} onChange={e => setReview(e.target.value)} placeholder="Chia sẻ suy nghĩ, review truyện..." className="w-full min-h-[100px] p-3 rounded-xl border border-[#D7CCC8] dark:border-[#3C2E27] bg-[#FDF6EC]/50 dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] resize-none text-sm focus:outline-none focus:border-[#8D6E63]" />
                <button type="submit" className="self-end px-6 py-2 bg-[#8D6E63] text-white rounded-lg font-bold text-sm uppercase tracking-widest hover:bg-[#5D4037] transition-colors">
                  Đăng bài
                </button>
@@ -532,9 +532,9 @@ export function Account() {
                 )}
                 {reviews.length === 0 ? <p className="text-gray-400 italic text-sm text-center py-8">Chưa có bài viết nào.</p> : null}
                 {reviews.map(r => (
-                  <div key={r.id} className="p-4 bg-[#F5E6D3]/30 rounded-xl border border-[#D7CCC8]/50 flex justify-between items-start gap-4">
+                  <div key={r.id} className="p-4 bg-[#F5E6D3]/30 dark:bg-[#251E1B]/30 rounded-xl border border-[#D7CCC8]/50 dark:border-[#3C2E27] flex justify-between items-start gap-4">
                     <div className="flex-1">
-                      <p className="text-sm font-semibold whitespace-pre-wrap text-[#3E2723]">{r.content}</p>
+                      <p className="text-sm font-semibold whitespace-pre-wrap text-[#3E2723] dark:text-[#ECE5DC]">{r.content}</p>
                       <p className="text-[10px] text-gray-400 mt-3 uppercase tracking-widest">{r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString() : ''}</p>
                     </div>
                     <button
