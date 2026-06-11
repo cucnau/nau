@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   Menu, Search, User, Key, LogOut, X, Trophy, BookOpen, Zap, Flame, ShieldCheck, 
   Camera, Calendar, Mail, Clock, Settings, Copy, Home, ClipboardList, ShoppingBag, List, Edit2, Library,
-  Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck
+  Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck, Sun, Moon
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
@@ -118,7 +118,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity" onClick={onClose} />
       
       {/* Navigation Drawer Container */}
-      <div className="fixed left-0 top-0 bottom-0 w-80 sm:w-[360px] bg-[#FDF6EC] z-50 shadow-2xl flex flex-col border-r-4 border-[#3E2723] overflow-hidden animate-in slide-in-from-left duration-300 font-sans">
+      <div className="fixed left-0 top-0 bottom-0 w-80 sm:w-[360px] bg-[#FDF6EC] dark:bg-[#161311] z-50 shadow-2xl flex flex-col border-r-4 border-[#3E2723] dark:border-[#261E1A] overflow-hidden animate-in slide-in-from-left duration-300 font-sans">
         
         {/* Header Row */}
         <div className="p-4 bg-[#3E2723] text-[#FDF6EC] flex items-center justify-between border-b border-[#5D4037]">
@@ -138,9 +138,9 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
              {/* Trang Chủ */}
              <button 
                 onClick={() => { onClose(); navigate('/'); }}
-                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] shadow-sm group"
+                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] dark:border-[#3C2E27] shadow-sm group"
              >
-                <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-black/35 flex items-center justify-center group-hover:scale-105 transition-transform">
                    <Home className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-bold leading-normal">Trang Chủ</span>
@@ -149,9 +149,9 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
              {/* Danh Sách */}
              <button 
                 onClick={() => { onClose(); navigate('/danh-sach'); }}
-                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] shadow-sm group"
+                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] dark:border-[#3C2E27] shadow-sm group"
              >
-                <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-black/35 flex items-center justify-center group-hover:scale-105 transition-transform">
                    <List className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-bold leading-normal">Danh Sách</span>
@@ -160,9 +160,9 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
              {/* Thư Viện */}
              <button 
                 onClick={() => { onClose(); navigate('/thu-vien'); }}
-                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] shadow-sm group"
+                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] dark:border-[#3C2E27] shadow-sm group"
              >
-                <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-black/35 flex items-center justify-center group-hover:scale-105 transition-transform">
                    <Library className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-bold leading-normal">Thư Viện</span>
@@ -171,9 +171,9 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
              {/* Cửa Hàng */}
              <button 
                 onClick={() => { onClose(); setStoreOpen(true); }}
-                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] shadow-sm group"
+                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] dark:border-[#3C2E27] shadow-sm group"
              >
-                <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-black/35 flex items-center justify-center group-hover:scale-105 transition-transform">
                    <ShoppingBag className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-bold leading-normal">Cửa Hàng</span>
@@ -182,9 +182,9 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
              {/* Nhiệm Vụ */}
              <button 
                 onClick={() => { onClose(); setMissionsOpen(true); }}
-                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] shadow-sm relative group"
+                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] active:scale-105 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] dark:border-[#3C2E27] shadow-sm relative group"
              >
-                <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-black/35 flex items-center justify-center group-hover:scale-105 transition-transform">
                    <ClipboardList className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-bold leading-normal">Nhiệm Vụ</span>
@@ -199,9 +199,9 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
              {/* Thành Tựu */}
              <button 
                 onClick={() => { onClose(); setAchievementsOpen(true); }}
-                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] shadow-sm group"
+                className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] dark:border-[#3C2E27] shadow-sm group"
              >
-                <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-black/35 flex items-center justify-center group-hover:scale-105 transition-transform">
                    <Trophy className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-bold leading-normal">Thành Tựu</span>
@@ -210,7 +210,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
               {/* Tài Khoản */}
               <button 
                  onClick={() => { onClose(); navigate('/tai-khoan'); }}
-                 className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] shadow-sm relative group"
+                 className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] dark:border-[#3C2E27] shadow-sm relative group"
               >
                  <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
                     <User className="w-5 h-5 text-[#8D6E63]" />
@@ -228,7 +228,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
              {isLoggedIn && (email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') && (
                 <button 
                    onClick={() => { onClose(); navigate('/admin'); }}
-                   className="bg-[#E2E8F0] hover:bg-[#CBD5E1] text-[#1E293B] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-slate-300 shadow-sm group"
+                   className="bg-[#E2E8F0] hover:bg-[#CBD5E1] text-[#1E293B] dark:bg-slate-900/60 dark:hover:bg-slate-800 dark:text-slate-200 active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-slate-300 dark:border-slate-800 shadow-sm group"
                 >
                    <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
                       <ShieldCheck className="w-5 h-5 text-indigo-600" />
@@ -241,7 +241,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
              {isLoggedIn ? (
                 <button 
                    onClick={() => { onClose(); handleLogout(); }}
-                   className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-red-200 shadow-sm group"
+                   className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] dark:bg-rose-950/40 dark:hover:bg-rose-905/30 dark:text-rose-200 active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-red-200 dark:border-red-900/40 shadow-sm group"
                 >
                    <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
                       <LogOut className="w-5 h-5 text-red-600" />
@@ -251,7 +251,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
              ) : (
                 <button 
                    onClick={() => { onClose(); handleLogin(); }}
-                   className="bg-[#D1FAE5] hover:bg-[#A7F3D0] text-[#065F46] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-emerald-200 shadow-sm group"
+                   className="bg-[#D1FAE5] hover:bg-[#A7F3D0] text-[#065F46] dark:bg-emerald-950/40 dark:hover:bg-emerald-905/30 dark:text-emerald-200 active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-emerald-200 dark:border-emerald-900/40 shadow-sm group"
                 >
                    <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
                       <User className="w-5 h-5 text-emerald-600" />
@@ -474,12 +474,22 @@ export function AppLayout() {
     isLoggedIn, uid, displayName, avatarUrl, equippedStickerAvatar: equippedSticker, stickerPositionAvatar: stickerPosition, choco, goldenChoco, email, level, lastClaimedRewardLevel, missions,
     isStoreOpen, isMissionsOpen, isAchievementsOpen, isInventoryOpen,
     setStoreOpen, setMissionsOpen, setAchievementsOpen, setInventoryOpen,
-    isQuotaExceeded, firebaseUser, activeTitle, getTitleColor
+    isQuotaExceeded, firebaseUser, activeTitle, getTitleColor,
+    theme, setTheme
   } = useStore();
   const navigate = useNavigate();
 
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
 
   useEffect(() => {
     if (!uid) {
@@ -613,6 +623,15 @@ export function AppLayout() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Theme Toggle Button */}
+          <button
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            className="p-2 text-white hover:bg-white/10 rounded-full transition-all flex items-center justify-center cursor-pointer outline-none hover:scale-110 active:scale-95"
+            title={theme === 'light' ? 'Chế độ tối' : 'Chế độ sáng'}
+          >
+            {theme === 'light' ? <Moon className="w-[20px] h-[20px]" /> : <Sun className="w-[20px] h-[20px]" />}
+          </button>
+
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
               <div className="hidden md:flex items-center gap-3 text-sm font-medium">
