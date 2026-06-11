@@ -54,7 +54,7 @@ export function Account() {
         goldenChoco: (goldenChoco || 0) + rewardClaimInfo.gchoco,
         ownedMysteryBoxes: (ownedMysteryBoxes || 0) + rewardClaimInfo.boxes,
         lastClaimedRewardLevel: level
-      });
+      }, "Nhận thưởng cấp độ");
       alert(`Đã nhận thành công phần thưởng lên cấp gồm:\n- ${rewardClaimInfo.gchoco} Gchoco\n- ${rewardClaimInfo.boxes} Hộp Quà Sticker Bí Ẩn!\n\nHộp quà đã được chuyển vào Túi đồ của bạn.`);
       setRewardClaimInfo(null);
     } catch (err: any) {
