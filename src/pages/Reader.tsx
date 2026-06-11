@@ -5,6 +5,8 @@ import { cn } from '../components/Layout';
 import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare, Clock, Pause, CheckCircle } from 'lucide-react';
 import { db, checkIfQuotaError } from '../lib/firebase';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, doc, getDoc, updateDoc, increment } from 'firebase/firestore';
+import { format } from 'date-fns';
+import { getWeeklyId } from '../types/achievements';
 
 export function Reader() {
   const { storyId, chapterId } = useParams();
@@ -293,8 +295,14 @@ export function Reader() {
 
   const handleReadingFinished = () => {
     if (storyId && currentChapter) {
+       const todayStr = format(new Date(), 'yyyy-MM-dd');
+       const weekId = getWeeklyId();
        // Increment firebase view count
-       updateDoc(doc(db, 'stories', storyId), { viewCount: increment(1) }).catch((err) => {
+       updateDoc(doc(db, 'stories', storyId), { 
+         viewCount: increment(1),
+         [`dailyViews.${todayStr}`]: increment(1),
+         [`weeklyViews.${weekId}`]: increment(1)
+       }).catch((err) => {
          console.error('Error auto-incrementing view count:', err);
          if (checkIfQuotaError(err)) {
            (window as any).__setQuotaExceeded?.(true);
