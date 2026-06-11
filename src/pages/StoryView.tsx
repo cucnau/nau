@@ -319,30 +319,30 @@ export function StoryView() {
       </div>
 
       {/* Tabs list (Chapters list vs Comments Feed) */}
-      <div className="bg-white border border-[#D7CCC8] rounded-3xl p-6 lg:p-8 shadow-sm">
-         <div className="flex border-b border-[#F5E6D3] mb-6">
+      <div className="bg-white dark:bg-[#1A1412] border border-[#D7CCC8] dark:border-[#3C2E27] rounded-3xl p-6 lg:p-8 shadow-sm">
+         <div className="flex border-b border-[#F5E6D3] dark:border-[#3C2E27] mb-6">
             <button
                onClick={() => setActiveTab('chapters')}
                className={cn(
                   "px-4 py-3 font-bold text-sm uppercase tracking-tight relative transition-all",
-                  activeTab === 'chapters' ? "text-[#3E2723]" : "text-gray-400 hover:text-gray-600"
+                  activeTab === 'chapters' ? "text-[#3E2723] dark:text-[#ECE5DC]" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                )}
             >
                Danh sách chương ({chapters.length})
                {activeTab === 'chapters' && (
-                  <span className="absolute bottom-0 left-0 right-0 h-1 bg-[#3E2723] rounded-t-full"></span>
+                  <span className="absolute bottom-0 left-0 right-0 h-1 bg-[#3E2723] dark:bg-[#ECE5DC] rounded-t-full"></span>
                )}
             </button>
             <button
                onClick={() => setActiveTab('comments')}
                className={cn(
                   "px-4 py-3 font-bold text-sm uppercase tracking-tight relative transition-all flex items-center gap-2",
-                  activeTab === 'comments' ? "text-[#3E2723]" : "text-gray-400 hover:text-gray-600"
+                  activeTab === 'comments' ? "text-[#3E2723] dark:text-[#ECE5DC]" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                )}
             >
                Bình luận & Quà tặng ({comments.length})
                {activeTab === 'comments' && (
-                  <span className="absolute bottom-0 left-0 right-0 h-1 bg-[#3E2723] rounded-t-full"></span>
+                  <span className="absolute bottom-0 left-0 right-0 h-1 bg-[#3E2723] dark:bg-[#ECE5DC] rounded-t-full"></span>
                )}
             </button>
          </div>
