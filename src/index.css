@@ -1,9 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Patrick+Hand&family=Roboto:wght@300;400;500;700;900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/@fontsource/iosevka/index.css');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+/* Custom font utilities for readers */
+.font-reading-nunito {
+  font-family: "Nunito", sans-serif;
+}
+.font-reading-garamond {
+  font-family: "EB Garamond", Georgia, serif;
+}
+.font-reading-roboto {
+  font-family: "Roboto", sans-serif;
+}
+.font-reading-patrick {
+  font-family: "Patrick Hand", cursive, sans-serif;
+}
+.font-reading-iosevka {
+  font-family: "Iosevka Charon", "Iosevka", monospace;
+}
+.font-reading-notoserif {
+  font-family: "Noto Serif", Georgia, serif;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
