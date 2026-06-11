@@ -22,8 +22,8 @@ export function Missions() {
                          {m.claimed && <span className="text-gray-400 text-[10px] px-2 py-0.5 rounded-full flex items-center uppercase tracking-widest font-bold"><CheckCircle className="w-3 h-3 mr-1"/> Đã nhận</span>}
                       </h3>
                       <div className="flex gap-2 mt-2">
-                         {m.chocoReward > 0 && <span className="text-xs font-bold text-[#3E2723] bg-white border border-[#D7CCC8] px-3 py-0.5 rounded-full shadow-sm">+{m.chocoReward} Choco</span>}
-                         {m.goldenReward > 0 && <span className="text-xs font-bold text-[#D4AF37] bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-3 py-0.5 rounded-full shadow-sm">+{m.goldenReward} Gchoco</span>}
+                         {m.chocoReward > 0 && <span className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC] bg-white dark:bg-[#1E1815] border border-[#D7CCC8] dark:border-[#3C2E27] px-3 py-0.5 rounded-full shadow-sm">+{m.chocoReward} Choco</span>}
+                         {m.goldenReward > 0 && <span className="text-xs font-bold text-[#D4AF37] dark:text-[#E8CD78] bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-3 py-0.5 rounded-full shadow-sm">+{m.goldenReward} Gchoco</span>}
                       </div>
                       
                       <div className="mt-4 bg-white border border-[#D7CCC8] rounded-full h-2.5 w-full max-w-sm overflow-hidden">
