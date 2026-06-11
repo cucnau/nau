@@ -232,7 +232,7 @@ export function StoryView() {
   return (
     <div className="p-4 sm:p-6 lg:p-10 flex flex-col gap-8 max-w-5xl mx-auto w-full">
       {/* Story Profile Card */}
-      <div className="flex flex-col gap-8 bg-white border border-[#D7CCC8] p-6 lg:p-8 rounded-3xl shadow-sm">
+      <div className="flex flex-col gap-8 bg-white dark:bg-[#211B18] border border-[#D7CCC8]/80 dark:border-[#3C2E27] p-6 lg:p-8 rounded-3xl shadow-sm">
         <div className="flex flex-col md:flex-row gap-8">
             <div className="w-full md:w-64 flex-shrink-0 flex justify-center md:block">
                 <img src={story.coverUrl} alt={story.title} className="w-48 md:w-full aspect-[2/3] object-cover rounded-xl shadow-lg border border-[#D7CCC8]/50" />
@@ -308,9 +308,9 @@ export function StoryView() {
             </div>
         </div>
 
-        <div className="border-t border-[#D7CCC8] pt-6 flex-1">
-            <h3 className="font-bold text-lg mb-4 uppercase text-[#3E2723]">Giới thiệu</h3>
-            <div className="text-gray-700 leading-relaxed italic text-[15px] space-y-4">
+        <div className="border-t border-[#D7CCC8]/85 dark:border-[#3C2E27] pt-6 flex-1">
+            <h3 className="font-bold text-lg mb-4 uppercase text-[#3E2723] dark:text-[#ECE5DC]">Giới thiệu</h3>
+            <div className="text-gray-700 dark:text-[#D7CCC8]/90 leading-relaxed italic text-[15px] space-y-4">
                {story.description?.split('\n').map((para: string, idx: number) => (
                   <p key={idx} className={para.trim() ? "" : "hidden"}>{para}</p>
                ))}
