@@ -212,7 +212,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                  onClick={() => { onClose(); navigate('/tai-khoan'); }}
                  className="bg-[#EEE2D4] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-[#DFD3C5] dark:border-[#3C2E27] shadow-sm relative group"
               >
-                 <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
+                 <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-black/35 flex items-center justify-center group-hover:scale-105 transition-transform">
                     <User className="w-5 h-5 text-[#8D6E63]" />
                  </div>
                  <span className="text-xs font-bold leading-normal">Hồ Sơ</span>
@@ -230,7 +230,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                    onClick={() => { onClose(); navigate('/admin'); }}
                    className="bg-[#E2E8F0] hover:bg-[#CBD5E1] text-[#1E293B] dark:bg-slate-900/60 dark:hover:bg-slate-800 dark:text-slate-200 active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-slate-300 dark:border-slate-800 shadow-sm group"
                 >
-                   <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
+                   <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-black/35 flex items-center justify-center group-hover:scale-105 transition-transform">
                       <ShieldCheck className="w-5 h-5 text-indigo-600" />
                    </div>
                    <span className="text-xs font-bold leading-normal">Quản Trị</span>
@@ -243,8 +243,8 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                    onClick={() => { onClose(); handleLogout(); }}
                    className="bg-[#FEE2E2] hover:bg-[#FCA5A5] text-[#991B1B] dark:bg-rose-950/40 dark:hover:bg-rose-905/30 dark:text-rose-200 active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-red-200 dark:border-red-900/40 shadow-sm group"
                 >
-                   <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
-                      <LogOut className="w-5 h-5 text-red-600" />
+                   <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-black/20 flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <LogOut className="w-5 h-5 text-red-600 dark:text-red-400" />
                    </div>
                    <span className="text-xs font-bold leading-normal">Đăng Xuất</span>
                 </button>
@@ -253,8 +253,8 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                    onClick={() => { onClose(); handleLogin(); }}
                    className="bg-[#D1FAE5] hover:bg-[#A7F3D0] text-[#065F46] dark:bg-emerald-950/40 dark:hover:bg-emerald-905/30 dark:text-emerald-200 active:scale-95 transition-all p-4 rounded-2xl flex flex-col items-center justify-center text-center gap-2 border border-emerald-200 dark:border-emerald-900/40 shadow-sm group"
                 >
-                   <div className="w-10 h-10 rounded-xl bg-white/50 flex items-center justify-center group-hover:scale-105 transition-transform">
-                      <User className="w-5 h-5 text-emerald-600" />
+                   <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-black/20 flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                    </div>
                    <span className="text-xs font-bold leading-normal font-sans">Đăng Nhập</span>
                 </button>
@@ -352,8 +352,8 @@ function AchievementsModal() {
             className={cn(
               "px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap border shrink-0",
               activeCategory === cat.id
-                ? "bg-[#5D4037] text-white border-[#5D4037] shadow-sm scale-105"
-                : "bg-white text-[#5D4037] border-[#D7CCC8]/80 hover:bg-[#EFEBE9]/40"
+                ? "bg-[#5D4037] text-white border-[#5D4037] dark:bg-[#C29D70] dark:text-[#1D1613] dark:border-[#C29D70] shadow-sm scale-105"
+                : "bg-white text-[#5D4037] border-[#D7CCC8]/80 hover:bg-[#EFEBE9]/40 dark:bg-[#1C1613] dark:text-[#ECE5DC] dark:border-[#3C2E27] dark:hover:bg-[#2C221D]"
             )}
           >
             {cat.name}
@@ -385,10 +385,10 @@ function AchievementsModal() {
                 className={cn(
                   "p-4 rounded-2xl border-2 transition-all duration-300 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer",
                   isClaimed 
-                    ? "bg-[#EFEBE9]/60 border-[#D7CCC8]/60 opacity-75"
+                    ? "bg-[#EFEBE9]/60 border-[#D7CCC8]/60 opacity-75 dark:bg-[#2C221D]/50 dark:border-[#3C2E27]/60"
                     : isUnlocked 
-                      ? "bg-white border-yellow-400 shadow-md ring-1 ring-yellow-200" 
-                      : "bg-white border-[#D7CCC8]/80 hover:shadow-sm"
+                      ? "bg-white border-yellow-400 shadow-md ring-1 ring-yellow-200 dark:bg-[#2C221D] dark:border-yellow-600 dark:ring-yellow-800" 
+                      : "bg-white border-[#D7CCC8]/80 hover:shadow-sm dark:bg-[#1E1815] dark:border-[#3C2E27]"
                 )}
               >
                 {/* Background Sparkle for Unlocked */}
@@ -411,12 +411,12 @@ function AchievementsModal() {
                     {/* Rewards badge */}
                     <span className={cn(
                       "px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider",
-                      ach.goldenReward > 0 ? "bg-yellow-100 text-yellow-700 border border-yellow-200" : "bg-[#EFEBE9] text-[#5D4037]"
+                      ach.goldenReward > 0 ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-700/50" : "bg-[#EFEBE9] dark:bg-[#1C1613] text-[#5D4037] dark:text-[#A1887F]"
                     )}>
                       {ach.rewardText}
                     </span>
                   </div>
-                  <p className="text-xs text-[#5D4037]">{ach.description}</p>
+                  <p className="text-xs text-[#5D4037] dark:text-[#D7CCC8]">{ach.description}</p>
 
                   {/* Progress bar */}
                   <div className="pt-2">
@@ -424,7 +424,7 @@ function AchievementsModal() {
                       <span>Tiến trình</span>
                       <span className="font-bold font-mono">{progress} / {ach.progressTarget} ({percent}%)</span>
                     </div>
-                    <div className="w-full bg-[#EFEBE9] h-2 rounded-full overflow-hidden border border-[#D7CCC8]/30">
+                    <div className="w-full bg-[#EFEBE9] dark:bg-[#1A1412] h-2 rounded-full overflow-hidden border border-[#D7CCC8]/30 dark:border-[#3C2E27]">
                       <div 
                         className={cn(
                           "h-full rounded-full transition-all duration-500",
@@ -656,9 +656,9 @@ export function AppLayout() {
                 {showNotifDropdown && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowNotifDropdown(false)} />
-                    <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-[#FDF6EC] text-[#3E2723] rounded-2xl shadow-2xl border border-[#D7CCC8]/60 z-50 flex flex-col overflow-hidden max-h-[450px]">
-                      <div className="p-4 border-b border-[#D7CCC8]/60 bg-[#F5E6D3]/40 flex items-center justify-between">
-                        <span className="font-extrabold text-xs uppercase tracking-wider text-[#3E2723]">Thông báo ({notifications.filter(n => !n.isRead).length})</span>
+                    <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-[#FDF6EC] dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] rounded-2xl shadow-2xl border border-[#D7CCC8]/60 dark:border-[#3C2E27] z-50 flex flex-col overflow-hidden max-h-[450px]">
+                      <div className="p-4 border-b border-[#D7CCC8]/60 dark:border-[#3C2E27] bg-[#F5E6D3]/40 dark:bg-[#251E1B]/50 flex items-center justify-between">
+                        <span className="font-extrabold text-xs uppercase tracking-wider text-[#3E2723] dark:text-[#D7CCC8]">Thông báo ({notifications.filter(n => !n.isRead).length})</span>
                         {hasUnreadNotifs && (
                           <button 
                             onClick={markAllAsRead} 
@@ -680,8 +680,8 @@ export function AppLayout() {
                               key={notif.id}
                               onClick={() => handleNotifClick(notif)}
                               className={cn(
-                                "p-3.5 hover:bg-[#F5E6D3]/30 transition-colors cursor-pointer flex gap-3 items-start text-xs sm:text-sm text-left font-normal",
-                                !notif.isRead ? "bg-[#FDF6EC] font-semibold text-[#3E2723]" : "bg-[#FDF6EC]/60 opacity-80 text-gray-600"
+                                "p-3.5 hover:bg-[#F5E6D3]/30 dark:hover:bg-[#2C221D] transition-colors cursor-pointer flex gap-3 items-start text-xs sm:text-sm text-left font-normal",
+                                !notif.isRead ? "bg-[#FDF6EC] dark:bg-[#1E1815] font-semibold text-[#3E2723] dark:text-[#ECE5DC]" : "bg-[#FDF6EC]/60 dark:bg-[#1A1412]/80 opacity-80 text-gray-600 dark:text-gray-400"
                               )}
                             >
                               <div className="w-2 h-2 rounded-full shrink-0 mt-1.5 bg-red-500 opacity-95" style={{ visibility: notif.isRead ? 'hidden' : 'visible' }} />
@@ -728,25 +728,25 @@ export function AppLayout() {
                    </div>
                    <span className="hidden sm:inline font-medium" style={{ color: getTitleColor(activeTitle) || undefined }}>{displayName}</span>
                 </div>
-                <div className="absolute right-0 top-full mt-2 w-48 bg-[#FDF6EC] text-[#3E2723] rounded-xl shadow-xl border border-[#D7CCC8] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden">
-                   <div className="px-4 py-3 border-b border-[#D7CCC8] mb-1">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-[#FDF6EC] dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl shadow-xl border border-[#D7CCC8] dark:border-[#3C2E27] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden">
+                   <div className="px-4 py-3 border-b border-[#D7CCC8] dark:border-[#3C2E27] mb-1">
                       <div className="flex items-center gap-1.5 mb-0.5">
                          <p className="font-semibold truncate" style={{ color: getTitleColor(activeTitle) || undefined }}>{displayName}</p>
                          <span className="px-1.5 py-0.5 bg-[#8D6E63] text-white text-[9px] font-bold rounded">Lv. {level || 1}</span>
                       </div>
                       <p className="text-xs opacity-70 truncate">{uid}</p>
                    </div>
-                   <button className="flex items-center gap-2 px-4 py-2 hover:bg-[#F5E6D3] text-left" onClick={() => navigate('/tai-khoan')}>
+                   <button className="flex items-center gap-2 px-4 py-2 hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] text-left" onClick={() => navigate('/tai-khoan')}>
                      <User className="w-4 h-4" />
                      <span>Hồ sơ & Cài đặt</span>
                    </button>
                    {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') && (
-                     <button className="flex items-center gap-2 px-4 py-2 hover:bg-[#F5E6D3] text-left text-blue-800" onClick={() => navigate('/admin')}>
+                     <button className="flex items-center gap-2 px-4 py-2 hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] text-left text-blue-800 dark:text-blue-400" onClick={() => navigate('/admin')}>
                        <Key className="w-4 h-4" />
                        <span>Quản lý Truyện</span>
                      </button>
                    )}
-                   <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 hover:bg-[#F5E6D3] text-left text-red-900">
+                   <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] text-left text-red-900 dark:text-red-400">
                      <LogOut className="w-4 h-4" />
                      <span>Đăng xuất</span>
                    </button>
@@ -770,7 +770,7 @@ export function AppLayout() {
       {isStoreOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setStoreOpen(false)} />
-          <div className="relative bg-[#FDF6EC] w-full max-w-4xl h-[85vh] rounded-3xl overflow-y-auto border-4 border-[#8D6E63] shadow-2xl flex flex-col z-10 transition-all">
+          <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-4xl h-[85vh] rounded-3xl overflow-y-auto border-4 border-[#8D6E63] dark:border-[#3C2E27] shadow-2xl flex flex-col z-10 transition-all">
             <button 
               onClick={() => setStoreOpen(false)} 
               className="absolute top-4 right-4 p-2 bg-[#3E2723] hover:bg-[#2D1B19] text-white rounded-full transition-colors z-20 shadow"
@@ -788,7 +788,7 @@ export function AppLayout() {
       {isMissionsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setMissionsOpen(false)} />
-          <div className="relative bg-[#FDF6EC] w-full max-w-3xl h-[85vh] rounded-3xl overflow-y-auto border-4 border-[#8D6E63] shadow-2xl flex flex-col z-10 transition-all">
+          <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-3xl h-[85vh] rounded-3xl overflow-y-auto border-4 border-[#8D6E63] dark:border-[#3C2E27] shadow-2xl flex flex-col z-10 transition-all">
             <button 
               onClick={() => setMissionsOpen(false)} 
               className="absolute top-4 right-4 p-1.5 bg-[#3E2723] hover:bg-[#2D1B19] text-white rounded-full transition-colors z-20 shadow"
@@ -806,7 +806,7 @@ export function AppLayout() {
       {isAchievementsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setAchievementsOpen(false)} />
-          <div className="relative bg-[#FDF6EC] w-full max-w-2xl max-h-[85vh] rounded-3xl overflow-y-auto border-4 border-[#8D6E63] shadow-2xl flex flex-col z-10 p-6 sm:p-8 transition-all">
+          <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-2xl max-h-[85vh] rounded-3xl overflow-y-auto border-4 border-[#8D6E63] dark:border-[#3C2E27] shadow-2xl flex flex-col z-10 p-6 sm:p-8 transition-all">
             <button 
               onClick={() => setAchievementsOpen(false)} 
               className="absolute top-4 right-4 p-2 bg-[#3E2723] hover:bg-[#2D1B19] text-white rounded-full transition-colors z-20 shadow"
@@ -822,7 +822,7 @@ export function AppLayout() {
       {isInventoryOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setInventoryOpen(false)} />
-          <div className="relative bg-[#FDF6EC] w-full max-w-4xl h-[85vh] rounded-3xl overflow-y-auto border-4 border-[#8D6E63] shadow-2xl flex flex-col z-10 transition-all">
+          <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-4xl h-[85vh] rounded-3xl overflow-y-auto border-4 border-[#8D6E63] dark:border-[#3C2E27] shadow-2xl flex flex-col z-10 transition-all">
             <button 
               onClick={() => setInventoryOpen(false)} 
               className="absolute top-4 right-4 p-2 bg-[#3E2723] hover:bg-[#2D1B19] text-white rounded-full transition-colors z-20 shadow"
