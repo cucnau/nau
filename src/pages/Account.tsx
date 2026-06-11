@@ -358,9 +358,9 @@ export function Account() {
 
       {tab === 'profile' && (
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8 items-start">
-           <div className="bg-white border border-[#D7CCC8] p-6 rounded-2xl shadow-sm flex flex-col items-center text-center">
+           <div className="bg-white dark:bg-[#1A1412] border border-[#D7CCC8] dark:border-[#3C2E27] p-6 rounded-2xl shadow-sm flex flex-col items-center text-center">
               <div className="w-24 h-24 relative mb-4">
-                 <div className="w-full h-full overflow-hidden bg-gray-200 border-4 border-[#FDF6EC] shadow-sm rounded-full">
+                 <div className="w-full h-full overflow-hidden bg-gray-200 dark:bg-gray-800 border-4 border-[#FDF6EC] dark:border-[#2C221D] shadow-sm rounded-full">
                     {avatarUrl ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400">Trống</div>}
                  </div>
                  {equippedStickerAvatar && (
@@ -376,10 +376,10 @@ export function Account() {
                     />
                  )}
               </div>
-              <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-1.5 flex-wrap" style={{ color: getTitleColor(activeTitle) || '#3E2723' }}>
+              <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-1.5 flex-wrap text-[#3E2723] dark:text-[#ECE5DC]" style={{ color: getTitleColor(activeTitle) || undefined }}>
                  {displayName}
                  {activeTitle && (
-                    <span className="px-2 py-0.5 bg-yellow-105 text-yellow-800 text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200">
+                    <span className="px-2 py-0.5 bg-yellow-105 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-400 text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200 dark:border-yellow-700">
                        🏆 {activeTitle}
                     </span>
                  )}
@@ -387,9 +387,9 @@ export function Account() {
               <p className="text-sm text-gray-500 mb-4">{email}</p>
               
               {/* Hệ thống level độc giả */}
-              <div className="w-full mb-4 bg-[#F2E5D5]/40 dark:bg-[#251E1B]/80 p-4 rounded-xl border border-[#D7CCC8]/60 dark:border-[#3C2E27] text-left">
+              <div className="w-full mb-4 bg-[#F2E5D5]/40 dark:bg-[#726458] p-4 rounded-xl border border-[#D7CCC8]/60 dark:border-[#3C2E27] text-left">
                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037]">Level</span>
+                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037] dark:text-white/90">Level</span>
                     <div className="flex items-center gap-2">
                        {totalBoxes > 0 && (
                           <button 
@@ -410,7 +410,7 @@ export function Account() {
                        className="bg-gradient-to-r from-[#8D6E63] to-[#5D4037] dark:from-[#967C64] dark:to-[#836355] h-full rounded-full transition-all duration-1000 ease-out"
                     />
                  </div>
-                 <div className="flex justify-between items-center text-[10px] text-gray-500 font-semibold tracking-tight">
+                 <div className="flex justify-between items-center text-[10px] text-gray-500 dark:text-white/80 font-semibold tracking-tight">
                     <span>{currentExp} / {nextLevelExp} EXP</span>
                     <span>{percent}%</span>
                  </div>
@@ -418,8 +418,8 @@ export function Account() {
 
               <div className="w-full bg-[#FDF6EC] dark:bg-[#1E1815] rounded-xl p-4 border border-[#D7CCC8] dark:border-[#3C2E27] flex items-center justify-between">
                  <div className="flex flex-col items-center flex-1">
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-[#8D6E63] mb-1">Choco</span>
-                    <span className="font-bold text-[#3E2723] text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}</span>
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-[#8D6E63] dark:text-gray-400 mb-1">Choco</span>
+                    <span className="font-bold text-[#3E2723] dark:text-white text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}</span>
                  </div>
                  <div className="w-px h-8 bg-[#D7CCC8]"></div>
                  <div className="flex flex-col items-center flex-1">
@@ -429,18 +429,18 @@ export function Account() {
                </div>
 
                {/* Trang bị danh hiệu */}
-               <div className="w-full mt-4 bg-orange-50/40 dark:bg-[#251E1B]/30 p-4 rounded-xl border border-orange-200/50 dark:border-orange-950/20 text-left animate-fade-in">
+               <div className="w-full mt-4 bg-[#7B726B] dark:bg-[#726458] p-4 rounded-xl border border-[#D7CCC8]/30 dark:border-[#3C2E27] text-left animate-fade-in">
                   <div className="flex justify-between items-center mb-1.5">
-                     <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037]">Danh hiệu của tôi</span>
+                     <span className="text-[11px] font-extrabold uppercase tracking-widest text-white/90">Danh hiệu của tôi</span>
                   </div>
                   {unlockedAchievements.length === 0 && (!customTitles || customTitles.length === 0) ? (
-                     <p className="text-xs text-gray-400 italic">Chưa sở hữu danh hiệu nào.</p>
+                     <p className="text-xs text-white/60 italic">Chưa sở hữu danh hiệu nào.</p>
                   ) : (
                      <div className="space-y-2">
                         <select 
                            value={activeTitle || ''} 
                            onChange={(e) => setActiveTitle(e.target.value || null)}
-                           className="w-full text-xs font-bold border border-[#D7CCC8] dark:border-[#3C2E27] rounded-lg p-2 bg-white dark:bg-[#1C1613] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:ring-1 focus:ring-[#8D6E63]"
+                           className="w-full text-xs font-bold border border-[#3C2E27] rounded-lg p-2 bg-[#1C1310] text-[#ECE5DC] focus:outline-none focus:ring-1 focus:ring-[#8D6E63]"
                         >
                            <option value="">-- Không trang bị --</option>
                            {ACHIEVEMENTS_LIST.filter(a => unlockedAchievements.includes(a.id)).map(a => (
@@ -450,7 +450,7 @@ export function Account() {
                               <option key={t.id || idx} value={t.name}>{t.name}</option>
                            ))}
                         </select>
-                        <div className="text-[10px] text-[#8D6E63] font-medium leading-tight">
+                        <div className="text-[10px] text-white/80 font-medium leading-tight">
                            Chọn danh hiệu để hiển thị cùng tên tài khoản và đổi màu tên của bạn ở mọi nơi!
                         </div>
                      </div>
@@ -458,14 +458,14 @@ export function Account() {
                </div>
 
                {/* Danh sách thành tựu đã nhận */}
-               <div className="w-full mt-3 bg-stone-50/50 dark:bg-[#251E1B]/30 p-4 rounded-xl border border-stone-200 dark:border-[#3C2E27] text-left">
-                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-stone-500 block mb-2">Thành tựu đã nhận ({unlockedAchievements.length})</span>
+               <div className="w-full mt-3 bg-[#7B726B] dark:bg-[#726458] p-4 rounded-xl border border-[#D7CCC8]/30 dark:border-[#3C2E27] text-left">
+                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-white/90 block mb-2">Thành tựu đã nhận ({unlockedAchievements.length})</span>
                   {unlockedAchievements.length === 0 ? (
-                     <p className="text-xs text-gray-400 italic">Chưa đạt thành tựu nào.</p>
+                     <p className="text-xs text-white/60 italic">Chưa đạt thành tựu nào.</p>
                   ) : (
                      <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pr-1">
                         {ACHIEVEMENTS_LIST.filter(a => unlockedAchievements.includes(a.id)).map(a => (
-                           <span key={a.id} className="text-[10px] px-2 py-0.5 bg-[#8D6E63]/10 dark:bg-[#8D6E63]/20 text-[#5D4037] dark:text-[#D7CCC8]/90 font-bold rounded-md uppercase tracking-wide border border-[#8D6E63]/20 dark:border-[#3C2E27]">
+                           <span key={a.id} className="text-[10px] px-2 py-0.5 bg-black/20 text-white/90 font-bold rounded-md uppercase tracking-wide border border-black/10">
                               🏆 {a.name}
                            </span>
                         ))}
