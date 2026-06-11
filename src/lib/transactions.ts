@@ -9,7 +9,8 @@ export const logTransaction = async (
   amount: number,
   currency: CurrencyType,
   type: TransactionType,
-  reason: string
+  reason: string,
+  balanceAfter?: number
 ) => {
   if (!uid || amount <= 0) return;
   try {
@@ -18,6 +19,7 @@ export const logTransaction = async (
       currency,
       type,
       reason,
+      balanceAfter,
       createdAt: serverTimestamp()
     });
   } catch (error) {
