@@ -470,10 +470,12 @@ export const useStore = create<UserState>()(
                }
 
                if (cDiff !== 0) {
-                  logTransaction(uid, Math.abs(cDiff), 'choco', cDiff > 0 ? 'earn' : 'spend', transactionReason);
+                  const bal = updates.choco !== undefined ? updates.choco : prevChoco + cDiff;
+                  logTransaction(uid, Math.abs(cDiff), 'choco', cDiff > 0 ? 'earn' : 'spend', transactionReason, bal);
                }
                if (gDiff !== 0) {
-                  logTransaction(uid, Math.abs(gDiff), 'gchoco', gDiff > 0 ? 'earn' : 'spend', transactionReason);
+                  const bal = updates.goldenChoco !== undefined ? updates.goldenChoco : prevGChoco + gDiff;
+                  logTransaction(uid, Math.abs(gDiff), 'gchoco', gDiff > 0 ? 'earn' : 'spend', transactionReason, bal);
                }
             }
 
