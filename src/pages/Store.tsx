@@ -33,8 +33,8 @@ export function Store() {
        return;
     }
     const cost = amount * 3;
-    if (spendChoco(cost)) {
-       addGoldenChoco(amount);
+    if (spendChoco(cost, `Đổi sang ${amount} GChoco`)) {
+       addGoldenChoco(amount, `Đổi từ ${cost} Choco`);
        alert(`Đổi thành công ${amount} Gchoco!`);
     } else {
        alert(`Không đủ Choco (Cần ${cost} Choco để đổi ${amount} Gchoco)!`);
@@ -52,14 +52,14 @@ export function Store() {
      }
      const totalPrice = pricePerUnit * qty;
      if (currencyType === 'choco') {
-         if (spendChoco(totalPrice)) {
+         if (spendChoco(totalPrice, `Mua ${qty} ${name}`)) {
             buyTicket(ticketType, qty);
             alert(`Đã mua thành công ${qty} ${name}!`);
          } else {
             alert(`Không đủ Choco (Cần ${totalPrice} Choco để mua ${qty} vé)`);
          }
      } else {
-         if (spendGoldenChoco(totalPrice)) {
+         if (spendGoldenChoco(totalPrice, `Mua ${qty} ${name}`)) {
             buyTicket(ticketType, qty);
             alert(`Đã mua thành công ${qty} ${name}!`);
          } else {
@@ -72,13 +72,13 @@ export function Store() {
      if (!isLoggedIn) { alert("Vui lòng đăng nhập!"); return; }
      
      if (type === 'choco') {
-         if (spendChoco(price)) {
+         if (spendChoco(price, `Mua ${name}`)) {
             if (effect) effect();
             alert(`Đã mua ${name}!`);
          }
          else alert(`Không đủ Choco (Cần ${price})`);
      } else {
-         if (spendGoldenChoco(price)) {
+         if (spendGoldenChoco(price, `Mua ${name}`)) {
             if (effect) effect();
             alert(`Đã mua ${name}!`);
          }
