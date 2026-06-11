@@ -98,6 +98,8 @@ interface UserState {
   setMissionsOpen: (open: boolean) => void;
   setAchievementsOpen: (open: boolean) => void;
   setInventoryOpen: (open: boolean) => void;
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
 
   login: (name: string) => void;
   logout: () => void;
@@ -243,6 +245,8 @@ export const useStore = create<UserState>()(
       setMissionsOpen: (open) => set({ isMissionsOpen: open }),
       setAchievementsOpen: (open) => set({ isAchievementsOpen: open }),
       setInventoryOpen: (open) => set({ isInventoryOpen: open }),
+      theme: 'light',
+      setTheme: (theme) => set({ theme }),
       
       login: (name: string) => set({ isLoggedIn: true, displayName: name }),
       logout: () => set({ 
