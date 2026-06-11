@@ -1,8 +1,8 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import { cn } from '../components/Layout';
-import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare } from 'lucide-react';
+import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare, Clock, Pause, CheckCircle } from 'lucide-react';
 import { db, checkIfQuotaError } from '../lib/firebase';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 
@@ -51,22 +51,21 @@ export function Reader() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
+  // Active reading clock state
+  const [secondsRead, setSecondsRead] = useState(0);
+  const [isFinished, setIsFinished] = useState(false);
+  const lastActivityRef = useRef<number>(Date.now());
+  const [isIdle, setIsIdle] = useState(false);
+
   useEffect(() => {
     setIsPassUnlockedLocal(false);
     setIsEarlyAccessUnlockedLocal(false);
+    setSecondsRead(0);
+    setIsFinished(false);
+    lastActivityRef.current = Date.now();
+    setIsIdle(false);
     window.scrollTo(0, 0);
   }, [chapterId]);
-
-  useEffect(() => {
-     if (storyId && chapterId) {
-        updateDoc(doc(db, 'stories', storyId), { viewCount: increment(1) }).catch((err) => {
-          console.error('Error auto-incrementing view count:', err);
-          if (checkIfQuotaError(err)) {
-            (window as any).__setQuotaExceeded?.(true);
-          }
-        });
-     }
-  }, [storyId, chapterId]);
 
   useEffect(() => {
     if (!storyId) return;
@@ -109,11 +108,7 @@ export function Reader() {
     return () => unsub();
   }, [currentChapter?.id]);
 
-  useEffect(() => {
-     if (currentChapter && isLoggedIn) {
-         markStoryRead(storyId!, currentChapter.order, story?.genres);
-     }
-  }, [currentChapter, isLoggedIn, markStoryRead, storyId, story?.genres]);
+
   
   const submitComment = async (content: string, type: string, paragraphIdx?: number) => {
      if (!content.trim() || !isLoggedIn) return;
@@ -271,26 +266,104 @@ export function Reader() {
      }
   };
 
+  const isPassRequired = currentChapter?.requiresPass;
+  const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(currentChapter?.id);
+  const needsPass = isPassRequired && !hasPassUnlocked && !isPassUnlockedLocal;
+
+  const isEarlyAccess = currentChapter?.requiresEarlyAccess;
+  const chapTime = currentChapter?.createdAt?.toMillis ? currentChapter.createdAt.toMillis() : (typeof currentChapter?.createdAt === 'number' ? currentChapter.createdAt : 0);
+  const isStillEarlyAccess = isEarlyAccess && (Date.now() - (chapTime || 0) < 24 * 60 * 60 * 1000);
+  const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(currentChapter?.id);
+  const needsEarlyAccess = isStillEarlyAccess && !hasEarlyAccessUnlocked && !isEarlyAccessUnlockedLocal;
+
+  const isLocked = !!(needsPass || needsEarlyAccess);
+
+  // Split into words to get Vietnamese word count
+  const wordCount = currentChapter?.content ? currentChapter.content.split(/\s+/).filter(Boolean).length : 0;
+  // Calculate average reading speed: 4 words per second (240 words/min).
+  // Clamp between 15 seconds (minimum) and 90 seconds (maximum) to prevent boredom but fully block immediate spam.
+  const timeRequired = Math.max(15, Math.min(90, Math.ceil(wordCount / 4)));
+
+  const handleReadingFinished = () => {
+    if (storyId && currentChapter) {
+       // Increment firebase view count
+       updateDoc(doc(db, 'stories', storyId), { viewCount: increment(1) }).catch((err) => {
+         console.error('Error auto-incrementing view count:', err);
+         if (checkIfQuotaError(err)) {
+           (window as any).__setQuotaExceeded?.(true);
+         }
+       });
+
+       // Mark story read to update active daily reading missions & stats
+       if (isLoggedIn) {
+          markStoryRead(storyId!, currentChapter.order, story?.genres);
+       }
+    }
+  };
+
+  // Track User Activity (resets idle status when user scrolls, touches, clicks, or moves mouse)
+  useEffect(() => {
+    if (isLocked || !currentChapter) return;
+
+    const updateActivity = () => {
+      lastActivityRef.current = Date.now();
+      setIsIdle(false);
+    };
+
+    window.addEventListener('scroll', updateActivity, { passive: true });
+    window.addEventListener('mousemove', updateActivity, { passive: true });
+    window.addEventListener('mousedown', updateActivity, { passive: true });
+    window.addEventListener('click', updateActivity, { passive: true });
+    window.addEventListener('touchstart', updateActivity, { passive: true });
+    window.addEventListener('touchmove', updateActivity, { passive: true });
+    window.addEventListener('keydown', updateActivity, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', updateActivity);
+      window.removeEventListener('mousemove', updateActivity);
+      window.removeEventListener('mousedown', updateActivity);
+      window.removeEventListener('click', updateActivity);
+      window.removeEventListener('touchstart', updateActivity);
+      window.removeEventListener('touchmove', updateActivity);
+      window.removeEventListener('keydown', updateActivity);
+    };
+  }, [chapterId, isLocked, currentChapter?.id]);
+
+  // Handle active reading timer
+  useEffect(() => {
+    if (isFinished || isLocked || !currentChapter) return;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const diff = now - lastActivityRef.current;
+      // If idle for over 6 seconds, pause countdown
+      if (diff > 6000) {
+        setIsIdle(true);
+      } else {
+        setIsIdle(false);
+        setSecondsRead((prev) => {
+          const next = prev + 1;
+          if (next >= timeRequired) {
+            setIsFinished(true);
+            handleReadingFinished();
+            clearInterval(interval);
+          }
+          return next;
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isFinished, isLocked, timeRequired, currentChapter?.id]);
+
   if (loading) return <div className="p-10 text-center">Đang tải...</div>;
   if (!story || !currentChapter) return <div className="p-10 text-center">Không tìm thấy chương</div>;
 
-  const isPassRequired = currentChapter.requiresPass;
-  const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(currentChapter.id);
-  const needsPass = isPassRequired && !hasPassUnlocked && !isPassUnlockedLocal;
-
-  const isEarlyAccess = currentChapter.requiresEarlyAccess;
-  const chapTime = currentChapter.createdAt?.toMillis ? currentChapter.createdAt.toMillis() : (typeof currentChapter.createdAt === 'number' ? currentChapter.createdAt : 0);
-  const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
-  const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(currentChapter.id);
-  const needsEarlyAccess = isStillEarlyAccess && !hasEarlyAccessUnlocked && !isEarlyAccessUnlockedLocal;
-
-  const isLocked = needsPass || needsEarlyAccess;
-
   return (
-    <div className={cn("min-h-screen flex flex-col transition-colors duration-300", isDark ? "bg-gray-900 text-gray-300" : "bg-[#FDF6EC] text-[#3E2723]")}>
+    <div className={cn("min-h-screen flex flex-col transition-colors duration-300", isDark ? "bg-[#1A1412] text-[#ECE5DC]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] text-[#3E2723] dark:text-[#3E2723]")}>
        {/* Top Navigation */}
        <header className={cn("sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b transition-all duration-300 shadow-sm", 
-         isDark ? "bg-gray-900 border-gray-800" : "bg-[#F5E6D3] border-[#D7CCC8]",
+         isDark ? "bg-[#1A1412] border-[#3C2E27]" : "bg-[#F5E6D3] dark:bg-[#F5E6D3] border-[#D7CCC8] dark:border-[#D7CCC8]",
          showHeader ? "translate-y-0" : "-translate-y-full"
        )}>
           <div className="flex flex-col">
@@ -306,18 +379,18 @@ export function Reader() {
              
              {/* Settings Panel */}
              {showSettings && (
-                <div className={cn("absolute right-0 top-full mt-2 w-64 p-5 rounded-2xl shadow-xl z-20 border transition-colors", isDark ? "bg-gray-800 border-gray-700" : "bg-white border-[#D7CCC8]")}>
-                   <h3 className="font-bold mb-4 uppercase text-[#3E2723]">Cài đặt</h3>
+                <div className={cn("absolute right-0 top-full mt-2 w-64 p-5 rounded-2xl shadow-xl z-20 border transition-colors", isDark ? "bg-[#2C221D] border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8]")}>
+                   <h3 className={cn("font-bold mb-4 uppercase", isDark ? "text-[#ECE5DC]" : "text-[#3E2723] dark:text-[#3E2723]")}>Cài đặt</h3>
              <div className="flex flex-col gap-6">
                 <div>
-                    <label className="text-xs font-bold uppercase mb-3 block text-[#8D6E63]">Màu nền</label>
-                    <div className="flex items-center gap-3">
-                        <button onClick={() => setIsDark(false)} className={cn("w-10 h-10 rounded-full bg-[#FDF6EC] border-2", !isDark ? "border-[#3E2723]" : "border-[#D7CCC8]")}></button>
-                        <button onClick={() => setIsDark(true)} className={cn("w-10 h-10 rounded-full bg-gray-900 border-2", isDark ? "border-[#D4AF37]" : "border-gray-600")}></button>
+                    <label className={cn("text-xs font-bold uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")}>Màu nền</label>
+                                        <div className="flex items-center gap-3">
+                        <button onClick={() => setIsDark(false)} style={{ backgroundColor: '#FDF6EC' }} className={cn("w-10 h-10 rounded-full border-2", !isDark ? "border-[#3E2723]" : "border-[#D7CCC8]")}></button>
+                        <button onClick={() => setIsDark(true)} style={{ backgroundColor: '#1A1412' }} className={cn("w-10 h-10 rounded-full border-2", isDark ? "border-[#D4AF37]" : "border-[#3C2E27]")}></button>
                     </div>
                 </div>
                 <div>
-                   <label className="text-xs font-bold uppercase mb-3 block text-[#8D6E63]">Cỡ chữ: {fontSize}px</label>
+                   <label className={cn("text-xs font-bold uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")}>Cỡ chữ: {fontSize}px</label>
                    <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-[#3E2723]" />
                 </div>
              </div>
@@ -331,11 +404,11 @@ export function Reader() {
            {isLocked ? (
               <div className="flex flex-col gap-6">
                   {needsPass && (
-                    <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-gray-800 bg-gray-800/50" : "border-[#8D6E63] bg-[#FDF6EC]")}>
-                       <Lock className="w-12 h-12 mb-4 text-[#8D6E63] animate-bounce" />
-                       <h2 className="text-xl font-bold mb-2 uppercase tracking-tighter">Chương có khoá Pass</h2>
-                       <p className="opacity-70 mb-4 italic text-[#5D4037]">Bạn cần dùng "Vé Pass Truyện" để đọc vĩnh viễn chương này.</p>
-                       <p className="text-sm font-bold mb-6 text-[#3E2723]">Bạn đang có: {ownedPassTickets || 0} Vé</p>
+                    <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#3C2E27] bg-[#2C221D]/50" : "border-[#8D6E63] dark:border-[#8D6E63] bg-[#FDF6EC] dark:bg-[#FDF6EC]")}>
+                       <Lock className={cn("w-12 h-12 mb-4 animate-bounce", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")} />
+                       <h2 className={cn("text-xl font-bold mb-2 uppercase tracking-tighter", isDark ? "text-[#ECE5DC]" : "text-[#3E2723] dark:text-[#3E2723]")}>Chương có khoá Pass</h2>
+                       <p className={cn("opacity-70 mb-4 italic", isDark ? "text-[#A1887F]" : "text-[#5D4037] dark:text-[#5D4037]")}>Bạn cần dùng "Vé Pass Truyện" để đọc vĩnh viễn chương này.</p>
+                       <p className={cn("text-sm font-bold mb-6", isDark ? "text-[#ECE5DC]" : "text-[#3E2723] dark:text-[#3E2723]")}>Bạn đang có: {ownedPassTickets || 0} Vé</p>
                        <button onClick={handleUnlockPass} className="bg-[#3E2723] hover:bg-[#2D1B19] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2">
                           Mở khoá bằng 1 Vé Pass
                        </button>
@@ -343,7 +416,7 @@ export function Reader() {
                   )}
 
                   {needsEarlyAccess && (
-                    <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#D4AF37] bg-gray-800/50" : "border-[#D4AF37] bg-[#FFFDE7]")}>
+                    <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#D4AF37] bg-[#2C221D]/50" : "border-[#D4AF37] dark:border-[#D4AF37] bg-[#FFFDE7] dark:bg-[#FFFDE7]")}>
                        <Zap className="w-12 h-12 mb-4 text-[#D4AF37] animate-pulse fill-yellow-100" />
                        <h2 className="text-xl font-bold mb-2 uppercase tracking-tighter text-[#827717]">Chương Đọc Sớm</h2>
                        <p className="opacity-70 mb-4 italic text-[#827717]">Bạn cần dùng "Vé Ưu Tiên" để đọc ngay, hoặc chờ hết 24h.</p>
@@ -379,9 +452,9 @@ export function Reader() {
                            </p>
 
                            {activeParagraphIndex === idx && (
-                               <div className={cn("mt-4 p-4 rounded-xl shadow-inner border", isDark ? "bg-gray-800/80 border-gray-700" : "bg-[#FDF6EC] border-[#D7CCC8]")}>
+                               <div className={cn("mt-4 p-4 rounded-xl shadow-inner border", isDark ? "bg-[#2C221D]/80 border-[#3C2E27]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] border-[#D7CCC8] dark:border-[#D7CCC8]")}>
                                    <div className="flex justify-between items-center mb-3">
-                                       <h4 className="text-sm font-bold uppercase tracking-wider text-[#8D6E63]">Bình luận đoạn</h4>
+                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")}>Bình luận đoạn</h4>
                                        <button onClick={() => setActiveParagraphIndex(null)} className="text-xs uppercase font-bold opacity-50 hover:opacity-100">Đóng</button>
                                    </div>
                                    
@@ -431,7 +504,7 @@ export function Reader() {
                                                                        setReplyText('');
                                                                     }
                                                                  }}
-                                                                 className="text-xs text-[#8D6E63] hover:text-[#5D4037] mt-1 font-bold block hover:underline"
+                                                                 className={cn("text-xs mt-1 font-bold block hover:underline", isDark ? "text-[#D7CCC8] hover:text-white" : "text-[#8D6E63] dark:text-[#8D6E63] hover:text-[#5D4037] dark:hover:text-[#5D4037]")}
                                                               >
                                                                  Trả lời
                                                               </button>
@@ -448,7 +521,7 @@ export function Reader() {
                                                             value={replyText}
                                                             disabled={submittingReply}
                                                             onChange={(e) => setReplyText(e.target.value)}
-                                                            className={cn("flex-1 px-2.5 py-1 text-xs rounded-lg border focus:outline-none focus:border-[#8D6E63] bg-transparent", isDark ? "border-gray-700 text-white" : "border-[#D7CCC8] text-[#3E2723]")}
+                                                            className={cn("flex-1 px-2.5 py-1 text-xs rounded-lg border focus:outline-none focus:border-[#8D6E63] bg-transparent", isDark ? "border-[#3C2E27] text-[#ECE5DC]" : "border-[#D7CCC8] dark:border-[#D7CCC8] text-[#3E2723] dark:text-[#3E2723]")}
                                                             onKeyDown={(e) => {
                                                                if (e.key === 'Enter') {
                                                                   e.preventDefault();
@@ -480,7 +553,7 @@ export function Reader() {
                                                       return (
                                                          <div className="mt-2 pl-11 space-y-2 border-l border-[#D7CCC8]/40">
                                                             {subReplies.map(reply => (
-                                                               <div key={reply.id} className={cn("flex gap-2 p-2 rounded-lg", isDark ? "bg-gray-800/40" : "bg-gray-50/50")}>
+                                                               <div key={reply.id} className={cn("flex gap-2 p-2 rounded-lg", isDark ? "bg-[#2C221D]/40" : "bg-gray-50/50 dark:bg-gray-50/50")}>
                                                                   <img src={reply.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-6 h-6 rounded-full object-cover shrink-0" />
                                                                   <div className="flex-1 min-w-0">
                                                                      <div className="text-[11px] font-bold mb-0.5 flex items-center gap-1" style={{ color: getTitleColor(reply.activeTitle) || undefined }}>
@@ -510,7 +583,7 @@ export function Reader() {
                                                 value={paragraphCommentText} 
                                                 onChange={(e) => setParagraphCommentText(e.target.value)} 
                                                 placeholder="Viết bình luận..." 
-                                                className={cn("flex-1 px-3 py-2 text-sm rounded-lg border focus:outline-none focus:border-[#8D6E63] bg-transparent", isDark ? "border-gray-700" : "border-[#D7CCC8]")}
+                                                className={cn("flex-1 px-3 py-2 text-sm rounded-lg border focus:outline-none focus:border-[#8D6E63] bg-transparent", isDark ? "border-[#3C2E27]" : "border-[#D7CCC8] dark:border-[#D7CCC8]")}
                                            />
                                            <button type="submit" disabled={!paragraphCommentText.trim()} className="bg-[#8D6E63] text-white px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider disabled:opacity-50 hover:bg-[#5D4037] transition-colors">Gửi</button>
                                        </form>
@@ -528,13 +601,13 @@ export function Reader() {
            {/* Navigation Buttons */}
            <div className="mt-16 mb-8 flex items-center justify-between">
               {prevChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className="flex items-center gap-2 hover:text-[#8D6E63] transition-colors font-bold uppercase tracking-wider text-sm border-b-2 border-transparent hover:border-[#8D6E63] pb-1">
+                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("flex items-center gap-2 transition-colors font-bold uppercase tracking-wider text-sm border-b-2 border-transparent pb-1", isDark ? "hover:text-[#ECE5DC] hover:border-[#ECE5DC]" : "hover:text-[#8D6E63] dark:hover:text-[#8D6E63] hover:border-[#8D6E63] dark:hover:border-[#8D6E63]")}>
                     <ArrowLeft className="w-5 h-5"/> Chương trước
                  </button>
               ) : <div></div>}
               
               {nextChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className="flex items-center gap-2 hover:text-[#8D6E63] transition-colors font-bold uppercase tracking-wider text-sm border-b-2 border-transparent hover:border-[#8D6E63] pb-1">
+                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("flex items-center gap-2 transition-colors font-bold uppercase tracking-wider text-sm border-b-2 border-transparent pb-1", isDark ? "hover:text-[#ECE5DC] hover:border-[#ECE5DC]" : "hover:text-[#8D6E63] dark:hover:text-[#8D6E63] hover:border-[#8D6E63] dark:hover:border-[#8D6E63]")}>
                     Chương sau <ArrowRight className="w-5 h-5"/>
                  </button>
               ) : <div className="text-sm opacity-50 uppercase font-bold tracking-widest">Hết truyện</div>}
@@ -551,11 +624,11 @@ export function Reader() {
                      onChange={(e) => setCommentText(e.target.value)}
                      disabled={!isLoggedIn}
                      placeholder={isLoggedIn ? "Nhập bình luận của bạn..." : "Đăng nhập để bình luận"}
-                     className={cn("w-full p-4 rounded-2xl resize-none border-2 outline-none focus:border-[#8D6E63] transition-colors", isDark ? "bg-gray-800 border-gray-700" : "bg-white border-[#D7CCC8] italic")}
+                     className={cn("w-full p-4 rounded-2xl resize-none border-2 outline-none focus:border-[#8D6E63] transition-colors", isDark ? "bg-[#2C221D] border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8] italic")}
                      rows={4}
                   />
                   <div className="flex justify-end">
-                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className="bg-[#3E2723] text-[#FDF6EC] px-8 py-2.5 rounded-full font-bold hover:bg-[#2D1B19] disabled:opacity-50 transition-colors uppercase text-sm tracking-wider shadow-sm border border-[#8D6E63]">
+                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-full font-bold disabled:opacity-50 transition-colors uppercase text-sm tracking-wider shadow-sm border", isDark ? "bg-[#3C2E27] text-[#ECE5DC] hover:bg-[#5D4037] border-[#8D6E63]" : "bg-[#3E2723] dark:bg-[#3E2723] text-[#FDF6EC] dark:text-[#FDF6EC] hover:bg-[#2D1B19]  border-[#8D6E63] dark:border-[#8D6E63]")}>
                         Gửi bình luận
                      </button>
                   </div>
@@ -566,7 +639,7 @@ export function Reader() {
                        <p className="text-center italic opacity-50">Chưa có bình luận nào cho chương này.</p>
                    ) : (
                        chapterComments.map(c => (
-                           <div key={c.id} className={cn("p-5 rounded-2xl border", isDark ? "bg-gray-800/80 border-gray-700" : "bg-white border-[#D7CCC8] shadow-sm relative overflow-visible pr-8")}>
+                           <div key={c.id} className={cn("p-5 rounded-2xl border", isDark ? "bg-[#2C221D]/80 border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8] shadow-sm relative overflow-visible pr-8")}>
                                <div className="flex items-center gap-3 mb-3">
                                    {c.equippedSticker && (
                                        <img 
@@ -618,7 +691,7 @@ export function Reader() {
                                                 setReplyText('');
                                              }
                                           }}
-                                          className="text-xs text-[#8D6E63] hover:text-[#5D4037] font-extrabold flex items-center gap-1 cursor-pointer transition-colors"
+                                          className={cn("text-xs font-extrabold flex items-center gap-1 cursor-pointer transition-colors", isDark ? "text-[#D7CCC8] hover:text-white" : "text-[#8D6E63] dark:text-[#8D6E63] hover:text-[#5D4037] dark:hover:text-[#5D4037]")}
                                        >
                                           <MessageSquare className="w-3.5 h-3.5" />
                                           Trả lời
@@ -635,7 +708,7 @@ export function Reader() {
                                           value={replyText}
                                           disabled={submittingReply}
                                           onChange={(e) => setReplyText(e.target.value)}
-                                          className={cn("flex-1 px-3 py-1.5 rounded-xl border text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#8D6E63]", isDark ? "bg-gray-900 border-gray-700 text-white focus:border-[#8D6E63]" : "bg-[#FDF6EC] border-[#D7CCC8]/80 text-[#3E2723] focus:border-[#8D6E63]")}
+                                          className={cn("flex-1 px-3 py-1.5 rounded-xl border text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#8D6E63]", isDark ? "bg-[#1A1412] border-[#3C2E27] text-[#ECE5DC] focus:border-[#8D6E63]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] border-[#D7CCC8]/80 dark:border-[#D7CCC8]/80 text-[#3E2723] dark:text-[#3E2723] focus:border-[#8D6E63]")}
                                           onKeyDown={(e) => {
                                              if (e.key === 'Enter') {
                                                 e.preventDefault();
@@ -649,7 +722,7 @@ export function Reader() {
                                           type="button"
                                           onClick={() => handleSendReply(c)}
                                           disabled={submittingReply || !replyText.trim()}
-                                          className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-gray-300 disabled:text-gray-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
+                                          className={cn("disabled:bg-gray-300 disabled:text-gray-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors", isDark ? "bg-[#3C2E27] hover:bg-[#5D4037] text-white" : "bg-[#3E2723] dark:bg-[#3E2723] hover:bg-[#2D1B19] dark:hover:bg-[#2D1B19] text-[#FDF6EC] dark:text-[#FDF6EC]")}
                                        >
                                           Gửi
                                        </button>
@@ -674,7 +747,7 @@ export function Reader() {
                                     return (
                                        <div className="mt-2 pl-3.5 border-l-2 border-[#D7CCC8]/40 space-y-3">
                                           {replies.map((reply: any) => (
-                                             <div key={reply.id} className={cn("flex gap-2.5 items-start p-3 rounded-xl border", isDark ? "bg-gray-900/40 border-gray-800" : "bg-gray-50/40 border-gray-100")}>
+                                             <div key={reply.id} className={cn("flex gap-2.5 items-start p-3 rounded-xl border", isDark ? "bg-[#1A1412]/40 border-[#3C2E27]" : "bg-gray-50/40 dark:bg-gray-50/40 border-gray-100 dark:border-gray-100")}>
                                                 <img src={reply.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 border border-gray-200" referrerPolicy="no-referrer" />
                                                 <div className="flex-1 min-w-0">
                                                    <div className="flex items-center justify-between gap-2 mb-0.5">
@@ -707,6 +780,73 @@ export function Reader() {
                </div>
            </div>
        </main>
+
+        {/* Floating active reading timer */}
+        {!isLocked && (
+          <div className={cn(
+             "fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 px-3.5 py-1.5 rounded-full shadow-lg border backdrop-blur-md transition-all duration-300 flex items-center gap-2 select-none text-xs font-semibold hover:opacity-100 opacity-80",
+             isDark 
+               ? "bg-[#2C221D]/95 border-[#3C2E27] text-[#ECE5DC]" 
+               : "bg-white/95 border-[#8D6E63]/30 text-[#3E2723]"
+          )}>
+             {isFinished ? ( <div className="flex items-center gap-1.5 text-emerald-500 font-bold dark:text-emerald-400"><CheckCircle className="w-4 h-4 text-emerald-500" /><span>Đã xong (+1 lượt đọc)</span></div> ) : false ? (
+                <div className="flex items-center gap-2">
+                   <div className="w-9 h-9 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-500 animate-pulse">
+                      <CheckCircle className="w-5 h-5" />
+                   </div>
+                   <div className="text-left">
+                      <p className="text-xs font-bold text-emerald-500">Hoàn thành đọc chương!</p>
+                      <p className="text-[10px] opacity-70 leading-tight">Lượt đọc & nhiệm vụ ngày đã được ghi nhận.</p>
+                   </div>
+                </div>
+             ) : (
+                <div className="flex items-center gap-3">
+                   <div className="hidden">
+                      {/* Circular progress background */}
+                      <svg className="w-10 h-10 transform -rotate-90">
+                         <circle 
+                            cx="20" 
+                            cy="20" 
+                            r="16" 
+                            className="stroke-gray-200/40 dark:stroke-gray-700/40" 
+                            strokeWidth="3" 
+                            fill="transparent" 
+                         />
+                         <circle 
+                            cx="20" 
+                            cy="20" 
+                            r="16" 
+                            className={cn(isIdle ? "stroke-amber-500" : "stroke-[#8D6E63] dark:stroke-[#D4AF37] transition-all duration-300")}
+                            strokeWidth="3" 
+                            fill="transparent" 
+                            strokeDasharray={2 * Math.PI * 16}
+                            strokeDashoffset={2 * Math.PI * 16 * (1 - secondsRead / timeRequired)}
+                         />
+                      </svg>
+                      {isIdle ? (
+                         <Pause className="w-3.5 h-3.5 absolute text-amber-500 animate-pulse" />
+                      ) : (
+                         <Clock className="w-3.5 h-3.5 absolute text-[#8D6E63] dark:text-[#D4AF37] animate-pulse" />
+                      )}
+                   </div>
+                   <div className="flex items-center gap-1.5">
+
+                      {isIdle ? (
+                         <span className="flex items-center gap-1 text-amber-500 font-bold animate-pulse text-[11px] sm:text-xs">
+                             <Pause className="w-3.5 h-3.5 flex-shrink-0" />
+                             <span>Dừng (cuộn để tiếp tục)</span>
+                          </span>
+                      ) : (
+                         <span className="flex items-center gap-1.5 text-[#3E2723] dark:text-[#ECE5DC] text-[11px] sm:text-xs">
+                             <Clock className="w-3.5 h-3.5 text-[#8D6E63] dark:text-[#D4AF37] animate-pulse flex-shrink-0" />
+                             <span>Còn <span className="font-mono text-xs sm:text-sm font-black text-[#8D6E63] dark:text-[#D4AF37]">{timeRequired - secondsRead}</span> giây</span>
+                          </span>
+                      )}
+                   </div>
+                </div>
+             )}
+          </div>
+        )}
     </div>
   )
 }
