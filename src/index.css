@@ -69,9 +69,13 @@ body {
 .dark .text-\[\#3E2723\]:not([class*="dark:text-"]) { color: #ECE5DC !important; }
 .dark .text-\[\#8D6E63\]:not([class*="dark:text-"]) { color: #D7CCC8 !important; }
 .dark .text-\[\#5D4037\]:not([class*="dark:text-"]) { color: #D7CCC8 !important; }
+.dark .text-gray-450:not([class*="dark:text-"]) { color: #A1887F !important; }
 .dark .text-gray-400:not([class*="dark:text-"]) { color: #8D6E63 !important; }
 .dark .text-gray-500:not([class*="dark:text-"]) { color: #A1887F !important; }
 .dark .text-gray-600:not([class*="dark:text-"]) { color: #D7CCC8 !important; }
+.dark .text-gray-700:not([class*="dark:text-"]) { color: #D7CCC8 !important; }
+.dark .text-gray-800:not([class*="dark:text-"]) { color: #ECE5DC !important; }
+.dark .text-gray-900:not([class*="dark:text-"]) { color: #FFFDF9 !important; }
 .dark .text-\[\#1E293B\]:not([class*="dark:text-"]) { color: #E2E8F0 !important; }
 
 /* Inputs and Forms */
