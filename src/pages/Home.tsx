@@ -8,6 +8,7 @@ import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { UserAvatar } from '../components/UserAvatar';
 import { format } from 'date-fns';
+import { getWeeklyId } from '../types/achievements';
 
 export function Home() {
   const navigate = useNavigate();
@@ -213,17 +214,23 @@ export function Home() {
               </div>
               <div className="space-y-3">
                  {stories.length === 0 && <p className="text-gray-400 italic text-sm text-center py-4">Chưa có truyện nào.</p>}
-                 {[...stories].sort((a,b) => (b.viewCount || 0) - (a.viewCount || 0)).slice(0, 3).map((story, i) => (
+                 {[...stories].sort((a,b) => {
+                    const viewA = bxhTab === 'day' ? (a.dailyViews?.[todayStr] || 0) : (a.weeklyViews?.[getWeeklyId()] || 0);
+                    const viewB = bxhTab === 'day' ? (b.dailyViews?.[todayStr] || 0) : (b.weeklyViews?.[getWeeklyId()] || 0);
+                    return viewB - viewA;
+                 }).slice(0, 3).map((story, i) => {
+                    const views = bxhTab === 'day' ? (story.dailyViews?.[todayStr] || 0) : (story.weeklyViews?.[getWeeklyId()] || 0);
+                    return (
                     <div key={story.id} className="flex items-center gap-4 p-2 bg-[#FDF6EC] dark:bg-[#1C1613] rounded-lg border border-[#F5E6D3] dark:border-[#3C2E27] cursor-pointer hover:border-[#D7CCC8] dark:hover:border-[#5D4037] transition-colors" onClick={() => navigate(`/truyen/${story.id}`)}>
                        <span className="font-black text-xl italic text-[#8D6E63] dark:text-[#C29D70] w-6">0{i + 1}</span>
                        <img src={story.coverUrl} alt={story.title} className="w-10 h-14 object-cover rounded opacity-90 border border-transparent dark:border-[#3C2E27]" />
                        <div className="flex-1">
                           <p className="font-bold text-sm text-[#3E2723] dark:text-[#ECE5DC]">{story.title}</p>
-                          <p className="text-[10px] opacity-70 italic dark:text-gray-400">Lượt đọc: {(story.viewCount || 0).toLocaleString()}</p>
+                          <p className="text-[10px] opacity-70 italic dark:text-gray-400">Lượt đọc: {views.toLocaleString()}</p>
                        </div>
-                       <span className="text-xs font-bold text-[#8D6E63] dark:text-[#C29D70]">{new Intl.NumberFormat('en-US', { notation: 'compact' }).format(story.viewCount || 0)} 🔥</span>
+                       <span className="text-xs font-bold text-[#8D6E63] dark:text-[#C29D70]">{new Intl.NumberFormat('en-US', { notation: 'compact' }).format(views)} 🔥</span>
                     </div>
-                 ))}
+                 )})}
               </div>
            </div>
 
