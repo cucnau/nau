@@ -56,17 +56,17 @@ export function NewsFeed() {
   };
 
   return (
-    <div className="flex flex-col bg-white rounded-3xl border border-[#D7CCC8]/80 p-5 shadow-sm">
-      <div className="flex justify-between items-center mb-4 pb-2 border-b border-[#D7CCC8]/30">
-        <h2 className="font-bold text-sm border-l-4 border-[#8D6E63] pl-2.5 text-[#3E2723] uppercase tracking-wider flex items-center gap-2">
-          <Newspaper className="w-4 h-4 text-[#8D6E63]" />
+    <div className="flex flex-col bg-white dark:bg-[#1A1412] rounded-3xl border border-[#D7CCC8]/80 dark:border-[#3C2E27] p-5 shadow-sm">
+      <div className="flex justify-between items-center mb-4 pb-2 border-b border-[#D7CCC8]/30 dark:border-[#3C2E27]/50">
+        <h2 className="font-bold text-sm border-l-4 border-[#8D6E63] dark:border-[#C29D70] pl-2.5 text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wider flex items-center gap-2">
+          <Newspaper className="w-4 h-4 text-[#8D6E63] dark:text-[#C29D70]" />
           Bản tin Choco
         </h2>
         {isLoggedIn && (
           <button 
             type="button"
             onClick={() => navigate('/tai-khoan')}
-            className="text-[10px] sm:text-xs font-bold text-[#8D6E63] hover:text-[#5D4037] flex items-center gap-1 transition-all"
+            className="text-[10px] sm:text-xs font-bold text-[#8D6E63] dark:text-[#A1887F] hover:text-[#5D4037] dark:hover:text-[#ECE5DC] flex items-center gap-1 transition-all"
           >
             Đăng bài ngay <ExternalLink className="w-3 h-3" />
           </button>
@@ -75,10 +75,10 @@ export function NewsFeed() {
 
       <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1 px-2 pt-3 pb-2 -mx-2">
         {posts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 bg-[#FDF6EC]/40 rounded-2xl border border-dashed border-[#D7CCC8]/50 text-center">
-            <MessageSquareQuote className="w-8 h-8 text-[#D7CCC8] mb-1 opacity-70" />
-            <p className="text-xs text-gray-400 italic">Chưa có bài đăng nào trên Bản tin.</p>
-            <p className="text-[10px] text-gray-400 mt-1">Hãy vào trang Hồ sơ của bạn để đăng bài viết đầu tiên!</p>
+          <div className="flex flex-col items-center justify-center p-8 bg-[#FDF6EC]/40 dark:bg-[#2C221D]/40 rounded-2xl border border-dashed border-[#D7CCC8]/50 dark:border-[#3C2E27]/50 text-center">
+            <MessageSquareQuote className="w-8 h-8 text-[#D7CCC8] dark:text-[#5D4037] mb-1 opacity-70" />
+            <p className="text-xs text-gray-400 dark:text-gray-500 italic">Chưa có bài đăng nào trên Bản tin.</p>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Hãy vào trang Hồ sơ của bạn để đăng bài viết đầu tiên!</p>
           </div>
         ) : (
           posts.map((post) => {
@@ -88,7 +88,7 @@ export function NewsFeed() {
             return (
               <div 
                 key={post.id} 
-                className="flex gap-3 p-3 bg-[#FDF6EC]/30 hover:bg-[#FDF6EC]/50 rounded-2xl border border-[#F5E6D3]/60 transition-colors relative overflow-visible pr-8"
+                className="flex gap-3 p-3 bg-[#FDF6EC]/30 dark:bg-[#2C221D]/30 hover:bg-[#FDF6EC]/50 dark:hover:bg-[#2C221D]/60 rounded-2xl border border-[#F5E6D3]/60 dark:border-[#3C2E27] transition-colors relative overflow-visible pr-8"
               >
                 {(post.equippedStickerPost || post.equippedSticker) && (
                   <img 
@@ -118,14 +118,14 @@ export function NewsFeed() {
                         {post.displayName}
                       </span>
                       {post.activeTitle && (
-                        <span className="px-1 py-0.5 bg-yellow-100 text-yellow-850 text-[7px] font-black rounded uppercase shadow-xs border border-yellow-250 inline-block">
+                        <span className="px-1 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 text-[7px] font-black rounded uppercase shadow-xs border border-yellow-200 dark:border-yellow-700/50 inline-block">
                           🏆 {post.activeTitle}
                         </span>
                       )}
                     </div>
                     
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="text-[9px] text-gray-400 font-mono">
+                      <span className="text-[9px] text-gray-400 dark:text-gray-500 font-mono">
                         {post.createdAt?.toDate 
                           ? new Date(post.createdAt.toDate()).toLocaleDateString('vi-VN', { 
                               month: 'numeric', 
@@ -139,7 +139,7 @@ export function NewsFeed() {
                     </div>
                   </div>
 
-                  <p className="text-xs text-[#3E2723] break-words mt-1 leading-relaxed whitespace-pre-wrap text-justify pr-1 font-medium">
+                  <p className="text-xs text-[#3E2723] dark:text-[#ECE5DC] break-words mt-1 leading-relaxed whitespace-pre-wrap text-justify pr-1 font-medium">
                     {post.content}
                   </p>
                 </div>
