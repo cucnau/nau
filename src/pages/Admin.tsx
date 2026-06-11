@@ -807,6 +807,26 @@ export function Admin() {
           choco: currentChoco + givingChoco,
           goldenChoco: currentGChoco + givingGChoco,
         });
+        
+        if (givingChoco !== 0) {
+           await addDoc(collection(db, `users/${userId}/transactions`), {
+              amount: Math.abs(givingChoco),
+              currency: 'choco',
+              type: givingChoco > 0 ? 'earn' : 'spend',
+              reason: 'Admin cập nhật',
+              createdAt: serverTimestamp()
+           });
+        }
+        if (givingGChoco !== 0) {
+           await addDoc(collection(db, `users/${userId}/transactions`), {
+              amount: Math.abs(givingGChoco),
+              currency: 'gchoco',
+              type: givingGChoco > 0 ? 'earn' : 'spend',
+              reason: 'Admin cập nhật',
+              createdAt: serverTimestamp()
+           });
+        }
+
         alert('Tặng thành công!');
         setGivingChoco(0);
         setGivingGChoco(0);
