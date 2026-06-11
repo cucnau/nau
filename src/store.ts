@@ -5,6 +5,7 @@ import { User as FirebaseUser } from 'firebase/auth';
 import { db, checkIfQuotaError } from './lib/firebase';
 import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit } from 'firebase/firestore';
 import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement } from './types/achievements';
+import { logTransaction } from './lib/transactions';
 
 interface Mission {
   id: string;
@@ -108,14 +109,14 @@ interface UserState {
   
   checkIn: () => void;
   gainExp: (amount: number) => void;
-  addChoco: (amount: number) => void;
-  addGoldenChoco: (amount: number) => void;
+  addChoco: (amount: number, reason?: string) => void;
+  addGoldenChoco: (amount: number, reason?: string) => void;
   buyTicket: (type: 'pass' | 'priority' | 'streak', amount?: number) => void;
   consumePassTicket: (chapterId: string) => boolean;
   consumePriorityTicket: (chapterId: string) => boolean;
   useStreakTicket: () => boolean;
-  spendChoco: (amount: number) => boolean;
-  spendGoldenChoco: (amount: number) => boolean;
+  spendChoco: (amount: number, reason?: string) => boolean;
+  spendGoldenChoco: (amount: number, reason?: string) => boolean;
   
   markStoryRead: (storyId: string, chapterOrder: number, genres?: string[]) => void;
   addCommentProgress: () => void;
@@ -126,7 +127,7 @@ interface UserState {
   setStickerPosition: (type: 'avatar' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => void;
   
   claimMission: (id: string) => void;
-  updateUserDoc: (updates: any) => Promise<void>;
+  updateUserDoc: (updates: any, transactionReason?: string) => Promise<void>;
   useMysteryBox: () => Promise<any | null>;
 
   // Achievements Actions
@@ -436,19 +437,36 @@ export const useStore = create<UserState>()(
          get().updateUserDoc({ exp: newExp, level: newLevel });
       },
 
-      updateUserDoc: async (updates: any) => {
-         const { uid } = get();
+      updateUserDoc: async (updates: any, transactionReason?: string) => {
+         const state = get();
+         const { uid, choco: prevChoco, goldenChoco: prevGChoco } = state;
          if (uid) {
             // Optimistically update local state
-            set((state) => {
+            set((currentState) => {
                const newState: any = {};
                Object.keys(updates).forEach(key => {
-                  if (key in state) {
+                  if (key in currentState) {
                      newState[key] = updates[key];
                   }
                });
                return newState;
             });
+
+            // Log transactions if amounts changed
+            if (transactionReason) {
+               if (updates.choco !== undefined) {
+                  const diff = updates.choco - prevChoco;
+                  if (diff !== 0) {
+                     logTransaction(uid, Math.abs(diff), 'choco', diff > 0 ? 'earn' : 'spend', transactionReason);
+                  }
+               }
+               if (updates.goldenChoco !== undefined) {
+                  const diff = updates.goldenChoco - prevGChoco;
+                  if (diff !== 0) {
+                     logTransaction(uid, Math.abs(diff), 'gchoco', diff > 0 ? 'earn' : 'spend', transactionReason);
+                  }
+               }
+            }
 
             try {
                await updateDoc(doc(db, 'users', uid), updates);
@@ -608,18 +626,18 @@ export const useStore = create<UserState>()(
             totalEarnedChoco: newTotalEarnedChoco,
             totalCheckIns: newTotalCheckins,
             ...updateStreakRecoveryStats
-        });
+        }, "Điểm danh hàng ngày");
         
         get().gainExp(10);
         get()._checkPerfectDailyDay();
         get()._triggerCountAchievementsCheck();
       },
       
-      addChoco: (amount) => {
+      addChoco: (amount, reason = "Nhận Choco") => {
           set((state) => {
               const newChoco = state.choco + amount;
               const newTotalEarned = (state.totalEarnedChoco || 0) + amount;
-              get().updateUserDoc({ choco: newChoco, totalEarnedChoco: newTotalEarned });
+              get().updateUserDoc({ choco: newChoco, totalEarnedChoco: newTotalEarned }, reason);
               
               setTimeout(() => {
                  get()._triggerCountAchievementsCheck();
@@ -628,11 +646,11 @@ export const useStore = create<UserState>()(
               return { choco: newChoco, totalEarnedChoco: newTotalEarned };
           });
       },
-      addGoldenChoco: (amount) => {
+      addGoldenChoco: (amount, reason = "Nhận GChoco") => {
           set((state) => {
               const newGolden = state.goldenChoco + amount;
               const newTotalEarnedG = (state.totalEarnedGChoco || 0) + amount;
-              get().updateUserDoc({ goldenChoco: newGolden, totalEarnedGChoco: newTotalEarnedG });
+              get().updateUserDoc({ goldenChoco: newGolden, totalEarnedGChoco: newTotalEarnedG }, reason);
 
               setTimeout(() => {
                  get()._triggerCountAchievementsCheck();
@@ -641,13 +659,13 @@ export const useStore = create<UserState>()(
               return { goldenChoco: newGolden, totalEarnedGChoco: newTotalEarnedG };
           });
       },
-      spendChoco: (amount) => {
+      spendChoco: (amount, reason = "Dùng Choco") => {
           const state = get();
           if (state.choco >= amount) {
               const newChoco = state.choco - amount;
               const newTotalSpent = (state.totalSpentChoco || 0) + amount;
               set({ choco: newChoco, totalSpentChoco: newTotalSpent });
-              get().updateUserDoc({ choco: newChoco, totalSpentChoco: newTotalSpent });
+              get().updateUserDoc({ choco: newChoco, totalSpentChoco: newTotalSpent }, reason);
 
               setTimeout(() => {
                  get()._triggerCountAchievementsCheck();
@@ -657,11 +675,11 @@ export const useStore = create<UserState>()(
           }
           return false;
       },
-      spendGoldenChoco: (amount) => {
+      spendGoldenChoco: (amount, reason = "Dùng GChoco") => {
           const state = get();
           if (state.goldenChoco >= amount) {
               set({ goldenChoco: state.goldenChoco - amount });
-              get().updateUserDoc({ goldenChoco: state.goldenChoco - amount });
+              get().updateUserDoc({ goldenChoco: state.goldenChoco - amount }, reason);
               return true;
           }
           return false;
@@ -796,7 +814,7 @@ export const useStore = create<UserState>()(
            totalEarnedChoco: newTotalEarned,
            totalCommentsCount: newCommentsCount,
            activePoints: finalActivePoints,
-         });
+         }, "Hoàn thành bình luận");
 
          get().gainExp(5);
          get()._checkPerfectDailyDay();
@@ -835,7 +853,7 @@ export const useStore = create<UserState>()(
                  totalEarnedChoco: newTotalEarnedC,
                  totalEarnedGChoco: newTotalEarnedG
               };
-              get().updateUserDoc(updates);
+              get().updateUserDoc(updates, "Nhận thưởng nhiệm vụ");
               
               setTimeout(() => {
                  get()._triggerCountAchievementsCheck();
@@ -978,7 +996,7 @@ export const useStore = create<UserState>()(
           get().updateUserDoc({ 
             choco: newChoco,
             activePoints: finalActivePoints,
-          });
+          }, "Tặng Choco cho truyện");
 
           // Unlock generous_donor (gifting choco first time)
           get().unlockAchievement('generous_donor');
@@ -1044,7 +1062,7 @@ export const useStore = create<UserState>()(
             goldenChoco: newGolden,
             totalEarnedChoco: newTotalEarnedChoco,
             totalEarnedGChoco: newTotalEarnedGChoco
-         });
+         }, `Nhận thưởng thành tựu: ${ach.name}`);
          
          get().gainExp(30);
 
