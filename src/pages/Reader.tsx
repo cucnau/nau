@@ -12,12 +12,12 @@ export function Reader() {
   const { 
     markStoryRead, isLoggedIn, addCommentProgress, uid, displayName, avatarUrl, 
     unlockedPassChapters, unlockedEarlyAccessChapters, consumePassTicket, consumePriorityTicket,
-    ownedPassTickets, ownedPriorityTickets, setStoreOpen, getTitleColor
+    ownedPassTickets, ownedPriorityTickets, setStoreOpen, getTitleColor, theme
   } = useStore();
   
   const [showSettings, setShowSettings] = useState(false);
   const [fontSize, setFontSize] = useState(18);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(theme === 'dark');
   const [commentText, setCommentText] = useState('');
   const [activeParagraphIndex, setActiveParagraphIndex] = useState<number | null>(null);
   const [paragraphCommentText, setParagraphCommentText] = useState('');
