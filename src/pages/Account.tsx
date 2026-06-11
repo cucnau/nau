@@ -584,7 +584,15 @@ export function Account() {
                      <div key={t.id} className="flex justify-between items-center p-3 bg-white dark:bg-[#1A1412] border border-[#F5E6D3] dark:border-[#3C2E27] rounded-xl hover:border-[#D7CCC8] transition-colors">
                         <div className="flex flex-col gap-1">
                            <span className="text-sm font-bold text-[#3E2723] dark:text-[#ECE5DC]">{t.reason}</span>
-                           <span className="text-[10px] text-gray-500 uppercase tracking-widest">{t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString() : 'Vừa xong'}</span>
+                           <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-gray-500">
+                              <span className="uppercase tracking-widest">{t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString() : 'Vừa xong'}</span>
+                              {t.balanceAfter !== undefined && (
+                                 <>
+                                    <span className="opacity-40">•</span>
+                                    <span className="font-semibold text-[#8D6E63] dark:text-[#BF9F95]">Số dư: {t.balanceAfter} {t.currency === 'choco' ? 'Choco' : 'GChoco'}</span>
+                                 </>
+                              )}
+                           </div>
                         </div>
                         <div className={`font-black text-sm flex items-center gap-1 ${t.type === 'earn' ? 'text-green-600' : 'text-red-500'}`}>
                            {t.type === 'earn' ? '+' : '-'}{t.amount} {t.currency === 'choco' ? 'Choco' : 'GChoco'}
