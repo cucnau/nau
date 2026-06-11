@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store';
 import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
-import { doc, updateDoc, collection, addDoc, setDoc, serverTimestamp, query, orderBy, onSnapshot, where, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc, setDoc, serverTimestamp, query, orderBy, onSnapshot, where, deleteDoc, limit } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 import { Gift } from 'lucide-react';
 
@@ -65,7 +65,7 @@ export function Account() {
     }
   };
 
-  const [tab, setTab] = useState<'profile' | 'settings'>('profile');
+  const [tab, setTab] = useState<'profile' | 'settings' | 'transactions'>('profile');
   const [name, setName] = useState(displayName || '');
   const [avatar, setAvatar] = useState(avatarUrl || '');
   const [pass, setPass] = useState('');
@@ -75,6 +75,7 @@ export function Account() {
   
   const [review, setReview] = useState('');
   const [reviews, setReviews] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -90,6 +91,18 @@ export function Account() {
       setReviews(arr);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, `users/${uid}/reviews`);
+    });
+    return () => unsubscribe();
+  }, [uid]);
+
+  useEffect(() => {
+    if (!uid) return;
+    const q = query(collection(db, `users/${uid}/transactions`), orderBy('createdAt', 'desc'), limit(50));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const arr = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setTransactions(arr);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, `users/${uid}/transactions`);
     });
     return () => unsubscribe();
   }, [uid]);
@@ -234,9 +247,15 @@ export function Account() {
         </button>
         <button 
           onClick={() => setTab('settings')} 
-          className={`text-xl font-bold uppercase tracking-tighter ${tab === 'settings' ? 'text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}
+          className={`text-xl font-bold uppercase tracking-tighter ${tab === 'settings' ? 'text-[#3E2723] dark:text-[#ECE5DC]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
         >
           Cài đặt
+        </button>
+        <button 
+          onClick={() => setTab('transactions')} 
+          className={`text-xl font-bold uppercase tracking-tighter ${tab === 'transactions' ? 'text-[#3E2723] dark:text-[#ECE5DC]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+        >
+          Lịch sử Choco
         </button>
       </div>
       
@@ -549,6 +568,31 @@ export function Account() {
              </div>
            </div>
         </div>
+      )}
+
+      {tab === 'transactions' && (
+         <div className="bg-[#FFFDF9] dark:bg-[#211B18] border border-[#D7CCC8] dark:border-[#3C2E27] rounded-3xl shadow-sm p-6 w-full">
+            <h2 className="text-xl font-bold text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-tighter mb-6 flex items-center gap-2 border-l-4 border-[#8D6E63] pl-3">
+               Lịch sử giao dịch
+            </h2>
+            <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-2">
+               {transactions.length === 0 ? (
+                  <p className="text-gray-400 italic text-sm text-center py-8">Chưa có giao dịch nào.</p>
+               ) : (
+                  transactions.map(t => (
+                     <div key={t.id} className="flex justify-between items-center p-3 bg-white dark:bg-[#1A1412] border border-[#F5E6D3] dark:border-[#3C2E27] rounded-xl hover:border-[#D7CCC8] transition-colors">
+                        <div className="flex flex-col gap-1">
+                           <span className="text-sm font-bold text-[#3E2723] dark:text-[#ECE5DC]">{t.reason}</span>
+                           <span className="text-[10px] text-gray-500 uppercase tracking-widest">{t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString() : 'Vừa xong'}</span>
+                        </div>
+                        <div className={`font-black text-sm flex items-center gap-1 ${t.type === 'earn' ? 'text-green-600' : 'text-red-500'}`}>
+                           {t.type === 'earn' ? '+' : '-'}{t.amount} {t.currency === 'choco' ? 'Choco' : 'GChoco'}
+                        </div>
+                     </div>
+                  ))
+               )}
+            </div>
+         </div>
       )}
     </div>
   );
