@@ -126,16 +126,16 @@ export function Store() {
           </div>
        </div>
 
-       <div className="inline-flex bg-[#FDF6EC] border border-[#D7CCC8] p-1 rounded-xl font-bold uppercase text-sm tracking-wide self-center sm:self-start my-4">
+       <div className="inline-flex bg-[#FDF6EC] dark:bg-[#1A1412] border border-[#D7CCC8] dark:border-[#3C2E27] p-1 rounded-xl font-bold uppercase text-sm tracking-wide self-center sm:self-start my-4">
           <button 
              onClick={() => setActiveTab('items')} 
-             className={cn("px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2", activeTab === 'items' ? 'bg-[#3E2723] text-[#FDF6EC] shadow-md' : 'text-[#8D6E63] hover:bg-[#FDF6EC]/80 hover:text-[#5D4037]')}
+             className={cn("px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2", activeTab === 'items' ? 'bg-[#3E2723] dark:bg-[#C29D70] text-[#FDF6EC] dark:text-[#181311] shadow-md' : 'text-[#8D6E63] dark:text-gray-400 hover:bg-[#FDF6EC]/80 dark:hover:bg-[#2C221D] hover:text-[#5D4037] dark:hover:text-[#ECE5DC]')}
           >
              <ShoppingBag className="w-4 h-4" /> Vật Phẩm
           </button>
           <button 
              onClick={() => setActiveTab('stickers')} 
-             className={cn("px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2", activeTab === 'stickers' ? 'bg-[#3E2723] text-[#FDF6EC] shadow-md' : 'text-[#8D6E63] hover:bg-[#FDF6EC]/80 hover:text-[#5D4037]')}
+             className={cn("px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2", activeTab === 'stickers' ? 'bg-[#3E2723] dark:bg-[#C29D70] text-[#FDF6EC] dark:text-[#181311] shadow-md' : 'text-[#8D6E63] dark:text-gray-400 hover:bg-[#FDF6EC]/80 dark:hover:bg-[#2C221D] hover:text-[#5D4037] dark:hover:text-[#ECE5DC]')}
           >
              <Smile className="w-4 h-4" /> Sticker Avatar
           </button>
