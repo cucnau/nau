@@ -201,27 +201,27 @@ export function Home() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Left Column: Rankings and Top Rich Users */}
         <section className="flex-[1.5] flex flex-col gap-6">
-           <div className="bg-white rounded-2xl shadow-sm border border-[#D7CCC8] p-5">
+           <div className="bg-white dark:bg-[#211B18] rounded-2xl shadow-sm border border-[#D7CCC8] dark:border-[#3C2E27] p-5">
               <div className="flex justify-between items-center mb-4">
-                 <h2 className="font-bold text-lg border-l-4 border-[#3E2723] pl-3 uppercase tracking-tighter">
+                 <h2 className="font-bold text-lg border-l-4 border-[#3E2723] dark:border-[#D7CCC8] pl-3 uppercase tracking-tighter text-[#3E2723] dark:text-[#ECE5DC]">
                    Bảng Xếp Hạng Truyện
                  </h2>
                  <div className="flex text-[10px] font-bold gap-3">
-                   <button onClick={() => setBxhTab('day')} className={`uppercase transition-colors ${bxhTab === 'day' ? 'text-[#3E2723] underline decoration-2 underline-offset-4' : 'text-gray-400 hover:text-gray-600'}`}>NGÀY</button>
-                   <button onClick={() => setBxhTab('week')} className={`uppercase transition-colors ${bxhTab === 'week' ? 'text-[#3E2723] underline decoration-2 underline-offset-4' : 'text-gray-400 hover:text-gray-600'}`}>TUẦN</button>
+                   <button onClick={() => setBxhTab('day')} className={`uppercase transition-colors ${bxhTab === 'day' ? 'text-[#3E2723] dark:text-[#ECE5DC] underline decoration-2 underline-offset-4' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}>NGÀY</button>
+                   <button onClick={() => setBxhTab('week')} className={`uppercase transition-colors ${bxhTab === 'week' ? 'text-[#3E2723] dark:text-[#ECE5DC] underline decoration-2 underline-offset-4' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}>TUẦN</button>
                  </div>
               </div>
               <div className="space-y-3">
                  {stories.length === 0 && <p className="text-gray-400 italic text-sm text-center py-4">Chưa có truyện nào.</p>}
                  {[...stories].sort((a,b) => (b.viewCount || 0) - (a.viewCount || 0)).slice(0, 3).map((story, i) => (
-                    <div key={story.id} className="flex items-center gap-4 p-2 bg-[#FDF6EC] rounded-lg border border-[#F5E6D3] cursor-pointer hover:border-[#D7CCC8] transition-colors" onClick={() => navigate(`/truyen/${story.id}`)}>
-                       <span className="font-black text-xl italic text-[#8D6E63] w-6">0{i + 1}</span>
-                       <img src={story.coverUrl} alt={story.title} className="w-10 h-14 object-cover rounded opacity-90" />
+                    <div key={story.id} className="flex items-center gap-4 p-2 bg-[#FDF6EC] dark:bg-[#1C1613] rounded-lg border border-[#F5E6D3] dark:border-[#3C2E27] cursor-pointer hover:border-[#D7CCC8] dark:hover:border-[#5D4037] transition-colors" onClick={() => navigate(`/truyen/${story.id}`)}>
+                       <span className="font-black text-xl italic text-[#8D6E63] dark:text-[#C29D70] w-6">0{i + 1}</span>
+                       <img src={story.coverUrl} alt={story.title} className="w-10 h-14 object-cover rounded opacity-90 border border-transparent dark:border-[#3C2E27]" />
                        <div className="flex-1">
-                          <p className="font-bold text-sm text-[#3E2723]">{story.title}</p>
-                          <p className="text-[10px] opacity-70 italic">Lượt đọc: {(story.viewCount || 0).toLocaleString()}</p>
+                          <p className="font-bold text-sm text-[#3E2723] dark:text-[#ECE5DC]">{story.title}</p>
+                          <p className="text-[10px] opacity-70 italic dark:text-gray-400">Lượt đọc: {(story.viewCount || 0).toLocaleString()}</p>
                        </div>
-                       <span className="text-xs font-bold text-[#8D6E63]">{new Intl.NumberFormat('en-US', { notation: 'compact' }).format(story.viewCount || 0)} 🔥</span>
+                       <span className="text-xs font-bold text-[#8D6E63] dark:text-[#C29D70]">{new Intl.NumberFormat('en-US', { notation: 'compact' }).format(story.viewCount || 0)} 🔥</span>
                     </div>
                  ))}
               </div>
@@ -244,10 +244,10 @@ export function Home() {
                      return (
                         <div key={u.id} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${isMe ? 'bg-orange-50 border-orange-300 dark:bg-[#331D12]/60 dark:border-[#5C3A21]/40' : 'bg-white border-[#F5E6D3] hover:border-orange-200 dark:bg-[#1D1613] dark:border-[#3C2E27]/80 dark:hover:border-orange-950'}`}>
                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
-                              i === 0 ? 'bg-yellow-400 text-yellow-950 ring-2 ring-yellow-200' :
-                              i === 1 ? 'bg-slate-300 text-slate-950 ring-2 ring-slate-100' :
-                              i === 2 ? 'bg-amber-600 text-amber-50 ring-2 ring-amber-100' :
-                              'bg-orange-100 text-orange-900'
+                              i === 0 ? 'bg-yellow-400 text-yellow-950 ring-2 ring-yellow-200 dark:bg-yellow-600 dark:text-yellow-100 dark:ring-yellow-800' :
+                              i === 1 ? 'bg-slate-300 text-slate-950 ring-2 ring-slate-100 dark:bg-slate-600 dark:text-slate-100 dark:ring-slate-700' :
+                              i === 2 ? 'bg-amber-600 text-amber-50 ring-2 ring-amber-100 dark:bg-amber-700 dark:text-amber-100 dark:ring-amber-900' :
+                              'bg-orange-100 text-orange-900 dark:bg-[#331D12] dark:text-orange-200'
                            }`}>
                               {i + 1}
                            </div>
@@ -276,25 +276,27 @@ export function Home() {
                </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-[#D7CCC8] p-5">
-               <h2 className="font-bold text-lg border-l-4 border-[#D4AF37] pl-3 mb-4 uppercase tracking-tighter">
+            <div className="bg-white dark:bg-[#211B18] rounded-2xl shadow-sm border border-[#D7CCC8] dark:border-[#3C2E27] p-5">
+               <h2 className="font-bold text-lg border-l-4 border-[#D4AF37] pl-3 mb-4 uppercase tracking-tighter text-[#3E2723] dark:text-[#ECE5DC]">
                 Đại Gia Choco
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  {topUsers.length === 0 && <p className="text-gray-400 italic text-sm text-center py-4">Chưa có dữ liệu.</p>}
                  {topUsers.map((u, i) => (
-                    <div key={u.id} className="flex items-center gap-3 bg-[#FDF6EC] p-3 rounded-xl border border-[#F5E6D3]">
+                    <div key={u.id} className="flex items-center gap-3 bg-[#FDF6EC] dark:bg-[#1C1613] p-3 rounded-xl border border-[#F5E6D3] dark:border-[#3C2E27]">
                         <UserAvatar 
                            avatarUrl={u.avatarUrl} 
                            equippedSticker={u.equippedStickerAvatar} 
                            stickerPosition={u.stickerPositionAvatar} 
                            className="w-10 h-10" 
-                           fallbackIconSizeClass="w-5 h-5 text-amber-200" 
-                           borderClass="border border-[#F5E6D3]"
+                           fallbackIconSizeClass="w-5 h-5 text-amber-200 dark:text-amber-700" 
+                           borderClass="border border-[#F5E6D3] dark:border-[#3C2E27]"
                         />
                        <div className="flex-1 min-w-0">
-                          <div className="text-xs font-bold truncate" style={{ color: getTitleColor(u.activeTitle) || '#3E2723' }}>Top {i + 1}: {u.displayName}</div>
-                          <div className="text-[10px] text-[#A1887F] font-semibold">{u.choco?.toLocaleString()} Choco</div>
+                          <div className="text-xs font-bold truncate" style={{ color: getTitleColor(u.activeTitle) || undefined }}>
+                              <span className={!getTitleColor(u.activeTitle) ? "text-[#3E2723] dark:text-[#ECE5DC]" : ""}>Top {i + 1}: {u.displayName}</span>
+                          </div>
+                          <div className="text-[10px] text-[#A1887F] dark:text-gray-400 font-semibold">{u.choco?.toLocaleString()} Choco</div>
                        </div>
                     </div>
                  ))}
@@ -321,10 +323,10 @@ export function Home() {
                           </div>
                           <div className="flex gap-1 items-center flex-wrap">
                              {story.genres && story.genres.slice(0, 2).map((g: string, i: number) => (
-                                <span key={i} className="text-[8px] font-bold bg-white/60 text-[#8D6E63] border border-[#F5E6D3] px-1.5 py-0.5 rounded-md uppercase tracking-tight truncate max-w-[60px]">{g}</span>
+                                <span key={i} className="text-[8px] font-bold bg-white/60 dark:bg-[#1A1412] text-[#8D6E63] dark:text-[#A1887F] border border-[#F5E6D3] dark:border-[#3C2E27] px-1.5 py-0.5 rounded-md uppercase tracking-tight truncate max-w-[60px]">{g}</span>
                              ))}
                              {(!story.genres || story.genres.length === 0) && (
-                                <span className="text-[8px] font-bold bg-white/60 text-[#8D6E63] border border-[#F5E6D3] px-1.5 py-0.5 rounded-md uppercase tracking-tight">Ký Sự</span>
+                                <span className="text-[8px] font-bold bg-white/60 dark:bg-[#1A1412] text-[#8D6E63] dark:text-[#A1887F] border border-[#F5E6D3] dark:border-[#3C2E27] px-1.5 py-0.5 rounded-md uppercase tracking-tight">Ký Sự</span>
                              )}
                           </div>
                        </div>
