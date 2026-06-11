@@ -86,4 +86,40 @@ body {
 .dark .bg-gray-100:not([class*="dark:bg-"]) { background-color: #2C221D !important; }
 .dark .bg-gray-200:not([class*="dark:bg-"]) { background-color: #3C2E27 !important; }
 
+/* Custom Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #A1887F transparent;
+}
+
+.dark * {
+  scrollbar-color: #3C2E27 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #A1887F;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #8D6E63;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: #3C2E27;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: #5D4037;
+}
+
 
