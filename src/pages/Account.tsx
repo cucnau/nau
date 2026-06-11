@@ -137,9 +137,8 @@ export function Account() {
     reader.onload = (event) => {
       const dataUrl = event.target?.result as string;
       if (file.type === 'image/gif') {
-         if (dataUrl.length > 500000) {
-             console.error('Ảnh GIF quá lớn!');
-             // alert('Ảnh GIF quá lớn! Vui lòng chọn file dung lượng nhỏ hơn (dưới ~350KB) để hệ thống có thể lưu.');
+         if (dataUrl.length > 100000) {
+             alert('Ảnh GIF quá lớn! Vui lòng chọn file dung lượng nhỏ hơn (dưới ~75KB) để lưu trữ hồ sơ của bạn an toàn và mượt mà nhất.');
              return;
          }
          setAvatar(dataUrl);
@@ -148,8 +147,8 @@ export function Account() {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 256;
-        const MAX_HEIGHT = 256;
+        const MAX_WIDTH = 96;
+        const MAX_HEIGHT = 96;
         let width = img.width;
         let height = img.height;
         if (width > height) {
@@ -161,7 +160,7 @@ export function Account() {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
-        setAvatar(canvas.toDataURL('image/jpeg', 0.8));
+        setAvatar(canvas.toDataURL('image/jpeg', 0.5));
       };
       if (dataUrl) img.src = dataUrl;
     };
