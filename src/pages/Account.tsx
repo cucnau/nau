@@ -52,6 +52,7 @@ export function Account() {
     try {
       await updateUserDoc({
         goldenChoco: (goldenChoco || 0) + rewardClaimInfo.gchoco,
+        $gchocoDiff: rewardClaimInfo.gchoco,
         ownedMysteryBoxes: (ownedMysteryBoxes || 0) + rewardClaimInfo.boxes,
         lastClaimedRewardLevel: level
       }, "Nhận thưởng cấp độ");
@@ -406,7 +407,7 @@ export function Account() {
               <p className="text-sm text-gray-500 mb-4">{email}</p>
               
               {/* Hệ thống level độc giả */}
-              <div className="w-full mb-4 bg-[#F2E5D5]/40 dark:bg-[#726458] p-4 rounded-xl border border-[#D7CCC8]/60 dark:border-[#3C2E27] text-left">
+              <div className="w-full mb-4 bg-[#F2E5D5]/40 dark:bg-[#34221A] p-4 rounded-xl border border-[#D7CCC8]/60 dark:border-[#3C2E27] text-left">
                  <div className="flex justify-between items-center mb-1.5">
                     <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037] dark:text-white/90">Level</span>
                     <div className="flex items-center gap-2">
@@ -435,7 +436,7 @@ export function Account() {
                  </div>
               </div>
 
-              <div className="w-full bg-[#FDF6EC] dark:bg-[#1E1815] rounded-xl p-4 border border-[#D7CCC8] dark:border-[#3C2E27] flex items-center justify-between">
+              <div className="w-full bg-[#FDF6EC] dark:bg-[#34221A] rounded-xl p-4 border border-[#D7CCC8] dark:border-[#3C2E27] flex items-center justify-between">
                  <div className="flex flex-col items-center flex-1">
                     <span className="text-[10px] uppercase font-bold tracking-widest text-[#8D6E63] dark:text-gray-400 mb-1">Choco</span>
                     <span className="font-bold text-[#3E2723] dark:text-white text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}</span>
@@ -448,18 +449,18 @@ export function Account() {
                </div>
 
                {/* Trang bị danh hiệu */}
-               <div className="w-full mt-4 bg-[#7B726B] dark:bg-[#726458] p-4 rounded-xl border border-[#D7CCC8]/30 dark:border-[#3C2E27] text-left animate-fade-in">
+               <div className="w-full mt-4 bg-[#F5E6D3] dark:bg-[#34221A] p-4 rounded-xl border border-[#D7CCC8]/30 dark:border-[#3C2E27] text-left animate-fade-in">
                   <div className="flex justify-between items-center mb-1.5">
-                     <span className="text-[11px] font-extrabold uppercase tracking-widest text-white/90">Danh hiệu của tôi</span>
+                     <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037] dark:text-white/90">Danh hiệu của tôi</span>
                   </div>
                   {unlockedAchievements.length === 0 && (!customTitles || customTitles.length === 0) ? (
-                     <p className="text-xs text-white/60 italic">Chưa sở hữu danh hiệu nào.</p>
+                     <p className="text-xs text-[#8D6E63] dark:text-white/60 italic">Chưa sở hữu danh hiệu nào.</p>
                   ) : (
                      <div className="space-y-2">
                         <select 
                            value={activeTitle || ''} 
                            onChange={(e) => setActiveTitle(e.target.value || null)}
-                           className="w-full text-xs font-bold border border-[#3C2E27] rounded-lg p-2 bg-[#1C1310] text-[#ECE5DC] focus:outline-none focus:ring-1 focus:ring-[#8D6E63]"
+                           className="w-full text-xs font-bold border border-[#D7CCC8] dark:border-[#3C2E27] rounded-lg p-2 bg-white dark:bg-[#1C1310] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:ring-1 focus:ring-[#8D6E63]"
                         >
                            <option value="">-- Không trang bị --</option>
                            {ACHIEVEMENTS_LIST.filter(a => unlockedAchievements.includes(a.id)).map(a => (
@@ -469,7 +470,7 @@ export function Account() {
                               <option key={t.id || idx} value={t.name}>{t.name}</option>
                            ))}
                         </select>
-                        <div className="text-[10px] text-white/80 font-medium leading-tight">
+                        <div className="text-[10px] text-[#5D4037] dark:text-white/80 font-medium leading-tight">
                            Chọn danh hiệu để hiển thị cùng tên tài khoản và đổi màu tên của bạn ở mọi nơi!
                         </div>
                      </div>
@@ -477,14 +478,14 @@ export function Account() {
                </div>
 
                {/* Danh sách thành tựu đã nhận */}
-               <div className="w-full mt-3 bg-[#7B726B] dark:bg-[#726458] p-4 rounded-xl border border-[#D7CCC8]/30 dark:border-[#3C2E27] text-left">
-                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-white/90 block mb-2">Thành tựu đã nhận ({unlockedAchievements.length})</span>
+               <div className="w-full mt-3 bg-[#F5E6D3] dark:bg-[#34221A] p-4 rounded-xl border border-[#D7CCC8]/30 dark:border-[#3C2E27] text-left">
+                  <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037] dark:text-white/90 block mb-2">Thành tựu đã nhận ({unlockedAchievements.length})</span>
                   {unlockedAchievements.length === 0 ? (
-                     <p className="text-xs text-white/60 italic">Chưa đạt thành tựu nào.</p>
+                     <p className="text-xs text-[#8D6E63] dark:text-white/60 italic">Chưa đạt thành tựu nào.</p>
                   ) : (
                      <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto pr-1">
                         {ACHIEVEMENTS_LIST.filter(a => unlockedAchievements.includes(a.id)).map(a => (
-                           <span key={a.id} className="text-[10px] px-2 py-0.5 bg-black/20 text-white/90 font-bold rounded-md uppercase tracking-wide border border-black/10">
+                           <span key={a.id} className="text-[10px] px-2 py-0.5 bg-white dark:bg-black/20 text-[#3E2723] dark:text-white/90 font-bold rounded-md uppercase tracking-wide border border-[#D7CCC8] dark:border-black/10">
                               🏆 {a.name}
                            </span>
                         ))}
