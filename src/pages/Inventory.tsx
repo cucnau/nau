@@ -34,51 +34,51 @@ export function Inventory() {
           </div>
        </div>
 
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white border border-[#D7CCC8] rounded-2xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden group">
-             <Lock className="w-12 h-12 text-[#D4AF37] mb-4" />
-             <h3 className="text-lg font-bold mb-2 uppercase text-[#3E2723]">Vé Pass Truyện</h3>
-             <p className="text-gray-500 text-sm mb-6 italic">Dùng để mở khoá chương truyện bị set password.</p>
-             <div className="mt-auto bg-[#FDF6EC] px-6 py-2 border border-[#8D6E63] rounded-full">
-                <span className="font-bold text-[#3E2723]">Sở hữu: {ownedPassTickets || 0}</span>
+       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#D4AF37] transition-colors">
+             <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-[#D4AF37] mb-2 sm:mb-4 group-hover:-translate-y-1 transition-transform" />
+             <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Pass Truyện</h3>
+             <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Dùng để mở khoá chương truyện bị set password.</p>
+             <div className="mt-auto bg-[#FDF6EC] p-2 sm:px-4 sm:py-2.5 border border-[#8D6E63] rounded-xl text-[10px] sm:text-xs font-bold text-[#3E2723] uppercase tracking-widest w-full">
+                Sở hữu: {ownedPassTickets || 0}
              </div>
           </div>
 
-          <div className="bg-white border border-[#D7CCC8] rounded-2xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden group">
-             <Zap className="w-12 h-12 text-[#D4AF37] mb-4" />
-             <h3 className="text-lg font-bold mb-2 uppercase text-[#3E2723]">Vé Ưu Tiên</h3>
-             <p className="text-gray-500 text-sm mb-6 italic">Đọc sớm nhất các chương truyện vừa đăng.</p>
-             <div className="mt-auto bg-[#FDF6EC] px-6 py-2 border border-[#8D6E63] rounded-full">
-                <span className="font-bold text-[#3E2723]">Sở hữu: {ownedPriorityTickets || 0}</span>
+          <div className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#D4AF37] transition-colors">
+             <Zap className="w-8 h-8 sm:w-10 sm:h-10 text-[#D4AF37] mb-2 sm:mb-4 group-hover:scale-110 transition-transform" />
+             <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Ưu Tiên</h3>
+             <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Đọc sớm nhất các chương truyện vừa đăng.</p>
+             <div className="mt-auto bg-[#FDF6EC] p-2 sm:px-4 sm:py-2.5 border border-[#8D6E63] rounded-xl text-[10px] sm:text-xs font-bold text-[#3E2723] uppercase tracking-widest w-full">
+                Sở hữu: {ownedPriorityTickets || 0}
              </div>
           </div>
 
-          <div className="bg-white border border-[#D7CCC8] rounded-2xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden group">
-             <CalendarCheck className="w-12 h-12 text-[#8D6E63] mb-4" />
-             <h3 className="text-lg font-bold mb-2 uppercase text-[#3E2723]">Vé Giữ Chuỗi</h3>
-             <p className="text-gray-500 text-sm mb-6 italic">Tự động tiêu hao để bảo vệ chuỗi nếu lỡ quên điểm danh.</p>
-             <div className="flex flex-col gap-3 w-full mt-auto">
-                <div className="bg-[#FDF6EC] px-6 py-2 border border-[#8D6E63] rounded-full text-xs font-bold text-[#3E2723] self-center">
+          <div className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
+             <CalendarCheck className="w-8 h-8 sm:w-10 sm:h-10 text-[#8D6E63] mb-2 sm:mb-4 group-hover:-translate-y-1 transition-transform" />
+             <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Giữ Chuỗi</h3>
+             <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Tự động tiêu hao để bảo vệ chuỗi nếu lỡ quên điểm danh.</p>
+             <div className="flex flex-col gap-2 w-full mt-auto">
+                <div className="bg-[#FDF6EC] p-2 sm:px-4 sm:py-2.5 border border-[#8D6E63] rounded-xl text-[10px] sm:text-xs font-bold text-[#3E2723] uppercase tracking-widest w-full">
                    Sở hữu: {useStore().ownedStreakTickets || 0}
                 </div>
-                <div className="w-full bg-gray-100 text-gray-500 px-6 py-2.5 rounded-full font-black uppercase text-sm tracking-wide shadow-md shrink-0 self-center text-center">Tự động sử dụng</div>
+                <div className="w-full bg-gray-100 text-gray-500 p-2 sm:py-2.5 rounded-xl font-black uppercase text-[10px] sm:text-xs tracking-wide shadow-sm text-center">Tự động sử dụng</div>
              </div>
           </div>
 
           {/* Hộp Quà Sticker Bí Ẩn */}
-          <div className="bg-white border-2 border-amber-200 hover:border-amber-400 transition-colors rounded-2xl p-6 flex flex-col items-center text-center shadow-sm relative overflow-hidden group">
-             <Gift className="w-12 h-12 text-amber-500 mb-4 animate-bounce" />
-             <h3 className="text-lg font-bold mb-2 uppercase text-[#3E2723]">Hộp Quà Sticker Bí Ẩn</h3>
-             <p className="text-gray-500 text-sm mb-6 italic">Mở ra nhận ngay 1 Sticker ngẫu nhiên trong cửa hàng mà bạn chưa sở hữu.</p>
-             <div className="flex flex-col gap-3 w-full mt-auto">
-                <div className="bg-[#FAF0E6] px-6 py-2 border border-[#8D6E63] rounded-full text-xs font-bold text-[#3E2723] self-center">
+          <div className="bg-white border-2 border-amber-200 hover:border-amber-400 transition-colors rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group">
+             <Gift className="w-8 h-8 sm:w-10 sm:h-10 text-amber-500 mb-2 sm:mb-4 animate-bounce" />
+             <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Hộp Quà Sticker Bí Ẩn</h3>
+             <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Mở ra nhận ngay 1 Sticker ngẫu nhiên trong cửa hàng mà bạn chưa sở hữu.</p>
+             <div className="flex flex-col gap-2 w-full mt-auto">
+                <div className="bg-[#FAF0E6] p-2 sm:px-4 sm:py-2.5 border border-[#8D6E63] rounded-xl text-[10px] sm:text-xs font-bold text-[#3E2723] uppercase tracking-widest w-full">
                    Sở hữu: {ownedMysteryBoxes || 0}
                 </div>
                 <button 
                    type="button"
                    onClick={handleUseBox}
                    disabled={usingBox || (ownedMysteryBoxes || 0) <= 0}
-                   className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 disabled:from-gray-300 disabled:to-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-full font-black text-sm uppercase tracking-wide shadow-md transition-all shrink-0 cursor-pointer"
+                   className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 disabled:from-gray-300 disabled:to-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] sm:text-xs shadow-md transition-all cursor-pointer"
                 >
                    {usingBox ? "Đang mở..." : "Sử dụng"}
                 </button>
