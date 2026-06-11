@@ -9,3 +9,145 @@
 body {
   font-family: var(--font-sans);
 }
+
+/* Dark theme overrides - beautiful cocoa charcoal palette */
+.dark {
+  background-color: #161311 !important;
+  color: #ECE5DC !important;
+}
+
+.dark body {
+  background-color: #161311 !important;
+  color: #ECE5DC !important;
+}
+
+.dark .bg-\[\#FDF6EC\] {
+  background-color: #161311 !important;
+}
+
+.dark .text-\[\#3E2723\] {
+  color: #ECE5DC !important;
+}
+
+.dark .bg-\[\#3E2723\] {
+  background-color: #261E1A !important;
+}
+
+.dark .border-\[\#D7CCC8\] {
+  border-color: #3C2E27 !important;
+}
+
+.dark .border-\[\#D7CCC8\]\/60 {
+  border-color: rgba(60, 46, 39, 0.6) !important;
+}
+
+.dark .border-\[\#D7CCC8\]\/80 {
+  border-color: rgba(60, 46, 39, 0.8) !important;
+}
+
+.dark .border-\[\#8D6E63\] {
+  border-color: #A1887F !important;
+}
+
+.dark .bg-\[\#F5E6D3\] {
+  background-color: #2D221D !important;
+}
+
+.dark .bg-\[\#F5E6D3\]\/30 {
+  background-color: rgba(45, 34, 29, 0.3) !important;
+}
+
+.dark .bg-\[\#F5E6D3\]\/40 {
+  background-color: rgba(45, 34, 29, 0.4) !important;
+}
+
+.dark .bg-\[\#FAF0E6\] {
+  background-color: #2C221D !important;
+}
+
+.dark .bg-\[\#FDF6EC\]\/20 {
+  background-color: rgba(38, 30, 26, 0.5) !important;
+}
+
+.dark .bg-\[\#FDF6EC\]\/60 {
+  background-color: rgba(22, 19, 17, 0.8) !important;
+}
+
+.dark .bg-\[\#FFFDE7\] {
+  background-color: #2A2718 !important;
+}
+
+.dark .bg-\[\#FFF9C4\] {
+  background-color: #2C2A1A !important;
+}
+
+.dark .bg-\[\#FDF6EC\]\/10 {
+  background-color: rgba(22, 19, 17, 0.4) !important;
+}
+
+.dark .bg-white {
+  background-color: #211B18 !important;
+  color: #ECE5DC !important;
+}
+
+.dark .hover\:bg-\[\#FDF6EC\]:hover {
+  background-color: #2C221D !important;
+}
+
+.dark .hover\:bg-\[\#F5E6D3\]:hover {
+  background-color: #3C2E27 !important;
+}
+
+.dark .text-\[\#8D6E63\] {
+  color: #D7CCC8 !important;
+}
+
+.dark .hover\:text-\[\#8D6E63\]:hover {
+  color: #ECE5DC !important;
+}
+
+.dark .text-\[\#5D4037\] {
+  color: #D7CCC8 !important;
+}
+
+.dark .bg-\[\#5D4037\] {
+  background-color: #3C2E27 !important;
+}
+
+.dark .text-[#3E2723] {
+  color: #ECE5DC !important;
+}
+
+.dark input, .dark textarea, .dark select {
+  background-color: #2B221E !important;
+  color: #ECE5DC !important;
+  border-color: #3C2E27 !important;
+}
+
+.dark .text-gray-500, .dark .text-gray-600 {
+  color: #BCAAA4 !important;
+}
+
+.dark .text-gray-400 {
+  color: #8D6E63 !important;
+}
+
+.dark .bg-gray-50, .dark .bg-gray-100 {
+  background-color: #2A221E !important;
+}
+
+.dark .hover\:bg-gray-50:hover {
+  background-color: #332924 !important;
+}
+
+.dark .divide-y > :not([hidden]) ~ :not([hidden]) {
+  border-color: #3C2E27 !important;
+}
+
+.dark .shadow-sm {
+  shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .shadow-md {
+  shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
