@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { onAuthStateChanged, getRedirectResult } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, collection } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, collection, updateDoc, deleteField } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 import { auth, db } from '../lib/firebase';
 import { useStore } from '../store';
@@ -108,6 +108,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 await setDoc(userRef, { choco: 9999999, goldenChoco: 9999999 }, { merge: true });
               } catch (e) {
                 console.error('Error updating admin doc', e);
+              }
+            }
+
+            // Tự động kiểm tra và dọn dẹp các trường rác/obsolete siêu lớn (như ownedFrames, equippedSticker cũ)
+            // để giải phóng dung lượng document Firestore (giới hạn 1MB) giúp tài khoản hoạt động mượt mà hơn.
+            const fieldsToDelete: any = {};
+            if ('ownedFrames' in data) fieldsToDelete.ownedFrames = deleteField();
+            if ('frameUrl' in data) fieldsToDelete.frameUrl = deleteField();
+            if ('equippedSticker' in data) fieldsToDelete.equippedSticker = deleteField();
+            if ('stickerPosition' in data) fieldsToDelete.stickerPosition = deleteField();
+            
+            if (Object.keys(fieldsToDelete).length > 0) {
+              console.log('Phát hiện trường obsolete lớn, tiến hành dọn dẹp:', Object.keys(fieldsToDelete));
+              try {
+                await updateDoc(userRef, fieldsToDelete);
+              } catch (err) {
+                console.error('Lỗi khi dọn dẹp trường obsolete:', err);
               }
             }
           }
