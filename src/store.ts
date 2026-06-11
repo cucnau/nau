@@ -7,6 +7,51 @@ import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit } fro
 import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement } from './types/achievements';
 import { logTransaction } from './lib/transactions';
 
+export function compressBase64Image(dataUrl: string, maxWidth = 80, maxHeight = 80, quality = 0.5): Promise<string> {
+   return new Promise((resolve) => {
+      if (!dataUrl || !dataUrl.startsWith('data:image/')) {
+         resolve(dataUrl);
+         return;
+      }
+      // If already small (<20KB), no need to compress
+      if (dataUrl.length < 20000) {
+         resolve(dataUrl);
+         return;
+      }
+      const img = new Image();
+      img.onload = () => {
+         try {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            if (width > height) {
+               if (width > maxWidth) {
+                  height *= maxWidth / width;
+                  width = maxWidth;
+               }
+            } else {
+               if (height > maxHeight) {
+                  width *= maxHeight / height;
+                  height = maxHeight;
+               }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+         } catch (e) {
+            console.error("Lỗi nén ảnh:", e);
+            resolve("");
+         }
+      };
+      img.onerror = () => {
+         resolve("");
+      };
+      img.src = dataUrl;
+   });
+}
+
 interface Mission {
   id: string;
   type: 'daily' | 'weekly' | 'permanent';
@@ -483,6 +528,23 @@ export const useStore = create<UserState>()(
                const docUpdates = { ...updates };
                delete docUpdates.$chocoDiff;
                delete docUpdates.$gchocoDiff;
+
+               // Tự động kiểm tra và phục hồi: nếu avatarUrl hiện tại quá lớn (>20KB Base64),
+               // ta sẽ đè lên bằng một phiên bản nén siêu nhỏ để cứu document khỏi giới hạn 1MB của Firestore.
+               const currentAvatarUrl = state.avatarUrl;
+               if (currentAvatarUrl && currentAvatarUrl.startsWith('data:image/') && currentAvatarUrl.length > 20000) {
+                  const compressed = await compressBase64Image(currentAvatarUrl);
+                  docUpdates.avatarUrl = compressed;
+                  set({ avatarUrl: compressed });
+               }
+
+               // Nếu bản thân payload/updates chứa avatarUrl mới siêu lớn, nén ngay lập tức trước khi lưu
+               if (docUpdates.avatarUrl && docUpdates.avatarUrl.startsWith('data:image/') && docUpdates.avatarUrl.length > 20000) {
+                  const compressed = await compressBase64Image(docUpdates.avatarUrl);
+                  docUpdates.avatarUrl = compressed;
+                  set({ avatarUrl: compressed });
+               }
+
                await updateDoc(doc(db, 'users', uid), docUpdates);
             } catch (err) {
                console.error('Lỗi khi update user doc:', err);
