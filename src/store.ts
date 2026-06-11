@@ -454,22 +454,34 @@ export const useStore = create<UserState>()(
 
             // Log transactions if amounts changed
             if (transactionReason) {
-               if (updates.choco !== undefined) {
-                  const diff = updates.choco - prevChoco;
-                  if (diff !== 0) {
-                     logTransaction(uid, Math.abs(diff), 'choco', diff > 0 ? 'earn' : 'spend', transactionReason);
-                  }
+               let cDiff = 0;
+               let gDiff = 0;
+               
+               if (updates.$chocoDiff !== undefined) {
+                  cDiff = updates.$chocoDiff;
+               } else if (updates.choco !== undefined) {
+                  cDiff = updates.choco - prevChoco;
                }
-               if (updates.goldenChoco !== undefined) {
-                  const diff = updates.goldenChoco - prevGChoco;
-                  if (diff !== 0) {
-                     logTransaction(uid, Math.abs(diff), 'gchoco', diff > 0 ? 'earn' : 'spend', transactionReason);
-                  }
+               
+               if (updates.$gchocoDiff !== undefined) {
+                  gDiff = updates.$gchocoDiff;
+               } else if (updates.goldenChoco !== undefined) {
+                  gDiff = updates.goldenChoco - prevGChoco;
+               }
+
+               if (cDiff !== 0) {
+                  logTransaction(uid, Math.abs(cDiff), 'choco', cDiff > 0 ? 'earn' : 'spend', transactionReason);
+               }
+               if (gDiff !== 0) {
+                  logTransaction(uid, Math.abs(gDiff), 'gchoco', gDiff > 0 ? 'earn' : 'spend', transactionReason);
                }
             }
 
             try {
-               await updateDoc(doc(db, 'users', uid), updates);
+               const docUpdates = { ...updates };
+               delete docUpdates.$chocoDiff;
+               delete docUpdates.$gchocoDiff;
+               await updateDoc(doc(db, 'users', uid), docUpdates);
             } catch (err) {
                console.error('Lỗi khi update user doc:', err);
                if (checkIfQuotaError(err)) {
@@ -623,6 +635,7 @@ export const useStore = create<UserState>()(
             lastCheckInDate: todayStr,
             checkInStreak: newStreak,
             choco: newChoco,
+            $chocoDiff: dailyChoco,
             totalEarnedChoco: newTotalEarnedChoco,
             totalCheckIns: newTotalCheckins,
             ...updateStreakRecoveryStats
@@ -665,7 +678,7 @@ export const useStore = create<UserState>()(
               const newChoco = state.choco - amount;
               const newTotalSpent = (state.totalSpentChoco || 0) + amount;
               set({ choco: newChoco, totalSpentChoco: newTotalSpent });
-              get().updateUserDoc({ choco: newChoco, totalSpentChoco: newTotalSpent }, reason);
+              get().updateUserDoc({ choco: newChoco, $chocoDiff: -amount, totalSpentChoco: newTotalSpent }, reason);
 
               setTimeout(() => {
                  get()._triggerCountAchievementsCheck();
@@ -679,7 +692,7 @@ export const useStore = create<UserState>()(
           const state = get();
           if (state.goldenChoco >= amount) {
               set({ goldenChoco: state.goldenChoco - amount });
-              get().updateUserDoc({ goldenChoco: state.goldenChoco - amount }, reason);
+              get().updateUserDoc({ goldenChoco: state.goldenChoco - amount, $gchocoDiff: -amount }, reason);
               return true;
           }
           return false;
@@ -811,6 +824,7 @@ export const useStore = create<UserState>()(
 
          get().updateUserDoc({ 
            choco: newChoco, 
+           $chocoDiff: rewardChoco,
            totalEarnedChoco: newTotalEarned,
            totalCommentsCount: newCommentsCount,
            activePoints: finalActivePoints,
@@ -849,7 +863,9 @@ export const useStore = create<UserState>()(
               
               const updates: any = {
                  choco: newChoco,
+                 $chocoDiff: m.chocoReward,
                  goldenChoco: newGolden,
+                 $gchocoDiff: m.goldenReward,
                  totalEarnedChoco: newTotalEarnedC,
                  totalEarnedGChoco: newTotalEarnedG
               };
@@ -995,6 +1011,7 @@ export const useStore = create<UserState>()(
 
           get().updateUserDoc({ 
             choco: newChoco,
+            $chocoDiff: -amount,
             activePoints: finalActivePoints,
           }, "Tặng Choco cho truyện");
 
@@ -1059,7 +1076,9 @@ export const useStore = create<UserState>()(
          get().updateUserDoc({
             claimedAchievements: newClaimed,
             choco: newChoco,
+            $chocoDiff: ach.chocoReward,
             goldenChoco: newGolden,
+            $gchocoDiff: ach.goldenReward,
             totalEarnedChoco: newTotalEarnedChoco,
             totalEarnedGChoco: newTotalEarnedGChoco
          }, `Nhận thưởng thành tựu: ${ach.name}`);
