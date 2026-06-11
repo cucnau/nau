@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store';
 import { ShoppingBag, Key, Zap, Smile, Lock, Shuffle, CalendarCheck, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../components/Layout';
@@ -11,12 +11,23 @@ export function Store() {
   const [activeTab, setActiveTab] = useState<'items' | 'stickers'>('items');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Scroll window and root elements
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    const mainEl = document.querySelector('main') || document.querySelector('.overflow-y-auto') || document.getElementById('main-container');
-    if (mainEl) {
-      mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+    document.body.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Traverse upwards from current container to scroll any scrollable elements (e.g. Modals)
+    if (containerRef.current) {
+      let parent = containerRef.current.parentElement;
+      while (parent) {
+         if (parent.scrollHeight > parent.clientHeight) {
+            parent.scrollTo({ top: 0, behavior: 'smooth' });
+         }
+         parent = parent.parentElement;
+      }
     }
   }, [currentPage]);
 
@@ -126,7 +137,7 @@ export function Store() {
   );
 
   return (
-    <div className="p-4 sm:p-6 lg:p-10 max-w-5xl mx-auto w-full flex flex-col gap-8">
+    <div ref={containerRef} className="p-4 sm:p-6 lg:p-10 max-w-5xl mx-auto w-full flex flex-col gap-8">
        <div className="bg-[#3E2723] text-[#FDF6EC] p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md border-2 border-[#8D6E63]">
           <div>
              <h1 className="text-xl sm:text-2xl font-bold mb-1 flex items-center gap-2 uppercase tracking-tighter">
