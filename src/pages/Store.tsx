@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useStore } from '../store';
-import { ShoppingBag, Key, Zap, Smile, Lock, Shuffle, CalendarCheck } from 'lucide-react';
+import { ShoppingBag, Key, Zap, Smile, Lock, Shuffle, CalendarCheck, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../components/Layout';
 import { db } from '../lib/firebase';
 import { collection, query, getDocs, orderBy } from 'firebase/firestore';
@@ -9,6 +9,8 @@ export function Store() {
   const { choco, goldenChoco, spendChoco, spendGoldenChoco, addGoldenChoco, isLoggedIn, email, buyTicket, updateUserDoc, ownedStickers, addOwnedSticker, equipSticker, firebaseUser } = useStore();
   const [storeStickers, setStoreStickers] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'items' | 'stickers'>('items');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchStickers = async () => {
@@ -104,6 +106,17 @@ export function Store() {
      });
   };
 
+  const filteredStickers = storeStickers.filter(sticker => 
+     (sticker.name || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const ITEMS_PER_PAGE = 12;
+  const totalPages = Math.ceil(filteredStickers.length / ITEMS_PER_PAGE);
+  const displayedStickers = filteredStickers.slice(
+     (currentPage - 1) * ITEMS_PER_PAGE,
+     currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <div className="p-4 sm:p-6 lg:p-10 max-w-5xl mx-auto w-full flex flex-col gap-8">
        <div className="bg-[#3E2723] text-[#FDF6EC] p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md border-2 border-[#8D6E63]">
@@ -184,34 +197,80 @@ export function Store() {
        )}
 
        {activeTab === 'stickers' && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-             {storeStickers.length === 0 && (
-                <div className="col-span-full text-center text-gray-500 py-8 italic border border-dashed border-[#D7CCC8] rounded-2xl">
-                   Cửa hàng hiện chưa có sticker nào.
-                </div>
-             )}
-             {storeStickers.map((sticker, i) => (
-                <div key={sticker.id} className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
-                   <div className="w-12 h-12 sm:w-14 sm:h-14 relative mb-2 sm:mb-4 p-1 sm:p-2 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center shrink-0">
-                      {sticker.url ? (
-                        <img src={sticker.url} alt="Sticker" className="w-10 h-10 sm:w-12 sm:h-12 object-contain pointer-events-none" />
+          <div className="flex flex-col gap-6 w-full">
+             <div className="relative w-full max-w-md self-center sm:self-start">
+                <input 
+                   type="text" 
+                   placeholder="Tìm kiếm sticker theo tên..." 
+                   value={searchQuery}
+                   onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                   className="w-full pl-10 pr-4 py-2 border-2 border-[#D7CCC8] dark:border-[#3C2E27] rounded-xl bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-[#8D6E63] transition-colors font-medium"
+                />
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+             </div>
+
+             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+                {displayedStickers.length === 0 && (
+                   <div className="col-span-full text-center text-gray-500 py-8 italic border border-dashed border-[#D7CCC8] rounded-2xl bg-white/50 dark:bg-black/20">
+                      {searchQuery ? "Không tìm thấy sticker nào phù hợp từ khóa tìm kiếm." : "Cửa hàng hiện chưa có sticker nào."}
+                   </div>
+                )}
+                {displayedStickers.map((sticker) => (
+                   <div key={sticker.id} className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 relative mb-2 sm:mb-4 p-1 sm:p-2 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center shrink-0">
+                         {sticker.url ? (
+                           <img src={sticker.url} alt="Sticker" className="w-10 h-10 sm:w-12 sm:h-12 object-contain pointer-events-none" />
+                         ) : (
+                           <Smile className="w-6 h-6 sm:w-8 sm:h-8 text-[#A1887F]" />
+                         )}
+                      </div>
+                      <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">{sticker.name}</h3>
+                      <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">{sticker.description}</p>
+                      {ownedStickers?.includes(sticker.url) ? (
+                         <button disabled className="p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest bg-gray-300 text-gray-500 cursor-not-allowed">
+                            Đã có
+                         </button>
                       ) : (
-                        <Smile className="w-6 h-6 sm:w-8 sm:h-8 text-[#A1887F]" />
+                         <button onClick={() => buySticker(sticker)} className={cn("p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md", sticker.type === 'golden' ? "bg-[#D4AF37] text-white hover:bg-[#B5952F]" : "bg-[#3E2723] text-[#FDF6EC] hover:bg-[#2D1B19]")}>
+                            <span>Mua</span> <span className={cn("px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap", sticker.type === 'golden' ? "bg-black/10" : "bg-[#FDF6EC]/20")}>{sticker.price} {sticker.type === 'golden' ? 'GChoco' : 'Choco'}</span>
+                         </button>
                       )}
                    </div>
-                   <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">{sticker.name}</h3>
-                   <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">{sticker.description}</p>
-                   {ownedStickers?.includes(sticker.url) ? (
-                      <button disabled className="p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest bg-gray-300 text-gray-500 cursor-not-allowed">
-                         Đã có
+                ))}
+             </div>
+
+             {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-4 self-center select-none">
+                   <button
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      className="p-2 rounded-xl border border-[#D7CCC8] dark:border-[#3C2E27] bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-[#2C221D] transition-colors"
+                   >
+                      <ChevronLeft className="w-4 h-4" />
+                   </button>
+                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((pg) => (
+                      <button
+                         key={pg}
+                         onClick={() => setCurrentPage(pg)}
+                         className={cn(
+                            "w-8 h-8 rounded-xl font-bold text-xs transition-colors border",
+                            currentPage === pg
+                               ? "bg-[#3E2723] dark:bg-[#C29D70] border-[#3E2723] dark:border-[#C29D70] text-[#FDF6EC] dark:text-[#181311]"
+                               : "bg-white dark:bg-[#1A1412] border-[#D7CCC8] dark:border-[#3C2E27] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-gray-50 dark:hover:bg-[#2C221D]"
+                         )}
+                      >
+                         {pg}
                       </button>
-                   ) : (
-                      <button onClick={() => buySticker(sticker)} className={cn("p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md", sticker.type === 'golden' ? "bg-[#D4AF37] text-white hover:bg-[#B5952F]" : "bg-[#3E2723] text-[#FDF6EC] hover:bg-[#2D1B19]")}>
-                         <span>Mua</span> <span className={cn("px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap", sticker.type === 'golden' ? "bg-black/10" : "bg-[#FDF6EC]/20")}>{sticker.price} {sticker.type === 'golden' ? 'GChoco' : 'Choco'}</span>
-                      </button>
-                   )}
+                   ))}
+                   <button
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      className="p-2 rounded-xl border border-[#D7CCC8] dark:border-[#3C2E27] bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-[#2C221D] transition-colors"
+                   >
+                      <ChevronRight className="w-4 h-4" />
+                   </button>
                 </div>
-             ))}
+             )}
           </div>
        )}
     </div>
