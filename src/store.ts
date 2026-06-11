@@ -647,30 +647,28 @@ export const useStore = create<UserState>()(
       },
       
       addChoco: (amount, reason = "Nhận Choco") => {
-          set((state) => {
-              const newChoco = state.choco + amount;
-              const newTotalEarned = (state.totalEarnedChoco || 0) + amount;
-              get().updateUserDoc({ choco: newChoco, totalEarnedChoco: newTotalEarned }, reason);
-              
-              setTimeout(() => {
-                 get()._triggerCountAchievementsCheck();
-              }, 50);
-
-              return { choco: newChoco, totalEarnedChoco: newTotalEarned };
-          });
+          const state = get();
+          const newChoco = state.choco + amount;
+          const newTotalEarned = (state.totalEarnedChoco || 0) + amount;
+          
+          set({ choco: newChoco, totalEarnedChoco: newTotalEarned });
+          get().updateUserDoc({ choco: newChoco, $chocoDiff: amount, totalEarnedChoco: newTotalEarned }, reason);
+          
+          setTimeout(() => {
+             get()._triggerCountAchievementsCheck();
+          }, 50);
       },
       addGoldenChoco: (amount, reason = "Nhận GChoco") => {
-          set((state) => {
-              const newGolden = state.goldenChoco + amount;
-              const newTotalEarnedG = (state.totalEarnedGChoco || 0) + amount;
-              get().updateUserDoc({ goldenChoco: newGolden, totalEarnedGChoco: newTotalEarnedG }, reason);
+          const state = get();
+          const newGolden = state.goldenChoco + amount;
+          const newTotalEarnedG = (state.totalEarnedGChoco || 0) + amount;
+          
+          set({ goldenChoco: newGolden, totalEarnedGChoco: newTotalEarnedG });
+          get().updateUserDoc({ goldenChoco: newGolden, $gchocoDiff: amount, totalEarnedGChoco: newTotalEarnedG }, reason);
 
-              setTimeout(() => {
-                 get()._triggerCountAchievementsCheck();
-              }, 50);
-
-              return { goldenChoco: newGolden, totalEarnedGChoco: newTotalEarnedG };
-          });
+          setTimeout(() => {
+             get()._triggerCountAchievementsCheck();
+          }, 50);
       },
       spendChoco: (amount, reason = "Dùng Choco") => {
           const state = get();
