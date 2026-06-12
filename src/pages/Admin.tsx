@@ -968,8 +968,8 @@ export function Admin() {
               let needsUpdate = false;
               const updateData: any = {};
 
-              if (userData.equippedSticker === stickerUrl) {
-                updateData.equippedSticker = null;
+              if (userData.equippedStickerComment === stickerUrl) {
+                updateData.equippedStickerComment = null;
                 needsUpdate = true;
               }
 
@@ -985,14 +985,14 @@ export function Admin() {
             await Promise.all(batchPromises);
 
             // Đồng thời cập nhật trạng thái trong bộ nhớ cục bộ (Zustand store) nếu người dùng hiện tại đang đeo sticker này
-            const { ownedStickers, equippedStickerAvatar, equippedStickerChat, equippedStickerPost, syncFromFirebase } = useStore.getState();
+            const { ownedStickers, equippedStickerComment, equippedStickerChat, equippedStickerPost, syncFromFirebase } = useStore.getState();
             const newOwned = (ownedStickers || []).filter((u: string) => u !== stickerUrl);
-            const newEquippedAvatar = equippedStickerAvatar === stickerUrl ? null : equippedStickerAvatar;
+            const newEquippedComment = equippedStickerComment === stickerUrl ? null : equippedStickerComment;
             const newEquippedChat = equippedStickerChat === stickerUrl ? null : equippedStickerChat;
             const newEquippedPost = equippedStickerPost === stickerUrl ? null : equippedStickerPost;
             syncFromFirebase({
               ownedStickers: newOwned,
-              equippedStickerAvatar: newEquippedAvatar,
+              equippedStickerComment: newEquippedComment,
               equippedStickerChat: newEquippedChat,
               equippedStickerPost: newEquippedPost,
             });
@@ -1247,7 +1247,7 @@ export function Admin() {
          <>
          {editingSticker ? (
            <form onSubmit={handleUpdateSticker} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-4 transition-colors duration-300 ${isDark ? 'bg-[#251A15] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8] text-[#3E2723]'}`}>
-             <h2 className={`text-xl font-bold ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Sửa Sticker Avatar</h2>
+             <h2 className={`text-xl font-bold ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Sửa Sticker</h2>
              <div className="flex gap-4">
                <div className="w-24 h-24 bg-gray-50 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2">
                  {editingSticker.url && <img src={editingSticker.url} className="w-16 h-16 object-contain" />}
@@ -1273,7 +1273,7 @@ export function Admin() {
            </form>
          ) : (
            <form onSubmit={handleCreateSticker} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-4 transition-colors duration-300 ${isDark ? 'bg-[#251A15] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8] text-[#3E2723]'}`}>
-             <h2 className={`text-xl font-bold transition-colors ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Thêm Sticker Avatar</h2>
+             <h2 className={`text-xl font-bold transition-colors ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Thêm Sticker</h2>
              <div className="flex gap-4">
                <div className="w-24 h-24 bg-gray-50 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2">
                  {stUrl ? <img src={stUrl} className="w-16 h-16 object-contain" /> : <div className="text-xs text-gray-500 text-center">Chưa có ảnh</div>}
