@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AppLayout } from './components/Layout';
 import { Home } from './pages/Home';
 import { StoryView } from './pages/StoryView';
@@ -8,6 +9,14 @@ import { Account } from './pages/Account';
 import { Admin } from './pages/Admin';
 import { Library } from './pages/Library';
 import { StoryList } from './pages/StoryList';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname]);
+  return null;
+}
 
 function Placeholder({ title }: { title: string }) {
   return (
@@ -21,6 +30,7 @@ function Placeholder({ title }: { title: string }) {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <Routes>
           <Route path="/" element={<AppLayout />}>
