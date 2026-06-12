@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store';
 import { collection, getDocs, doc, addDoc, updateDoc, deleteDoc, getDoc, query, where, orderBy, writeBatch, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Trash2, Plus, Edit, ShieldAlert, CheckCircle, Smile, BookOpen, Users, Save, MessageSquare, Award } from 'lucide-react';
+import { Trash2, Plus, Edit, ShieldAlert, CheckCircle, Smile, BookOpen, Users, Save, MessageSquare, Award, Sparkles, FileText, MessageCircle } from 'lucide-react';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 
 interface Book {
@@ -57,7 +57,8 @@ interface AdminComment {
 }
 
 export function Admin() {
-  const { email, firebaseUser } = useStore();
+  const { email, firebaseUser, theme } = useStore();
+  const isDark = theme === 'dark';
 
   const [activeTab, setActiveTab] = useState<'stories' | 'users' | 'comments' | 'messages' | 'stickers' | 'posts' | 'titles' | 'accessories'>('stories');
   
@@ -1149,78 +1150,144 @@ export function Admin() {
   }
 
   return (
-    <div className="flex-1 p-4 sm:p-6 lg:p-8 flex flex-col gap-8 max-w-4xl mx-auto w-full">
-      <h1 className="text-3xl font-bold text-[#3E2723] uppercase tracking-tighter">Bảng Điều Khiển Admin</h1>
+    <div className={`flex-1 p-4 sm:p-6 lg:p-8 flex flex-col gap-8 max-w-4xl mx-auto w-full transition-colors duration-300`}>
+      <h1 className={`text-3xl font-bold uppercase tracking-tighter transition-colors duration-300 ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Bảng Điều Khiển Admin</h1>
 
-      <div className="flex bg-[#FDF6EC] p-1 rounded-xl sticky top-4 z-10 border border-[#D7CCC8]/50 shadow-sm overflow-x-auto">
-         <button onClick={() => setActiveTab('stories')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'stories' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
-            <BookOpen className="w-4 h-4" /> Truyện
-         </button>
-         <button onClick={() => setActiveTab('users')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'users' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
-            <Users className="w-4 h-4" /> Thành viên
-         </button>
-         <button onClick={() => setActiveTab('comments')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'comments' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
-            <MessageSquare className="w-4 h-4" /> Bình luận
-         </button>
-         <button onClick={() => setActiveTab('messages')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'messages' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
-            <MessageSquare className="w-4 h-4" /> Choco Lounge
-         </button>
-         <button onClick={() => setActiveTab('stickers')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'stickers' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
-            <Smile className="w-4 h-4" /> Stickers
-         </button>
-         <button onClick={() => setActiveTab('posts')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'posts' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
-            <MessageSquare className="w-4 h-4" /> Bài đăng
-         </button>
-         <button onClick={() => setActiveTab('titles')} className={`flex-1 py-2 px-4 rounded-lg font-bold text-sm tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'titles' ? 'bg-[#8D6E63] text-white shadow' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}>
-            <Award className="w-4 h-4" /> Danh hiệu
-         </button>
+      <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 p-1.5 rounded-2xl sticky top-4 z-30 border shadow-md max-w-max mx-auto transition-all backdrop-blur-md ${isDark ? 'bg-[#251A15]/95 border-[#3E2D25] shadow-[#140D0B]/80' : 'bg-[#FDF6EC]/95 border-[#D7CCC8]/60'}`}>
+         {/* Nhóm 1: Nội dung & Tương tác */}
+         <div className="flex gap-1">
+            <button 
+               onClick={() => setActiveTab('stories')} 
+               title="Quản lý Truyện"
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'stories' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+            >
+               <BookOpen className="w-5 h-5" />
+            </button>
+            <button 
+               onClick={() => setActiveTab('posts')} 
+               title="Quản lý Bài đăng"
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'posts' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+            >
+               <FileText className="w-5 h-5" />
+            </button>
+            <button 
+               onClick={() => setActiveTab('comments')} 
+               title="Quản lý Bình luận"
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'comments' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+            >
+               <MessageSquare className="w-5 h-5" />
+            </button>
+            <button 
+               onClick={() => setActiveTab('messages')} 
+               title="Quản lý Choco Lounge"
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'messages' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+            >
+               <MessageCircle className="w-5 h-5" />
+            </button>
+         </div>
+
+         {/* Thanh dọc phân cách */}
+         <div className={`h-6 w-[1.5px] mx-0.5 transition-colors ${isDark ? 'bg-[#3E2D25]' : 'bg-[#D7CCC8]/60'}`} />
+
+         {/* Nhóm 2: Người dùng & Danh hiệu */}
+         <div className="flex gap-1">
+            <button 
+               onClick={() => setActiveTab('users')} 
+               title="Quản lý Thành viên"
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'users' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+            >
+               <Users className="w-5 h-5" />
+            </button>
+            <button 
+               onClick={() => setActiveTab('titles')} 
+               title="Quản lý Danh hiệu"
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'titles' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+            >
+               <Award className="w-5 h-5" />
+            </button>
+         </div>
+
+         {/* Thanh dọc phân cách */}
+         <div className={`h-6 w-[1.5px] mx-0.5 transition-colors ${isDark ? 'bg-[#3E2D25]' : 'bg-[#D7CCC8]/60'}`} />
+
+         {/* Nhóm 3: Vật phẩm Cửa hàng */}
+         <div className="flex gap-1">
+            <button 
+               onClick={() => setActiveTab('stickers')} 
+               title="Quản lý Stickers"
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'stickers' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+            >
+               <Smile className="w-5 h-5" />
+            </button>
+            <button 
+               onClick={() => setActiveTab('accessories')} 
+               title="Quản lý Phụ kiện"
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'accessories' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+            >
+               <Sparkles className="w-5 h-5" />
+            </button>
+         </div>
+      </div>
+
+      {/* Tiêu đề mục quản trị hiện tại */}
+      <div className="text-center -mt-2">
+         <span className={`text-xs uppercase font-extrabold tracking-widest px-4 py-1.5 rounded-full border shadow-sm inline-flex items-center gap-1.5 transition-all ${isDark ? 'text-[#ECE5DC] bg-[#251A15] border-[#3E2D25]' : 'text-[#8D6E63] bg-[#FDF6EC] border-[#D7CCC8]/40'}`}>
+            {activeTab === 'stories' && '📖 Quản lý Truyện'}
+            {activeTab === 'posts' && '📝 Quản lý Bài đăng'}
+            {activeTab === 'comments' && '💬 Quản lý Bình luận'}
+            {activeTab === 'messages' && '☕ Quản lý Choco Lounge'}
+            {activeTab === 'users' && '👥 Quản lý Thành viên'}
+            {activeTab === 'titles' && '🏆 Quản lý Danh hiệu'}
+            {activeTab === 'stickers' && '✨ Quản lý Stickers'}
+            {activeTab === 'accessories' && '👑 Quản lý Phụ kiện'}
+         </span>
       </div>
 
       {activeTab === 'stickers' && (
          <>
          {editingSticker ? (
-           <form onSubmit={handleUpdateSticker} className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-             <h2 className="text-xl font-bold text-[#3E2723]">Sửa Sticker Avatar</h2>
+           <form onSubmit={handleUpdateSticker} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-4 transition-colors duration-300 ${isDark ? 'bg-[#251A15] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8] text-[#3E2723]'}`}>
+             <h2 className={`text-xl font-bold ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Sửa Sticker Avatar</h2>
              <div className="flex gap-4">
                <div className="w-24 h-24 bg-gray-50 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2">
                  {editingSticker.url && <img src={editingSticker.url} className="w-16 h-16 object-contain" />}
                </div>
                <div className="flex-1 flex flex-col justify-end gap-2">
                   <input type="file" accept="image/png, image/webp, image/gif" onChange={e => handleStickerImageChange(e, true)} ref={editStickerFileInputRef} className="hidden" />
-                  <button type="button" onClick={() => editStickerFileInputRef.current?.click()} className="px-4 py-1.5 bg-[#FDF6EC] border border-[#8D6E63] text-sm font-bold w-max rounded-lg hover:bg-white transition-colors">Đổi ảnh sticker</button>
+                  <button type="button" onClick={() => editStickerFileInputRef.current?.click()} className={`px-4 py-1.5 border text-sm font-bold w-max rounded-lg transition-all ${isDark ? 'bg-[#1D1410] border-[#8D6E63] text-[#ECE5DC] hover:bg-[#251A15]' : 'bg-[#FDF6EC] border-[#8D6E63] text-[#8D6E63] hover:bg-white'}`}>Đổi ảnh sticker</button>
                </div>
              </div>
-             <input type="text" placeholder="Tên sticker" value={editingSticker.name} onChange={e => setEditingSticker({...editingSticker, name: e.target.value})} className="px-4 py-2 border rounded-lg" required />
-             <input type="text" placeholder="Mô tả" value={editingSticker.description} onChange={e => setEditingSticker({...editingSticker, description: e.target.value})} className="px-4 py-2 border rounded-lg" required />
+             <input type="text" placeholder="Tên sticker" value={editingSticker.name} onChange={e => setEditingSticker({...editingSticker, name: e.target.value})} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+             <input type="text" placeholder="Mô tả" value={editingSticker.description} onChange={e => setEditingSticker({...editingSticker, description: e.target.value})} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
              <div className="flex gap-4">
-                 <input type="number" placeholder="Giá" value={editingSticker.price} onChange={e => setEditingSticker({...editingSticker, price: e.target.value})} className="px-4 py-2 border rounded-lg flex-1" required />
-                 <select value={editingSticker.type} onChange={e => setEditingSticker({...editingSticker, type: e.target.value})} className="px-4 py-2 border rounded-lg w-32">
+                 <input type="number" placeholder="Giá" value={editingSticker.price} onChange={e => setEditingSticker({...editingSticker, price: e.target.value})} className={`px-4 py-2 border rounded-lg flex-1 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+                 <select value={editingSticker.type} onChange={e => setEditingSticker({...editingSticker, type: e.target.value})} className={`px-4 py-2 border rounded-lg w-32 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
                     <option value="choco">Choco</option>
                     <option value="golden">Golden Choco</option>
                  </select>
              </div>
              <div className="flex justify-end gap-2 mt-2">
-               <button type="button" onClick={() => setEditingSticker(null)} className="px-4 py-2 bg-gray-200 rounded font-bold hover:bg-gray-300">Hủy</button>
+               <button type="button" onClick={() => setEditingSticker(null)} className={`px-4 py-2 rounded font-bold transition-colors ${isDark ? 'bg-[#3E2D25] text-[#ECE5DC] hover:bg-[#523C32]' : 'bg-gray-200 hover:bg-gray-300'}`}>Hủy</button>
                <button type="submit" className="px-4 py-2 bg-[#8D6E63] text-white rounded font-bold hover:bg-[#5D4037]">Cập nhật</button>
              </div>
            </form>
          ) : (
-           <form onSubmit={handleCreateSticker} className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-             <h2 className="text-xl font-bold text-[#3E2723]">Thêm Sticker Avatar</h2>
+           <form onSubmit={handleCreateSticker} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-4 transition-colors duration-300 ${isDark ? 'bg-[#251A15] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8] text-[#3E2723]'}`}>
+             <h2 className={`text-xl font-bold transition-colors ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Thêm Sticker Avatar</h2>
              <div className="flex gap-4">
                <div className="w-24 h-24 bg-gray-50 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2">
                  {stUrl ? <img src={stUrl} className="w-16 h-16 object-contain" /> : <div className="text-xs text-gray-500 text-center">Chưa có ảnh</div>}
                </div>
                <div className="flex-1 flex flex-col justify-end gap-2">
                   <input type="file" accept="image/png, image/webp, image/gif" onChange={e => handleStickerImageChange(e, false)} ref={stickerFileInputRef} className="hidden" />
-                  <button type="button" onClick={() => stickerFileInputRef.current?.click()} className="px-4 py-1.5 bg-[#FDF6EC] border border-[#8D6E63] text-sm font-bold w-max rounded-lg hover:bg-white transition-colors">Chọn ảnh sticker (PNG/WebP/GIF trong suốt)</button>
+                  <button type="button" onClick={() => stickerFileInputRef.current?.click()} className={`px-4 py-1.5 border text-sm font-bold w-max rounded-lg transition-all ${isDark ? 'bg-[#1D1410] border-[#8D6E63] text-[#ECE5DC] hover:bg-[#251A15]' : 'bg-[#FDF6EC] border-[#8D6E63] text-[#8D6E63] hover:bg-white'}`}>Chọn ảnh sticker (PNG/WebP/GIF trong suốt)</button>
                </div>
              </div>
-             <input type="text" placeholder="Tên sticker" value={stName} onChange={e => setStName(e.target.value)} className="px-4 py-2 border rounded-lg" required />
-             <input type="text" placeholder="Mô tả" value={stDesc} onChange={e => setStDesc(e.target.value)} className="px-4 py-2 border rounded-lg" required />
+             <input type="text" placeholder="Tên sticker" value={stName} onChange={e => setStName(e.target.value)} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+             <input type="text" placeholder="Mô tả" value={stDesc} onChange={e => setStDesc(e.target.value)} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
              <div className="flex gap-4">
-                 <input type="number" placeholder="Giá" value={stPrice} onChange={e => setStPrice(Number(e.target.value))} className="px-4 py-2 border rounded-lg flex-1" required />
-                 <select value={stType} onChange={e => setStType(e.target.value as any)} className="px-4 py-2 border rounded-lg w-32">
+                 <input type="number" placeholder="Giá" value={stPrice} onChange={e => setStPrice(Number(e.target.value))} className={`px-4 py-2 border rounded-lg flex-1 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+                 <select value={stType} onChange={e => setStType(e.target.value as any)} className={`px-4 py-2 border rounded-lg w-32 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
                      <option value="choco">Choco</option>
                      <option value="golden">Golden Choco</option>
                  </select>
@@ -1230,25 +1297,25 @@ export function Admin() {
          )}
    
          <div className="space-y-4 pb-20">
-            <h2 className="text-xl font-bold text-[#3E2723]">Danh sách sticker ({stickers.length})</h2>
+            <h2 className={isDark ? "text-xl font-bold transition-colors text-[#ECE5DC]" : "text-xl font-bold transition-colors text-[#3E2723]"}>Danh sách sticker ({stickers.length})</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {stickers.map(s => (
-                 <div key={s.id} className="p-4 bg-white rounded-xl border border-[#D7CCC8] shadow-sm flex flex-col items-center text-center">
-                    <div className="w-16 h-16 relative mb-4 p-2 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0">
+                 <div key={s.id} className={`p-4 rounded-xl border shadow-sm flex flex-col items-center text-center transition-colors ${isDark ? 'bg-[#251A15] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
+                    <div className={`w-16 h-16 relative mb-4 p-2 rounded-xl border flex items-center justify-center shrink-0 transition-colors ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-gray-50'}`}>
                        {s.url ? (
                          <img src={s.url} alt="" className="w-12 h-12 object-contain pointer-events-none" />
                        ) : (
                          <div className="text-xs text-gray-400">Trống</div>
                        )}
                     </div>
-                    <h3 className="font-bold text-[#3E2723] leading-tight">{s.name}</h3>
-                    <p className="text-xs text-gray-500 mb-2 mt-1 line-clamp-2">{s.description}</p>
-                    <span className={`text-xs font-bold px-2 py-1 rounded ${s.type === 'golden' ? 'bg-yellow-100 text-yellow-800' : 'bg-[#D7CCC8]/30 text-[#5D4037]'}`}>
+                    <h3 className={`font-bold leading-tight transition-colors ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>{s.name}</h3>
+                    <p className={`text-xs mb-2 mt-1 line-clamp-2 transition-colors ${isDark ? 'text-[#A1887F]' : 'text-gray-500'}`}>{s.description}</p>
+                    <span className={`text-xs font-bold px-2 py-1 rounded transition-colors ${s.type === 'golden' ? 'bg-yellow-500/20 text-yellow-500' : isDark ? 'bg-[#3E2D25] text-[#ECE5DC]' : 'bg-[#D7CCC8]/30 text-[#5D4037]'}`}>
                         {s.price} {s.type === 'golden' ? 'GChoco' : 'Choco'}
                     </span>
                     <div className="flex gap-2 mt-4 w-full">
-                       <button onClick={() => setEditingSticker(s)} className="flex-1 py-1.5 text-xs bg-[#D7CCC8]/30 rounded font-bold hover:bg-[#D7CCC8]/60 transition-colors">Sửa</button>
-                       <button onClick={() => deleteSticker(s.id)} className="px-3 py-1.5 text-xs bg-red-100 text-red-600 rounded font-bold hover:bg-red-200 transition-colors flex items-center justify-center"><Trash2 className="w-3 h-3" /></button>
+                       <button onClick={() => setEditingSticker(s)} className={`flex-1 py-1.5 text-xs rounded font-bold transition-all ${isDark ? 'bg-[#3E2D25] text-[#ECE5DC] hover:bg-[#523C32]' : 'bg-[#D7CCC8]/30 text-[#5D4037] hover:bg-[#D7CCC8]/60'}`}>Sửa</button>
+                       <button onClick={() => deleteSticker(s.id)} className={`px-3 py-1.5 text-xs rounded font-bold transition-colors flex items-center justify-center ${isDark ? 'bg-red-950/40 text-red-400 hover:bg-red-900/60' : 'bg-red-100 text-red-600 hover:bg-red-200'}`}><Trash2 className="w-3 h-3" /></button>
                     </div>
                  </div>
               ))}
@@ -1260,48 +1327,48 @@ export function Admin() {
       {activeTab === 'accessories' && (
          <>
          {editingAccessory ? (
-           <form onSubmit={handleUpdateAccessory} className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-             <h2 className="text-xl font-bold text-[#3E2723]">Sửa Phụ Kiện Avatar</h2>
+           <form onSubmit={handleUpdateAccessory} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-4 ${isDark ? 'bg-[#251A15] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8] text-[#3E2723]'}`}>
+             <h2 className={`text-xl font-bold ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Sửa Phụ Kiện Avatar</h2>
              <div className="flex gap-4">
-               <div className="w-24 h-24 bg-gray-50 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2">
+               <div className={`w-24 h-24 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2 transition-colors ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-gray-50 border-[#D7CCC8]'}`}>
                  {editingAccessory.url && <img src={editingAccessory.url} className="w-16 h-16 object-contain" />}
                </div>
                <div className="flex-1 flex flex-col justify-end gap-2">
-                  <input type="file" accept="image/png, image/webp" onChange={e => handleAccessoryImageChange(e, true)} ref={editAccessoryFileInputRef} className="hidden" />
-                  <button type="button" onClick={() => editAccessoryFileInputRef.current?.click()} className="px-4 py-1.5 bg-[#FDF6EC] border border-[#8D6E63] text-sm font-bold w-max rounded-lg hover:bg-white transition-colors">Đổi ảnh phụ kiện</button>
+                  <input type="file" accept="image/png, image/webp, image/gif" onChange={e => handleAccessoryImageChange(e, true)} ref={editAccessoryFileInputRef} className="hidden" />
+                  <button type="button" onClick={() => editAccessoryFileInputRef.current?.click()} className={`px-4 py-1.5 border text-sm font-bold w-max rounded-lg transition-all ${isDark ? 'bg-[#1D1410] border-[#8D6E63] text-[#ECE5DC] hover:bg-[#251A15]' : 'bg-[#FDF6EC] border-[#8D6E63] text-[#8D6E63] hover:bg-white'}`}>Đổi ảnh phụ kiện (PNG/WebP/GIF)</button>
                </div>
              </div>
-             <input type="text" placeholder="Tên phụ kiện" value={editingAccessory.name} onChange={e => setEditingAccessory({...editingAccessory, name: e.target.value})} className="px-4 py-2 border rounded-lg" required />
-             <input type="text" placeholder="Mô tả" value={editingAccessory.description} onChange={e => setEditingAccessory({...editingAccessory, description: e.target.value})} className="px-4 py-2 border rounded-lg" required />
+             <input type="text" placeholder="Tên phụ kiện" value={editingAccessory.name} onChange={e => setEditingAccessory({...editingAccessory, name: e.target.value})} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+             <input type="text" placeholder="Mô tả" value={editingAccessory.description} onChange={e => setEditingAccessory({...editingAccessory, description: e.target.value})} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
              <div className="flex gap-4">
-                 <input type="number" placeholder="Giá" value={editingAccessory.price} onChange={e => setEditingAccessory({...editingAccessory, price: e.target.value})} className="px-4 py-2 border rounded-lg flex-1" required />
-                 <select value={editingAccessory.type} onChange={e => setEditingAccessory({...editingAccessory, type: e.target.value})} className="px-4 py-2 border rounded-lg w-32">
+                 <input type="number" placeholder="Giá" value={editingAccessory.price} onChange={e => setEditingAccessory({...editingAccessory, price: e.target.value})} className={`px-4 py-2 border rounded-lg flex-1 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+                 <select value={editingAccessory.type} onChange={e => setEditingAccessory({...editingAccessory, type: e.target.value})} className={`px-4 py-2 border rounded-lg w-32 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
                     <option value="choco">Choco</option>
                     <option value="golden">Golden Choco</option>
                  </select>
              </div>
              <div className="flex justify-end gap-2 mt-2">
-               <button type="button" onClick={() => setEditingAccessory(null)} className="px-4 py-2 bg-gray-200 rounded font-bold hover:bg-gray-300">Hủy</button>
+               <button type="button" onClick={() => setEditingAccessory(null)} className={`px-4 py-2 rounded font-bold transition-colors ${isDark ? 'bg-[#3E2D25] text-[#ECE5DC] hover:bg-[#523C32]' : 'bg-gray-200 hover:bg-gray-300'}`}>Hủy</button>
                <button type="submit" className="px-4 py-2 bg-[#8D6E63] text-white rounded font-bold hover:bg-[#5D4037]">Cập nhật</button>
              </div>
            </form>
          ) : (
-           <form onSubmit={handleCreateAccessory} className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-             <h2 className="text-xl font-bold text-[#3E2723]">Thêm Phụ Kiện Avatar</h2>
+           <form onSubmit={handleCreateAccessory} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-4 ${isDark ? 'bg-[#251A15] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8] text-[#3E2723]'}`}>
+             <h2 className={`text-xl font-bold ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Thêm Phụ Kiện Avatar</h2>
              <div className="flex gap-4">
-               <div className="w-24 h-24 bg-gray-50 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2">
+               <div className={`w-24 h-24 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2 transition-colors ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-gray-50 border-[#D7CCC8]'}`}>
                  {accUrl ? <img src={accUrl} className="w-16 h-16 object-contain" /> : <div className="text-xs text-gray-500 text-center">Chưa có ảnh</div>}
                </div>
                <div className="flex-1 flex flex-col justify-end gap-2">
-                  <input type="file" accept="image/png, image/webp" onChange={e => handleAccessoryImageChange(e, false)} ref={accessoryFileInputRef} className="hidden" />
-                  <button type="button" onClick={() => accessoryFileInputRef.current?.click()} className="px-4 py-1.5 bg-[#FDF6EC] border border-[#8D6E63] text-sm font-bold w-max rounded-lg hover:bg-white transition-colors">Chọn ảnh phụ kiện (PNG/WebP trong suốt)</button>
+                  <input type="file" accept="image/png, image/webp, image/gif" onChange={e => handleAccessoryImageChange(e, false)} ref={accessoryFileInputRef} className="hidden" />
+                  <button type="button" onClick={() => accessoryFileInputRef.current?.click()} className={`px-4 py-1.5 border text-sm font-bold w-max rounded-lg transition-all ${isDark ? 'bg-[#1D1410] border-[#8D6E63] text-[#ECE5DC] hover:bg-[#251A15]' : 'bg-[#FDF6EC] border-[#8D6E63] text-[#8D6E63] hover:bg-white'}`}>Chọn ảnh phụ kiện (PNG/WebP/GIF trong suốt)</button>
                </div>
              </div>
-             <input type="text" placeholder="Tên phụ kiện" value={accName} onChange={e => setAccName(e.target.value)} className="px-4 py-2 border rounded-lg" required />
-             <input type="text" placeholder="Mô tả" value={accDesc} onChange={e => setAccDesc(e.target.value)} className="px-4 py-2 border rounded-lg" required />
+             <input type="text" placeholder="Tên phụ kiện" value={accName} onChange={e => setAccName(e.target.value)} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+             <input type="text" placeholder="Mô tả" value={accDesc} onChange={e => setAccDesc(e.target.value)} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
              <div className="flex gap-4">
-                 <input type="number" placeholder="Giá" value={accPrice} onChange={e => setAccPrice(Number(e.target.value))} className="px-4 py-2 border rounded-lg flex-1" required />
-                 <select value={accType} onChange={e => setAccType(e.target.value as any)} className="px-4 py-2 border rounded-lg w-32">
+                 <input type="number" placeholder="Giá" value={accPrice} onChange={e => setAccPrice(Number(e.target.value))} className={`px-4 py-2 border rounded-lg flex-1 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+                 <select value={accType} onChange={e => setAccType(e.target.value as any)} className={`px-4 py-2 border rounded-lg w-32 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
                      <option value="choco">Choco</option>
                      <option value="golden">Golden Choco</option>
                  </select>
@@ -1314,8 +1381,8 @@ export function Admin() {
              <h2 className="text-xl font-bold text-[#3E2723]">Danh sách phụ kiện ({accessories.length})</h2>
              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                {accessories.map(a => (
-                  <div key={a.id} className="p-4 bg-white rounded-xl border border-[#D7CCC8] shadow-sm flex flex-col items-center text-center">
-                     <div className="w-16 h-16 relative mb-4 p-2 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0">
+                  <div key={a.id} className={`p-4 rounded-xl border shadow-sm flex flex-col items-center text-center transition-colors ${isDark ? 'bg-[#251A15] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
+                     <div className={`w-16 h-16 relative mb-4 p-2 rounded-xl border flex items-center justify-center shrink-0 transition-colors ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-gray-50'}`}>
                         {a.url ? (
                           <img src={a.url} alt="" className="w-12 h-12 object-contain pointer-events-none" />
                         ) : (
