@@ -264,8 +264,8 @@ export function Account() {
       {tab === 'settings' && (
         <div className="bg-white border border-[#D7CCC8] p-6 rounded-2xl shadow-sm max-w-xl mx-auto w-full">
           <h2 className="text-xl font-bold text-[#3E2723] mb-6">Cài đặt Tài khoản</h2>
-          <form onSubmit={handleSaveProfile} className="space-y-5">
-            <div className="flex items-center gap-4">
+          <form onSubmit={handleSaveProfile} className="flex flex-col gap-5">
+            <div className="order-1 sticky top-20 z-10 bg-white/95 dark:bg-[#1A1412]/95 backdrop-blur shadow-sm border border-[#D7CCC8]/60 dark:border-[#3C2E27]/60 p-4 -mt-2 -mx-2 md:mx-0 rounded-2xl flex items-center gap-4">
               <UserAvatar 
                 avatarUrl={avatar} 
                 equippedSticker={equippedStickerAvatar} 
@@ -274,27 +274,28 @@ export function Account() {
                 accessoryPosition={accessoryPosition}
                 className="w-16 h-16 pointer-events-none" 
                 fallbackIconSizeClass="w-8 h-8 text-[#A1887F]" 
-                borderClass="border border-[#D7CCC8]"
+                stickerSizeClass="w-8 h-8"
+                borderClass="border border-[#D7CCC8] dark:border-[#3C2E27]"
               />
               <div className="flex-1">
-                <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Ảnh đại diện</label>
+                <label className="block text-sm font-semibold mb-1 text-[#5D4037] dark:text-[#ECE5DC]">Ảnh đại diện</label>
                 <div className="flex items-center gap-2">
                   <input type="file" accept="image/*" onChange={handleAvatarChange} ref={fileInputRef} className="hidden" />
-                  <button type="button" onClick={() => fileInputRef.current?.click()} className="px-4 py-1.5 bg-[#FDF6EC] border border-[#8D6E63] text-[#3E2723] rounded-lg text-sm font-bold hover:bg-[#3E2723] hover:text-[#FDF6EC] transition-colors">Chọn ảnh</button>
-                  {avatar !== avatarUrl && <span className="text-xs text-green-600 font-medium">Chưa lưu</span>}
+                  <button type="button" onClick={() => fileInputRef.current?.click()} className="px-4 py-1.5 bg-[#FDF6EC] dark:bg-[#1D1410] border border-[#8D6E63] text-[#3E2723] dark:text-[#ECE5DC] rounded-lg text-sm font-bold hover:bg-[#3E2723] dark:hover:bg-[#ECE5DC] hover:text-[#FDF6EC] dark:hover:text-[#1D1410] transition-colors">Chọn ảnh</button>
+                  {avatar !== avatarUrl && <span className="text-xs text-green-600 dark:text-green-400 font-medium whitespace-nowrap">Chưa lưu</span>}
                 </div>
               </div>
             </div>
-            <div>
+            <div className="order-3">
               <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Tên hiển thị</label>
               <input type="text" value={name} onChange={e => setName(e.target.value)} required className="w-full px-4 py-2 rounded-lg border border-[#D7CCC8] bg-[#FDF6EC]/50 focus:outline-none focus:border-[#8D6E63] text-sm font-semibold" />
             </div>
-            <div>
+            <div className="order-4">
               <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Email</label>
               <input type="text" value={email || ''} disabled className="w-full px-4 py-2 rounded-lg border border-[#D7CCC8] bg-gray-100 text-gray-500 cursor-not-allowed text-sm" />
             </div>
 
-            <div>
+            <div className="order-5">
               <label className="block text-sm font-semibold mb-2 text-[#5D4037]">Cài đặt Sticker</label>
               {(ownedStickers || []).length === 0 ? (
                  <p className="text-xs text-gray-500 italic bg-gray-50 p-3 rounded-lg border">Bạn chưa sở hữu sticker nào. Hãy vào Cửa hàng để mua!</p>
@@ -360,7 +361,7 @@ export function Account() {
               )}
             </div>
 
-            <div>
+            <div className="order-2">
               <label className="block text-sm font-semibold mb-2 text-[#5D4037]">Cài đặt Phụ kiện Avatar</label>
               {(!ownedAccessories || ownedAccessories.length === 0) ? (
                 <p className="text-xs text-gray-400 italic bg-gray-50 border border-[#D7CCC8] p-3 rounded-xl">
@@ -503,11 +504,11 @@ export function Account() {
               )}
             </div>
 
-            <div>
+            <div className="order-6">
               <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Đổi mật khẩu</label>
               <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="Nhập để đổi mật khẩu (Chưa hỗ trợ)" disabled className="w-full px-4 py-2 rounded-lg border border-[#D7CCC8] bg-gray-100 italic text-sm" />
             </div>
-            <button type="submit" disabled={saving || saveSuccess} className="w-full py-2.5 bg-[#3E2723] text-[#FDF6EC] rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-[#5D4037] transition-colors mt-2 disabled:bg-[#8D6E63] disabled:cursor-not-allowed">
+            <button type="submit" disabled={saving || saveSuccess} className="order-last w-full py-2.5 bg-[#3E2723] text-[#FDF6EC] rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-[#5D4037] transition-colors mt-2 disabled:bg-[#8D6E63] disabled:cursor-not-allowed">
               {saving ? 'Đang lưu...' : saveSuccess ? 'Đã Lưu Thành Công ✓' : 'Lưu Thay Đổi'}
             </button>
           </form>
@@ -525,6 +526,7 @@ export function Account() {
                 accessoryPosition={accessoryPosition}
                 className="w-24 h-24 shadow-sm relative mb-4 border-4 border-[#FDF6EC] dark:border-[#2C221D]" 
                 fallbackIconSizeClass="w-12 h-12 text-[#A1887F]" 
+                stickerSizeClass="w-10 h-10"
                 borderClass="border-0"
               />
               <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-1.5 flex-wrap text-[#3E2723] dark:text-[#ECE5DC]" style={{ color: getTitleColor(activeTitle) || undefined }}>
