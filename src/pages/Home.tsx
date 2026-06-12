@@ -260,8 +260,6 @@ export function Home() {
                            </div>
                             <UserAvatar 
                                avatarUrl={u.avatarUrl} 
-                               equippedSticker={u.equippedStickerAvatar} 
-                               stickerPosition={u.stickerPositionAvatar}
                                equippedAccessory={u.equippedAccessory}
                                accessoryPosition={u.accessoryPosition} 
                                className="w-10 h-10" 
@@ -295,8 +293,6 @@ export function Home() {
                     <div key={u.id} className="flex items-center gap-3 bg-[#FDF6EC] dark:bg-[#1C1613] p-3 rounded-xl border border-[#F5E6D3] dark:border-[#3C2E27]">
                         <UserAvatar 
                            avatarUrl={u.avatarUrl} 
-                           equippedSticker={u.equippedStickerAvatar} 
-                           stickerPosition={u.stickerPositionAvatar}
                            equippedAccessory={u.equippedAccessory}
                            accessoryPosition={u.accessoryPosition} 
                            className="w-10 h-10" 
@@ -356,8 +352,14 @@ export function Home() {
               </h2>
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                  <button onClick={handleCheckInBtnClick} className="flex flex-col items-center justify-center text-center p-3 hover:bg-[#FDF6EC] dark:hover:bg-[#2C221D] rounded-2xl transition-all group border border-transparent hover:border-[#D7CCC8]/40 dark:hover:border-[#3C2E27]/80">
-                    <div className="w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-950/40 flex items-center justify-center mb-1.5 border border-orange-100/40 dark:border-orange-900/30 group-hover:scale-105 transition-transform">
+                    <div className="relative w-12 h-12 rounded-2xl bg-orange-50 dark:bg-orange-950/40 flex items-center justify-center mb-1.5 border border-orange-100/40 dark:border-orange-900/30 group-hover:scale-105 transition-transform">
                        <CalendarCheck className="w-5 h-5 text-[#8D6E63]" />
+                       {(!lastCheckInDate || lastCheckInDate !== format(new Date(), 'yyyy-MM-dd')) && isLoggedIn && (
+                          <span className="absolute top-0 right-0 flex h-3 w-3">
+                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                             <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-white dark:border-[#211B18]"></span>
+                          </span>
+                       )}
                     </div>
                     <span className="font-extrabold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-tight group-hover:text-[#8D6E63] dark:group-hover:text-white transition-colors">Điểm danh</span>
                  </button>
