@@ -6,6 +6,8 @@ interface UserAvatarProps {
   avatarUrl?: string | null;
   equippedSticker?: string | null;
   stickerPosition?: string | null;
+  equippedAccessory?: string | null;
+  accessoryPosition?: { x: number; y: number; scale: number; rotate: number } | null;
   className?: string; // e.g. "w-10 h-10" or "w-8 h-8"
   stickerSizeClass?: string; // e.g. "w-4 h-4" or "w-3 h-3"
   fallbackIconSizeClass?: string; // e.g. "w-4 h-4" or "w-5 h-5"
@@ -16,6 +18,8 @@ export function UserAvatar({
   avatarUrl,
   equippedSticker,
   stickerPosition,
+  equippedAccessory,
+  accessoryPosition,
   className = "w-8 h-8",
   stickerSizeClass = "w-4 h-4",
   fallbackIconSizeClass = "w-4 h-4",
@@ -42,6 +46,17 @@ export function UserAvatar({
             stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
             (stickerPosition === 'bottom-right' || !stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
           )} 
+        />
+      )}
+      {equippedAccessory && (
+        <img 
+          src={equippedAccessory} 
+          alt="Accessory" 
+          style={{
+            transform: `translate(${accessoryPosition?.x || 0}px, ${accessoryPosition?.y || 0}px) scale(${(accessoryPosition?.scale ?? 100) / 100}) rotate(${accessoryPosition?.rotate || 0}deg)`,
+          }}
+          className="absolute object-contain pointer-events-none z-20 w-3/4 h-3/4"
+          referrerPolicy="no-referrer"
         />
       )}
     </div>
