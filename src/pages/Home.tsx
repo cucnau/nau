@@ -261,7 +261,9 @@ export function Home() {
                             <UserAvatar 
                                avatarUrl={u.avatarUrl} 
                                equippedSticker={u.equippedStickerAvatar} 
-                               stickerPosition={u.stickerPositionAvatar} 
+                               stickerPosition={u.stickerPositionAvatar}
+                               equippedAccessory={u.equippedAccessory}
+                               accessoryPosition={u.accessoryPosition} 
                                className="w-10 h-10" 
                                fallbackIconSizeClass="w-5 h-5 text-orange-200" 
                                borderClass="border border-orange-200"
@@ -294,7 +296,9 @@ export function Home() {
                         <UserAvatar 
                            avatarUrl={u.avatarUrl} 
                            equippedSticker={u.equippedStickerAvatar} 
-                           stickerPosition={u.stickerPositionAvatar} 
+                           stickerPosition={u.stickerPositionAvatar}
+                           equippedAccessory={u.equippedAccessory}
+                           accessoryPosition={u.accessoryPosition} 
                            className="w-10 h-10" 
                            fallbackIconSizeClass="w-5 h-5 text-amber-200 dark:text-amber-700" 
                            borderClass="border border-[#F5E6D3] dark:border-[#3C2E27]"
