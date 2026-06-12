@@ -101,6 +101,8 @@ export function NewsFeed() {
                       (post.stickerPositionPost || post.stickerPosition) === 'top-right' && "right-3 -top-2",
                       ((post.stickerPositionPost || post.stickerPosition) === 'bottom-right' || !(post.stickerPositionPost || post.stickerPosition)) && "right-3 -bottom-1"
                     )} 
+                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                    referrerPolicy="no-referrer"
                   />
                 )}
                 <UserAvatar 
