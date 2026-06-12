@@ -55,7 +55,7 @@ export function UserAvatar({
           style={{
             transform: `translate(${accessoryPosition?.x || 0}px, ${accessoryPosition?.y || 0}px) scale(${(accessoryPosition?.scale ?? 100) / 100}) rotate(${accessoryPosition?.rotate || 0}deg)`,
           }}
-          className="absolute object-contain pointer-events-none z-20 w-3/4 h-3/4"
+          className="absolute inset-0 m-auto object-contain pointer-events-none z-20 w-full h-full max-w-none max-h-none"
           referrerPolicy="no-referrer"
         />
       )}
