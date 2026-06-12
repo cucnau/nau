@@ -70,8 +70,8 @@ interface UserState {
   displayName: string | null;
   email: string | null;
   avatarUrl: string | null;
-  equippedStickerAvatar: string | null;
-  stickerPositionAvatar: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  equippedStickerComment: string | null;
+  stickerPositionComment: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   equippedStickerChat: string | null;
   equippedStickerPost: string | null;
   stickerPositionPost: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -172,8 +172,8 @@ interface UserState {
   toggleSaveStory: (storyId: string) => void;
   giftChoco: (storyId: string, amount: number) => boolean;
   addOwnedSticker: (stickerUrl: string) => void;
-  equipSticker: (type: 'avatar' | 'chat' | 'post', stickerUrl: string | null) => void;
-  setStickerPosition: (type: 'avatar' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => void;
+  equipSticker: (type: 'comment' | 'chat' | 'post', stickerUrl: string | null) => void;
+  setStickerPosition: (type: 'comment' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => void;
   addOwnedAccessory: (accessoryUrl: string) => void;
   equipAccessory: (accessoryUrl: string | null) => void;
   setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => void;
@@ -219,8 +219,8 @@ export const useStore = create<UserState>()(
       displayName: null,
       email: null,
       avatarUrl: null,
-      equippedStickerAvatar: null,
-      stickerPositionAvatar: 'top-right',
+      equippedStickerComment: null,
+      stickerPositionComment: 'top-right',
       equippedStickerChat: null,
       equippedStickerPost: null,
       stickerPositionPost: 'top-right',
@@ -313,8 +313,8 @@ export const useStore = create<UserState>()(
         firebaseUser: null, 
         email: null, 
         avatarUrl: null,
-        equippedStickerAvatar: null,
-        stickerPositionAvatar: 'top-right',
+        equippedStickerComment: null,
+        stickerPositionComment: 'top-right',
         equippedStickerChat: null,
         equippedStickerPost: null,
         stickerPositionPost: 'top-right',
@@ -441,8 +441,8 @@ export const useStore = create<UserState>()(
             displayName: data.displayName !== undefined ? data.displayName : state.displayName,
             email: data.email !== undefined ? data.email : state.email,
             avatarUrl: data.avatarUrl !== undefined ? data.avatarUrl : state.avatarUrl,
-            equippedStickerAvatar: data.equippedStickerAvatar !== undefined ? data.equippedStickerAvatar : state.equippedStickerAvatar,
-            stickerPositionAvatar: data.stickerPositionAvatar !== undefined ? data.stickerPositionAvatar : state.stickerPositionAvatar,
+            equippedStickerComment: data.equippedStickerComment !== undefined ? data.equippedStickerComment : (data.equippedStickerAvatar !== undefined ? data.equippedStickerAvatar : state.equippedStickerComment),
+            stickerPositionComment: data.stickerPositionComment !== undefined ? data.stickerPositionComment : (data.stickerPositionAvatar !== undefined ? data.stickerPositionAvatar : state.stickerPositionComment),
             equippedStickerChat: data.equippedStickerChat !== undefined ? data.equippedStickerChat : state.equippedStickerChat,
             equippedStickerPost: data.equippedStickerPost !== undefined ? data.equippedStickerPost : state.equippedStickerPost,
             stickerPositionPost: data.stickerPositionPost !== undefined ? data.stickerPositionPost : state.stickerPositionPost,
@@ -1065,20 +1065,20 @@ export const useStore = create<UserState>()(
          get().updateUserDoc({ ownedStickers: newOwned });
       },
       
-      equipSticker: (type: 'avatar' | 'chat' | 'post', stickerUrl: string | null) => {
+      equipSticker: (type: 'comment' | 'chat' | 'post', stickerUrl: string | null) => {
          const state = get();
          if (!state.isLoggedIn) return;
          
-         const key = type === 'avatar' ? 'equippedStickerAvatar' : type === 'chat' ? 'equippedStickerChat' : 'equippedStickerPost';
+         const key = type === 'comment' ? 'equippedStickerComment' : type === 'chat' ? 'equippedStickerChat' : 'equippedStickerPost';
          set({ [key]: stickerUrl });
          get().updateUserDoc({ [key]: stickerUrl });
       },
 
-      setStickerPosition: (type: 'avatar' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
+      setStickerPosition: (type: 'comment' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
          const state = get();
          if (!state.isLoggedIn) return;
          
-         const key = type === 'avatar' ? 'stickerPositionAvatar' : 'stickerPositionPost';
+         const key = type === 'comment' ? 'stickerPositionComment' : 'stickerPositionPost';
          set({ [key]: pos });
          get().updateUserDoc({ [key]: pos });
       },
