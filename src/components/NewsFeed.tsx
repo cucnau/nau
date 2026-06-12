@@ -107,6 +107,8 @@ export function NewsFeed() {
                   avatarUrl={post.avatarUrl} 
                   equippedSticker={post.equippedStickerAvatar || post.equippedSticker} 
                   stickerPosition={post.stickerPositionAvatar || post.stickerPosition} 
+                  equippedAccessory={post.equippedAccessory}
+                  accessoryPosition={post.accessoryPosition}
                   className="w-8 h-8" 
                   fallbackIconSizeClass="w-4 h-4" 
                 />
