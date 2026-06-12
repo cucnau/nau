@@ -15,6 +15,7 @@ import { ACHIEVEMENTS_LIST, getWeeklyId, getPreviousWeeklyId, ACHIEVEMENT_CATEGO
 import { Store } from '../pages/Store';
 import { Missions } from '../pages/Missions';
 import { Inventory } from '../pages/Inventory';
+import { UserAvatar } from './UserAvatar';
 
 export function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -471,7 +472,9 @@ export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showQuotaWarning, setShowQuotaWarning] = useState(true);
   const { 
-    isLoggedIn, uid, displayName, avatarUrl, equippedStickerAvatar: equippedSticker, stickerPositionAvatar: stickerPosition, choco, goldenChoco, email, level, lastClaimedRewardLevel, missions,
+    isLoggedIn, uid, displayName, avatarUrl, 
+    equippedAccessory, accessoryPosition,
+    choco, goldenChoco, email, level, lastClaimedRewardLevel, missions,
     isStoreOpen, isMissionsOpen, isAchievementsOpen, isInventoryOpen,
     setStoreOpen, setMissionsOpen, setAchievementsOpen, setInventoryOpen,
     isQuotaExceeded, firebaseUser, activeTitle, getTitleColor,
@@ -708,24 +711,14 @@ export function AppLayout() {
 
               <div className="relative group cursor-pointer">
                 <div className="flex items-center gap-2 hover:bg-white/10 px-3 py-1.5 rounded-full transition-colors relative group">
-                   <div className="w-6 h-6 relative shrink-0">
-                     <div className="w-full h-full overflow-hidden rounded-full">
-                       {avatarUrl ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> : <User className="w-full h-full p-0.5" />}
-                     </div>
-                     {equippedSticker && (
-                       <img 
-                         src={equippedSticker} 
-                         alt="Sticker" 
-                         className={cn(
-                           "absolute w-3.5 h-3.5 object-contain pointer-events-none z-10",
-                           stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/3 -translate-y-1/3",
-                           stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/3 -translate-y-1/3",
-                           stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/3 translate-y-1/3",
-                           stickerPosition === 'bottom-right' && "right-0 bottom-0 translate-x-1/3 translate-y-1/3"
-                         )} 
-                       />
-                     )}
-                   </div>
+                   <UserAvatar 
+                     avatarUrl={avatarUrl} 
+                     equippedAccessory={equippedAccessory}
+                     accessoryPosition={accessoryPosition}
+                     className="w-6 h-6" 
+                     fallbackIconSizeClass="w-3 h-3" 
+                     borderClass="border-0"
+                   />
                    <span className="hidden sm:inline font-medium" style={{ color: getTitleColor(activeTitle) || undefined }}>{displayName}</span>
                 </div>
                 <div className="absolute right-0 top-full mt-2 w-48 bg-[#FDF6EC] dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl shadow-xl border border-[#D7CCC8] dark:border-[#3C2E27] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden">
