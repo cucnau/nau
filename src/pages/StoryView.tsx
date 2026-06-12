@@ -6,6 +6,172 @@ import React, { useEffect, useState } from 'react';
 import { db, checkIfQuotaError } from '../lib/firebase';
 import { doc, getDoc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where } from 'firebase/firestore';
 
+interface CommentNodeProps {
+   comment: any;
+   comments: any[];
+   replyingToId: string | null;
+   setReplyingToId: (id: string | null) => void;
+   replyText: string;
+   setReplyText: (text: string) => void;
+   submittingReply: boolean;
+   handleSendReply: (comment: any) => void;
+   getTitleColor: (title: string | null) => string | undefined;
+   isLoggedIn: boolean;
+   depth?: number;
+}
+
+const CommentNode: React.FC<CommentNodeProps> = ({
+   comment,
+   comments,
+   replyingToId,
+   setReplyingToId,
+   replyText,
+   setReplyText,
+   submittingReply,
+   handleSendReply,
+   getTitleColor,
+   isLoggedIn,
+   depth = 0
+}) => {
+   const isGift = comment.type === 'choco_gift';
+   const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
+      const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0));
+      const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0));
+      return timeA - timeB;
+   });
+
+   return (
+      <div key={comment.id} className="w-full flex flex-col gap-2">
+         <div 
+            className={cn(
+               "p-4 rounded-2xl flex gap-3.5 border transition-all shadow-sm relative overflow-visible pr-8",
+               isGift 
+                  ? "bg-amber-50/70 border-amber-200/80 hover:bg-amber-50" 
+                  : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50"
+            )}
+         >
+            {comment.avatarUrl ? (
+               <img src={comment.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#D7CCC8]/30" referrerPolicy="no-referrer" />
+            ) : (
+               <div className="w-10 h-10 rounded-full bg-[#8D6E63] text-[#FDF6EC] flex items-center justify-center shrink-0 font-bold text-xs uppercase shadow-inner">
+                  {comment.displayName?.substring(0, 2)}
+               </div>
+            )}
+            
+            <div className="flex-1 min-w-0">
+               <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                     <span className="font-extrabold text-sm shrink-0" style={{ color: getTitleColor(comment.activeTitle) || '#3E2723' }}>
+                        {comment.displayName}
+                        {comment.activeTitle && (
+                           <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-850 text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200 ml-1.5 inline-block align-middle">
+                              🏆 {comment.activeTitle}
+                           </span>
+                        )}
+                     </span>
+                     
+                     {isGift && (
+                        <span className="bg-amber-100 text-amber-950 text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-amber-300 flex items-center gap-1 shadow-sm">
+                           <Sparkles className="w-3 h-3 text-amber-600 inline shrink-0" />
+                           Tặng {comment.giftAmount} Choco 🍫
+                        </span>
+                     )}
+                  </div>
+                  
+                  <span className="text-[10px] text-gray-400 font-mono shrink-0">
+                     {comment.createdAt?.toDate 
+                        ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
+                        : 'Vừa xong'}
+                  </span>
+               </div>
+               <p className={cn(
+                  "text-sm break-words leading-relaxed",
+                  isGift ? "text-amber-900 font-medium italic" : "text-gray-700"
+               )}>
+                  {comment.content}
+               </p>
+
+               {/* Reply panel button */}
+               {isLoggedIn && (
+                  <div className="flex items-center gap-4 mt-2">
+                     <button 
+                        onClick={() => {
+                           if (replyingToId === comment.id) {
+                              setReplyingToId(null);
+                           } else {
+                              setReplyingToId(comment.id);
+                              setReplyText('');
+                           }
+                        }}
+                        className="text-xs text-[#8D6E63] hover:text-[#5D4037] font-extrabold flex items-center gap-1 cursor-pointer transition-colors"
+                     >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        Trả lời
+                     </button>
+                  </div>
+               )}
+
+               {/* Dynamic inline reply input */}
+               {replyingToId === comment.id && (
+                  <div className="mt-3 flex gap-2 animate-fade-in pl-1">
+                     <input 
+                        type="text"
+                        placeholder={`Trả lời bình luận của ${comment.displayName}...`}
+                        value={replyText}
+                        disabled={submittingReply}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        className="flex-1 bg-[#FDF6EC] border border-[#D7CCC8]/80 text-[#3E2723] focus:border-[#8D6E63] focus:outline-none focus:ring-1 focus:ring-[#8D6E63] rounded-xl px-3.5 py-1.5 placeholder-gray-400 text-xs sm:text-sm"
+                        onKeyDown={(e) => {
+                           if (e.key === 'Enter' && replyText.trim() && !submittingReply) {
+                              handleSendReply(comment);
+                           }
+                        }}
+                     />
+                     <button 
+                        onClick={() => handleSendReply(comment)}
+                        disabled={submittingReply || !replyText.trim()}
+                        className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-gray-300 disabled:text-gray-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
+                     >
+                        {submittingReply ? 'Gửi...' : 'Gửi'}
+                     </button>
+                     <button 
+                        onClick={() => setReplyingToId(null)}
+                        className="text-gray-400 hover:text-gray-500 border border-gray-200 px-2 rounded-xl text-xs"
+                     >
+                        Hủy
+                     </button>
+                  </div>
+               )}
+            </div>
+         </div>
+
+         {replies.length > 0 && (
+            <div className={cn(
+               "pl-4 space-y-3 border-l-2 border-[#D7CCC8]/40 mt-1",
+               depth > 4 ? "pl-1 border-0" : ""
+            )}>
+               {replies.map(r => (
+                  <CommentNode
+                     key={r.id}
+                     comment={r}
+                     comments={comments}
+                     replyingToId={replyingToId}
+                     setReplyingToId={setReplyingToId}
+                     replyText={replyText}
+                     setReplyText={setReplyText}
+                     submittingReply={submittingReply}
+                     handleSendReply={handleSendReply}
+                     getTitleColor={getTitleColor}
+                     isLoggedIn={isLoggedIn}
+                     depth={depth + 1}
+                  />
+               ))}
+            </div>
+         )}
+      </div>
+   );
+};
+
 export function StoryView() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -416,6 +582,21 @@ export function StoryView() {
                      </div>
                   ) : (
                      comments.filter(c => !c.parentId).map((comment) => {
+                        return (
+                           <CommentNode
+                              key={comment.id}
+                              comment={comment}
+                              comments={comments}
+                              replyingToId={replyingToId}
+                              setReplyingToId={setReplyingToId}
+                              replyText={replyText}
+                              setReplyText={setReplyText}
+                              submittingReply={submittingReply}
+                              handleSendReply={handleSendReply}
+                              getTitleColor={getTitleColor}
+                              isLoggedIn={isLoggedIn}
+                           />
+                        );
                         const isGift = comment.type === 'choco_gift';
                         return (
                            <div 
