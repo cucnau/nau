@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
+import { UserAvatar } from '../components/UserAvatar';
 import { cn } from '../components/Layout';
 import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare, Clock, Pause, CheckCircle } from 'lucide-react';
 import { db, checkIfQuotaError } from '../lib/firebase';
@@ -31,7 +32,16 @@ const ParagraphCommentNode = ({
    return (
       <div key={comment.id} className="text-xs pt-1 mt-1 border-t border-dashed border-gray-100 dark:border-[#3C2E27]/30 first:border-0">
          <div className="flex gap-2.5 items-start p-2 rounded-xl bg-[#FDF6EC]/40 dark:bg-[#1A1412]/20 border border-[#F5E6D3]/40 dark:border-[#3C2E27]/30">
-            <img src={comment.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-8 h-8 rounded-full object-cover shrink-0" />
+            <UserAvatar 
+               avatarUrl={comment.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} 
+               equippedSticker={comment.equippedSticker || comment.equippedStickerAvatar} 
+               stickerPosition={comment.stickerPosition || comment.stickerPositionAvatar} 
+               equippedAccessory={comment.equippedAccessory}
+               accessoryPosition={comment.accessoryPosition}
+               className="w-8 h-8 shrink-0 pointer-events-none" 
+               fallbackIconSizeClass="w-4 h-4 text-[#A1887F]" 
+               borderClass="border border-[#D7CCC8]/30"
+            />
             <div className="flex-1 min-w-0">
                <div className="text-[11px] font-bold mb-0.5 flex justify-between tracking-tight" style={{ color: getTitleColor(comment.activeTitle) || undefined }}>
                   <span className="flex items-center gap-1">
@@ -151,7 +161,16 @@ const ChapterCommentNode = ({
    return (
       <div key={comment.id} className={cn("p-4 rounded-2xl border flex flex-col gap-2 shadow-xs transition-colors", isDark ? "bg-[#211B18]/40 border-[#3C2E27]" : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50")}>
          <div className="flex gap-3.5">
-            <img src={comment.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#D7CCC8]/30" referrerPolicy="no-referrer" />
+            <UserAvatar 
+               avatarUrl={comment.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} 
+               equippedSticker={comment.equippedSticker || comment.equippedStickerAvatar} 
+               stickerPosition={comment.stickerPosition || comment.stickerPositionAvatar} 
+               equippedAccessory={comment.equippedAccessory}
+               accessoryPosition={comment.accessoryPosition}
+               className="w-10 h-10 shrink-0 pointer-events-none" 
+               fallbackIconSizeClass="w-5 h-5 text-[#A1887F]" 
+               borderClass="border border-[#D7CCC8]/30"
+            />
             <div className="flex-1 min-w-0">
                <div className="flex items-center justify-between gap-2 mb-1">
                   <span className="font-extrabold text-xs flex items-center gap-1.5" style={{ color: getTitleColor(comment.activeTitle) || undefined }}>
@@ -377,7 +396,9 @@ export function Reader() {
              paragraphIdx: paragraphIdx ?? null,
              createdAt: serverTimestamp(),
              equippedSticker: useStore.getState().equippedStickerAvatar || null,
-             stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right'
+            stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right',
+            equippedAccessory: useStore.getState().equippedAccessory || null,
+            accessoryPosition: useStore.getState().accessoryPosition || null
          });
          addCommentProgress();
      } catch (err) {
@@ -421,12 +442,15 @@ export function Reader() {
            avatarUrl: avatarUrl || '',
            content: replyText.trim(),
            type: 'comment_reply',
+           replyToUser: parentComment.displayName || null,
            parentId: parentComment.id,
            activeTitle: useStore.getState().activeTitle || null,
            giftAmount: 0,
            paragraphIdx: parentComment.paragraphIdx !== undefined ? parentComment.paragraphIdx : null,
             equippedSticker: useStore.getState().equippedStickerAvatar || null,
             stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right',
+            equippedAccessory: useStore.getState().equippedAccessory || null,
+            accessoryPosition: useStore.getState().accessoryPosition || null,
            createdAt: serverTimestamp()
         });
 
