@@ -59,7 +59,7 @@ interface AdminComment {
 export function Admin() {
   const { email, firebaseUser } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'stories' | 'users' | 'comments' | 'messages' | 'stickers' | 'posts' | 'titles'>('stories');
+  const [activeTab, setActiveTab] = useState<'stories' | 'users' | 'comments' | 'messages' | 'stickers' | 'posts' | 'titles' | 'accessories'>('stories');
   
   // Custom Confirmation Dialog
   const [confirmDialog, setConfirmDialog] = useState<{ text: string; action: () => void } | null>(null);
@@ -140,6 +140,17 @@ export function Admin() {
   const [editingSticker, setEditingSticker] = useState<any | null>(null);
   const stickerFileInputRef = useRef<HTMLInputElement>(null);
   const editStickerFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Avatar Accessories state
+  const [accessories, setAccessories] = useState<any[]>([]);
+  const [accName, setAccName] = useState('');
+  const [accDesc, setAccDesc] = useState('');
+  const [accPrice, setAccPrice] = useState<number>(0);
+  const [accType, setAccType] = useState<'choco' | 'golden'>('choco');
+  const [accUrl, setAccUrl] = useState('');
+  const [editingAccessory, setEditingAccessory] = useState<any | null>(null);
+  const accessoryFileInputRef = useRef<HTMLInputElement>(null);
+  const editAccessoryFileInputRef = useRef<HTMLInputElement>(null);
 
   // Posts Management
   const [posts, setPosts] = useState<any[]>([]);
@@ -448,8 +459,23 @@ export function Admin() {
       console.error('Error fetching stickers realtime:', err);
     });
 
+    const unsubAccessories = onSnapshot(query(collection(db, 'store_accessories'), orderBy('createdAt', 'desc')), (snap) => {
+      const list: any[] = [];
+      snap.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({
+          id: docSnap.id,
+          ...data
+        });
+      });
+      setAccessories(list);
+    }, (err) => {
+      console.error('Error fetching accessories realtime:', err);
+    });
+
     return () => {
       unsubStickers();
+      unsubAccessories();
     };
   }, []);
 
@@ -988,6 +1014,135 @@ export function Admin() {
     });
   };
 
+  // Accessories handlers
+  const handleAccessoryImageChange = async (e: React.ChangeEvent<HTMLInputElement>, isEditing = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    let base64Data: string;
+    if (file.type === 'image/gif') {
+      base64Data = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          resolve(event.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+      });
+    } else {
+      base64Data = await handleImageResize(file);
+    }
+
+    if (base64Data.length > 500000) {
+      alert('Ảnh phụ kiện quá lớn! Vui lòng chọn ảnh dung lượng nhỏ hơn (dưới ~350KB).');
+      if (accessoryFileInputRef.current) accessoryFileInputRef.current.value = '';
+      if (editAccessoryFileInputRef.current) editAccessoryFileInputRef.current.value = '';
+      return;
+    }
+
+    if (isEditing && editingAccessory) {
+      setEditingAccessory({ ...editingAccessory, url: base64Data });
+    } else {
+      setAccUrl(base64Data);
+    }
+  };
+
+  const handleCreateAccessory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!accUrl) {
+      alert('Vui lòng chọn ảnh phụ kiện!');
+      return;
+    }
+    try {
+      await addDoc(collection(db, 'store_accessories'), {
+        name: accName,
+        description: accDesc,
+        price: accPrice,
+        type: accType,
+        url: accUrl,
+        createdAt: serverTimestamp()
+      });
+      setAccName('');
+      setAccDesc('');
+      setAccPrice(0);
+      setAccType('choco');
+      setAccUrl('');
+      if (accessoryFileInputRef.current) accessoryFileInputRef.current.value = '';
+    } catch (err: any) {
+      console.error('Error creating accessory:', err);
+      alert('Lỗi: ' + err.message);
+    }
+  };
+
+  const handleUpdateAccessory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingAccessory) return;
+    try {
+      await updateDoc(doc(db, 'store_accessories', editingAccessory.id), {
+        name: editingAccessory.name,
+        description: editingAccessory.description,
+        price: Number(editingAccessory.price),
+        type: editingAccessory.type,
+        url: editingAccessory.url
+      });
+      setEditingAccessory(null);
+      if (editAccessoryFileInputRef.current) editAccessoryFileInputRef.current.value = '';
+    } catch (err: any) {
+      console.error('Error updating accessory:', err);
+      alert('Lỗi: ' + err.message);
+    }
+  };
+
+  const deleteAccessory = (id: string) => {
+    const accessoryToDelete = accessories.find(a => a.id === id);
+    const accessoryUrl = accessoryToDelete ? accessoryToDelete.url : null;
+
+    setConfirmDialog({
+      text: 'Bạn có chắc chắn muốn xóa phụ kiện này khỏi cửa hàng? Điều này cũng sẽ gỡ phụ kiện khỏi hồ sơ của tất cả những ai đang sở hữu/trang bị nó.',
+      action: async () => {
+        try {
+          await deleteDoc(doc(db, 'store_accessories', id));
+          
+          if (accessoryUrl) {
+            // Cập nhật Firestore cho tất cả người dùng
+            const usersSnap = await getDocs(collection(db, 'users'));
+            const batchPromises = usersSnap.docs.map(async (userDoc) => {
+              const userData = userDoc.data();
+              let needsUpdate = false;
+              const updateData: any = {};
+
+              if (userData.equippedAccessory === accessoryUrl) {
+                updateData.equippedAccessory = null;
+                needsUpdate = true;
+              }
+
+              if (Array.isArray(userData.ownedAccessories) && userData.ownedAccessories.includes(accessoryUrl)) {
+                updateData.ownedAccessories = userData.ownedAccessories.filter((u: string) => u !== accessoryUrl);
+                needsUpdate = true;
+              }
+
+              if (needsUpdate) {
+                await updateDoc(doc(db, 'users', userDoc.id), updateData);
+              }
+            });
+            await Promise.all(batchPromises);
+
+            // Đồng thời cập nhật trạng thái trong bộ nhớ cục bộ (Zustand store) nếu người dùng hiện tại đang đeo phụ kiện này
+            const { ownedAccessories, equippedAccessory, syncFromFirebase } = useStore.getState();
+            const newOwned = (ownedAccessories || []).filter((u: string) => u !== accessoryUrl);
+            const newEquipped = equippedAccessory === accessoryUrl ? null : equippedAccessory;
+            syncFromFirebase({
+              ownedAccessories: newOwned,
+              equippedAccessory: newEquipped,
+            });
+          }
+        } catch (err: any) {
+          console.error('Error deleting accessory:', err);
+          alert('Lỗi: ' + err.message);
+        }
+      }
+    });
+  };
+
   const isAdmin = email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com';
   if (!isAdmin) {
     return <div className="p-8 text-center text-red-500 font-bold">Không có quyền truy cập. ({email || firebaseUser?.email || 'Chưa đăng nhập'})</div>;
@@ -1100,6 +1255,87 @@ export function Admin() {
             </div>
          </div>
          </>
+      )}
+
+      {activeTab === 'accessories' && (
+         <>
+         {editingAccessory ? (
+           <form onSubmit={handleUpdateAccessory} className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
+             <h2 className="text-xl font-bold text-[#3E2723]">Sửa Phụ Kiện Avatar</h2>
+             <div className="flex gap-4">
+               <div className="w-24 h-24 bg-gray-50 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2">
+                 {editingAccessory.url && <img src={editingAccessory.url} className="w-16 h-16 object-contain" />}
+               </div>
+               <div className="flex-1 flex flex-col justify-end gap-2">
+                  <input type="file" accept="image/png, image/webp" onChange={e => handleAccessoryImageChange(e, true)} ref={editAccessoryFileInputRef} className="hidden" />
+                  <button type="button" onClick={() => editAccessoryFileInputRef.current?.click()} className="px-4 py-1.5 bg-[#FDF6EC] border border-[#8D6E63] text-sm font-bold w-max rounded-lg hover:bg-white transition-colors">Đổi ảnh phụ kiện</button>
+               </div>
+             </div>
+             <input type="text" placeholder="Tên phụ kiện" value={editingAccessory.name} onChange={e => setEditingAccessory({...editingAccessory, name: e.target.value})} className="px-4 py-2 border rounded-lg" required />
+             <input type="text" placeholder="Mô tả" value={editingAccessory.description} onChange={e => setEditingAccessory({...editingAccessory, description: e.target.value})} className="px-4 py-2 border rounded-lg" required />
+             <div className="flex gap-4">
+                 <input type="number" placeholder="Giá" value={editingAccessory.price} onChange={e => setEditingAccessory({...editingAccessory, price: e.target.value})} className="px-4 py-2 border rounded-lg flex-1" required />
+                 <select value={editingAccessory.type} onChange={e => setEditingAccessory({...editingAccessory, type: e.target.value})} className="px-4 py-2 border rounded-lg w-32">
+                    <option value="choco">Choco</option>
+                    <option value="golden">Golden Choco</option>
+                 </select>
+             </div>
+             <div className="flex justify-end gap-2 mt-2">
+               <button type="button" onClick={() => setEditingAccessory(null)} className="px-4 py-2 bg-gray-200 rounded font-bold hover:bg-gray-300">Hủy</button>
+               <button type="submit" className="px-4 py-2 bg-[#8D6E63] text-white rounded font-bold hover:bg-[#5D4037]">Cập nhật</button>
+             </div>
+           </form>
+         ) : (
+           <form onSubmit={handleCreateAccessory} className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
+             <h2 className="text-xl font-bold text-[#3E2723]">Thêm Phụ Kiện Avatar</h2>
+             <div className="flex gap-4">
+               <div className="w-24 h-24 bg-gray-50 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2">
+                 {accUrl ? <img src={accUrl} className="w-16 h-16 object-contain" /> : <div className="text-xs text-gray-500 text-center">Chưa có ảnh</div>}
+               </div>
+               <div className="flex-1 flex flex-col justify-end gap-2">
+                  <input type="file" accept="image/png, image/webp" onChange={e => handleAccessoryImageChange(e, false)} ref={accessoryFileInputRef} className="hidden" />
+                  <button type="button" onClick={() => accessoryFileInputRef.current?.click()} className="px-4 py-1.5 bg-[#FDF6EC] border border-[#8D6E63] text-sm font-bold w-max rounded-lg hover:bg-white transition-colors">Chọn ảnh phụ kiện (PNG/WebP trong suốt)</button>
+               </div>
+             </div>
+             <input type="text" placeholder="Tên phụ kiện" value={accName} onChange={e => setAccName(e.target.value)} className="px-4 py-2 border rounded-lg" required />
+             <input type="text" placeholder="Mô tả" value={accDesc} onChange={e => setAccDesc(e.target.value)} className="px-4 py-2 border rounded-lg" required />
+             <div className="flex gap-4">
+                 <input type="number" placeholder="Giá" value={accPrice} onChange={e => setAccPrice(Number(e.target.value))} className="px-4 py-2 border rounded-lg flex-1" required />
+                 <select value={accType} onChange={e => setAccType(e.target.value as any)} className="px-4 py-2 border rounded-lg w-32">
+                     <option value="choco">Choco</option>
+                     <option value="golden">Golden Choco</option>
+                 </select>
+             </div>
+             <button type="submit" className="mt-2 bg-[#8D6E63] text-white py-2 rounded-lg font-bold hover:bg-[#5D4037] transition-colors">Tạo Phụ Kiện</button>
+           </form>
+         )}
+    
+         <div className="space-y-4 pb-20">
+             <h2 className="text-xl font-bold text-[#3E2723]">Danh sách phụ kiện ({accessories.length})</h2>
+             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+               {accessories.map(a => (
+                  <div key={a.id} className="p-4 bg-white rounded-xl border border-[#D7CCC8] shadow-sm flex flex-col items-center text-center">
+                     <div className="w-16 h-16 relative mb-4 p-2 bg-gray-50 rounded-xl border flex items-center justify-center shrink-0">
+                        {a.url ? (
+                          <img src={a.url} alt="" className="w-12 h-12 object-contain pointer-events-none" />
+                        ) : (
+                          <div className="text-xs text-gray-400">Trống</div>
+                        )}
+                     </div>
+                     <h3 className="font-bold text-[#3E2723] leading-tight">{a.name}</h3>
+                     <p className="text-xs text-gray-500 mb-2 mt-1 line-clamp-2">{a.description}</p>
+                     <span className={`text-xs font-bold px-2 py-1 rounded ${a.type === 'golden' ? 'bg-yellow-100 text-yellow-800' : 'bg-[#D7CCC8]/30 text-[#5D4037]'}`}>
+                         {a.price} {a.type === 'golden' ? 'GChoco' : 'Choco'}
+                     </span>
+                     <div className="flex gap-2 mt-4 w-full">
+                        <button onClick={() => setEditingAccessory(a)} className="flex-1 py-1.5 text-xs bg-[#D7CCC8]/30 rounded font-bold hover:bg-[#D7CCC8]/60 transition-colors">Sửa</button>
+                        <button onClick={() => deleteAccessory(a.id)} className="px-3 py-1.5 text-xs bg-red-100 text-red-600 rounded font-bold hover:bg-red-200 transition-colors flex items-center justify-center"><Trash2 className="w-3 h-3" /></button>
+                     </div>
+                  </div>
+               ))}
+             </div>
+          </div>
+          </>
       )}
 
       {activeTab === 'stories' && (
