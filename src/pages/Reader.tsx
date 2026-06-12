@@ -37,7 +37,7 @@ const ParagraphCommentNode = ({
                  src={comment.equippedSticker} 
                  alt="Sticker" 
                  className={cn(
-                   "absolute w-5 h-5 object-contain pointer-events-none z-10 animate-pulse",
+                   "absolute w-5 h-5 object-contain pointer-events-none z-10",
                    comment.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
                    comment.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
                    comment.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
@@ -176,7 +176,7 @@ const ChapterCommentNode = ({
              src={comment.equippedSticker} 
              alt="Sticker" 
              className={cn(
-               "absolute w-8 h-8 object-contain pointer-events-none z-10 animate-pulse",
+               "absolute w-8 h-8 object-contain pointer-events-none z-10",
                comment.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
                comment.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
                comment.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
@@ -793,6 +793,19 @@ export function Reader() {
                                                        <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="hidden" />
                                                         <div className="w-8 h-8 shrink-0 relative bg-gray-200 rounded-full">
                                                             <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-full h-full rounded-full object-cover" />
+                                                            {c.equippedSticker && (
+                                                                <img 
+                                                                    src={c.equippedSticker} 
+                                                                    alt="Sticker" 
+                                                                    className={cn(
+                                                                        "absolute w-3.5 h-3.5 object-contain pointer-events-none z-10",
+                                                                        c.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
+                                                                        c.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
+                                                                        c.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
+                                                                        (c.stickerPosition === 'bottom-right' || !c.stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                                                                    )} 
+                                                                />
+                                                            )}
                                                         </div>
                                                        <div className="flex-1 min-w-0">
                                                            <div className="text-xs font-bold mb-0.5 flex items-center gap-1" style={{ color: getTitleColor(c.activeTitle) || undefined }}>
