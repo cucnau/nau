@@ -4,6 +4,7 @@ import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
 import { doc, updateDoc, collection, addDoc, setDoc, serverTimestamp, query, orderBy, onSnapshot, where, deleteDoc, limit } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 import { Gift } from 'lucide-react';
+import { UserAvatar } from '../components/UserAvatar';
 
 export function Account() {
   const { 
@@ -13,7 +14,8 @@ export function Account() {
     equippedStickerPost, stickerPositionPost,
     choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, 
     ownedStickers, equipSticker, setStickerPosition, firebaseUser, updateUserDoc, unlockAchievement,
-    customTitles, getTitleColor, lastClaimedRewardLevel, ownedMysteryBoxes
+    customTitles, getTitleColor, lastClaimedRewardLevel, ownedMysteryBoxes,
+    equippedAccessory, accessoryPosition, ownedAccessories, equipAccessory, setAccessoryPosition
   } = useStore();
   const nextLevelExp = (level || 1) * 100;
   const currentExp = exp || 0;
@@ -160,7 +162,7 @@ export function Account() {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
-        setAvatar(canvas.toDataURL('image/jpeg', 0.8));
+        setAvatar(canvas.toDataURL('image/jpeg', 0.85));
       };
       if (dataUrl) img.src = dataUrl;
     };
@@ -264,23 +266,16 @@ export function Account() {
           <h2 className="text-xl font-bold text-[#3E2723] mb-6">Cài đặt Tài khoản</h2>
           <form onSubmit={handleSaveProfile} className="space-y-5">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 relative shrink-0">
-                 <div className="w-full h-full overflow-hidden bg-gray-200 border border-[#D7CCC8] rounded-full">
-                    {avatar ? <img src={avatar} alt="Avatar" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-2 leading-none">Chưa có ảnh</div>}
-                 </div>
-                 {equippedStickerAvatar && (
-                    <img 
-                      src={equippedStickerAvatar} 
-                      alt="Sticker" 
-                      className={`absolute w-8 h-8 object-contain pointer-events-none z-10 ${
-                        stickerPositionAvatar === 'top-left' ? 'left-0 top-0 -translate-x-1/4 -translate-y-1/4' :
-                        stickerPositionAvatar === 'top-right' ? 'right-0 top-0 translate-x-1/4 -translate-y-1/4' :
-                        stickerPositionAvatar === 'bottom-left' ? 'left-0 bottom-0 -translate-x-1/4 translate-y-1/4' :
-                        'right-0 bottom-0 translate-x-1/4 translate-y-1/4'
-                      }`} 
-                    />
-                 )}
-              </div>
+              <UserAvatar 
+                avatarUrl={avatar} 
+                equippedSticker={equippedStickerAvatar} 
+                stickerPosition={stickerPositionAvatar} 
+                equippedAccessory={equippedAccessory}
+                accessoryPosition={accessoryPosition}
+                className="w-16 h-16 pointer-events-none" 
+                fallbackIconSizeClass="w-8 h-8 text-[#A1887F]" 
+                borderClass="border border-[#D7CCC8]"
+              />
               <div className="flex-1">
                 <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Ảnh đại diện</label>
                 <div className="flex items-center gap-2">
@@ -364,6 +359,150 @@ export function Account() {
                 </div>
               )}
             </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-[#5D4037]">Cài đặt Phụ kiện Avatar</label>
+              {(!ownedAccessories || ownedAccessories.length === 0) ? (
+                <p className="text-xs text-gray-400 italic bg-gray-50 border border-[#D7CCC8] p-3 rounded-xl">
+                  Bạn chưa sở hữu phụ kiện nào. Hãy vào Cửa hàng để sở hữu phụ kiện!
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {/* Accessory selector picker */}
+                  <div className="flex flex-wrap gap-3 p-3 bg-gray-50 border border-[#D7CCC8]/80 rounded-xl">
+                    <div 
+                      type="button"
+                      onClick={() => equipAccessory(null)}
+                      className={`w-14 h-14 cursor-pointer flex flex-col items-center justify-center border-2 border-dashed transition-all rounded-xl ${
+                        !equippedAccessory 
+                          ? 'border-[#8D6E63] bg-[#8D6E63]/10 text-[#8D6E63]' 
+                          : 'border-gray-300 hover:border-gray-400 bg-white text-gray-500'}`}
+                    >
+                      <span className="text-[10px] font-extrabold uppercase text-center">Tháo ra</span>
+                    </div>
+
+                    {ownedAccessories.map((url) => {
+                      const isEquipped = equippedAccessory === url;
+                      return (
+                        <div 
+                          key={url} 
+                          onClick={() => equipAccessory(url)}
+                          className={`w-14 h-14 cursor-pointer relative p-1 transition-all rounded-xl border flex items-center justify-center ${
+                            isEquipped 
+                              ? 'ring-2 ring-offset-2 ring-[#8D6E63] bg-white border-transparent' 
+                              : 'hover:scale-105 bg-white shadow-sm border-gray-200'}`}
+                        >
+                          <img src={url} alt="Accessory preview" className="w-10 h-10 object-contain pointer-events-none" referrerPolicy="no-referrer" />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {equippedAccessory && (
+                    <div className="bg-[#FDF6EC] border border-[#F5E6D3] p-4 rounded-xl space-y-4">
+                      <div className="text-xs font-bold uppercase tracking-wide text-[#8D6E63] mb-1">
+                        🛠️ Điều chỉnh vị trí phụ kiện
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Horizontal X Slider */}
+                        <div>
+                          <div className="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                            <span>Ngang (X Offset)</span>
+                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.x || 0}px</span>
+                          </div>
+                          <input 
+                            type="range" 
+                            min="-50" 
+                            max="50" 
+                            value={accessoryPosition?.x || 0} 
+                            onChange={(e) => {
+                              const x = parseInt(e.target.value);
+                              setAccessoryPosition({
+                                ...(accessoryPosition || { y: 0, scale: 100, rotate: 0 }),
+                                x
+                              });
+                            }}
+                            className="w-full accent-[#8D6E63]"
+                          />
+                        </div>
+
+                        {/* Vertical Y Slider */}
+                        <div>
+                          <div className="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                            <span>Dọc (Y Offset)</span>
+                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.y || 0}px</span>
+                          </div>
+                          <input 
+                            type="range" 
+                            min="-50" 
+                            max="50" 
+                            value={accessoryPosition?.y || 0} 
+                            onChange={(e) => {
+                              const y = parseInt(e.target.value);
+                              setAccessoryPosition({
+                                ...(accessoryPosition || { x: 0, scale: 100, rotate: 0 }),
+                                y
+                              });
+                            }}
+                            className="w-full accent-[#8D6E63]"
+                          />
+                        </div>
+
+                        {/* Scale Slider */}
+                        <div>
+                          <div className="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                            <span>Kích thước (Scale)</span>
+                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.scale ?? 100}%</span>
+                          </div>
+                          <input 
+                            type="range" 
+                            min="30" 
+                            max="200" 
+                            value={accessoryPosition?.scale ?? 100} 
+                            onChange={(e) => {
+                              const scale = parseInt(e.target.value);
+                              setAccessoryPosition({
+                                ...(accessoryPosition || { x: 0, y: 0, rotate: 0 }),
+                                scale
+                              });
+                            }}
+                            className="w-full accent-[#8D6E63]"
+                          />
+                        </div>
+
+                        {/* Rotate Slider */}
+                        <div>
+                          <div className="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                            <span>Xoay (Rotation)</span>
+                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.rotate || 0}°</span>
+                          </div>
+                          <input 
+                            type="range" 
+                            min="-180" 
+                            max="180" 
+                            value={accessoryPosition?.rotate || 0} 
+                            onChange={(e) => {
+                              const rotate = parseInt(e.target.value);
+                              setAccessoryPosition({
+                                ...(accessoryPosition || { x: 0, y: 0, scale: 100 }),
+                                rotate
+                              });
+                            }}
+                            className="w-full accent-[#8D6E63]"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="text-[10px] text-gray-500 italic bg-white/60 p-2 rounded border border-dashed border-[#D7CCC8]/60 mt-1">
+                        * Bạn có thể kéo các thanh trượt trên để dịch chuyển vật phẩm gắn tự do tới bất kỳ tọa độ, xoay góc hoặc thu phóng tùy ý trên avatar của bạn!
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div>
               <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Đổi mật khẩu</label>
               <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="Nhập để đổi mật khẩu (Chưa hỗ trợ)" disabled className="w-full px-4 py-2 rounded-lg border border-[#D7CCC8] bg-gray-100 italic text-sm" />
@@ -378,23 +517,16 @@ export function Account() {
       {tab === 'profile' && (
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8 items-start">
            <div className="bg-white dark:bg-[#1A1412] border border-[#D7CCC8] dark:border-[#3C2E27] p-6 rounded-2xl shadow-sm flex flex-col items-center text-center">
-              <div className="w-24 h-24 relative mb-4">
-                 <div className="w-full h-full overflow-hidden bg-gray-200 dark:bg-gray-800 border-4 border-[#FDF6EC] dark:border-[#2C221D] shadow-sm rounded-full">
-                    {avatarUrl ? <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400">Trống</div>}
-                 </div>
-                 {equippedStickerAvatar && (
-                    <img 
-                      src={equippedStickerAvatar} 
-                      alt="Sticker" 
-                      className={`absolute w-12 h-12 object-contain pointer-events-none z-10 ${
-                        stickerPositionAvatar === 'top-left' ? 'left-0 top-0 -translate-x-1/4 -translate-y-1/4' :
-                        stickerPositionAvatar === 'top-right' ? 'right-0 top-0 translate-x-1/4 -translate-y-1/4' :
-                        stickerPositionAvatar === 'bottom-left' ? 'left-0 bottom-0 -translate-x-1/4 translate-y-1/4' :
-                        'right-0 bottom-0 translate-x-1/4 translate-y-1/4'
-                      }`} 
-                    />
-                 )}
-              </div>
+              <UserAvatar 
+                avatarUrl={avatarUrl} 
+                equippedSticker={equippedStickerAvatar} 
+                stickerPosition={stickerPositionAvatar} 
+                equippedAccessory={equippedAccessory}
+                accessoryPosition={accessoryPosition}
+                className="w-24 h-24 shadow-sm relative mb-4 border-4 border-[#FDF6EC] dark:border-[#2C221D]" 
+                fallbackIconSizeClass="w-12 h-12 text-[#A1887F]" 
+                borderClass="border-0"
+              />
               <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-1.5 flex-wrap text-[#3E2723] dark:text-[#ECE5DC]" style={{ color: getTitleColor(activeTitle) || undefined }}>
                  {displayName}
                  {activeTitle && (
