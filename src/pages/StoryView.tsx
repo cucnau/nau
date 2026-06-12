@@ -66,6 +66,8 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                   comment.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
                   (comment.stickerPosition === 'bottom-right' || !comment.stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
                 )} 
+                style={{ imageRendering: '-webkit-optimize-contrast' }}
+                referrerPolicy="no-referrer"
               />
             )}
             <UserAvatar 
