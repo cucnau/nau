@@ -55,10 +55,21 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                   : "p-3.5 rounded-2xl flex gap-3 bg-[#FAF7F2]/60 dark:bg-gray-850/10 border border-[#F5E6D3]/40 hover:border-[#D7CCC8]/40 transition-colors relative"
             )}
          >
+            {comment.equippedSticker && (
+              <img 
+                src={comment.equippedSticker} 
+                alt="Sticker" 
+                className={cn(
+                  "absolute w-6 h-6 object-contain pointer-events-none z-10 animate-pulse",
+                  comment.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
+                  comment.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
+                  comment.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
+                  (comment.stickerPosition === 'bottom-right' || !comment.stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                )} 
+              />
+            )}
             <UserAvatar 
                avatarUrl={comment.avatarUrl} 
-               equippedSticker={comment.equippedSticker || comment.equippedStickerAvatar} 
-               stickerPosition={comment.stickerPosition || comment.stickerPositionAvatar} 
                equippedAccessory={comment.equippedAccessory}
                accessoryPosition={comment.accessoryPosition}
                className={depth === 0 ? "w-10 h-10 shrink-0" : "w-8.5 h-8.5 shrink-0"} 
@@ -300,8 +311,8 @@ export function StoryView() {
              content: giftMessage.trim() || 'Gửi tặng Choco ngọt ngào ủng hộ tác phẩm!',
              type: 'choco_gift',
              activeTitle: useStore.getState().activeTitle || null,
-            equippedSticker: useStore.getState().equippedStickerAvatar || null,
-            stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right',
+            equippedSticker: useStore.getState().equippedStickerComment || null,
+            stickerPosition: useStore.getState().stickerPositionComment || 'top-right',
             equippedAccessory: useStore.getState().equippedAccessory || null,
             accessoryPosition: useStore.getState().accessoryPosition || null,
              giftAmount: giftAmount,
@@ -347,8 +358,8 @@ export function StoryView() {
            activeTitle: useStore.getState().activeTitle || null,
            giftAmount: 0,
            paragraphIdx: parentComment.paragraphIdx || null,
-           equippedSticker: useStore.getState().equippedStickerAvatar || null,
-           stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right',
+           equippedSticker: useStore.getState().equippedStickerComment || null,
+           stickerPosition: useStore.getState().stickerPositionComment || 'top-right',
            equippedAccessory: useStore.getState().equippedAccessory || null,
            accessoryPosition: useStore.getState().accessoryPosition || null,
            createdAt: serverTimestamp()
@@ -399,8 +410,8 @@ export function StoryView() {
            content: commentText.trim(),
            type: 'story_review',
            activeTitle: useStore.getState().activeTitle || null,
-           equippedSticker: useStore.getState().equippedStickerAvatar || null,
-           stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right',
+           equippedSticker: useStore.getState().equippedStickerComment || null,
+           stickerPosition: useStore.getState().stickerPositionComment || 'top-right',
            equippedAccessory: useStore.getState().equippedAccessory || null,
            accessoryPosition: useStore.getState().accessoryPosition || null,
            giftAmount: 0,
