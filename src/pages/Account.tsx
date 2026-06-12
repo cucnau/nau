@@ -9,7 +9,7 @@ import { UserAvatar } from '../components/UserAvatar';
 export function Account() {
   const { 
     isLoggedIn, uid, displayName, email, avatarUrl,
-    equippedStickerAvatar, stickerPositionAvatar,
+    equippedStickerComment, stickerPositionComment,
     equippedStickerChat,
     equippedStickerPost, stickerPositionPost,
     choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, 
@@ -211,10 +211,12 @@ export function Account() {
         activeTitle: activeTitle || null,
         content: review,
         createdAt: serverTimestamp(),
-        equippedStickerAvatar: useStore.getState().equippedStickerAvatar || null,
-        stickerPositionAvatar: useStore.getState().stickerPositionAvatar || 'top-right',
+        equippedStickerComment: useStore.getState().equippedStickerComment || null,
+        stickerPositionComment: useStore.getState().stickerPositionComment || 'top-right',
         equippedStickerPost: useStore.getState().equippedStickerPost || null,
-        stickerPositionPost: useStore.getState().stickerPositionPost || 'top-right'
+        stickerPositionPost: useStore.getState().stickerPositionPost || 'top-right',
+        equippedAccessory: useStore.getState().equippedAccessory || null,
+        accessoryPosition: useStore.getState().accessoryPosition || null
       });
 
       unlockAchievement('blogger_choco_new');
@@ -268,8 +270,6 @@ export function Account() {
             <div className="order-1 sticky top-20 z-10 bg-white/95 dark:bg-[#1A1412]/95 backdrop-blur shadow-sm border border-[#D7CCC8]/60 dark:border-[#3C2E27]/60 p-4 -mt-2 -mx-2 md:mx-0 rounded-2xl flex items-center gap-4">
               <UserAvatar 
                 avatarUrl={avatar} 
-                equippedSticker={equippedStickerAvatar} 
-                stickerPosition={stickerPositionAvatar} 
                 equippedAccessory={equippedAccessory}
                 accessoryPosition={accessoryPosition}
                 className="w-16 h-16 pointer-events-none" 
@@ -302,7 +302,7 @@ export function Account() {
               ) : (
                 <div className="space-y-4">
                   <div className="flex border-b border-[#D7CCC8]">
-                     <button type="button" onClick={() => setActiveStickerTab('avatar')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'avatar' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}>Avatar</button>
+                     <button type="button" onClick={() => setActiveStickerTab('comment')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'comment' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}>Bình Luận</button>
                      <button type="button" onClick={() => setActiveStickerTab('chat')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'chat' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}>Chat Bubble</button>
                      <button type="button" onClick={() => setActiveStickerTab('post')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'post' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}>Bài Đăng</button>
                   </div>
@@ -313,13 +313,13 @@ export function Account() {
                        onClick={() => equipSticker(activeStickerTab, null)} 
                        title="Tháo sticker"
                        className={`w-14 h-14 cursor-pointer flex items-center justify-center border-2 border-dashed transition-all rounded-xl ${
-                          !(activeStickerTab === 'avatar' ? equippedStickerAvatar : activeStickerTab === 'chat' ? equippedStickerChat : equippedStickerPost) 
+                          !(activeStickerTab === 'comment' ? equippedStickerComment : activeStickerTab === 'chat' ? equippedStickerChat : equippedStickerPost) 
                           ? 'border-[#8D6E63] bg-[#8D6E63]/10 shadow-sm' : 'border-gray-300 hover:border-gray-400 bg-white'}`}
                     >
                        <span className="text-xs font-bold text-gray-500">Trống</span>
                     </div>
                     {(ownedStickers || []).map(url => {
-                       const isEquipped = (activeStickerTab === 'avatar' ? equippedStickerAvatar : activeStickerTab === 'chat' ? equippedStickerChat : equippedStickerPost) === url;
+                       const isEquipped = (activeStickerTab === 'comment' ? equippedStickerComment : activeStickerTab === 'chat' ? equippedStickerChat : equippedStickerPost) === url;
                        return (
                           <div 
                             key={url} 
@@ -332,9 +332,9 @@ export function Account() {
                     })}
                   </div>
 
-                  {(activeStickerTab === 'avatar' || activeStickerTab === 'post') && (activeStickerTab === 'avatar' ? equippedStickerAvatar : equippedStickerPost) && (
+                  {(activeStickerTab === 'comment' || activeStickerTab === 'post') && (activeStickerTab === 'comment' ? equippedStickerComment : equippedStickerPost) && (
                     <div>
-                      <label className="block text-xs font-bold mb-1.5 text-[#5D4037] uppercase tracking-wider">Vị trí gắn Sticker cho {activeStickerTab === 'avatar' ? 'Avatar' : 'Bài Đăng'}</label>
+                      <label className="block text-xs font-bold mb-1.5 text-[#5D4037] uppercase tracking-wider">Vị trí gắn Sticker cho {activeStickerTab === 'comment' ? 'Bình Luận' : 'Bài Đăng'}</label>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         {[
                           { id: 'top-left', label: 'Trên - Trái' },
@@ -342,12 +342,12 @@ export function Account() {
                           { id: 'bottom-left', label: 'Dưới - Trái' },
                           { id: 'bottom-right', label: 'Dưới - Phải' }
                         ].map(pos => {
-                          const isPosActive = (activeStickerTab === 'avatar' ? stickerPositionAvatar : stickerPositionPost) === pos.id;
+                          const isPosActive = (activeStickerTab === 'comment' ? stickerPositionComment : stickerPositionPost) === pos.id;
                           return (
                             <button
                               key={pos.id}
                               type="button"
-                              onClick={() => setStickerPosition(activeStickerTab as 'avatar' | 'post', pos.id as any)}
+                              onClick={() => setStickerPosition(activeStickerTab as 'comment' | 'post', pos.id as any)}
                               className={`py-1.5 px-3 rounded-lg border text-xs font-bold transition-all ${isPosActive ? 'bg-[#8D6E63] text-white border-[#8D6E63]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                             >
                               {pos.label}
@@ -409,13 +409,13 @@ export function Account() {
                         {/* Horizontal X Slider */}
                         <div>
                           <div className="flex justify-between text-xs font-bold text-gray-600 mb-1">
-                            <span>Ngang (X Offset)</span>
-                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.x || 0}px</span>
+                            <span>Ngang (X)</span>
+                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.x || 0}%</span>
                           </div>
                           <input 
                             type="range" 
-                            min="-50" 
-                            max="50" 
+                            min="-200" 
+                            max="200" 
                             value={accessoryPosition?.x || 0} 
                             onChange={(e) => {
                               const x = parseInt(e.target.value);
@@ -431,13 +431,13 @@ export function Account() {
                         {/* Vertical Y Slider */}
                         <div>
                           <div className="flex justify-between text-xs font-bold text-gray-600 mb-1">
-                            <span>Dọc (Y Offset)</span>
-                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.y || 0}px</span>
+                            <span>Dọc (Y)</span>
+                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.y || 0}%</span>
                           </div>
                           <input 
                             type="range" 
-                            min="-50" 
-                            max="50" 
+                            min="-200" 
+                            max="200" 
                             value={accessoryPosition?.y || 0} 
                             onChange={(e) => {
                               const y = parseInt(e.target.value);
@@ -520,8 +520,6 @@ export function Account() {
            <div className="bg-white dark:bg-[#1A1412] border border-[#D7CCC8] dark:border-[#3C2E27] p-6 rounded-2xl shadow-sm flex flex-col items-center text-center">
               <UserAvatar 
                 avatarUrl={avatarUrl} 
-                equippedSticker={equippedStickerAvatar} 
-                stickerPosition={stickerPositionAvatar} 
                 equippedAccessory={equippedAccessory}
                 accessoryPosition={accessoryPosition}
                 className="w-24 h-24 shadow-sm relative mb-4 border-4 border-[#FDF6EC] dark:border-[#2C221D]" 
