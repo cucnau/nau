@@ -7,7 +7,7 @@ import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit } fro
 import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement } from './types/achievements';
 import { logTransaction } from './lib/transactions';
 
-export function compressBase64Image(dataUrl: string, maxWidth = 180, maxHeight = 180, quality = 0.8): Promise<string> {
+export function compressBase64Image(dataUrl: string, maxWidth = 180, maxHeight = 180, quality = 0.85): Promise<string> {
    return new Promise((resolve) => {
       if (!dataUrl || !dataUrl.startsWith('data:image/')) {
          resolve(dataUrl);
@@ -76,6 +76,9 @@ interface UserState {
   equippedStickerPost: string | null;
   stickerPositionPost: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   ownedStickers: string[];
+  equippedAccessory: string | null;
+  accessoryPosition: { x: number; y: number; scale: number; rotate: number };
+  ownedAccessories: string[];
   ownedPassTickets: number;
   ownedPriorityTickets: number;
   ownedMysteryBoxes: number;
@@ -110,6 +113,7 @@ interface UserState {
   allUsersUnlockedAchievements: Record<string, string[]>;
   allUsersClaimedAchievements: Record<string, string[]>;
   allUsersOwnedStickers: Record<string, string[]>;
+  allUsersOwnedAccessories: Record<string, string[]>;
 
   // Achievements properties
   unlockedAchievements: string[];
@@ -170,6 +174,9 @@ interface UserState {
   addOwnedSticker: (stickerUrl: string) => void;
   equipSticker: (type: 'avatar' | 'chat' | 'post', stickerUrl: string | null) => void;
   setStickerPosition: (type: 'avatar' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => void;
+  addOwnedAccessory: (accessoryUrl: string) => void;
+  equipAccessory: (accessoryUrl: string | null) => void;
+  setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => void;
   
   claimMission: (id: string) => void;
   updateUserDoc: (updates: any, transactionReason?: string) => Promise<void>;
@@ -218,6 +225,9 @@ export const useStore = create<UserState>()(
       equippedStickerPost: null,
       stickerPositionPost: 'top-right',
       ownedStickers: [],
+      equippedAccessory: null,
+      accessoryPosition: { x: 0, y: 0, scale: 100, rotate: 0 },
+      ownedAccessories: [],
       ownedPassTickets: 0,
       ownedPriorityTickets: 0,
       ownedMysteryBoxes: 0,
@@ -250,6 +260,7 @@ export const useStore = create<UserState>()(
       allUsersUnlockedAchievements: {},
       allUsersClaimedAchievements: {},
       allUsersOwnedStickers: {},
+      allUsersOwnedAccessories: {},
 
       // Achievements defaults
       unlockedAchievements: [],
@@ -308,6 +319,9 @@ export const useStore = create<UserState>()(
         equippedStickerPost: null,
         stickerPositionPost: 'top-right',
         ownedStickers: [],
+        equippedAccessory: null,
+        accessoryPosition: { x: 0, y: 0, scale: 100, rotate: 0 },
+        ownedAccessories: [],
         ownedPassTickets: 0,
         ownedPriorityTickets: 0,
         ownedMysteryBoxes: 0,
@@ -356,6 +370,7 @@ export const useStore = create<UserState>()(
             const allHl = state.allUsersReadHistoryList || {};
             const allSaved = state.allUsersSavedStories || {};
             const allOwnedStickers = state.allUsersOwnedStickers || {};
+            const allOwnedAccessories = state.allUsersOwnedAccessories || {};
             const allUnlocked = state.allUsersUnlockedAchievements || {};
             const allClaimed = state.allUsersClaimedAchievements || {};
             
@@ -364,6 +379,7 @@ export const useStore = create<UserState>()(
             const userHistory = allHl[uid] || [];
             const userSaved = allSaved[uid] || [];
             const userOwnedStickers = allOwnedStickers[uid] || [];
+            const userOwnedAccessories = allOwnedAccessories[uid] || [];
             const userUnlocked = allUnlocked[uid] || [];
             const userClaimed = allClaimed[uid] || [];
 
@@ -381,6 +397,9 @@ export const useStore = create<UserState>()(
                unlockedPassChapters: (user as any).unlockedPassChapters || [],
                unlockedEarlyAccessChapters: (user as any).unlockedEarlyAccessChapters || [],
                ownedStickers: userOwnedStickers,
+               equippedAccessory: (user as any).equippedAccessory || null,
+               accessoryPosition: (user as any).accessoryPosition || { x: 0, y: 0, scale: 100, rotate: 0 },
+               ownedAccessories: userOwnedAccessories,
                ownedPassTickets: (user as any).ownedPassTickets || 0,
                ownedPriorityTickets: (user as any).ownedPriorityTickets || 0,
                unlockedAchievements: userUnlocked,
@@ -398,6 +417,9 @@ export const useStore = create<UserState>()(
                unlockedPassChapters: [],
                unlockedEarlyAccessChapters: [],
                ownedStickers: [],
+               equippedAccessory: null,
+               accessoryPosition: { x: 0, y: 0, scale: 100, rotate: 0 },
+               ownedAccessories: [],
                ownedPassTickets: 0,
                ownedPriorityTickets: 0,
                unlockedAchievements: [],
@@ -425,6 +447,9 @@ export const useStore = create<UserState>()(
             equippedStickerPost: data.equippedStickerPost !== undefined ? data.equippedStickerPost : state.equippedStickerPost,
             stickerPositionPost: data.stickerPositionPost !== undefined ? data.stickerPositionPost : state.stickerPositionPost,
             ownedStickers: data.ownedStickers !== undefined ? data.ownedStickers : state.ownedStickers,
+            equippedAccessory: data.equippedAccessory !== undefined ? data.equippedAccessory : state.equippedAccessory,
+            accessoryPosition: data.accessoryPosition !== undefined ? data.accessoryPosition : state.accessoryPosition,
+            ownedAccessories: data.ownedAccessories !== undefined ? data.ownedAccessories : state.ownedAccessories,
             ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
             ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
             ownedMysteryBoxes: data.ownedMysteryBoxes !== undefined ? data.ownedMysteryBoxes : state.ownedMysteryBoxes,
@@ -1056,6 +1081,40 @@ export const useStore = create<UserState>()(
          const key = type === 'avatar' ? 'stickerPositionAvatar' : 'stickerPositionPost';
          set({ [key]: pos });
          get().updateUserDoc({ [key]: pos });
+      },
+
+      addOwnedAccessory: (accessoryUrl: string) => {
+         const state = get();
+         if (!state.isLoggedIn || !state.uid) return;
+         if ((state.ownedAccessories || []).includes(accessoryUrl)) return;
+         
+         const newOwned = [...(state.ownedAccessories || []), accessoryUrl];
+         const uid = state.uid;
+         const allOwned = { ...(state.allUsersOwnedAccessories || {}) };
+         allOwned[uid] = newOwned;
+         
+         set({
+            ownedAccessories: newOwned,
+            allUsersOwnedAccessories: allOwned
+         });
+         
+         get().updateUserDoc({ ownedAccessories: newOwned });
+      },
+      
+      equipAccessory: (accessoryUrl: string | null) => {
+         const state = get();
+         if (!state.isLoggedIn) return;
+         
+         set({ equippedAccessory: accessoryUrl });
+         get().updateUserDoc({ equippedAccessory: accessoryUrl });
+      },
+
+      setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => {
+         const state = get();
+         if (!state.isLoggedIn) return;
+         
+         set({ accessoryPosition: pos });
+         get().updateUserDoc({ accessoryPosition: pos });
       },
 
       giftChoco: (storyId: string, amount: number) => {
