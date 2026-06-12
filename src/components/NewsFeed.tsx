@@ -105,8 +105,6 @@ export function NewsFeed() {
                 )}
                 <UserAvatar 
                   avatarUrl={post.avatarUrl} 
-                  equippedSticker={post.equippedStickerAvatar || post.equippedSticker} 
-                  stickerPosition={post.stickerPositionAvatar || post.stickerPosition} 
                   equippedAccessory={post.equippedAccessory}
                   accessoryPosition={post.accessoryPosition}
                   className="w-8 h-8" 
