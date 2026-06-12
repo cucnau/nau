@@ -5,6 +5,7 @@ import { cn } from '../components/Layout';
 import React, { useEffect, useState } from 'react';
 import { db, checkIfQuotaError } from '../lib/firebase';
 import { doc, getDoc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where } from 'firebase/firestore';
+import { UserAvatar } from '../components/UserAvatar';
 
 interface CommentNodeProps {
    comment: any;
@@ -44,19 +45,26 @@ const CommentNode: React.FC<CommentNodeProps> = ({
       <div key={comment.id} className="w-full flex flex-col gap-2">
          <div 
             className={cn(
-               "p-4 rounded-2xl flex gap-3.5 border transition-all shadow-sm relative overflow-visible pr-8",
-               isGift 
-                  ? "bg-amber-50/70 border-amber-200/80 hover:bg-amber-50" 
-                  : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50"
+               depth === 0 
+                  ? cn(
+                     "p-4 rounded-2xl flex gap-3.5 border transition-all shadow-sm relative overflow-visible pr-8",
+                     isGift 
+                        ? "bg-amber-50/70 border-amber-200/80 hover:bg-amber-50" 
+                        : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50"
+                    )
+                  : "p-3.5 rounded-2xl flex gap-3 bg-[#FAF7F2]/60 dark:bg-gray-850/10 border border-[#F5E6D3]/40 hover:border-[#D7CCC8]/40 transition-colors relative"
             )}
          >
-            {comment.avatarUrl ? (
-               <img src={comment.avatarUrl} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#D7CCC8]/30" referrerPolicy="no-referrer" />
-            ) : (
-               <div className="w-10 h-10 rounded-full bg-[#8D6E63] text-[#FDF6EC] flex items-center justify-center shrink-0 font-bold text-xs uppercase shadow-inner">
-                  {comment.displayName?.substring(0, 2)}
-               </div>
-            )}
+            <UserAvatar 
+               avatarUrl={comment.avatarUrl} 
+               equippedSticker={comment.equippedSticker || comment.equippedStickerAvatar} 
+               stickerPosition={comment.stickerPosition || comment.stickerPositionAvatar} 
+               equippedAccessory={comment.equippedAccessory}
+               accessoryPosition={comment.accessoryPosition}
+               className={depth === 0 ? "w-10 h-10 shrink-0" : "w-8.5 h-8.5 shrink-0"} 
+               fallbackIconSizeClass={depth === 0 ? "w-5 h-5 text-[#A1887F]" : "w-4.5 h-4.5 text-[#A1887F]"} 
+               borderClass="border border-[#D7CCC8]/30"
+            />
             
             <div className="flex-1 min-w-0">
                <div className="flex items-center justify-between gap-2 mb-1">
@@ -85,9 +93,14 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                   </span>
                </div>
                <p className={cn(
-                  "text-sm break-words leading-relaxed",
+                  "text-sm break-words leading-relaxed text-justify",
                   isGift ? "text-amber-900 font-medium italic" : "text-gray-700"
                )}>
+                  {comment.replyToUser && (
+                     <span className="text-[#8D6E63] font-bold text-[10px] uppercase mr-1.5 bg-[#8D6E63]/10 px-2 py-0.5 rounded-md select-none border border-[#8D6E63]/25 align-middle inline-block">
+                        @{comment.replyToUser}
+                     </span>
+                  )}
                   {comment.content}
                </p>
 
@@ -287,6 +300,10 @@ export function StoryView() {
              content: giftMessage.trim() || 'Gửi tặng Choco ngọt ngào ủng hộ tác phẩm!',
              type: 'choco_gift',
              activeTitle: useStore.getState().activeTitle || null,
+            equippedSticker: useStore.getState().equippedStickerAvatar || null,
+            stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right',
+            equippedAccessory: useStore.getState().equippedAccessory || null,
+            accessoryPosition: useStore.getState().accessoryPosition || null,
              giftAmount: giftAmount,
              paragraphIdx: null,
              createdAt: serverTimestamp()
@@ -326,9 +343,14 @@ export function StoryView() {
            content: replyText.trim(),
            type: 'comment_reply',
            parentId: parentComment.id,
+           replyToUser: parentComment.displayName || null,
            activeTitle: useStore.getState().activeTitle || null,
            giftAmount: 0,
            paragraphIdx: parentComment.paragraphIdx || null,
+           equippedSticker: useStore.getState().equippedStickerAvatar || null,
+           stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right',
+           equippedAccessory: useStore.getState().equippedAccessory || null,
+           accessoryPosition: useStore.getState().accessoryPosition || null,
            createdAt: serverTimestamp()
         });
 
@@ -377,6 +399,10 @@ export function StoryView() {
            content: commentText.trim(),
            type: 'story_review',
            activeTitle: useStore.getState().activeTitle || null,
+           equippedSticker: useStore.getState().equippedStickerAvatar || null,
+           stickerPosition: useStore.getState().stickerPositionAvatar || 'top-right',
+           equippedAccessory: useStore.getState().equippedAccessory || null,
+           accessoryPosition: useStore.getState().accessoryPosition || null,
            giftAmount: 0,
            paragraphIdx: null,
            createdAt: serverTimestamp()
