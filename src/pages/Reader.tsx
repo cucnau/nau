@@ -43,6 +43,8 @@ const ParagraphCommentNode = ({
                    comment.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
                    (comment.stickerPosition === 'bottom-right' || !comment.stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
                  )} 
+                 style={{ imageRendering: '-webkit-optimize-contrast' }}
+                 referrerPolicy="no-referrer"
                />
              )}
             <UserAvatar 
@@ -182,6 +184,8 @@ const ChapterCommentNode = ({
                comment.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
                (comment.stickerPosition === 'bottom-right' || !comment.stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
              )} 
+             style={{ imageRendering: '-webkit-optimize-contrast' }}
+             referrerPolicy="no-referrer"
            />
          )}
          <div className="flex gap-3.5">
@@ -804,6 +808,8 @@ export function Reader() {
                                                                         c.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
                                                                         (c.stickerPosition === 'bottom-right' || !c.stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
                                                                     )} 
+                                                                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                                                                    referrerPolicy="no-referrer"
                                                                 />
                                                             )}
                                                         </div>
@@ -970,6 +976,8 @@ export function Reader() {
                                        src={c.equippedSticker} 
                                        alt="Decor sticker" 
                                        className="absolute right-3 bottom-3 w-8 h-8 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:4s] z-10" 
+                                       style={{ imageRendering: '-webkit-optimize-contrast' }}
+                                       referrerPolicy="no-referrer"
                                    />
                                )}
                                <div className="flex items-center gap-3 mb-3">
