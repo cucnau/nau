@@ -32,7 +32,10 @@
         "equippedStickerChat": { "type": "string" },
         "equippedStickerPost": { "type": "string" },
         "stickerPositionPost": { "type": "string" },
-        "ownedStickers": { "type": "array" }
+        "ownedStickers": { "type": "array" },
+        "equippedAccessory": { "type": "string" },
+        "accessoryPosition": { "type": "object" },
+        "ownedAccessories": { "type": "array" }
       },
       "required": ["uid", "choco", "goldenChoco", "createdAt"]
     },
@@ -117,6 +120,21 @@
       },
       "required": ["name", "description", "price", "type", "url"]
     },
+    "AvatarAccessory": {
+      "title": "AvatarAccessory",
+      "description": "Avatar accessory item for purchase in store",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "type": { "type": "string" },
+        "url": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["name", "description", "price", "type", "url"]
+    },
     "Notification": {
       "title": "Notification",
       "description": "User notification for new audiobook/story chapters",
@@ -175,6 +193,10 @@
     "store_stickers/{stickerId}": {
       "schema": { "$ref": "#/entities/AvatarSticker" },
       "description": "Collectible avatar stickers"
+    },
+    "store_accessories/{accessoryId}": {
+      "schema": { "$ref": "#/entities/AvatarAccessory" },
+      "description": "Collectible avatar accessories"
     },
     "notifications/{notificationId}": {
       "schema": { "$ref": "#/entities/Notification" },
