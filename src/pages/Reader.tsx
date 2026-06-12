@@ -8,6 +8,250 @@ import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapsho
 import { format } from 'date-fns';
 import { getWeeklyId } from '../types/achievements';
 
+const ParagraphCommentNode = ({
+   comment,
+   comments,
+   replyingToId,
+   setReplyingToId,
+   replyText,
+   setReplyText,
+   submittingReply,
+   handleSendReply,
+   getTitleColor,
+   isLoggedIn,
+   isDark,
+   depth = 0
+}: any) => {
+   const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
+      const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
+      const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis?.() || 0);
+      return timeA - timeB;
+   });
+
+   return (
+      <div key={comment.id} className="text-xs pt-1 mt-1 border-t border-dashed border-gray-100 dark:border-[#3C2E27]/30 first:border-0">
+         <div className="flex gap-2.5 items-start p-2 rounded-xl bg-[#FDF6EC]/40 dark:bg-[#1A1412]/20 border border-[#F5E6D3]/40 dark:border-[#3C2E27]/30">
+            <img src={comment.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-8 h-8 rounded-full object-cover shrink-0" />
+            <div className="flex-1 min-w-0">
+               <div className="text-[11px] font-bold mb-0.5 flex justify-between tracking-tight" style={{ color: getTitleColor(comment.activeTitle) || undefined }}>
+                  <span className="flex items-center gap-1">
+                     {comment.displayName}
+                     {comment.activeTitle && (
+                        <span className="px-1 py-0.5 bg-yellow-101 text-yellow-800 text-[7px] font-extrabold rounded">
+                           🏆 {comment.activeTitle}
+                        </span>
+                     )}
+                  </span>
+                  <span className="text-[9px] text-gray-400 font-mono">
+                     {comment.createdAt?.toDate 
+                        ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
+                        : 'Vừa xong'}
+                  </span>
+               </div>
+               <p className={cn("text-xs leading-relaxed text-justify break-words", isDark ? "text-[#ECE5DC]" : "text-gray-700")}>
+                  {comment.content}
+               </p>
+               
+               {isLoggedIn && (
+                  <button 
+                     type="button"
+                     onClick={() => {
+                        if (replyingToId === comment.id) {
+                           setReplyingToId(null);
+                        } else {
+                           setReplyingToId(comment.id);
+                           setReplyText('');
+                        }
+                     }}
+                     className="text-[10px] text-[#8D6E63] hover:text-[#5D4037] font-extrabold block mt-1"
+                  >
+                     Trả lời
+                  </button>
+               )}
+
+               {replyingToId === comment.id && (
+                  <div className="mt-2 flex gap-2">
+                     <input 
+                        type="text" 
+                        placeholder={`Trả lời ${comment.displayName}...`}
+                        value={replyText}
+                        disabled={submittingReply}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        className={cn("flex-1 px-2.5 py-1 text-xs rounded-lg border focus:outline-none focus:border-[#8D6E63] bg-transparent", isDark ? "border-[#3C2E27] text-[#ECE5DC]" : "border-[#D7CCC8] dark:border-[#D7CCC8] text-[#3E2723] dark:text-[#3E2723]")}
+                        onKeyDown={(e) => {
+                           if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (replyText.trim() && !submittingReply) {
+                                 handleSendReply(comment);
+                              }
+                           }
+                        }}
+                     />
+                     <button 
+                        type="button"
+                        onClick={() => handleSendReply(comment)}
+                        disabled={submittingReply || !replyText.trim()}
+                        className="bg-[#8D6E63] text-white px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors hover:bg-[#5D4037] disabled:opacity-50"
+                     >
+                        Gửi
+                     </button>
+                  </div>
+               )}
+            </div>
+         </div>
+
+         {replies.length > 0 && (
+            <div className={cn(
+               "mt-2 pl-4 space-y-2 border-l border-[#D7CCC8]/40",
+               depth > 4 ? "pl-1 border-0" : ""
+            )}>
+               {replies.map(r => (
+                  <ParagraphCommentNode
+                     key={r.id}
+                     comment={r}
+                     comments={comments}
+                     replyingToId={replyingToId}
+                     setReplyingToId={setReplyingToId}
+                     replyText={replyText}
+                     setReplyText={setReplyText}
+                     submittingReply={submittingReply}
+                     handleSendReply={handleSendReply}
+                     getTitleColor={getTitleColor}
+                     isLoggedIn={isLoggedIn}
+                     isDark={isDark}
+                     depth={depth + 1}
+                  />
+               ))}
+            </div>
+         )}
+      </div>
+   );
+};
+
+const ChapterCommentNode = ({
+   comment,
+   comments,
+   replyingToId,
+   setReplyingToId,
+   replyText,
+   setReplyText,
+   submittingReply,
+   handleSendReply,
+   getTitleColor,
+   isLoggedIn,
+   isDark,
+   depth = 0
+}: any) => {
+   const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
+      const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
+      const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis?.() || 0);
+      return timeA - timeB;
+   });
+
+   return (
+      <div key={comment.id} className={cn("p-4 rounded-2xl border flex flex-col gap-2 shadow-xs transition-colors", isDark ? "bg-[#211B18]/40 border-[#3C2E27]" : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50")}>
+         <div className="flex gap-3.5">
+            <img src={comment.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} alt="" className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#D7CCC8]/30" referrerPolicy="no-referrer" />
+            <div className="flex-1 min-w-0">
+               <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="font-extrabold text-xs flex items-center gap-1.5" style={{ color: getTitleColor(comment.activeTitle) || undefined }}>
+                     {comment.displayName}
+                     {comment.activeTitle && (
+                        <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-850 text-[9px] font-black rounded uppercase tracking-tight select-none border border-yellow-200 inline-block align-middle">
+                           🏆 {comment.activeTitle}
+                        </span>
+                     )}
+                  </span>
+                  
+                  <span className="text-[9px] text-gray-400 font-mono shrink-0">
+                     {comment.createdAt?.toDate 
+                        ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
+                        : 'Vừa xong'}
+                  </span>
+               </div>
+               <p className={cn("text-xs leading-relaxed text-justify break-words", isDark ? "text-[#ECE5DC]" : "text-gray-700")}>
+                  {comment.content}
+               </p>
+
+               {/* Reply panel button */}
+               {isLoggedIn && (
+                  <div className="flex items-center gap-4 mt-2">
+                     <button 
+                        onClick={() => {
+                           if (replyingToId === comment.id) {
+                              setReplyingToId(null);
+                           } else {
+                              setReplyingToId(comment.id);
+                              setReplyText('');
+                           }
+                        }}
+                        className="text-xs text-[#8D6E63] hover:text-[#5D4037] font-extrabold flex items-center gap-1 cursor-pointer transition-colors"
+                     >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                        Trả lời
+                     </button>
+                  </div>
+               )}
+
+               {/* Dynamic inline reply input */}
+               {replyingToId === comment.id && (
+                  <div className="mt-3 flex gap-2 animate-fade-in pl-1">
+                     <input 
+                        type="text"
+                        placeholder={`Trả lời bình luận của ${comment.displayName}...`}
+                        value={replyText}
+                        disabled={submittingReply}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        className={cn("flex-1 px-3.5 py-1.5 placeholder-gray-400 text-xs sm:text-sm rounded-xl border focus:outline-none focus:ring-1 focus:ring-[#8D6E63] focus:border-[#8D6E63]", isDark ? "border-[#3C2E27] text-[#ECE5DC] bg-transparent" : "bg-[#FDF6EC] border-[#D7CCC8]/80 text-[#3E2723]")}
+                        onKeyDown={(e) => {
+                           if (e.key === 'Enter') {
+                              e.preventDefault();
+                              if (replyText.trim() && !submittingReply) {
+                                 handleSendReply(comment);
+                              }
+                           }
+                        }}
+                     />
+                     <button 
+                        onClick={() => handleSendReply(comment)}
+                        disabled={submittingReply || !replyText.trim()}
+                        className={cn("px-4 py-1.5 rounded-xl text-xs font-bold transition-colors disabled:bg-gray-300 disabled:text-gray-400", isDark ? "bg-[#3C2E27] hover:bg-[#5D4037] text-white" : "bg-[#3E2723] dark:bg-[#3E2723] hover:bg-[#2D1B19] dark:hover:bg-[#2D1B19] text-[#FDF6EC] dark:text-[#FDF6EC]")}
+                     >
+                        Gửi
+                     </button>
+                  </div>
+               )}
+            </div>
+         </div>
+
+         {replies.length > 0 && (
+            <div className={cn(
+               "pl-4 space-y-3 border-l-2 border-[#D7CCC8]/40 mt-1",
+               depth > 4 ? "pl-1 border-0" : ""
+            )}>
+               {replies.map(r => (
+                  <ChapterCommentNode
+                     key={r.id}
+                     comment={r}
+                     comments={comments}
+                     replyingToId={replyingToId}
+                     setReplyingToId={setReplyingToId}
+                     replyText={replyText}
+                     setReplyText={setReplyText}
+                     submittingReply={submittingReply}
+                     handleSendReply={handleSendReply}
+                     getTitleColor={getTitleColor}
+                     isLoggedIn={isLoggedIn}
+                     isDark={isDark}
+                     depth={depth + 1}
+                  />
+               ))}
+            </div>
+         )}
+      </div>
+   );
+};
+
 export function Reader() {
   const { storyId, chapterId } = useParams();
   const navigate = useNavigate();
@@ -497,7 +741,7 @@ export function Reader() {
                                        {pComments.length === 0 ? (
                                            <div className="text-center italic text-sm opacity-50 py-2">Chưa có bình luận. Hãy là người đầu tiên!</div>
                                        ) : (
-                                           pComments.map(c => (
+                                           pComments.map(c => { return <ParagraphCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={isDark} />; if (false) { return (
                                                <div key={c.id} className="flex flex-col gap-1 w-full border-b border-gray-100/15 pb-3 last:border-0 last:pb-0">
                                                    <div className="flex gap-3">
                                                        <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="hidden" />
@@ -607,7 +851,7 @@ export function Reader() {
                                                       );
                                                    })()}
                                                 </div>
-                                           ))
+                                           )}})
                                        )}
                                    </div>
 
@@ -673,7 +917,7 @@ export function Reader() {
                    {chapterComments.length === 0 ? (
                        <p className="text-center italic opacity-50">Chưa có bình luận nào cho chương này.</p>
                    ) : (
-                       chapterComments.map(c => (
+                       chapterComments.map(c => { return <ChapterCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={isDark} />; if (false) { return (
                            <div key={c.id} className={cn("p-5 rounded-2xl border", isDark ? "bg-[#2C221D]/80 border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8] shadow-sm relative overflow-visible pr-8")}>
                                <div className="flex items-center gap-3 mb-3">
                                    {c.equippedSticker && (
@@ -810,7 +1054,7 @@ export function Reader() {
                                     );
                                 })()}
                            </div>
-                       ))
+                       )}})
                    )}
                </div>
            </div>
