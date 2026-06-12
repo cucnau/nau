@@ -101,6 +101,8 @@ export function GlobalChat() {
                      avatarUrl={msg.avatarUrl} 
                      equippedSticker={msg.equippedStickerAvatar || msg.equippedSticker} 
                      stickerPosition={msg.stickerPositionAvatar || msg.stickerPosition} 
+                     equippedAccessory={msg.equippedAccessory}
+                     accessoryPosition={msg.accessoryPosition}
                      className="w-8 h-8 mb-0.5" 
                      fallbackIconSizeClass="w-4 h-4" 
                    />
