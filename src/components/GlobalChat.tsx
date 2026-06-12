@@ -123,6 +123,8 @@ export function GlobalChat() {
                                src={msg.equippedStickerChat || msg.equippedSticker} 
                                alt="Bouncing sticker" 
                                className="absolute right-1.5 -bottom-2 w-5 h-5 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:3.5s] z-10" 
+                               style={{ imageRendering: '-webkit-optimize-contrast' }}
+                               referrerPolicy="no-referrer"
                              />
                           )}
                       </div>
