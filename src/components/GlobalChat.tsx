@@ -62,9 +62,9 @@ export function GlobalChat() {
         content: text,
         activeTitle: activeTitle || null,
         createdAt: serverTimestamp(),
-        equippedStickerAvatar: useStore.getState().equippedStickerAvatar || null,
-        stickerPositionAvatar: useStore.getState().stickerPositionAvatar || 'top-right',
-        equippedStickerChat: useStore.getState().equippedStickerChat || null
+        equippedStickerChat: useStore.getState().equippedStickerChat || null,
+        equippedAccessory: useStore.getState().equippedAccessory || null,
+        accessoryPosition: useStore.getState().accessoryPosition || null
       });
       incrementSentMessages();
     } catch (e) {
@@ -99,8 +99,6 @@ export function GlobalChat() {
                 <div className="flex items-end gap-2 pr-1 pl-1 max-w-[85%] flex-row">
                    <UserAvatar 
                      avatarUrl={msg.avatarUrl} 
-                     equippedSticker={msg.equippedStickerAvatar || msg.equippedSticker} 
-                     stickerPosition={msg.stickerPositionAvatar || msg.stickerPosition} 
                      equippedAccessory={msg.equippedAccessory}
                      accessoryPosition={msg.accessoryPosition}
                      className="w-8 h-8 mb-0.5" 
