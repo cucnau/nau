@@ -60,7 +60,7 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                 src={comment.equippedSticker} 
                 alt="Sticker" 
                 className={cn(
-                  "absolute w-6 h-6 object-contain pointer-events-none z-10 animate-pulse",
+                  "absolute w-6 h-6 object-contain pointer-events-none z-10",
                   comment.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
                   comment.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
                   comment.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
