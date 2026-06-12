@@ -198,7 +198,7 @@ export function Store() {
              onClick={() => { setActiveTab('stickers'); setCurrentPage(1); }} 
              className={cn("px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2", activeTab === 'stickers' ? 'bg-[#3E2723] dark:bg-[#C29D70] text-[#FDF6EC] dark:text-[#181311] shadow-md' : 'text-[#8D6E63] dark:text-gray-400 hover:bg-[#FDF6EC]/80 dark:hover:bg-[#2C221D] hover:text-[#5D4037] dark:hover:text-[#ECE5DC]')}
           >
-             <Smile className="w-4 h-4" /> Sticker Avatar
+             <Smile className="w-4 h-4" /> Sticker
           </button>
           <button 
              onClick={() => { setActiveTab('accessories'); setCurrentPage(1); }} 
