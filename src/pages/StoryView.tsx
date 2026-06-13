@@ -34,7 +34,18 @@ const CommentNode: React.FC<CommentNodeProps> = ({
    isLoggedIn,
    depth = 0
 }) => {
+   const { uid: storeUid, equippedStickerComment, stickerPositionComment, displayName: storeDisplayName, avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle, equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition } = useStore();
    const isGift = comment.type === 'choco_gift';
+   const isMe = comment.uid === storeUid;
+   
+   const currentSticker = isMe ? equippedStickerComment : comment.equippedSticker;
+   const currentStickerPos = isMe ? stickerPositionComment : comment.stickerPosition;
+   const currentDisplayName = isMe ? storeDisplayName : comment.displayName;
+   const currentAvatarUrl = isMe ? storeAvatarUrl : comment.avatarUrl;
+   const currentActiveTitle = isMe ? storeActiveTitle : comment.activeTitle;
+   const currentAccessory = isMe ? storeEquippedAccessory : comment.equippedAccessory;
+   const currentAccessoryPos = isMe ? storeAccessoryPosition : comment.accessoryPosition;
+
    const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
       const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0));
       const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0));
@@ -55,25 +66,24 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                   : "p-3.5 rounded-2xl flex gap-3 bg-[#FAF7F2]/60 dark:bg-gray-850/10 border border-[#F5E6D3]/40 hover:border-[#D7CCC8]/40 transition-colors relative"
             )}
          >
-            {comment.equippedSticker && (
+            {currentSticker && (
               <img 
-                src={comment.equippedSticker} 
+                src={currentSticker} 
                 alt="Sticker" 
                 className={cn(
-                  "absolute w-6 h-6 object-contain pointer-events-none z-10",
-                  comment.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-                  comment.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-                  comment.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-                  (comment.stickerPosition === 'bottom-right' || !comment.stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                  "absolute w-10 h-10 object-contain pointer-events-none z-10",
+                  currentStickerPos === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
+                  currentStickerPos === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
+                  currentStickerPos === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
+                  (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
                 )} 
-                style={{ imageRendering: '-webkit-optimize-contrast' }}
                 referrerPolicy="no-referrer"
               />
             )}
             <UserAvatar 
-               avatarUrl={comment.avatarUrl} 
-               equippedAccessory={comment.equippedAccessory}
-               accessoryPosition={comment.accessoryPosition}
+               avatarUrl={currentAvatarUrl} 
+               equippedAccessory={currentAccessory}
+               accessoryPosition={currentAccessoryPos}
                className={depth === 0 ? "w-10 h-10 shrink-0" : "w-8.5 h-8.5 shrink-0"} 
                fallbackIconSizeClass={depth === 0 ? "w-5 h-5 text-[#A1887F]" : "w-4.5 h-4.5 text-[#A1887F]"} 
                borderClass="border border-[#D7CCC8]/30"
@@ -82,11 +92,11 @@ const CommentNode: React.FC<CommentNodeProps> = ({
             <div className="flex-1 min-w-0">
                <div className="flex items-center justify-between gap-2 mb-1">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                     <span className="font-extrabold text-sm shrink-0" style={{ color: getTitleColor(comment.activeTitle) || '#3E2723' }}>
-                        {comment.displayName}
-                        {comment.activeTitle && (
+                     <span className="font-extrabold text-sm shrink-0" style={{ color: getTitleColor(currentActiveTitle) || '#3E2723' }}>
+                        {currentDisplayName}
+                        {currentActiveTitle && (
                            <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-850 text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200 ml-1.5 inline-block align-middle">
-                              🏆 {comment.activeTitle}
+                              🏆 {currentActiveTitle}
                            </span>
                         )}
                      </span>
