@@ -46,7 +46,7 @@ const ParagraphCommentNode = ({
                <img 
                  src={currentSticker} 
                  alt="Sticker" 
-                 className="absolute w-10 h-10 object-contain pointer-events-none z-10 right-0 top-1/2 -translate-y-1/2" 
+                 className="absolute w-12 h-12 object-contain pointer-events-none z-10 right-0 top-1/2 -translate-y-1/2" 
                  style={{ imageRendering: 'pixelated' }}
                  referrerPolicy="no-referrer"
                />
@@ -809,8 +809,8 @@ export function Reader() {
                                                                 <img 
                                                                     src={c.equippedSticker} 
                                                                     alt="Sticker" 
-                                                                    className="absolute w-5 h-5 object-contain pointer-events-none z-10 -right-2 top-1/2 -translate-y-1/2" 
-                                                                    style={{ imageRendering: '-webkit-optimize-contrast' }}
+                                                                    className="absolute w-8 h-8 object-contain pointer-events-none z-10 -right-3 top-1/2 -translate-y-1/2" 
+                                                                    style={{ imageRendering: 'pixelated' }}
                                                                     referrerPolicy="no-referrer"
                                                                 />
                                                             )}
@@ -977,8 +977,8 @@ export function Reader() {
                                    <img 
                                        src={c.equippedSticker} 
                                        alt="Decor sticker" 
-                                       className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 object-contain pointer-events-none hover:scale-125 transition-transform z-10" 
-                                       style={{ imageRendering: '-webkit-optimize-contrast' }}
+                                       className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 object-contain pointer-events-none hover:scale-125 transition-transform z-10" 
+                                       style={{ imageRendering: 'pixelated' }}
                                        referrerPolicy="no-referrer"
                                    />
                                )}
