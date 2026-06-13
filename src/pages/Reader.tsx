@@ -23,6 +23,15 @@ const ParagraphCommentNode = ({
    isDark,
    depth = 0
 }: any) => {
+   const isMe = comment.uid === useStore.getState().uid;
+   const currentSticker = isMe ? useStore.getState().equippedStickerComment : comment.equippedSticker;
+   const currentStickerPos = isMe ? useStore.getState().stickerPositionComment : comment.stickerPosition;
+   const currentDisplayName = isMe ? useStore.getState().displayName : comment.displayName;
+   const currentAvatarUrl = isMe ? useStore.getState().avatarUrl : comment.avatarUrl;
+   const currentActiveTitle = isMe ? useStore.getState().activeTitle : comment.activeTitle;
+   const currentAccessory = isMe ? useStore.getState().equippedAccessory : comment.equippedAccessory;
+   const currentAccessoryPos = isMe ? useStore.getState().accessoryPosition : comment.accessoryPosition;
+
    const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
       const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
       const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis?.() || 0);
@@ -32,36 +41,36 @@ const ParagraphCommentNode = ({
    return (
       <div key={comment.id} className="text-xs pt-1 mt-1 border-t border-dashed border-gray-100 dark:border-[#3C2E27]/30 first:border-0">
          <div className="relative flex gap-2.5 items-start p-2 rounded-xl bg-[#FDF6EC]/40 dark:bg-[#1A1412]/20 border border-[#F5E6D3]/40 dark:border-[#3C2E27]/30">
-             {comment.equippedSticker && (
+             {currentSticker && (
                <img 
-                 src={comment.equippedSticker} 
+                 src={currentSticker} 
                  alt="Sticker" 
                  className={cn(
                    "absolute w-5 h-5 object-contain pointer-events-none z-10",
-                   comment.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-                   comment.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-                   comment.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-                   (comment.stickerPosition === 'bottom-right' || !comment.stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                   currentStickerPos === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
+                   currentStickerPos === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
+                   currentStickerPos === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
+                   (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
                  )} 
                  style={{ imageRendering: '-webkit-optimize-contrast' }}
                  referrerPolicy="no-referrer"
                />
              )}
             <UserAvatar 
-               avatarUrl={comment.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} 
-               equippedAccessory={comment.equippedAccessory}
-               accessoryPosition={comment.accessoryPosition}
+               avatarUrl={currentAvatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} 
+               equippedAccessory={currentAccessory}
+               accessoryPosition={currentAccessoryPos}
                className="w-8 h-8 shrink-0 pointer-events-none" 
                fallbackIconSizeClass="w-4 h-4 text-[#A1887F]" 
                borderClass="border border-[#D7CCC8]/30"
             />
             <div className="flex-1 min-w-0">
-               <div className="text-[11px] font-bold mb-0.5 flex justify-between tracking-tight" style={{ color: getTitleColor(comment.activeTitle) || undefined }}>
+               <div className="text-[11px] font-bold mb-0.5 flex justify-between tracking-tight" style={{ color: getTitleColor(currentActiveTitle) || undefined }}>
                   <span className="flex items-center gap-1">
-                     {comment.displayName}
-                     {comment.activeTitle && (
+                     {currentDisplayName}
+                     {currentActiveTitle && (
                         <span className="px-1 py-0.5 bg-yellow-101 text-yellow-800 text-[7px] font-extrabold rounded">
-                           🏆 {comment.activeTitle}
+                           🏆 {currentActiveTitle}
                         </span>
                      )}
                   </span>
@@ -165,6 +174,15 @@ const ChapterCommentNode = ({
    isDark,
    depth = 0
 }: any) => {
+   const isMe = comment.uid === useStore.getState().uid;
+   const currentSticker = isMe ? useStore.getState().equippedStickerComment : comment.equippedSticker;
+   const currentStickerPos = isMe ? useStore.getState().stickerPositionComment : comment.stickerPosition;
+   const currentDisplayName = isMe ? useStore.getState().displayName : comment.displayName;
+   const currentAvatarUrl = isMe ? useStore.getState().avatarUrl : comment.avatarUrl;
+   const currentActiveTitle = isMe ? useStore.getState().activeTitle : comment.activeTitle;
+   const currentAccessory = isMe ? useStore.getState().equippedAccessory : comment.equippedAccessory;
+   const currentAccessoryPos = isMe ? useStore.getState().accessoryPosition : comment.accessoryPosition;
+
    const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
       const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
       const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis?.() || 0);
@@ -173,16 +191,16 @@ const ChapterCommentNode = ({
 
    return (
       <div key={comment.id} className={cn("relative p-4 rounded-2xl border flex flex-col gap-2 shadow-xs transition-colors", isDark ? "bg-[#211B18]/40 border-[#3C2E27]" : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50")}>
-         {comment.equippedSticker && (
+         {currentSticker && (
            <img 
-             src={comment.equippedSticker} 
+             src={currentSticker} 
              alt="Sticker" 
              className={cn(
                "absolute w-8 h-8 object-contain pointer-events-none z-10",
-               comment.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-               comment.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-               comment.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-               (comment.stickerPosition === 'bottom-right' || !comment.stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+               currentStickerPos === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
+               currentStickerPos === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
+               currentStickerPos === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
+               (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
              )} 
              style={{ imageRendering: '-webkit-optimize-contrast' }}
              referrerPolicy="no-referrer"
@@ -190,20 +208,20 @@ const ChapterCommentNode = ({
          )}
          <div className="flex gap-3.5">
             <UserAvatar 
-               avatarUrl={comment.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} 
-               equippedAccessory={comment.equippedAccessory}
-               accessoryPosition={comment.accessoryPosition}
+               avatarUrl={currentAvatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} 
+               equippedAccessory={currentAccessory}
+               accessoryPosition={currentAccessoryPos}
                className="w-10 h-10 shrink-0 pointer-events-none" 
                fallbackIconSizeClass="w-5 h-5 text-[#A1887F]" 
                borderClass="border border-[#D7CCC8]/30"
             />
             <div className="flex-1 min-w-0">
                <div className="flex items-center justify-between gap-2 mb-1">
-                  <span className="font-extrabold text-xs flex items-center gap-1.5" style={{ color: getTitleColor(comment.activeTitle) || undefined }}>
-                     {comment.displayName}
-                     {comment.activeTitle && (
+                  <span className="font-extrabold text-xs flex items-center gap-1.5" style={{ color: getTitleColor(currentActiveTitle) || undefined }}>
+                     {currentDisplayName}
+                     {currentActiveTitle && (
                         <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-850 text-[9px] font-black rounded uppercase tracking-tight select-none border border-yellow-200 inline-block align-middle">
-                           🏆 {comment.activeTitle}
+                           🏆 {currentActiveTitle}
                         </span>
                      )}
                   </span>
