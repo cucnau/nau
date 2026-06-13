@@ -73,7 +73,7 @@ export function NewsFeed() {
         )}
       </div>
 
-      <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1 px-2 pt-3 pb-2 -mx-2">
+      <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1 px-2 pt-6 pb-6 -mx-2">
         {posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 bg-[#FDF6EC]/40 dark:bg-[#2C221D]/40 rounded-2xl border border-dashed border-[#D7CCC8]/50 dark:border-[#3C2E27]/50 text-center">
             <MessageSquareQuote className="w-8 h-8 text-[#D7CCC8] dark:text-[#5D4037] mb-1 opacity-70" />
@@ -100,7 +100,7 @@ export function NewsFeed() {
                     src={currentSticker} 
                     alt="Decor sticker" 
                     className={cn(
-                      "absolute w-14 h-14 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:4s] z-10",
+                      "absolute w-14 h-14 object-contain pointer-events-none hover:scale-125 transition-transform z-10",
                       currentStickerPos === 'top-left' && "left-3 -top-2",
                       currentStickerPos === 'bottom-left' && "left-3 -bottom-1",
                       currentStickerPos === 'top-right' && "right-3 -top-2",
