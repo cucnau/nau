@@ -131,7 +131,7 @@ export function GlobalChat() {
                              <img 
                                src={currentSticker} 
                                alt="Sticker" 
-                               className="absolute -right-3 top-1/2 -translate-y-1/2 w-10 h-10 object-contain pointer-events-none hover:scale-110 transition-transform z-10" 
+                               className="absolute -right-3 top-1/2 -translate-y-1/2 w-12 h-12 object-contain pointer-events-none hover:scale-110 transition-transform z-10" 
                                style={{ imageRendering: 'pixelated' }}
                                referrerPolicy="no-referrer"
                              />
