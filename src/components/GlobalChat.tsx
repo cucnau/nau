@@ -90,7 +90,7 @@ export function GlobalChat() {
       </div>
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 text-xs"
+        className="flex-1 overflow-y-auto p-4 pb-8 flex flex-col gap-3 text-xs"
       >
         {messages.map((msg, i) => {
           const isMe = msg.uid === uid;
@@ -123,13 +123,15 @@ export function GlobalChat() {
                          )}
                       </div>
                       
-                      <div className={cn("p-2.5 rounded-2xl relative text-[13px] leading-relaxed shadow-sm min-w-10 break-words text-white rounded-tl-sm pr-7 overflow-visible", isMe ? "bg-[#8D6E63]" : "bg-[#5D4037]")}>
-                          <p>{msg.content}</p>
+                      <div className={cn("p-2.5 rounded-2xl relative text-[13px] leading-relaxed shadow-sm break-words text-white rounded-tl-sm overflow-visible flex-1", isMe ? "bg-[#8D6E63]" : "bg-[#5D4037]")}>
+                          <div className={currentSticker ? "pr-10" : ""}>
+                             <p>{msg.content}</p>
+                          </div>
                           {currentSticker && (
                              <img 
                                src={currentSticker} 
-                               alt="Bouncing sticker" 
-                               className="absolute right-1.5 -bottom-2 w-12 h-12 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:3.5s] z-10" 
+                               alt="Sticker" 
+                               className="absolute right-1 bottom-1 w-12 h-12 object-contain pointer-events-none hover:scale-110 transition-transform z-10" 
                                style={{ imageRendering: 'pixelated' }}
                                referrerPolicy="no-referrer"
                              />
