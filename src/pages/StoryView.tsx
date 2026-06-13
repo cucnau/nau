@@ -63,7 +63,10 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                         ? "bg-amber-50/70 border-amber-200/80 hover:bg-amber-50" 
                         : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50"
                     )
-                  : "p-3.5 rounded-2xl flex gap-3 bg-[#FAF7F2]/60 dark:bg-gray-850/10 border border-[#F5E6D3]/40 hover:border-[#D7CCC8]/40 transition-colors relative"
+                  : cn(
+                     "p-3.5 rounded-2xl flex gap-3 bg-[#FAF7F2]/60 dark:bg-gray-850/10 border border-[#F5E6D3]/40 hover:border-[#D7CCC8]/40 transition-colors relative block",
+                     currentSticker ? "pr-12 pb-6" : ""
+                  )
             )}
          >
             {currentSticker && (
@@ -72,10 +75,10 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                 alt="Sticker" 
                 className={cn(
                   "absolute w-12 h-12 object-contain pointer-events-none z-10",
-                  currentStickerPos === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-                  currentStickerPos === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-                  currentStickerPos === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-                  (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                  currentStickerPos === 'top-left' && "left-0 top-0",
+                  currentStickerPos === 'top-right' && "right-0 top-0",
+                  currentStickerPos === 'bottom-left' && "left-0 bottom-0",
+                  (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-2 -bottom-2"
                 )} 
                 style={{ imageRendering: 'pixelated' }}
                 referrerPolicy="no-referrer"
