@@ -23,14 +23,15 @@ const ParagraphCommentNode = ({
    isDark,
    depth = 0
 }: any) => {
-   const isMe = comment.uid === useStore.getState().uid;
-   const currentSticker = isMe ? useStore.getState().equippedStickerComment : comment.equippedSticker;
-   const currentStickerPos = isMe ? useStore.getState().stickerPositionComment : comment.stickerPosition;
-   const currentDisplayName = isMe ? useStore.getState().displayName : comment.displayName;
-   const currentAvatarUrl = isMe ? useStore.getState().avatarUrl : comment.avatarUrl;
-   const currentActiveTitle = isMe ? useStore.getState().activeTitle : comment.activeTitle;
-   const currentAccessory = isMe ? useStore.getState().equippedAccessory : comment.equippedAccessory;
-   const currentAccessoryPos = isMe ? useStore.getState().accessoryPosition : comment.accessoryPosition;
+   const { uid: storeUid, equippedStickerComment, stickerPositionComment, displayName: storeDisplayName, avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle, equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition } = useStore();
+   const isMe = comment.uid === storeUid;
+   const currentSticker = isMe ? equippedStickerComment : comment.equippedSticker;
+   const currentStickerPos = isMe ? stickerPositionComment : comment.stickerPosition;
+   const currentDisplayName = isMe ? storeDisplayName : comment.displayName;
+   const currentAvatarUrl = isMe ? storeAvatarUrl : comment.avatarUrl;
+   const currentActiveTitle = isMe ? storeActiveTitle : comment.activeTitle;
+   const currentAccessory = isMe ? storeEquippedAccessory : comment.equippedAccessory;
+   const currentAccessoryPos = isMe ? storeAccessoryPosition : comment.accessoryPosition;
 
    const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
       const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
@@ -46,13 +47,12 @@ const ParagraphCommentNode = ({
                  src={currentSticker} 
                  alt="Sticker" 
                  className={cn(
-                   "absolute w-5 h-5 object-contain pointer-events-none z-10",
+                   "absolute w-8 h-8 object-contain pointer-events-none z-10",
                    currentStickerPos === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
                    currentStickerPos === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
                    currentStickerPos === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
                    (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
                  )} 
-                 style={{ imageRendering: '-webkit-optimize-contrast' }}
                  referrerPolicy="no-referrer"
                />
              )}
@@ -174,14 +174,15 @@ const ChapterCommentNode = ({
    isDark,
    depth = 0
 }: any) => {
-   const isMe = comment.uid === useStore.getState().uid;
-   const currentSticker = isMe ? useStore.getState().equippedStickerComment : comment.equippedSticker;
-   const currentStickerPos = isMe ? useStore.getState().stickerPositionComment : comment.stickerPosition;
-   const currentDisplayName = isMe ? useStore.getState().displayName : comment.displayName;
-   const currentAvatarUrl = isMe ? useStore.getState().avatarUrl : comment.avatarUrl;
-   const currentActiveTitle = isMe ? useStore.getState().activeTitle : comment.activeTitle;
-   const currentAccessory = isMe ? useStore.getState().equippedAccessory : comment.equippedAccessory;
-   const currentAccessoryPos = isMe ? useStore.getState().accessoryPosition : comment.accessoryPosition;
+   const { uid: storeUid, equippedStickerComment, stickerPositionComment, displayName: storeDisplayName, avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle, equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition } = useStore();
+   const isMe = comment.uid === storeUid;
+   const currentSticker = isMe ? equippedStickerComment : comment.equippedSticker;
+   const currentStickerPos = isMe ? stickerPositionComment : comment.stickerPosition;
+   const currentDisplayName = isMe ? storeDisplayName : comment.displayName;
+   const currentAvatarUrl = isMe ? storeAvatarUrl : comment.avatarUrl;
+   const currentActiveTitle = isMe ? storeActiveTitle : comment.activeTitle;
+   const currentAccessory = isMe ? storeEquippedAccessory : comment.equippedAccessory;
+   const currentAccessoryPos = isMe ? storeAccessoryPosition : comment.accessoryPosition;
 
    const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
       const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
@@ -196,13 +197,12 @@ const ChapterCommentNode = ({
              src={currentSticker} 
              alt="Sticker" 
              className={cn(
-               "absolute w-8 h-8 object-contain pointer-events-none z-10",
+               "absolute w-12 h-12 object-contain pointer-events-none z-10",
                currentStickerPos === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
                currentStickerPos === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
                currentStickerPos === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
                (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
              )} 
-             style={{ imageRendering: '-webkit-optimize-contrast' }}
              referrerPolicy="no-referrer"
            />
          )}
