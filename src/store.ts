@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { format, differenceInDays } from 'date-fns';
 import { User as FirebaseUser } from 'firebase/auth';
 import { db, checkIfQuotaError } from './lib/firebase';
-import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit, writeBatch } from 'firebase/firestore';
+import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit, writeBatch, addDoc } from 'firebase/firestore';
 import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement } from './types/achievements';
 import { logTransaction } from './lib/transactions';
 
@@ -1063,7 +1063,12 @@ export const useStore = create<UserState>()(
             allUsersOwnedStickers: allOwned
          });
          
-         get().updateUserDoc({ ownedStickers: newOwned });
+         addDoc(collection(db, 'users', uid, 'owned_stickers'), {
+            url: stickerUrl,
+            acquiredAt: Date.now()
+         }).catch(err => {
+            console.error("Lỗi khi lưu sticker sở hữu vào subcollection:", err);
+         });
       },
       
       equipSticker: (type: 'comment' | 'chat' | 'post', stickerUrl: string | null) => {
@@ -1121,7 +1126,12 @@ export const useStore = create<UserState>()(
             allUsersOwnedAccessories: allOwned
          });
          
-         get().updateUserDoc({ ownedAccessories: newOwned });
+         addDoc(collection(db, 'users', uid, 'owned_accessories'), {
+            url: accessoryUrl,
+            acquiredAt: Date.now()
+         }).catch(err => {
+            console.error("Lỗi khi lưu phụ kiện sở hữu vào subcollection:", err);
+         });
       },
       
       equipAccessory: (accessoryUrl: string | null) => {
