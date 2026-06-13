@@ -21,7 +21,7 @@ interface FeedPost {
 
 export function NewsFeed() {
   const [posts, setPosts] = useState<FeedPost[]>([]);
-  const { isLoggedIn, uid, email, getTitleColor } = useStore();
+  const { isLoggedIn, uid, email, getTitleColor, displayName, activeTitle, avatarUrl, equippedStickerPost, stickerPositionPost, equippedAccessory, accessoryPosition } = useStore();
   const navigate = useNavigate();
   const isAdmin = email?.toLowerCase() === 'cucnau01@gmail.com';
 
@@ -85,43 +85,47 @@ export function NewsFeed() {
             const isAuthor = post.uid === uid;
             const canDelete = isAuthor || isAdmin;
             
+            const currentSticker = isAuthor ? equippedStickerPost : (post.equippedStickerPost || post.equippedSticker);
+            const currentStickerPos = isAuthor ? stickerPositionPost : (post.stickerPositionPost || post.stickerPosition);
+            const currentDisplayName = isAuthor ? displayName : post.displayName;
+            const currentActiveTitle = isAuthor ? activeTitle : post.activeTitle;
+
             return (
               <div 
                 key={post.id} 
                 className="flex gap-3 p-3 bg-[#FDF6EC]/30 dark:bg-[#2C221D]/30 hover:bg-[#FDF6EC]/50 dark:hover:bg-[#2C221D]/60 rounded-2xl border border-[#F5E6D3]/60 dark:border-[#3C2E27] transition-colors relative overflow-visible pr-8"
               >
-                {(post.equippedStickerPost || post.equippedSticker) && (
+                {currentSticker && (
                   <img 
-                    src={post.equippedStickerPost || post.equippedSticker} 
+                    src={currentSticker} 
                     alt="Decor sticker" 
                     className={cn(
-                      "absolute w-8 h-8 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:4s] z-10",
-                      (post.stickerPositionPost || post.stickerPosition) === 'top-left' && "left-3 -top-2",
-                      (post.stickerPositionPost || post.stickerPosition) === 'bottom-left' && "left-3 -bottom-1",
-                      (post.stickerPositionPost || post.stickerPosition) === 'top-right' && "right-3 -top-2",
-                      ((post.stickerPositionPost || post.stickerPosition) === 'bottom-right' || !(post.stickerPositionPost || post.stickerPosition)) && "right-3 -bottom-1"
+                      "absolute w-12 h-12 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:4s] z-10",
+                      currentStickerPos === 'top-left' && "left-3 -top-2",
+                      currentStickerPos === 'bottom-left' && "left-3 -bottom-1",
+                      currentStickerPos === 'top-right' && "right-3 -top-2",
+                      (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-3 -bottom-1"
                     )} 
-                    style={{ imageRendering: '-webkit-optimize-contrast' }}
                     referrerPolicy="no-referrer"
                   />
                 )}
                 <UserAvatar 
-                  avatarUrl={post.avatarUrl} 
-                  equippedAccessory={post.equippedAccessory}
-                  accessoryPosition={post.accessoryPosition}
-                  className="w-8 h-8" 
-                  fallbackIconSizeClass="w-4 h-4" 
+                  avatarUrl={isAuthor ? avatarUrl : post.avatarUrl} 
+                  equippedAccessory={isAuthor ? equippedAccessory : post.equippedAccessory}
+                  accessoryPosition={isAuthor ? accessoryPosition : post.accessoryPosition}
+                  className="w-10 h-10" 
+                  fallbackIconSizeClass="w-5 h-5" 
                 />
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-extrabold text-xs" style={{ color: getTitleColor(post.activeTitle) || '#5D4037' }}>
-                        {post.displayName}
+                      <span className="font-extrabold text-xs" style={{ color: getTitleColor(currentActiveTitle) || '#5D4037' }}>
+                        {currentDisplayName}
                       </span>
-                      {post.activeTitle && (
+                      {currentActiveTitle && (
                         <span className="px-1 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 text-[7px] font-black rounded uppercase shadow-xs border border-yellow-200 dark:border-yellow-700/50 inline-block">
-                          🏆 {post.activeTitle}
+                          🏆 {currentActiveTitle}
                         </span>
                       )}
                     </div>
