@@ -73,13 +73,7 @@ const CommentNode: React.FC<CommentNodeProps> = ({
               <img 
                 src={currentSticker} 
                 alt="Sticker" 
-                className={cn(
-                  "absolute w-12 h-12 object-contain pointer-events-none z-10",
-                  currentStickerPos === 'top-left' && "left-0 top-0",
-                  currentStickerPos === 'top-right' && "right-0 top-0",
-                  currentStickerPos === 'bottom-left' && "left-0 bottom-0",
-                  (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-2 -bottom-2"
-                )} 
+                className="absolute w-12 h-12 object-contain pointer-events-none z-10 right-0 top-1/2 -translate-y-1/2" 
                 style={{ imageRendering: 'pixelated' }}
                 referrerPolicy="no-referrer"
               />
