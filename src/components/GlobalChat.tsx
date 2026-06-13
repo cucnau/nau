@@ -129,7 +129,8 @@ export function GlobalChat() {
                              <img 
                                src={currentSticker} 
                                alt="Bouncing sticker" 
-                               className="absolute right-1.5 -bottom-2 w-8 h-8 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:3.5s] z-10" 
+                               className="absolute right-1.5 -bottom-2 w-12 h-12 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:3.5s] z-10" 
+                               style={{ imageRendering: 'pixelated' }}
                                referrerPolicy="no-referrer"
                              />
                           )}
