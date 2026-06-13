@@ -71,12 +71,13 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                 src={currentSticker} 
                 alt="Sticker" 
                 className={cn(
-                  "absolute w-10 h-10 object-contain pointer-events-none z-10",
+                  "absolute w-12 h-12 object-contain pointer-events-none z-10",
                   currentStickerPos === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
                   currentStickerPos === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
                   currentStickerPos === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
                   (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
                 )} 
+                style={{ imageRendering: 'pixelated' }}
                 referrerPolicy="no-referrer"
               />
             )}
