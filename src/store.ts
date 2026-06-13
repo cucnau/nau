@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { format, differenceInDays } from 'date-fns';
 import { User as FirebaseUser } from 'firebase/auth';
 import { db, checkIfQuotaError } from './lib/firebase';
-import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit } from 'firebase/firestore';
+import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit, writeBatch } from 'firebase/firestore';
 import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement } from './types/achievements';
 import { logTransaction } from './lib/transactions';
 
@@ -1250,20 +1250,37 @@ export const useStore = create<UserState>()(
          if (Object.keys(stickerUpdates).length === 0) return;
 
          try {
+            let batch = writeBatch(db);
+            let writeCount = 0;
+
+            const commitBatchIfNeeded = async () => {
+                if (writeCount >= 450) {
+                    await batch.commit();
+                    batch = writeBatch(db);
+                    writeCount = 0;
+                }
+            };
+
             // Update News Feed
             const feedQ = query(collection(db, 'newsFeed'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(100));
             const feedSnaps = await getDocs(feedQ);
-            feedSnaps.forEach(d => updateDoc(d.ref, stickerUpdates).catch(e => console.warn("Sync failed for feed doc", d.id, e)));
+            feedSnaps.forEach(d => { batch.update(d.ref, stickerUpdates); writeCount++; });
+            await commitBatchIfNeeded();
 
             // Update Chat
             const chatQ = query(collection(db, 'chatMessages'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(150));
             const chatSnaps = await getDocs(chatQ);
-            chatSnaps.forEach(d => updateDoc(d.ref, stickerUpdates).catch(e => console.warn("Sync failed for chat doc", d.id, e)));
+            chatSnaps.forEach(d => { batch.update(d.ref, stickerUpdates); writeCount++; });
+            await commitBatchIfNeeded();
 
             // Update Comments
             const commQ = query(collection(db, 'comments'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(150));
             const commSnaps = await getDocs(commQ);
-            commSnaps.forEach(d => updateDoc(d.ref, stickerUpdates).catch(e => console.warn("Sync failed for comment doc", d.id, e)));
+            commSnaps.forEach(d => { batch.update(d.ref, stickerUpdates); writeCount++; });
+            
+            if (writeCount > 0) {
+                await batch.commit();
+            }
          } catch (err) {
             console.error("Lỗi đồng bộ phụ kiện:", err);
          }
