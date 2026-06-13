@@ -29,7 +29,7 @@ export function NewsFeed() {
     const q = query(
       collection(db, 'newsFeed'),
       orderBy('createdAt', 'desc'),
-      limit(30)
+      limit(3)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
