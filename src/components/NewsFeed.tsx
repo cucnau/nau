@@ -93,19 +93,13 @@ export function NewsFeed() {
             return (
               <div 
                 key={post.id} 
-                className="flex gap-3 p-3 bg-[#FDF6EC]/30 dark:bg-[#2C221D]/30 hover:bg-[#FDF6EC]/50 dark:hover:bg-[#2C221D]/60 rounded-2xl border border-[#F5E6D3]/60 dark:border-[#3C2E27] transition-colors relative overflow-visible pr-8"
+                className={cn("flex gap-3 p-3 bg-[#FDF6EC]/30 dark:bg-[#2C221D]/30 hover:bg-[#FDF6EC]/50 dark:hover:bg-[#2C221D]/60 rounded-2xl border border-[#F5E6D3]/60 dark:border-[#3C2E27] transition-colors relative overflow-visible", currentSticker ? "pr-10" : "")}
               >
                 {currentSticker && (
                   <img 
                     src={currentSticker} 
                     alt="Decor sticker" 
-                    className={cn(
-                      "absolute w-14 h-14 object-contain pointer-events-none hover:scale-125 transition-transform z-10",
-                      currentStickerPos === 'top-left' && "left-3 -top-2",
-                      currentStickerPos === 'bottom-left' && "left-3 -bottom-1",
-                      currentStickerPos === 'top-right' && "right-3 -top-2",
-                      (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-3 -bottom-1"
-                    )} 
+                    className="absolute -right-2 top-1/2 -translate-y-1/2 w-12 h-12 object-contain pointer-events-none hover:scale-125 transition-transform z-10" 
                     style={{ imageRendering: 'pixelated' }}
                     referrerPolicy="no-referrer"
                   />
