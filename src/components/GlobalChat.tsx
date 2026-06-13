@@ -19,7 +19,7 @@ interface ChatMessage {
 export function GlobalChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const { isLoggedIn, uid, displayName, avatarUrl, incrementSentMessages, activeTitle, getTitleColor } = useStore();
+  const { isLoggedIn, uid, displayName, avatarUrl, incrementSentMessages, activeTitle, getTitleColor, equippedStickerChat, equippedAccessory, accessoryPosition } = useStore();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -94,36 +94,42 @@ export function GlobalChat() {
       >
         {messages.map((msg, i) => {
           const isMe = msg.uid === uid;
+          const currentSticker = isMe ? equippedStickerChat : (msg.equippedStickerChat || msg.equippedSticker);
+          const currentDisplayName = isMe ? displayName : msg.displayName;
+          const currentAvatarUrl = isMe ? avatarUrl : msg.avatarUrl;
+          const currentActiveTitle = isMe ? activeTitle : msg.activeTitle;
+          const currentAccessory = isMe ? equippedAccessory : msg.equippedAccessory;
+          const currentAccessoryPos = isMe ? accessoryPosition : msg.accessoryPosition;
+
           return (
              <div key={msg.id || i} className="flex flex-col w-full text-white items-start">
                 <div className="flex items-end gap-2 pr-1 pl-1 max-w-[85%] flex-row">
                    <UserAvatar 
-                     avatarUrl={msg.avatarUrl} 
-                     equippedAccessory={msg.equippedAccessory}
-                     accessoryPosition={msg.accessoryPosition}
-                     className="w-8 h-8 mb-0.5" 
-                     fallbackIconSizeClass="w-4 h-4" 
+                     avatarUrl={currentAvatarUrl} 
+                     equippedAccessory={currentAccessory}
+                     accessoryPosition={currentAccessoryPos}
+                     className="w-10 h-10 mb-0.5" 
+                     fallbackIconSizeClass="w-5 h-5" 
                    />
                    <div className="flex flex-col gap-1 items-start">
                       <div className="flex items-center gap-1.5 px-1 flex-wrap">
-                         <span className="font-bold text-[10px] whitespace-nowrap" style={{ color: getTitleColor(msg.activeTitle) || '#A1887F' }}>
-                            {msg.displayName}
+                         <span className="font-bold text-[10px] whitespace-nowrap" style={{ color: getTitleColor(currentActiveTitle) || '#A1887F' }}>
+                            {currentDisplayName}
                          </span>
-                         {msg.activeTitle && (
+                         {currentActiveTitle && (
                             <span className="px-1 py-0.5 bg-yellow-100 text-yellow-800 text-[8px] font-extrabold rounded uppercase tracking-tighter select-none border border-yellow-200">
-                               🏆 {msg.activeTitle}
+                               🏆 {currentActiveTitle}
                             </span>
                          )}
                       </div>
                       
                       <div className={cn("p-2.5 rounded-2xl relative text-[13px] leading-relaxed shadow-sm min-w-10 break-words text-white rounded-tl-sm pr-7 overflow-visible", isMe ? "bg-[#8D6E63]" : "bg-[#5D4037]")}>
                           <p>{msg.content}</p>
-                          {(msg.equippedStickerChat || msg.equippedSticker) && (
+                          {currentSticker && (
                              <img 
-                               src={msg.equippedStickerChat || msg.equippedSticker} 
+                               src={currentSticker} 
                                alt="Bouncing sticker" 
-                               className="absolute right-1.5 -bottom-2 w-5 h-5 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:3.5s] z-10" 
-                               style={{ imageRendering: '-webkit-optimize-contrast' }}
+                               className="absolute right-1.5 -bottom-2 w-8 h-8 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:3.5s] z-10" 
                                referrerPolicy="no-referrer"
                              />
                           )}
