@@ -186,6 +186,7 @@ interface UserState {
   unlockAchievement: (id: string) => void;
   claimAchievement: (id: string) => void;
   incrementSentMessages: () => void;
+  propagateEquipmentChanges: () => Promise<void>;
   checkChocoCuteAchievement: () => Promise<void>;
   _ensureActiveWeekCalculations: () => Promise<void>;
   _triggerCountAchievementsCheck: () => void;
@@ -1071,7 +1072,9 @@ export const useStore = create<UserState>()(
          
          const key = type === 'comment' ? 'equippedStickerComment' : type === 'chat' ? 'equippedStickerChat' : 'equippedStickerPost';
          set({ [key]: stickerUrl });
-         get().updateUserDoc({ [key]: stickerUrl });
+         get().updateUserDoc({ [key]: stickerUrl }).then(() => {
+            get().propagateEquipmentChanges();
+         });
       },
 
       setStickerPosition: (type: 'comment' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
@@ -1080,7 +1083,9 @@ export const useStore = create<UserState>()(
          
          const key = type === 'comment' ? 'stickerPositionComment' : 'stickerPositionPost';
          set({ [key]: pos });
-         get().updateUserDoc({ [key]: pos });
+         get().updateUserDoc({ [key]: pos }).then(() => {
+            get().propagateEquipmentChanges();
+         });
       },
 
       addOwnedAccessory: (accessoryUrl: string) => {
@@ -1106,7 +1111,9 @@ export const useStore = create<UserState>()(
          if (!state.isLoggedIn) return;
          
          set({ equippedAccessory: accessoryUrl });
-         get().updateUserDoc({ equippedAccessory: accessoryUrl });
+         get().updateUserDoc({ equippedAccessory: accessoryUrl }).then(() => {
+            get().propagateEquipmentChanges();
+         });
       },
 
       setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => {
@@ -1114,7 +1121,9 @@ export const useStore = create<UserState>()(
          if (!state.isLoggedIn) return;
          
          set({ accessoryPosition: pos });
-         get().updateUserDoc({ accessoryPosition: pos });
+         get().updateUserDoc({ accessoryPosition: pos }).then(() => {
+            get().propagateEquipmentChanges();
+         });
       },
 
       giftChoco: (storyId: string, amount: number) => {
@@ -1221,6 +1230,43 @@ export const useStore = create<UserState>()(
          setTimeout(() => {
             get()._triggerCountAchievementsCheck();
          }, 50);
+      },
+
+      propagateEquipmentChanges: async () => {
+         const state = get();
+         if (!state.uid) return;
+         
+         const stickerUpdates: any = {};
+         if (state.equippedStickerComment !== undefined) stickerUpdates.equippedSticker = state.equippedStickerComment;
+         if (state.stickerPositionComment !== undefined) stickerUpdates.stickerPosition = state.stickerPositionComment;
+         if (state.equippedStickerChat !== undefined) stickerUpdates.equippedStickerChat = state.equippedStickerChat;
+         if (state.equippedStickerPost !== undefined) stickerUpdates.equippedStickerPost = state.equippedStickerPost;
+         if (state.stickerPositionPost !== undefined) stickerUpdates.stickerPositionPost = state.stickerPositionPost;
+         if (state.equippedAccessory !== undefined) stickerUpdates.equippedAccessory = state.equippedAccessory;
+         if (state.accessoryPosition !== undefined) stickerUpdates.accessoryPosition = state.accessoryPosition;
+         if (state.avatarUrl !== undefined) stickerUpdates.avatarUrl = state.avatarUrl;
+         if (state.activeTitle !== undefined) stickerUpdates.activeTitle = state.activeTitle;
+
+         if (Object.keys(stickerUpdates).length === 0) return;
+
+         try {
+            // Update News Feed
+            const feedQ = query(collection(db, 'newsFeed'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(100));
+            const feedSnaps = await getDocs(feedQ);
+            feedSnaps.forEach(d => updateDoc(d.ref, stickerUpdates).catch(e => console.warn("Sync failed for feed doc", d.id, e)));
+
+            // Update Chat
+            const chatQ = query(collection(db, 'chatMessages'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(150));
+            const chatSnaps = await getDocs(chatQ);
+            chatSnaps.forEach(d => updateDoc(d.ref, stickerUpdates).catch(e => console.warn("Sync failed for chat doc", d.id, e)));
+
+            // Update Comments
+            const commQ = query(collection(db, 'comments'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(150));
+            const commSnaps = await getDocs(commQ);
+            commSnaps.forEach(d => updateDoc(d.ref, stickerUpdates).catch(e => console.warn("Sync failed for comment doc", d.id, e)));
+         } catch (err) {
+            console.error("Lỗi đồng bộ phụ kiện:", err);
+         }
       },
 
       checkChocoCuteAchievement: async () => {
