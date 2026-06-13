@@ -74,7 +74,7 @@ export function Account() {
   const [pass, setPass] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [activeStickerTab, setActiveStickerTab] = useState<'avatar' | 'chat' | 'post'>('avatar');
+  const [activeStickerTab, setActiveStickerTab] = useState<'comment' | 'chat' | 'post'>('comment');
   
   const [review, setReview] = useState('');
   const [reviews, setReviews] = useState<any[]>([]);
@@ -274,8 +274,7 @@ export function Account() {
                 accessoryPosition={accessoryPosition}
                 className="w-16 h-16 pointer-events-none" 
                 fallbackIconSizeClass="w-8 h-8 text-[#A1887F]" 
-                stickerSizeClass="w-8 h-8"
-                borderClass="border border-[#D7CCC8] dark:border-[#3C2E27]"
+                borderClass="border-2 border-[#D7CCC8] dark:border-[#3C2E27]"
               />
               <div className="flex-1">
                 <label className="block text-sm font-semibold mb-1 text-[#5D4037] dark:text-[#ECE5DC]">Ảnh đại diện</label>
@@ -522,10 +521,9 @@ export function Account() {
                 avatarUrl={avatarUrl} 
                 equippedAccessory={equippedAccessory}
                 accessoryPosition={accessoryPosition}
-                className="w-24 h-24 shadow-sm relative mb-4 border-4 border-[#FDF6EC] dark:border-[#2C221D]" 
+                className="w-24 h-24 shadow-sm relative mb-4" 
                 fallbackIconSizeClass="w-12 h-12 text-[#A1887F]" 
-                stickerSizeClass="w-10 h-10"
-                borderClass="border-0"
+                borderClass="border-2 border-[#FDF6EC] dark:border-[#2C221D]"
               />
               <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-1.5 flex-wrap text-[#3E2723] dark:text-[#ECE5DC]" style={{ color: getTitleColor(activeTitle) || undefined }}>
                  {displayName}
