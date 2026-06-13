@@ -100,12 +100,13 @@ export function NewsFeed() {
                     src={currentSticker} 
                     alt="Decor sticker" 
                     className={cn(
-                      "absolute w-12 h-12 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:4s] z-10",
+                      "absolute w-14 h-14 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:4s] z-10",
                       currentStickerPos === 'top-left' && "left-3 -top-2",
                       currentStickerPos === 'bottom-left' && "left-3 -bottom-1",
                       currentStickerPos === 'top-right' && "right-3 -top-2",
                       (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-3 -bottom-1"
                     )} 
+                    style={{ imageRendering: 'pixelated' }}
                     referrerPolicy="no-referrer"
                   />
                 )}
