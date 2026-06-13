@@ -41,17 +41,17 @@ const ParagraphCommentNode = ({
 
    return (
       <div key={comment.id} className="text-xs pt-1 mt-1 border-t border-dashed border-gray-100 dark:border-[#3C2E27]/30 first:border-0">
-         <div className="relative flex gap-2.5 items-start p-2 rounded-xl bg-[#FDF6EC]/40 dark:bg-[#1A1412]/20 border border-[#F5E6D3]/40 dark:border-[#3C2E27]/30">
+         <div className={cn("relative flex gap-2.5 items-start p-2 rounded-xl bg-[#FDF6EC]/40 dark:bg-[#1A1412]/20 border border-[#F5E6D3]/40 dark:border-[#3C2E27]/30", currentSticker ? "pr-10" : "")}>
              {currentSticker && (
                <img 
                  src={currentSticker} 
                  alt="Sticker" 
                  className={cn(
                    "absolute w-10 h-10 object-contain pointer-events-none z-10",
-                   currentStickerPos === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-                   currentStickerPos === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-                   currentStickerPos === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-                   (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+                   currentStickerPos === 'top-left' && "left-0 top-0",
+                   currentStickerPos === 'top-right' && "right-0 top-0",
+                   currentStickerPos === 'bottom-left' && "left-0 bottom-0",
+                   (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0"
                  )} 
                  style={{ imageRendering: 'pixelated' }}
                  referrerPolicy="no-referrer"
@@ -192,17 +192,17 @@ const ChapterCommentNode = ({
    });
 
    return (
-      <div key={comment.id} className={cn("relative p-4 rounded-2xl border flex flex-col gap-2 shadow-xs transition-colors", isDark ? "bg-[#211B18]/40 border-[#3C2E27]" : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50")}>
+      <div key={comment.id} className={cn("relative p-4 rounded-2xl border flex flex-col gap-2 shadow-xs transition-colors overflow-visible", isDark ? "bg-[#211B18]/40 border-[#3C2E27]" : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50", currentSticker ? "pr-12" : "")}>
          {currentSticker && (
            <img 
              src={currentSticker} 
              alt="Sticker" 
              className={cn(
                "absolute w-14 h-14 object-contain pointer-events-none z-10",
-               currentStickerPos === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-               currentStickerPos === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-               currentStickerPos === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-               (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
+               currentStickerPos === 'top-left' && "left-0 top-0",
+               currentStickerPos === 'top-right' && "right-0 top-0",
+               currentStickerPos === 'bottom-left' && "left-0 bottom-0",
+               (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-1 -bottom-2"
              )} 
              style={{ imageRendering: 'pixelated' }}
              referrerPolicy="no-referrer"
@@ -807,7 +807,7 @@ export function Reader() {
                                        <button onClick={() => setActiveParagraphIndex(null)} className="text-xs uppercase font-bold opacity-50 hover:opacity-100">Đóng</button>
                                    </div>
                                    
-                                   <div className="space-y-4 mb-4 max-h-60 overflow-y-auto pr-2">
+                                   <div className="space-y-4 mb-4 max-h-60 overflow-y-auto pr-2 pt-4">
                                        {pComments.length === 0 ? (
                                            <div className="text-center italic text-sm opacity-50 py-2">Chưa có bình luận. Hãy là người đầu tiên!</div>
                                        ) : (
@@ -995,7 +995,7 @@ export function Reader() {
                                    <img 
                                        src={c.equippedSticker} 
                                        alt="Decor sticker" 
-                                       className="absolute right-3 bottom-3 w-8 h-8 object-contain pointer-events-none hover:scale-125 transition-transform animate-bounce [animation-duration:4s] z-10" 
+                                       className="absolute right-3 bottom-3 w-8 h-8 object-contain pointer-events-none hover:scale-125 transition-transform z-10" 
                                        style={{ imageRendering: '-webkit-optimize-contrast' }}
                                        referrerPolicy="no-referrer"
                                    />
