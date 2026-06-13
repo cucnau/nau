@@ -46,13 +46,7 @@ const ParagraphCommentNode = ({
                <img 
                  src={currentSticker} 
                  alt="Sticker" 
-                 className={cn(
-                   "absolute w-10 h-10 object-contain pointer-events-none z-10",
-                   currentStickerPos === 'top-left' && "left-0 top-0",
-                   currentStickerPos === 'top-right' && "right-0 top-0",
-                   currentStickerPos === 'bottom-left' && "left-0 bottom-0",
-                   (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-0 bottom-0"
-                 )} 
+                 className="absolute w-10 h-10 object-contain pointer-events-none z-10 right-0 top-1/2 -translate-y-1/2" 
                  style={{ imageRendering: 'pixelated' }}
                  referrerPolicy="no-referrer"
                />
@@ -197,13 +191,7 @@ const ChapterCommentNode = ({
            <img 
              src={currentSticker} 
              alt="Sticker" 
-             className={cn(
-               "absolute w-14 h-14 object-contain pointer-events-none z-10",
-               currentStickerPos === 'top-left' && "left-0 top-0",
-               currentStickerPos === 'top-right' && "right-0 top-0",
-               currentStickerPos === 'bottom-left' && "left-0 bottom-0",
-               (currentStickerPos === 'bottom-right' || !currentStickerPos) && "right-1 -bottom-2"
-             )} 
+             className="absolute w-14 h-14 object-contain pointer-events-none z-10 right-0 top-1/2 -translate-y-1/2" 
              style={{ imageRendering: 'pixelated' }}
              referrerPolicy="no-referrer"
            />
@@ -821,13 +809,7 @@ export function Reader() {
                                                                 <img 
                                                                     src={c.equippedSticker} 
                                                                     alt="Sticker" 
-                                                                    className={cn(
-                                                                        "absolute w-3.5 h-3.5 object-contain pointer-events-none z-10",
-                                                                        c.stickerPosition === 'top-left' && "left-0 top-0 -translate-x-1/4 -translate-y-1/4",
-                                                                        c.stickerPosition === 'top-right' && "right-0 top-0 translate-x-1/4 -translate-y-1/4",
-                                                                        c.stickerPosition === 'bottom-left' && "left-0 bottom-0 -translate-x-1/4 translate-y-1/4",
-                                                                        (c.stickerPosition === 'bottom-right' || !c.stickerPosition) && "right-0 bottom-0 translate-x-1/4 translate-y-1/4"
-                                                                    )} 
+                                                                    className="absolute w-5 h-5 object-contain pointer-events-none z-10 -right-2 top-1/2 -translate-y-1/2" 
                                                                     style={{ imageRendering: '-webkit-optimize-contrast' }}
                                                                     referrerPolicy="no-referrer"
                                                                 />
@@ -995,7 +977,7 @@ export function Reader() {
                                    <img 
                                        src={c.equippedSticker} 
                                        alt="Decor sticker" 
-                                       className="absolute right-3 bottom-3 w-8 h-8 object-contain pointer-events-none hover:scale-125 transition-transform z-10" 
+                                       className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 object-contain pointer-events-none hover:scale-125 transition-transform z-10" 
                                        style={{ imageRendering: '-webkit-optimize-contrast' }}
                                        referrerPolicy="no-referrer"
                                    />
