@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { onAuthStateChanged, getRedirectResult } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, collection, updateDoc, deleteField } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, collection, updateDoc, deleteField, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 import { auth, db } from '../lib/firebase';
 import { useStore } from '../store';
@@ -10,6 +10,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let unsubUserDoc: (() => void) | null = null;
+    let unsubSubStickers: (() => void) | null = null;
+    let unsubSubAccessories: (() => void) | null = null;
 
     // Handle redirect result to catch any login errors on redirect-back (e.g. unauthorized-domain)
     getRedirectResult(auth).catch((error: any) => {
@@ -31,6 +33,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (unsubUserDoc) {
         unsubUserDoc();
         unsubUserDoc = null;
+      }
+      if (unsubSubStickers) {
+        unsubSubStickers();
+        unsubSubStickers = null;
+      }
+      if (unsubSubAccessories) {
+        unsubSubAccessories();
+        unsubSubAccessories = null;
       }
 
       if (user) {
@@ -118,9 +128,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if ('frameUrl' in data) fieldsToDelete.frameUrl = deleteField();
             if ('equippedSticker' in data) fieldsToDelete.equippedSticker = deleteField();
             if ('stickerPosition' in data) fieldsToDelete.stickerPosition = deleteField();
+
+            // Tiến hành di chuyển dữ liệu ownedStickers từ trường sang subcollection
+            if (Array.isArray(data.ownedStickers) && data.ownedStickers.length > 0) {
+              console.log('Phát hiện ownedStickers cũ ở document gốc. Đang di chuyển sang subcollection...');
+              const pStickers = data.ownedStickers.map(async (url: string) => {
+                if (!url) return;
+                try {
+                  const q = query(collection(db, 'users', user.uid, 'owned_stickers'), where('url', '==', url));
+                  const hold = await getDocs(q);
+                  if (hold.empty) {
+                    await addDoc(collection(db, 'users', user.uid, 'owned_stickers'), {
+                      url,
+                      acquiredAt: Date.now()
+                    });
+                  }
+                } catch (e) {
+                  console.error('Lỗi khi migrate sticker:', e);
+                }
+              });
+              await Promise.all(pStickers);
+              fieldsToDelete.ownedStickers = deleteField();
+            } else if ('ownedStickers' in data) {
+              fieldsToDelete.ownedStickers = deleteField();
+            }
+
+            // Tiến hành di chuyển dữ liệu ownedAccessories từ trường sang subcollection
+            if (Array.isArray(data.ownedAccessories) && data.ownedAccessories.length > 0) {
+              console.log('Phát hiện ownedAccessories cũ ở document gốc. Đang di chuyển sang subcollection...');
+              const pAccessories = data.ownedAccessories.map(async (url: string) => {
+                if (!url) return;
+                try {
+                  const q = query(collection(db, 'users', user.uid, 'owned_accessories'), where('url', '==', url));
+                  const hold = await getDocs(q);
+                  if (hold.empty) {
+                    await addDoc(collection(db, 'users', user.uid, 'owned_accessories'), {
+                      url,
+                      acquiredAt: Date.now()
+                    });
+                  }
+                } catch (e) {
+                  console.error('Lỗi khi migrate phụ kiện:', e);
+                }
+              });
+              await Promise.all(pAccessories);
+              fieldsToDelete.ownedAccessories = deleteField();
+            } else if ('ownedAccessories' in data) {
+              fieldsToDelete.ownedAccessories = deleteField();
+            }
             
             if (Object.keys(fieldsToDelete).length > 0) {
-              console.log('Phát hiện trường obsolete lớn, tiến hành dọn dẹp:', Object.keys(fieldsToDelete));
+              console.log('Phát hiện trường obsolete lớn hoặc đã migrate xong, tiến hành dọn dẹp:', Object.keys(fieldsToDelete));
               try {
                 await updateDoc(userRef, fieldsToDelete);
               } catch (err) {
@@ -152,6 +210,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.error('Error listening to user document updates:', err);
           });
 
+          // Mount subcollection snapshot listeners to load owned items in real-time
+          unsubSubStickers = onSnapshot(collection(db, 'users', user.uid, 'owned_stickers'), (snap) => {
+             const urls = snap.docs.map(d => d.data().url).filter(Boolean);
+             useStore.setState({ ownedStickers: urls });
+          }, (err) => {
+             console.error('Error listening to user owned_stickers updates:', err);
+          });
+
+          unsubSubAccessories = onSnapshot(collection(db, 'users', user.uid, 'owned_accessories'), (snap) => {
+             const urls = snap.docs.map(d => d.data().url).filter(Boolean);
+             useStore.setState({ ownedAccessories: urls });
+          }, (err) => {
+              console.error('Error listening to user owned_accessories updates:', err);
+          });
+
         } catch (e) {
              console.error('Error fetching/processing user doc', e);
              if ((e as any)?.code === 'resource-exhausted') {
@@ -169,9 +242,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       unsubscribe();
-      if (unsubUserDoc) {
-        unsubUserDoc();
-      }
+      if (unsubUserDoc) unsubUserDoc();
+      if (unsubSubStickers) unsubSubStickers();
+      if (unsubSubAccessories) unsubSubAccessories();
     };
   }, [login, logout, setFirebaseUser, syncFromFirebase]);
 
