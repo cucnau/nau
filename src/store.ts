@@ -1071,10 +1071,19 @@ export const useStore = create<UserState>()(
          if (!state.isLoggedIn) return;
          
          const key = type === 'comment' ? 'equippedStickerComment' : type === 'chat' ? 'equippedStickerChat' : 'equippedStickerPost';
+         const originalValue = state[key];
+
          set({ [key]: stickerUrl });
-         get().updateUserDoc({ [key]: stickerUrl }).then(() => {
-            get().propagateEquipmentChanges();
-         });
+         get().updateUserDoc({ [key]: stickerUrl })
+            .then(() => {
+               get().propagateEquipmentChanges();
+            })
+            .catch((err) => {
+               console.error("Lỗi khi trang bị sticker:", err);
+               // Rollback local state
+               set({ [key]: originalValue });
+               alert(`Không thể trang bị sticker này: ${err?.message || String(err)}`);
+            });
       },
 
       setStickerPosition: (type: 'comment' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
@@ -1082,10 +1091,19 @@ export const useStore = create<UserState>()(
          if (!state.isLoggedIn) return;
          
          const key = type === 'comment' ? 'stickerPositionComment' : 'stickerPositionPost';
+         const originalValue = state[key];
+
          set({ [key]: pos });
-         get().updateUserDoc({ [key]: pos }).then(() => {
-            get().propagateEquipmentChanges();
-         });
+         get().updateUserDoc({ [key]: pos })
+            .then(() => {
+               get().propagateEquipmentChanges();
+            })
+            .catch((err) => {
+               console.error("Lỗi khi đổi vị trí sticker:", err);
+               // Rollback local state
+               set({ [key]: originalValue });
+               alert(`Không thể thay đổi vị trí sticker: ${err?.message || String(err)}`);
+            });
       },
 
       addOwnedAccessory: (accessoryUrl: string) => {
