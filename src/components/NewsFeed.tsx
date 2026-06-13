@@ -73,7 +73,7 @@ export function NewsFeed() {
         )}
       </div>
 
-      <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto pr-1 px-2 pt-6 pb-6 -mx-2">
+      <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto overflow-x-hidden pr-1 px-2 pt-6 pb-6 -mx-2">
         {posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-8 bg-[#FDF6EC]/40 dark:bg-[#2C221D]/40 rounded-2xl border border-dashed border-[#D7CCC8]/50 dark:border-[#3C2E27]/50 text-center">
             <MessageSquareQuote className="w-8 h-8 text-[#D7CCC8] dark:text-[#5D4037] mb-1 opacity-70" />
@@ -99,7 +99,7 @@ export function NewsFeed() {
                   <img 
                     src={currentSticker} 
                     alt="Decor sticker" 
-                    className="absolute -right-2 top-1/2 -translate-y-1/2 w-12 h-12 object-contain pointer-events-none hover:scale-125 transition-transform z-10" 
+                    className="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-12 object-contain pointer-events-none hover:scale-125 transition-transform z-10" 
                     style={{ imageRendering: 'pixelated' }}
                     referrerPolicy="no-referrer"
                   />
