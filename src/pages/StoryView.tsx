@@ -60,11 +60,11 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                   ? cn(
                      "p-4 rounded-2xl flex gap-3.5 border transition-all shadow-sm relative overflow-visible pr-8",
                      isGift 
-                        ? "bg-amber-50/70 border-amber-200/80 hover:bg-amber-50" 
+                        ? "bg-[#FDF6EC]/70 border-[#D7CCC8]/80 hover:bg-[#F5E6D3]" 
                         : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50"
                     )
                   : cn(
-                     "p-3.5 rounded-2xl flex gap-3 bg-[#FAF7F2]/60 dark:bg-gray-850/10 border border-[#F5E6D3]/40 hover:border-[#D7CCC8]/40 transition-colors relative block",
+                     "p-3.5 rounded-2xl flex gap-3 bg-[#FAF7F2]/60 dark:bg-stone-850/10 border border-[#F5E6D3]/40 hover:border-[#D7CCC8]/40 transition-colors relative block",
                      currentSticker ? "pr-12 pb-6" : ""
                   )
             )}
@@ -74,7 +74,6 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                 src={currentSticker} 
                 alt="Sticker" 
                 className="absolute w-12 h-12 object-contain pointer-events-none z-10 right-0 top-1/2 -translate-y-1/2" 
-                style={{ imageRendering: 'pixelated' }}
                 referrerPolicy="no-referrer"
               />
             )}
@@ -93,21 +92,21 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                      <span className="font-extrabold text-sm shrink-0" style={{ color: getTitleColor(currentActiveTitle) || '#3E2723' }}>
                         {currentDisplayName}
                         {currentActiveTitle && (
-                           <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-850 text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200 ml-1.5 inline-block align-middle">
+                           <span className="px-1.5 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-[#D7CCC8] ml-1.5 inline-block align-middle">
                               🏆 {currentActiveTitle}
                            </span>
                         )}
                      </span>
                      
                      {isGift && (
-                        <span className="bg-amber-100 text-amber-950 text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-amber-300 flex items-center gap-1 shadow-sm">
-                           <Sparkles className="w-3 h-3 text-amber-600 inline shrink-0" />
+                        <span className="bg-[#F5E6D3] text-[#3E2723] text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-[#D7CCC8] flex items-center gap-1 shadow-sm">
+                           <Sparkles className="w-3 h-3 text-[#8D6E63] inline shrink-0" />
                            Tặng {comment.giftAmount} Choco 🍫
                         </span>
                      )}
                   </div>
                   
-                  <span className="text-[10px] text-gray-400 font-mono shrink-0">
+                  <span className="text-[10px] text-stone-400 font-mono shrink-0">
                      {comment.createdAt?.toDate 
                         ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                         : 'Vừa xong'}
@@ -115,7 +114,7 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                </div>
                <p className={cn(
                   "text-sm break-words leading-relaxed text-justify",
-                  isGift ? "text-amber-900 font-medium italic" : "text-gray-700"
+                  isGift ? "text-[#5D4037] font-medium italic" : "text-stone-700"
                )}>
                   {comment.replyToUser && (
                      <span className="text-[#8D6E63] font-bold text-[10px] uppercase mr-1.5 bg-[#8D6E63]/10 px-2 py-0.5 rounded-md select-none border border-[#8D6E63]/25 align-middle inline-block">
@@ -164,13 +163,13 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                      <button 
                         onClick={() => handleSendReply(comment)}
                         disabled={submittingReply || !replyText.trim()}
-                        className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-gray-300 disabled:text-gray-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
+                        className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-stone-300 disabled:text-stone-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
                      >
                         {submittingReply ? 'Gửi...' : 'Gửi'}
                      </button>
                      <button 
                         onClick={() => setReplyingToId(null)}
-                        className="text-gray-400 hover:text-gray-500 border border-gray-200 px-2 rounded-xl text-xs"
+                        className="text-stone-400 hover:text-stone-500 border border-stone-200 px-2 rounded-xl text-xs"
                      >
                         Hủy
                      </button>
@@ -445,24 +444,24 @@ export function StoryView() {
   return (
     <div className="p-4 sm:p-6 lg:p-10 flex flex-col gap-8 max-w-5xl mx-auto w-full">
       {/* Story Profile Card */}
-      <div className="flex flex-col gap-8 bg-white dark:bg-[#211B18] border border-[#D7CCC8]/80 dark:border-[#3C2E27] p-6 lg:p-8 rounded-3xl shadow-sm">
+      <div className="flex flex-col gap-8 bg-[#FFFDF9] dark:bg-[#211B18] border-2 border-[#3E2723] dark:border-[#4E342E] p-6 lg:p-8 rounded-3xl shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]">
         <div className="flex flex-col md:flex-row gap-8">
             <div className="w-full md:w-64 flex-shrink-0 flex justify-center md:block">
-                <img src={story.coverUrl} alt={story.title} className="w-48 md:w-full aspect-[2/3] object-cover rounded-xl shadow-lg border border-[#D7CCC8]/50" />
+                <img src={story.coverUrl} alt={story.title} className="w-48 md:w-full aspect-[2/3] object-cover rounded-2xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[1.5px_1.5px_0_0_#3E2723] dark:shadow-[1.5px_1.5px_0_0_#0D0907]" />
             </div>
             <div className="flex-1 flex flex-col">
-                <h1 className="text-2xl lg:text-4xl font-bold mb-2 text-[#3E2723] uppercase tracking-tighter">
+                <h1 className="text-2xl lg:text-4xl font-black mb-3 text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wider leading-snug">
                    {story.title}
-                   {story.completed && <span className="inline-block text-xs lg:text-sm bg-green-100 text-green-700 px-2 py-1 rounded uppercase tracking-widest font-bold ml-3 align-middle">Full</span>}
+                   {story.completed && <span className="inline-block text-[10px] lg:text-xs bg-[#E6D4BF] text-[#3E2723] px-2.5 py-1 rounded-lg uppercase tracking-widest font-black ml-3 align-middle border-[2px] border-[#3E2723]">Full</span>}
                 </h1>
-                <div className="text-gray-600 mb-4 flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    <span className="font-medium italic">{story.author}</span>
+                <div className="text-[#8D6E63] font-bold mb-4 flex items-center gap-2">
+                    <Users className="w-4.5 h-4.5" />
+                    <span className="font-bold italic uppercase text-xs tracking-wider">Tác giả: {story.author}</span>
                 </div>
                 
                 <div className="flex flex-wrap gap-2 mb-6">
                     {story.genres?.map?.((g: string) => (
-                        <span key={g} className="bg-[#FDF6EC] text-[#3E2723] px-3 py-1 text-xs font-semibold rounded-full border border-[#D7CCC8]">
+                        <span key={g} className="bg-[#FDF6EC] text-[#3E2723] dark:text-[#ECE5DC] dark:bg-stone-800 px-3.5 py-1 text-xs font-black uppercase tracking-wider rounded-xl border-[2px] border-[#3E2723]">
                             {g}
                         </span>
                     ))}
@@ -470,28 +469,28 @@ export function StoryView() {
      
                 <div className="flex items-center gap-6 mb-6">
                    <div className="flex flex-col">
-                       <span className="text-[#8D6E63] text-sm uppercase font-bold">Chương</span>
-                       <span className="font-black text-xl text-[#3E2723]">{Math.max(story.chapterCount || 0, chapters.length)}</span>
+                       <span className="text-[#8D6E63] text-xs uppercase font-extrabold tracking-widest">Chương</span>
+                       <span className="font-extrabold text-2xl text-[#3E2723] dark:text-[#ECE5DC]">{Math.max(story.chapterCount || 0, chapters.length)}</span>
                    </div>
-                   <div className="w-px h-8 bg-[#D7CCC8]"></div>
+                   <div className="w-[3px] h-10 bg-[#3E2723]/25 dark:bg-stone-600/40 rounded-full"></div>
                    <div className="flex flex-col">
-                       <span className="text-[#8D6E63] text-sm uppercase font-bold">Lượt đọc</span>
-                       <span className="font-black text-xl text-[#3E2723]">{new Intl.NumberFormat('en-US', { notation: 'compact' }).format(story.viewCount || 0)}</span>
+                       <span className="text-[#8D6E63] text-xs uppercase font-extrabold tracking-widest">Lượt đọc</span>
+                       <span className="font-extrabold text-2xl text-[#3E2723] dark:text-[#ECE5DC]">{new Intl.NumberFormat('en-US', { notation: 'compact' }).format(story.viewCount || 0)}</span>
                    </div>
-                   <div className="w-px h-8 bg-[#D7CCC8]"></div>
+                   <div className="w-[3px] h-10 bg-[#3E2723]/25 dark:bg-stone-600/40 rounded-full"></div>
                    <div className="flex flex-col">
-                       <span className="text-[#8D6E63] text-sm uppercase font-bold">Đã tặng</span>
-                       <span className="font-black text-xl text-[#3E2723] flex items-center gap-1">
+                       <span className="text-[#8D6E63] text-xs uppercase font-extrabold tracking-widest">Đã tặng</span>
+                       <span className="font-extrabold text-2xl text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-1">
                           {totalGiftedChoco} <span className="text-xs">🍫</span>
                        </span>
                    </div>
                 </div>
                 
                 {/* Interactive Action Row */}
-                <div className="mt-auto flex flex-wrap gap-2 pt-4">
+                <div className="mt-auto flex flex-wrap gap-3 pt-4">
                     <button 
                       onClick={() => navigate(`/doc/${story.id}/${chapters[0]?.id}`)} 
-                      className="bg-[#3E2723] text-[#FDF6EC] px-4 py-1.5 text-sm rounded-full font-bold flex items-center justify-center gap-2 hover:bg-[#2D1B19] transition-all shadow-md border border-[#8D6E63]"
+                      className="bg-[#8D6E63] hover:bg-[#5D4037] text-white px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none transition-all"
                     >
                         <BookOpen className="w-4 h-4" />
                         Đọc từ đầu
@@ -500,10 +499,10 @@ export function StoryView() {
                     <button 
                       onClick={handleSaveToggle} 
                       className={cn(
-                        "px-4 py-1.5 text-sm rounded-full font-bold flex items-center justify-center gap-2 transition-all shadow-sm border",
+                        "px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none",
                         isSaved 
-                          ? "bg-[#E6D8C9] border-[#D7CCC8] text-[#3E2723] hover:bg-[#D5C9BB]" 
-                          : "bg-white border-[#D7CCC8] text-[#5D4037] hover:bg-[#FDF6EC]"
+                          ? "bg-[#E6D8C9] text-[#3E2723]" 
+                          : "bg-white text-[#5D4037]"
                       )}
                     >
                         <Bookmark className={cn("w-4 h-4", isSaved && "fill-[#8D6E63] text-[#8D6E63]")} />
@@ -512,18 +511,18 @@ export function StoryView() {
     
                     <button 
                       onClick={() => setShowGiftModal(true)} 
-                      className="bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 px-4 py-1.5 text-sm rounded-full font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
+                      className="bg-[#E6D4BF] hover:bg-[#5D4037] hover:text-white text-[#3E2723] px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none"
                     >
-                        <Gift className="w-4 h-4 text-amber-700 animate-bounce" />
+                        <Gift className="w-4 h-4 text-[#3E2723] animate-bounce shrink-0" />
                         Tặng Choco
                     </button>
                 </div>
             </div>
         </div>
 
-        <div className="border-t border-[#D7CCC8]/85 dark:border-[#3C2E27] pt-6 flex-1">
-            <h3 className="font-bold text-lg mb-4 uppercase text-[#3E2723] dark:text-[#ECE5DC]">Giới thiệu</h3>
-            <div className="text-gray-700 dark:text-[#D7CCC8]/90 leading-relaxed italic text-[15px] space-y-4">
+        <div className="border-t-[3px] border-[#3E2723]/10 dark:border-[#5D4037]/50 pt-6 flex-1">
+            <h3 className="font-extrabold text-base mb-4 uppercase tracking-widest text-[#3E2723] dark:text-[#ECE5DC]">Giới thiệu</h3>
+            <div className="text-stone-700 dark:text-[#D7CCC8]/90 leading-relaxed italic text-[14px] space-y-4 font-sans font-medium">
                {story.description?.split('\n').map((para: string, idx: number) => (
                   <p key={idx} className={para.trim() ? "" : "hidden"}>{para}</p>
                ))}
@@ -532,30 +531,30 @@ export function StoryView() {
       </div>
 
       {/* Tabs list (Chapters list vs Comments Feed) */}
-      <div className="bg-white dark:bg-[#1A1412] border border-[#D7CCC8] dark:border-[#3C2E27] rounded-3xl p-6 lg:p-8 shadow-sm">
-         <div className="flex border-b border-[#F5E6D3] dark:border-[#3C2E27] mb-6">
+      <div className="bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723] dark:border-[#4E342E] rounded-3xl p-6 lg:p-8 shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]">
+         <div className="flex border-b-[3px] border-[#3E2723]/20 dark:border-stone-800/40 mb-6">
             <button
                onClick={() => setActiveTab('chapters')}
                className={cn(
-                  "px-4 py-3 font-bold text-sm uppercase tracking-tight relative transition-all",
-                  activeTab === 'chapters' ? "text-[#3E2723] dark:text-[#ECE5DC]" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  "px-4 py-3 font-black text-xs uppercase tracking-wider relative transition-all",
+                  activeTab === 'chapters' ? "text-[#3E2723] dark:text-[#ECE5DC]" : "text-stone-400 hover:text-stone-600 dark:hover:text-[#ECE5DC]"
                )}
             >
                Danh sách chương ({chapters.length})
                {activeTab === 'chapters' && (
-                  <span className="absolute bottom-0 left-0 right-0 h-1 bg-[#3E2723] dark:bg-[#ECE5DC] rounded-t-full"></span>
+                  <span className="absolute bottom-0 left-0 right-0 h-[4px] bg-[#3E2723] dark:bg-[#C29D70] rounded-t-full"></span>
                )}
             </button>
             <button
                onClick={() => setActiveTab('comments')}
                className={cn(
-                  "px-4 py-3 font-bold text-sm uppercase tracking-tight relative transition-all flex items-center gap-2",
-                  activeTab === 'comments' ? "text-[#3E2723] dark:text-[#ECE5DC]" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  "px-4 py-3 font-black text-xs uppercase tracking-wider relative transition-all flex items-center gap-2",
+                  activeTab === 'comments' ? "text-[#3E2723] dark:text-[#ECE5DC]" : "text-stone-400 hover:text-stone-600 dark:hover:text-[#ECE5DC]"
                )}
             >
                Bình luận & Quà tặng ({comments.length})
                {activeTab === 'comments' && (
-                  <span className="absolute bottom-0 left-0 right-0 h-1 bg-[#3E2723] dark:bg-[#ECE5DC] rounded-t-full"></span>
+                  <span className="absolute bottom-0 left-0 right-0 h-[4px] bg-[#3E2723] dark:bg-[#C29D70] rounded-t-full"></span>
                )}
             </button>
          </div>
@@ -578,8 +577,8 @@ export function StoryView() {
                         key={chap.id}
                         onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
                         className={cn(
-                            "flex items-center justify-between p-4 border-b border-[#F5E6D3] hover:bg-[#FDF6EC] transition-colors group last:border-0 rounded-lg mb-1",
-                            isRead && "text-[#A1887F]"
+                            "flex items-center justify-between p-4 border-[2px] border-dashed border-[#3E2723]/20 hover:border-solid hover:border-[#3E2723] hover:bg-[#FDF6EC] transition-all rounded-xl mb-2 text-left w-full",
+                            isRead ? "text-[#A1887F]" : "text-[#3E2723]"
                         )}
                      >
                         <div className="flex items-center gap-3">
@@ -589,8 +588,8 @@ export function StoryView() {
                         </div>
                         <div className="flex items-center gap-3">
                             {isPassRequired && (hasPassUnlocked ? <Unlock className="w-4 h-4 text-[#8D6E63]" title="Đã mở khóa Pass" /> : <Lock className="w-4 h-4 text-[#8D6E63]" title="Cần vé Pass" />)}
-                            {(isEarlyAccess && isStillEarlyAccess) && (hasEarlyAccessUnlocked ? <Zap className="w-4 h-4 text-gray-400" title="Đã đọc sớm" /> : <Zap className="w-4 h-4 text-[#D4AF37] fill-yellow-100" title="Cần vé Ưu Tiên" />)}
-                            {(isEarlyAccess && !isStillEarlyAccess) && <Zap className="w-4 h-4 text-gray-400" title="Đã chuyển sang đọc miễn phí" />}
+                            {(isEarlyAccess && isStillEarlyAccess) && (hasEarlyAccessUnlocked ? <Zap className="w-4 h-4 text-stone-400" title="Đã đọc sớm" /> : <Zap className="w-4 h-4 text-[#D4AF37] fill-[#F5E6D3]" title="Cần vé Ưu Tiên" />)}
+                            {(isEarlyAccess && !isStillEarlyAccess) && <Zap className="w-4 h-4 text-stone-400" title="Đã chuyển sang đọc miễn phí" />}
                             
                             {isRead && <span className="text-[10px] uppercase font-bold tracking-wider bg-[#F5E6D3] text-[#8D6E63] px-2 py-0.5 rounded-full">Đã đọc</span>}
                             <ChevronRight className={cn("w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity", !isRead && "text-[#8D6E63]")} />
@@ -614,7 +613,7 @@ export function StoryView() {
                   <button
                      type="submit"
                      disabled={submittingComment || !commentText.trim() || !isLoggedIn}
-                     className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-gray-300 disabled:text-gray-400 px-5 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1"
+                     className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-stone-300 disabled:text-stone-400 px-5 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1"
                   >
                      <Send className="w-3.5 h-3.5" />
                      Gửi
@@ -624,7 +623,7 @@ export function StoryView() {
                {/* Comments List */}
                <div className="space-y-4">
                   {comments.filter(c => !c.parentId).length === 0 ? (
-                     <div className="py-10 text-center text-gray-400 text-sm italic">
+                     <div className="py-10 text-center text-stone-400 text-sm italic">
                         Chưa có cuộc thảo luận hoặc quà tặng nào cho tác phẩm này. Hãy là người đầu tiên tiếp sức!
                      </div>
                   ) : (
@@ -651,7 +650,7 @@ export function StoryView() {
                               className={cn(
                                  "p-4 rounded-2xl flex gap-3.5 border transition-all shadow-sm",
                                  isGift 
-                                    ? "bg-amber-50/70 border-amber-200/80 hover:bg-amber-50" 
+                                    ? "bg-[#FDF6EC]/70 border-[#D7CCC8]/80 hover:bg-[#F5E6D3]" 
                                     : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50"
                               )}
                            >
@@ -669,21 +668,21 @@ export function StoryView() {
                                        <span className="font-extrabold text-sm shrink-0" style={{ color: getTitleColor(comment.activeTitle) || '#3E2723' }}>
                                           {comment.displayName}
                                           {comment.activeTitle && (
-                                             <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-800 text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200 ml-1.5 inline-block align-middle">
+                                             <span className="px-1.5 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-[#D7CCC8] ml-1.5 inline-block align-middle">
                                                 🏆 {comment.activeTitle}
                                              </span>
                                           )}
                                        </span>
                                        
                                        {isGift && (
-                                          <span className="bg-amber-100 text-amber-950 text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-amber-300 flex items-center gap-1 shadow-sm">
-                                             <Sparkles className="w-3 h-3 text-amber-600 inline shrink-0" />
+                                          <span className="bg-[#F5E6D3] text-[#3E2723] text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-[#D7CCC8] flex items-center gap-1 shadow-sm">
+                                             <Sparkles className="w-3 h-3 text-[#8D6E63] inline shrink-0" />
                                              Tặng {comment.giftAmount} Choco 🍫
                                           </span>
                                        )}
                                     </div>
                                     
-                                    <span className="text-[10px] text-gray-400 font-mono shrink-0">
+                                    <span className="text-[10px] text-stone-400 font-mono shrink-0">
                                        {comment.createdAt?.toDate 
                                           ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                                           : 'Vừa xong'}
@@ -691,7 +690,7 @@ export function StoryView() {
                                  </div>
                                  <p className={cn(
                                     "text-sm break-words leading-relaxed",
-                                    isGift ? "text-amber-900 font-medium italic" : "text-gray-700"
+                                    isGift ? "text-[#5D4037] font-medium italic" : "text-stone-700"
                                  )}>
                                     {comment.content}
                                  </p>
@@ -735,13 +734,13 @@ export function StoryView() {
                                        <button 
                                           onClick={() => handleSendReply(comment)}
                                           disabled={submittingReply || !replyText.trim()}
-                                          className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-gray-300 disabled:text-gray-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
+                                          className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-stone-300 disabled:text-stone-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
                                        >
                                           {submittingReply ? 'Gửi...' : 'Gửi'}
                                        </button>
                                        <button 
                                           onClick={() => setReplyingToId(null)}
-                                          className="text-gray-400 hover:text-gray-500 border border-gray-200 px-2 rounded-xl text-xs"
+                                          className="text-stone-400 hover:text-stone-500 border border-stone-200 px-2 rounded-xl text-xs"
                                        >
                                           Hủy
                                        </button>
@@ -759,9 +758,9 @@ export function StoryView() {
                                     return (
                                        <div className="mt-4 pl-3.5 border-l-2 border-[#D7CCC8]/40 space-y-3 ml-1">
                                           {replies.map((reply: any) => (
-                                             <div key={reply.id} className="flex gap-2.5 items-start bg-gray-50/40 p-2.5 rounded-xl border border-gray-100">
+                                             <div key={reply.id} className="flex gap-2.5 items-start bg-stone-50/40 p-2.5 rounded-xl border border-stone-100">
                                                 {reply.avatarUrl ? (
-                                                   <img src={reply.avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 border border-gray-200" referrerPolicy="no-referrer" />
+                                                   <img src={reply.avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 border border-stone-200" referrerPolicy="no-referrer" />
                                                 ) : (
                                                    <div className="w-7 h-7 rounded-full bg-[#8D6E63] text-[#FDF6EC] flex items-center justify-center shrink-0 font-bold text-[10px] uppercase shadow-inner">
                                                       {reply.displayName?.substring(0, 2)}
@@ -772,18 +771,18 @@ export function StoryView() {
                                                       <span className="font-bold text-xs" style={{ color: getTitleColor(reply.activeTitle) || '#3E2723' }}>
                                                          {reply.displayName}
                                                          {reply.activeTitle && (
-                                                            <span className="px-1 py-0.5 bg-yellow-101 text-yellow-800 text-[8px] font-black rounded uppercase ml-1 shadow-sm border border-yellow-250 inline-block align-middle">
+                                                            <span className="px-1 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[8px] font-black rounded uppercase ml-1 shadow-sm border border-[#D7CCC8] inline-block align-middle">
                                                                🏆 {reply.activeTitle}
                                                             </span>
                                                          )}
                                                       </span>
-                                                      <span className="text-[9px] text-gray-400 font-mono">
+                                                      <span className="text-[9px] text-stone-400 font-mono">
                                                          {reply.createdAt?.toDate 
                                                             ? new Date(reply.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                                                             : 'Vừa xong'}
                                                       </span>
                                                    </div>
-                                                   <p className="text-xs text-gray-700 break-words leading-relaxed">
+                                                   <p className="text-xs text-stone-700 break-words leading-relaxed">
                                                       {reply.content}
                                                    </p>
                                                 </div>
@@ -809,12 +808,12 @@ export function StoryView() {
                {/* Header */}
                <div className="flex items-center justify-between border-b border-[#F5E6D3] pb-4 mb-5">
                   <h3 className="text-lg font-extrabold text-[#3E2723] uppercase tracking-tighter flex items-center gap-1.5">
-                     <Gift className="w-5 h-5 text-amber-600 animate-pulse" />
+                     <Gift className="w-5 h-5 text-[#8D6E63] animate-pulse" />
                      Gửi Quà Tặng Choco
                   </h3>
                   <button 
                      onClick={() => setShowGiftModal(false)}
-                     className="text-gray-400 hover:text-gray-600 text-xs font-bold font-mono border border-gray-200 rounded-lg px-2 py-1"
+                     className="text-stone-400 hover:text-stone-600 text-xs font-bold font-mono border border-stone-200 rounded-lg px-2 py-1"
                   >
                      Đóng
                   </button>
@@ -823,10 +822,10 @@ export function StoryView() {
                {/* Choco balance stats */}
                <div className="bg-[#FDF6EC] p-4 rounded-2xl border border-[#F5E6D3] mb-5 flex items-center justify-between">
                   <div>
-                     <p className="text-gray-500 text-xs font-semibold">Túi Choco của bạn</p>
+                     <p className="text-stone-500 text-xs font-semibold">Túi Choco của bạn</p>
                      <p className="text-xl font-black text-[#3E2723]">{choco.toLocaleString()} 🍫</p>
                   </div>
-                  <Sparkles className="w-6 h-6 text-amber-500" />
+                  <Sparkles className="w-6 h-6 text-[#8D6E63]" />
                </div>
 
                {/* Preset amounts selection */}
