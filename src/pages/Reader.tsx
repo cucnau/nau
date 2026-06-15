@@ -40,8 +40,8 @@ const ParagraphCommentNode = ({
    });
 
    return (
-      <div key={comment.id} className="text-xs pt-1 mt-1 border-t border-dashed border-stone-100 dark:border-[#5D4037]/30 first:border-0">
-         <div className={cn("relative flex gap-2.5 items-start p-2 rounded-xl bg-[#FDF6EC]/40 dark:bg-[#1A1412]/20 border border-[#F5E6D3]/40 dark:border-[#5D4037]/30", currentSticker ? "pr-10" : "")}>
+      <div key={comment.id} className="text-xs pt-2 mt-2 border-t-2 border-dashed border-[#3E2723]/10 dark:border-[#4E342E]/30 first:border-0">
+         <div className={cn("relative flex gap-2.5 items-start p-2.5 rounded-2xl border-2 transition-all hover:-translate-y-0.5", isDark ? "bg-[#1C1613] border-[#3E2723] text-[#ECE5DC] shadow-[1px_1px_0_0_#1C1613]" : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] shadow-[1px_1px_0_0_#3E2723]", currentSticker ? "pr-11" : "")}>
              {currentSticker && (
                <img 
                  src={currentSticker} 
@@ -59,11 +59,11 @@ const ParagraphCommentNode = ({
                borderClass="border border-[#D7CCC8]/30"
             />
             <div className="flex-1 min-w-0">
-               <div className="text-[11px] font-bold mb-0.5 flex justify-between tracking-tight" style={{ color: getTitleColor(currentActiveTitle) || undefined }}>
+               <div className="text-[11px] font-black mb-0.5 flex justify-between tracking-tight" style={{ color: getTitleColor(currentActiveTitle) || undefined }}>
                   <span className="flex items-center gap-1">
                      {currentDisplayName}
                      {currentActiveTitle && (
-                        <span className="px-1 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[7px] font-extrabold rounded">
+                        <span className="px-1 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[7px] font-black rounded border border-[#3E2723]">
                            🏆 {currentActiveTitle}
                         </span>
                      )}
@@ -74,7 +74,7 @@ const ParagraphCommentNode = ({
                         : 'Vừa xong'}
                   </span>
                </div>
-               <p className={cn("text-xs leading-relaxed text-justify break-words", isDark ? "text-[#ECE5DC]" : "text-stone-700")}>
+               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isDark ? "text-[#ECE5DC]" : "text-[#5D4037]")}>
                   {comment.content}
                </p>
                
@@ -89,7 +89,7 @@ const ParagraphCommentNode = ({
                            setReplyText('');
                         }
                      }}
-                     className="text-[10px] text-[#8D6E63] hover:text-[#5D4037] font-extrabold block mt-1"
+                     className="text-[10px] text-[#8D6E63] hover:text-[#5D4037] font-black uppercase tracking-wider block mt-1 cursor-pointer"
                   >
                      Trả lời
                   </button>
@@ -103,7 +103,7 @@ const ParagraphCommentNode = ({
                         value={replyText}
                         disabled={submittingReply}
                         onChange={(e) => setReplyText(e.target.value)}
-                        className={cn("flex-1 px-2.5 py-1 text-xs rounded-lg border focus:outline-none focus:border-[#8D6E63] bg-transparent", isDark ? "border-[#3C2E27] text-[#ECE5DC]" : "border-[#D7CCC8] dark:border-[#D7CCC8] text-[#3E2723] dark:text-[#3E2723]")}
+                        className={cn("flex-1 px-3 py-1.5 text-xs rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold bg-white dark:bg-[#1A1412]", isDark ? "border-[#3E2723] text-[#ECE5DC]" : "border-[#3E2723] text-[#3E2723]")}
                         onKeyDown={(e) => {
                            if (e.key === 'Enter') {
                               e.preventDefault();
@@ -117,7 +117,7 @@ const ParagraphCommentNode = ({
                         type="button"
                         onClick={() => handleSendReply(comment)}
                         disabled={submittingReply || !replyText.trim()}
-                        className="bg-[#8D6E63] text-white px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors hover:bg-[#5D4037] disabled:opacity-50"
+                        className="bg-[#8D6E63] hover:bg-[#5D4037] text-white px-3 py-1 rounded-xl text-xs font-black uppercase transition-all border-2 border-[#3E2723] cursor-pointer disabled:opacity-50"
                      >
                         Gửi
                      </button>
@@ -128,7 +128,7 @@ const ParagraphCommentNode = ({
 
          {replies.length > 0 && (
             <div className={cn(
-               "mt-2 pl-4 space-y-2 border-l border-[#D7CCC8]/40",
+               "mt-2 pl-4 space-y-2 border-l-2 border-dashed border-[#3E2723]/20 dark:border-white/10",
                depth > 4 ? "pl-1 border-0" : ""
             )}>
                {replies.map(r => (
@@ -185,7 +185,7 @@ const ChapterCommentNode = ({
    });
 
    return (
-      <div key={comment.id} className={cn("relative p-4 rounded-2xl border flex flex-col gap-2 shadow-xs transition-colors overflow-visible", isDark ? "bg-[#211B18]/40 border-[#3C2E27]" : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50", currentSticker ? "pr-12" : "")}>
+      <div key={comment.id} className={cn("relative p-5 rounded-3xl border-3 flex flex-col gap-3 transition-all hover:-translate-y-0.5 whitespace-normal", isDark ? "bg-[#1C1613] border-[#3E2723] text-[#ECE5DC] shadow-[2px_2px_0_0_#1A1412]" : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]", currentSticker ? "pr-14" : "")}>
          {currentSticker && (
            <img 
              src={currentSticker} 
@@ -205,10 +205,10 @@ const ChapterCommentNode = ({
             />
             <div className="flex-1 min-w-0">
                <div className="flex items-center justify-between gap-2 mb-1">
-                  <span className="font-extrabold text-xs flex items-center gap-1.5" style={{ color: getTitleColor(currentActiveTitle) || undefined }}>
+                  <span className="font-black text-xs flex items-center gap-1.5" style={{ color: getTitleColor(currentActiveTitle) || undefined }}>
                      {currentDisplayName}
                      {currentActiveTitle && (
-                        <span className="px-1.5 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[9px] font-black rounded uppercase tracking-tight select-none border border-[#D7CCC8] inline-block align-middle">
+                        <span className="px-1.5 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[9px] font-black rounded uppercase tracking-tight select-none border border-[#3E2723] inline-block align-middle">
                            🏆 {currentActiveTitle}
                         </span>
                      )}
@@ -220,7 +220,7 @@ const ChapterCommentNode = ({
                         : 'Vừa xong'}
                   </span>
                </div>
-               <p className={cn("text-xs leading-relaxed text-justify break-words", isDark ? "text-[#ECE5DC]" : "text-stone-700")}>
+               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isDark ? "text-[#ECE5DC]" : "text-[#5D4037]")}>
                   {comment.content}
                </p>
 
@@ -236,7 +236,7 @@ const ChapterCommentNode = ({
                               setReplyText('');
                            }
                         }}
-                        className="text-xs text-[#8D6E63] hover:text-[#5D4037] font-extrabold flex items-center gap-1 cursor-pointer transition-colors"
+                        className="text-xs text-[#8D6E63] hover:text-[#5D4037] font-black flex items-center gap-1 cursor-pointer transition-colors uppercase tracking-wider"
                      >
                         <MessageSquare className="w-3.5 h-3.5" />
                         Trả lời
@@ -253,7 +253,7 @@ const ChapterCommentNode = ({
                         value={replyText}
                         disabled={submittingReply}
                         onChange={(e) => setReplyText(e.target.value)}
-                        className={cn("flex-1 px-3.5 py-1.5 placeholder-gray-400 text-xs sm:text-sm rounded-xl border focus:outline-none focus:ring-1 focus:ring-[#8D6E63] focus:border-[#8D6E63]", isDark ? "border-[#3C2E27] text-[#ECE5DC] bg-transparent" : "bg-[#FDF6EC] border-[#D7CCC8]/80 text-[#3E2723]")}
+                        className={cn("flex-1 px-3.5 py-1.5 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold bg-white dark:bg-[#1A1412]", isDark ? "border-[#3E2723] text-[#ECE5DC]" : "border-[#3E2723] text-[#3E2723]")}
                         onKeyDown={(e) => {
                            if (e.key === 'Enter') {
                               e.preventDefault();
@@ -266,7 +266,7 @@ const ChapterCommentNode = ({
                      <button 
                         onClick={() => handleSendReply(comment)}
                         disabled={submittingReply || !replyText.trim()}
-                        className={cn("px-4 py-1.5 rounded-xl text-xs font-bold transition-colors disabled:bg-stone-300 disabled:text-stone-400", isDark ? "bg-[#3C2E27] hover:bg-[#5D4037] text-white" : "bg-[#3E2723] dark:bg-[#3E2723] hover:bg-[#2D1B19] dark:hover:bg-[#2D1B19] text-[#FDF6EC] dark:text-[#FDF6EC]")}
+                        className={cn("px-4 py-1.5 bg-[#8D6E63] hover:bg-[#5D4037] text-white font-black text-xs rounded-xl border-2 border-[#3E2723] transition-all cursor-pointer")}
                      >
                         Gửi
                      </button>
@@ -277,7 +277,7 @@ const ChapterCommentNode = ({
 
          {replies.length > 0 && (
             <div className={cn(
-               "pl-4 space-y-3 border-l-2 border-[#D7CCC8]/40 mt-1",
+               "pl-4 space-y-3 border-l-2 border-dashed border-[#3E2723]/20 dark:border-white/10 mt-1",
                depth > 4 ? "pl-1 border-0" : ""
             )}>
                {replies.map(r => (
@@ -675,67 +675,67 @@ export function Reader() {
   if (!story || !currentChapter) return <div className="p-10 text-center">Không tìm thấy chương</div>;
 
   return (
-    <div className={cn("min-h-screen flex flex-col transition-colors duration-300", isDark ? "bg-[#1A1412] text-[#ECE5DC]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] text-[#3E2723] dark:text-[#3E2723]")}>
+    <div className={cn("min-h-screen flex flex-col transition-colors duration-300", isDark ? "bg-[#14100E] text-[#ECE5DC]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] text-[#3E2723] dark:text-[#3E2723]")}>
        {/* Top Navigation */}
-       <header className={cn("sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b transition-all duration-300 shadow-sm", 
-         isDark ? "bg-[#1A1412] border-[#3C2E27]" : "bg-[#F5E6D3] dark:bg-[#F5E6D3] border-[#D7CCC8] dark:border-[#D7CCC8]",
+       <header className={cn("sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b-2 transition-all duration-300 shadow-sm", 
+         isDark ? "bg-[#1A1412] border-[#3E2723]" : "bg-[#F5E6D3] dark:bg-[#F5E6D3] border-[#3E2723] dark:border-[#3E2723]",
          showHeader ? "translate-y-0" : "-translate-y-full"
        )}>
           <div className="flex flex-col">
-             <button onClick={() => navigate(`/truyen/${story.id}`)} className="text-xs font-bold uppercase tracking-wider opacity-70 hover:opacity-100 flex items-center gap-1 mb-1">
+             <button onClick={() => navigate(`/truyen/${story.id}`)} className="text-xs font-black uppercase tracking-wider opacity-70 hover:opacity-100 flex items-center gap-1 mb-1 bg-transparent border-0 cursor-pointer">
                 <ArrowLeft className="w-4 h-4" /> {story.title}
              </button>
-             <h1 className="text-lg font-bold">{currentChapter.title}</h1>
+             <h1 className="text-base sm:text-lg font-black tracking-tight">{currentChapter.title}</h1>
           </div>
           <div className="relative flex items-center gap-2">
-             <button onClick={() => setShowSettings(!showSettings)} className="p-2 rounded-full hover:bg-black/5">
+             <button onClick={() => setShowSettings(!showSettings)} className="p-2 rounded-xl border-2 border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412] shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer">
                 <Settings2 className="w-5 h-5" />
              </button>
              
              {/* Settings Panel */}
              {showSettings && (
-                <div className={cn("absolute right-0 top-full mt-2 w-64 p-5 rounded-2xl shadow-xl z-20 border transition-colors", isDark ? "bg-[#2C221D] border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8]")}>
-                   <h3 className={cn("font-bold mb-4 uppercase", isDark ? "text-[#ECE5DC]" : "text-[#3E2723] dark:text-[#3E2723]")}>Cài đặt</h3>
-             <div className="flex flex-col gap-6">
-                <div>
-                    <label className={cn("text-xs font-bold uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")}>Màu nền</label>
-                                        <div className="flex items-center gap-3">
-                        <button onClick={() => setIsDark(false)} style={{ backgroundColor: '#FDF6EC' }} className={cn("w-10 h-10 rounded-full border-2", !isDark ? "border-[#3E2723]" : "border-[#D7CCC8]")}></button>
-                        <button onClick={() => setIsDark(true)} style={{ backgroundColor: '#1A1412' }} className={cn("w-10 h-10 rounded-full border-2", isDark ? "border-[#D4AF37]" : "border-[#3C2E27]")}></button>
-                    </div>
+                <div className={cn("absolute right-0 top-full mt-2 w-64 p-5 rounded-3xl shadow-xl z-20 border-3 border-[#3E2723] transition-colors", isDark ? "bg-[#211B18] text-[#ECE5DC]" : "bg-[#FFFDF9] text-[#3E2723]")}>
+                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isDark ? "text-[#ECE5DC]" : "text-[#3E2723]")}>Cài đặt</h3>
+                   <div className="flex flex-col gap-6">
+                      <div>
+                           <label className={cn("text-xs font-black uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63]")}>Màu nền</label>
+                           <div className="flex items-center gap-3">
+                              <button onClick={() => setIsDark(false)} style={{ backgroundColor: '#FDF6EC' }} className={cn("w-10 h-10 rounded-full border-3", !isDark ? "border-[#3E2723]" : "border-[#D7CCC8]")}></button>
+                              <button onClick={() => setIsDark(true)} style={{ backgroundColor: '#1A1412' }} className={cn("w-10 h-10 rounded-full border-3", isDark ? "border-[#D4AF37]" : "border-[#3C2E27]")}></button>
+                           </div>
+                      </div>
+                      <div>
+                         <label className={cn("text-xs font-black uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63]")}>Cỡ chữ: {fontSize}px</label>
+                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-[#3E2723]" />
+                       </div>
+                       <div>
+                          <label className={cn("text-xs font-black uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63]")}>Phông chữ</label>
+                          <select 
+                            value={fontFamily} 
+                            onChange={(e) => setFontFamily(e.target.value)} 
+                            className={cn(
+                              "w-full px-3 py-2 text-sm rounded-xl border-2 outline-none transition-colors",
+                              isDark 
+                                ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723] focus:border-[#D4AF37]" 
+                                : "bg-white text-[#3E2723] border-[#3E2723] focus:border-[#8D6E63]"
+                            )}
+                          >
+                            <option value="font-reading-nunito" className="font-reading-nunito">Nunito (Mặc định)</option>
+                            <option value="font-reading-garamond" className="font-reading-garamond">EB Garamond</option>
+                            <option value="font-reading-roboto" className="font-reading-roboto">Roboto</option>
+                            <option value="font-reading-patrick" className="font-reading-patrick">Patrick Hand</option>
+                            <option value="font-reading-iosevka" className="font-reading-iosevka">Iosevka Charon</option>
+                            <option value="font-reading-notoserif" className="font-reading-notoserif">Noto Serif</option>
+                          </select>
+                      </div>
+                   </div>
                 </div>
-                <div>
-                   <label className={cn("text-xs font-bold uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")}>Cỡ chữ: {fontSize}px</label>
-                   <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-[#3E2723]" />
-                 </div>
-                 <div>
-                    <label className={cn("text-xs font-bold uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")}>Phông chữ</label>
-                    <select 
-                      value={fontFamily} 
-                      onChange={(e) => setFontFamily(e.target.value)} 
-                      className={cn(
-                        "w-full px-3 py-2 text-sm rounded-lg border outline-none transition-colors",
-                        isDark 
-                          ? "bg-[#211B18] text-[#ECE5DC] border-[#3C2E27] focus:border-[#D4AF37]" 
-                          : "bg-white text-[#3E2723] border-[#D7CCC8] dark:border-[#D7CCC8] dark:bg-white dark:text-[#3E2723] focus:border-[#8D6E63]"
-                      )}
-                    >
-                      <option value="font-reading-nunito" className="font-reading-nunito">Nunito (Mặc định)</option>
-                      <option value="font-reading-garamond" className="font-reading-garamond">EB Garamond</option>
-                      <option value="font-reading-roboto" className="font-reading-roboto">Roboto</option>
-                      <option value="font-reading-patrick" className="font-reading-patrick">Patrick Hand</option>
-                      <option value="font-reading-iosevka" className="font-reading-iosevka">Iosevka Charon</option>
-                      <option value="font-reading-notoserif" className="font-reading-notoserif">Noto Serif</option>
-                    </select>
-                </div>
-             </div>
+             )}
           </div>
-       )}
-       </div>
        </header>
 
        {/* Content */}
-       <main className="flex-1 w-full max-w-3xl mx-auto p-6 sm:p-8 md:p-12">
+       <main className="flex-1 w-full max-w-3xl mx-auto p-4 sm:p-6">
            {isLocked ? (
               <div className="flex flex-col gap-6">
                   {needsPass && (
@@ -764,7 +764,7 @@ export function Reader() {
               </div>
            ) : (
               <div 
-                  className={cn("leading-relaxed text-justify space-y-6 select-none", fontFamily)}
+                  className={cn("leading-relaxed text-justify space-y-6 select-none p-6 sm:p-10 md:p-12 rounded-[24px] sm:rounded-[32px] border-3 border-[#3E2723] shadow-[3px_3px_0_0_#3E2723] transition-all", isDark ? "bg-[#1E1815] text-[#ECE5DC]" : "bg-[#FFFDF9] text-[#3E2723]", fontFamily)}
                   style={{ fontSize: `${fontSize}px` }}
               >
                  {paragraphs.map((p: string, idx: number) => {
@@ -787,7 +787,7 @@ export function Reader() {
                            </p>
 
                            {activeParagraphIndex === idx && (
-                               <div className={cn("mt-4 p-4 rounded-xl shadow-inner border", isDark ? "bg-[#2C221D]/80 border-[#3C2E27]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] border-[#D7CCC8] dark:border-[#D7CCC8]")}>
+                               <div className={cn("mt-4 p-5 rounded-2xl border-2 shadow-[2px_2px_0_0_#3E2723] transition-all", isDark ? "bg-[#120E0C] border-[#3E2723]" : "bg-[#FFFDF9] border-[#3E2723]")}>
                                    <div className="flex justify-between items-center mb-3">
                                        <h4 className={cn("text-sm font-bold uppercase tracking-wider", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")}>Bình luận đoạn</h4>
                                        <button onClick={() => setActiveParagraphIndex(null)} className="text-xs uppercase font-bold opacity-50 hover:opacity-100">Đóng</button>
@@ -913,9 +913,9 @@ export function Reader() {
                                                 value={paragraphCommentText} 
                                                 onChange={(e) => setParagraphCommentText(e.target.value)} 
                                                 placeholder="Viết bình luận..." 
-                                                className={cn("flex-1 px-3 py-2 text-sm rounded-lg border focus:outline-none focus:border-[#8D6E63] bg-transparent", isDark ? "border-[#3C2E27]" : "border-[#D7CCC8] dark:border-[#D7CCC8]")}
+                                                className={cn("flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] bg-white dark:bg-[#1A1412]", isDark ? "border-[#3E2723] text-[#ECE5DC]" : "border-[#3E2723] text-[#3E2723]")}
                                            />
-                                           <button type="submit" disabled={!paragraphCommentText.trim()} className="bg-[#8D6E63] text-white px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider disabled:opacity-50 hover:bg-[#5D4037] transition-colors">Gửi</button>
+                                           <button type="submit" disabled={!paragraphCommentText.trim()} className="px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-[#3E2723] bg-[#8D6E63] text-white hover:bg-[#5D4037] shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 cursor-pointer">Gửi</button>
                                        </form>
                                    ) : (
                                        <div className="text-xs italic opacity-70 text-center">Đăng nhập để bình luận</div>
@@ -931,13 +931,13 @@ export function Reader() {
            {/* Navigation Buttons */}
            <div className="mt-16 mb-8 flex items-center justify-between">
               {prevChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("flex items-center gap-2 transition-colors font-bold uppercase tracking-wider text-sm border-b-2 border-transparent pb-1", isDark ? "hover:text-[#ECE5DC] hover:border-[#ECE5DC]" : "hover:text-[#8D6E63] dark:hover:text-[#8D6E63] hover:border-[#8D6E63] dark:hover:border-[#8D6E63]")}>
+                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("px-4 py-2 border-2 border-[#3E2723] rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 cursor-pointer bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC]")}>
                     <ArrowLeft className="w-5 h-5"/> Chương trước
                  </button>
               ) : <div></div>}
               
               {nextChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("flex items-center gap-2 transition-colors font-bold uppercase tracking-wider text-sm border-b-2 border-transparent pb-1", isDark ? "hover:text-[#ECE5DC] hover:border-[#ECE5DC]" : "hover:text-[#8D6E63] dark:hover:text-[#8D6E63] hover:border-[#8D6E63] dark:hover:border-[#8D6E63]")}>
+                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("px-4 py-2 border-2 border-[#3E2723] rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 cursor-pointer bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC]")}>
                     Chương sau <ArrowRight className="w-5 h-5"/>
                  </button>
               ) : <div className="text-sm opacity-50 uppercase font-bold tracking-widest">Hết truyện</div>}
@@ -947,18 +947,18 @@ export function Reader() {
 
            {/* Comments Area (Counts for missions) */}
            <div className="mb-12">
-               <h3 className="text-xl font-bold mb-6 border-l-4 border-[#3E2723] pl-3 uppercase tracking-tighter">Bình luận chương</h3>
+               <h3 className="text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 border-[#3E2723] inline-block rounded-xl bg-[#F5E6D3]/65 dark:bg-[#2C221D] shadow-[2px_2px_0_0_#3E2723]">Bình luận chương</h3>
                <form onSubmit={handleComment} className="flex flex-col gap-3 mb-8">
                   <textarea 
                      value={commentText}
                      onChange={(e) => setCommentText(e.target.value)}
                      disabled={!isLoggedIn}
                      placeholder={isLoggedIn ? "Nhập bình luận của bạn..." : "Đăng nhập để bình luận"}
-                     className={cn("w-full p-4 rounded-2xl resize-none border-2 outline-none focus:border-[#8D6E63] transition-colors", isDark ? "bg-[#2C221D] border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8] italic")}
+                     className={cn("w-full p-4 rounded-2xl resize-none border-2 border-[#3E2723] focus:border-[#8D6E63] outline-none font-semibold text-xs sm:text-sm transition-all focus:shadow-[2px_2px_0_0_#3E2723] dark:focus:shadow-[2px_2px_0_0_#000] bg-white dark:bg-[#1A1412]", isDark ? "text-white" : "text-[#3E2723]")}
                      rows={4}
                   />
                   <div className="flex justify-end">
-                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-full font-bold disabled:opacity-50 transition-colors uppercase text-sm tracking-wider shadow-sm border", isDark ? "bg-[#3C2E27] text-[#ECE5DC] hover:bg-[#5D4037] border-[#8D6E63]" : "bg-[#3E2723] dark:bg-[#3E2723] text-[#FDF6EC] dark:text-[#FDF6EC] hover:bg-[#2D1B19]  border-[#8D6E63] dark:border-[#8D6E63]")}>
+                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-xl font-black disabled:opacity-50 transition-all uppercase text-xs tracking-wider border-2 border-[#3E2723] bg-[#8D6E63] text-white hover:bg-[#5D4037] shadow-[3px_3px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none cursor-pointer")}>
                         Gửi bình luận
                      </button>
                   </div>
