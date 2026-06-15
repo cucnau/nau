@@ -1150,79 +1150,79 @@ export function Admin() {
   }
 
   return (
-    <div className={`flex-1 p-4 sm:p-6 lg:p-8 flex flex-col gap-8 max-w-4xl mx-auto w-full transition-colors duration-300`}>
-      <h1 className={`text-3xl font-bold uppercase tracking-tighter transition-colors duration-300 ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Bảng Điều Khiển Admin</h1>
+    <div className={`flex-1 p-4 sm:p-6 lg:p-10 flex flex-col gap-8 max-w-4xl mx-auto w-full transition-colors duration-300`}>
+      <h1 className={`text-3xl font-black uppercase tracking-widest text-[#3E2723] dark:text-[#ECE5DC]`}>Bảng Điều Khiển Admin</h1>
 
-      <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 p-1.5 rounded-2xl sticky top-4 z-30 border shadow-md max-w-max mx-auto transition-all backdrop-blur-md ${isDark ? 'bg-[#251A15]/95 border-[#3E2D25] shadow-[#140D0B]/80' : 'bg-[#FDF6EC]/95 border-[#D7CCC8]/60'}`}>
+      <div className={`flex flex-wrap items-center justify-center gap-1 sm:gap-2 p-2 rounded-2xl sticky top-4 z-30 border-[3px] shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] max-w-max mx-auto transition-all backdrop-blur-md ${isDark ? 'bg-[#251A15]/95 border-[#1A1412]' : 'bg-[#FFFDF9]/95 border-[#3E2723]'}`}>
          {/* Nhóm 1: Nội dung & Tương tác */}
          <div className="flex gap-1">
             <button 
                onClick={() => setActiveTab('stories')} 
                title="Quản lý Truyện"
-               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'stories' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === 'stories' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm' : 'border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]'}`}
             >
                <BookOpen className="w-5 h-5" />
             </button>
             <button 
                onClick={() => setActiveTab('posts')} 
                title="Quản lý Bài đăng"
-               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'posts' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === 'posts' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm' : 'border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]'}`}
             >
                <FileText className="w-5 h-5" />
             </button>
             <button 
                onClick={() => setActiveTab('comments')} 
                title="Quản lý Bình luận"
-               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'comments' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === 'comments' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm' : 'border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]'}`}
             >
                <MessageSquare className="w-5 h-5" />
             </button>
             <button 
                onClick={() => setActiveTab('messages')} 
                title="Quản lý Choco Lounge"
-               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'messages' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === 'messages' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm' : 'border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]'}`}
             >
                <MessageCircle className="w-5 h-5" />
             </button>
          </div>
 
          {/* Thanh dọc phân cách */}
-         <div className={`h-6 w-[1.5px] mx-0.5 transition-colors ${isDark ? 'bg-[#3E2D25]' : 'bg-[#D7CCC8]/60'}`} />
+         <div className={`h-6 w-[2px] mx-1 transition-colors ${isDark ? 'bg-[#3E2D25]' : 'bg-[#3E2723]/30'}`} />
 
          {/* Nhóm 2: Người dùng & Danh hiệu */}
          <div className="flex gap-1">
             <button 
                onClick={() => setActiveTab('users')} 
                title="Quản lý Thành viên"
-               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'users' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === 'users' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm' : 'border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]'}`}
             >
                <Users className="w-5 h-5" />
             </button>
             <button 
                onClick={() => setActiveTab('titles')} 
                title="Quản lý Danh hiệu"
-               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'titles' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === 'titles' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm' : 'border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]'}`}
             >
                <Award className="w-5 h-5" />
             </button>
          </div>
 
          {/* Thanh dọc phân cách */}
-         <div className={`h-6 w-[1.5px] mx-0.5 transition-colors ${isDark ? 'bg-[#3E2D25]' : 'bg-[#D7CCC8]/60'}`} />
+         <div className={`h-6 w-[2px] mx-1 transition-colors ${isDark ? 'bg-[#3E2D25]' : 'bg-[#3E2723]/30'}`} />
 
          {/* Nhóm 3: Vật phẩm Cửa hàng */}
          <div className="flex gap-1">
             <button 
                onClick={() => setActiveTab('stickers')} 
                title="Quản lý Stickers"
-               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'stickers' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === 'stickers' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm' : 'border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]'}`}
             >
                <Smile className="w-5 h-5" />
             </button>
             <button 
                onClick={() => setActiveTab('accessories')} 
                title="Quản lý Phụ kiện"
-               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-105 active:scale-95 ${activeTab === 'accessories' ? 'bg-[#8D6E63] text-white shadow-md' : isDark ? 'text-[#A1887F] hover:bg-[#3E2D25]/60 hover:text-[#ECE5DC]' : 'text-[#8D6E63] hover:bg-[#D7CCC8]/30'}`}
+               className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === 'accessories' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm' : 'border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]'}`}
             >
                <Sparkles className="w-5 h-5" />
             </button>
@@ -1231,7 +1231,7 @@ export function Admin() {
 
       {/* Tiêu đề mục quản trị hiện tại */}
       <div className="text-center -mt-2">
-         <span className={`text-xs uppercase font-extrabold tracking-widest px-4 py-1.5 rounded-full border shadow-sm inline-flex items-center gap-1.5 transition-all ${isDark ? 'text-[#ECE5DC] bg-[#251A15] border-[#3E2D25]' : 'text-[#8D6E63] bg-[#FDF6EC] border-[#D7CCC8]/40'}`}>
+         <span className={`text-xs uppercase font-extrabold tracking-widest px-4 py-2 rounded-xl border-[3px] shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] inline-flex items-center gap-1.5 transition-all ${isDark ? 'text-[#ECE5DC] bg-[#251A15] border-[#1A1412]' : 'text-[#3E2723] bg-[#FFFDF9] border-[#3E2723]'}`}>
             {activeTab === 'stories' && '📖 Quản lý Truyện'}
             {activeTab === 'posts' && '📝 Quản lý Bài đăng'}
             {activeTab === 'comments' && '💬 Quản lý Bình luận'}
