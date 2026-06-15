@@ -1,15 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Patrick+Hand&family=Roboto:wght@300;400;500;700;900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Patrick+Hand&family=Roboto:wght@300;400;500;700;900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/@fontsource/iosevka/index.css');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Quicksand", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 /* Custom font utilities for readers */
 .font-reading-nunito {
-  font-family: "Nunito", sans-serif;
+  font-family: "Quicksand", sans-serif;
 }
 .font-reading-garamond {
   font-family: "EB Garamond", Georgia, serif;
@@ -31,6 +31,9 @@
 
 body {
   font-family: var(--font-sans);
+  background-color: #FDF6EC;
+  background-image: radial-gradient(#D7CCC8 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
 }
 
 .dark {
@@ -41,6 +44,8 @@ body {
 .dark body {
   background-color: #161311;
   color: #ECE5DC;
+  background-image: radial-gradient(#3C2E27 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
 }
 
 /* Base Overrides for Dark Mode - Fallback for elements missing Tailwind dark classes */
