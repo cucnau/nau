@@ -1246,8 +1246,8 @@ export function Admin() {
       {activeTab === 'stickers' && (
          <>
          {editingSticker ? (
-           <form onSubmit={handleUpdateSticker} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-4 transition-colors duration-300 ${isDark ? 'bg-[#251A15] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8] text-[#3E2723]'}`}>
-             <h2 className={`text-xl font-bold ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Sửa Sticker</h2>
+           <form onSubmit={handleUpdateSticker} className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 transition-all duration-300 ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]'}`}>
+             <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Sửa Sticker</h2>
              <div className="flex gap-4">
                <div className="w-24 h-24 bg-gray-50 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2">
                  {editingSticker.url && <img src={editingSticker.url} className="w-16 h-16 object-contain" />}
@@ -1257,11 +1257,11 @@ export function Admin() {
                   <button type="button" onClick={() => editStickerFileInputRef.current?.click()} className={`px-4 py-1.5 border text-sm font-bold w-max rounded-lg transition-all ${isDark ? 'bg-[#1D1410] border-[#8D6E63] text-[#ECE5DC] hover:bg-[#251A15]' : 'bg-[#FDF6EC] border-[#8D6E63] text-[#8D6E63] hover:bg-white'}`}>Đổi ảnh sticker</button>
                </div>
              </div>
-             <input type="text" placeholder="Tên sticker" value={editingSticker.name} onChange={e => setEditingSticker({...editingSticker, name: e.target.value})} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
-             <input type="text" placeholder="Mô tả" value={editingSticker.description} onChange={e => setEditingSticker({...editingSticker, description: e.target.value})} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+             <input type="text" placeholder="Tên sticker" value={editingSticker.name} onChange={e => setEditingSticker({...editingSticker, name: e.target.value})} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
+             <input type="text" placeholder="Mô tả" value={editingSticker.description} onChange={e => setEditingSticker({...editingSticker, description: e.target.value})} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
              <div className="flex gap-4">
-                 <input type="number" placeholder="Giá" value={editingSticker.price} onChange={e => setEditingSticker({...editingSticker, price: e.target.value})} className={`px-4 py-2 border rounded-lg flex-1 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
-                 <select value={editingSticker.type} onChange={e => setEditingSticker({...editingSticker, type: e.target.value})} className={`px-4 py-2 border rounded-lg w-32 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
+                 <input type="number" placeholder="Giá" value={editingSticker.price} onChange={e => setEditingSticker({...editingSticker, price: e.target.value})} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl flex-1 focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
+                 <select value={editingSticker.type} onChange={e => setEditingSticker({...editingSticker, type: e.target.value})} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] w-32 transition-all`}>
                     <option value="choco">Choco</option>
                     <option value="golden">Golden Choco</option>
                  </select>
@@ -1272,22 +1272,22 @@ export function Admin() {
              </div>
            </form>
          ) : (
-           <form onSubmit={handleCreateSticker} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-4 transition-colors duration-300 ${isDark ? 'bg-[#251A15] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8] text-[#3E2723]'}`}>
+           <form onSubmit={handleCreateSticker} className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 transition-all duration-300 ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]'}`}>
              <h2 className={`text-xl font-bold transition-colors ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Thêm Sticker</h2>
              <div className="flex gap-4">
                <div className="w-24 h-24 bg-gray-50 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2">
-                 {stUrl ? <img src={stUrl} className="w-16 h-16 object-contain" /> : <div className="text-xs text-gray-500 text-center">Chưa có ảnh</div>}
+                 {stUrl ? <img src={stUrl} className="w-16 h-16 object-contain" /> : <div className="text-xs text-[#8D6E63]/80 dark:text-stone-400 text-center">Chưa có ảnh</div>}
                </div>
                <div className="flex-1 flex flex-col justify-end gap-2">
                   <input type="file" accept="image/png, image/webp, image/gif" onChange={e => handleStickerImageChange(e, false)} ref={stickerFileInputRef} className="hidden" />
                   <button type="button" onClick={() => stickerFileInputRef.current?.click()} className={`px-4 py-1.5 border text-sm font-bold w-max rounded-lg transition-all ${isDark ? 'bg-[#1D1410] border-[#8D6E63] text-[#ECE5DC] hover:bg-[#251A15]' : 'bg-[#FDF6EC] border-[#8D6E63] text-[#8D6E63] hover:bg-white'}`}>Chọn ảnh sticker (PNG/WebP/GIF trong suốt)</button>
                </div>
              </div>
-             <input type="text" placeholder="Tên sticker" value={stName} onChange={e => setStName(e.target.value)} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
-             <input type="text" placeholder="Mô tả" value={stDesc} onChange={e => setStDesc(e.target.value)} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+             <input type="text" placeholder="Tên sticker" value={stName} onChange={e => setStName(e.target.value)} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
+             <input type="text" placeholder="Mô tả" value={stDesc} onChange={e => setStDesc(e.target.value)} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
              <div className="flex gap-4">
-                 <input type="number" placeholder="Giá" value={stPrice} onChange={e => setStPrice(Number(e.target.value))} className={`px-4 py-2 border rounded-lg flex-1 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
-                 <select value={stType} onChange={e => setStType(e.target.value as any)} className={`px-4 py-2 border rounded-lg w-32 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
+                 <input type="number" placeholder="Giá" value={stPrice} onChange={e => setStPrice(Number(e.target.value))} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl flex-1 focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
+                 <select value={stType} onChange={e => setStType(e.target.value as any)} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] w-32 transition-all`}>
                      <option value="choco">Choco</option>
                      <option value="golden">Golden Choco</option>
                  </select>
@@ -1300,16 +1300,16 @@ export function Admin() {
             <h2 className={isDark ? "text-xl font-bold transition-colors text-[#ECE5DC]" : "text-xl font-bold transition-colors text-[#3E2723]"}>Danh sách sticker ({stickers.length})</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {stickers.map(s => (
-                 <div key={s.id} className={`p-4 rounded-xl border shadow-sm flex flex-col items-center text-center transition-colors ${isDark ? 'bg-[#251A15] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
-                    <div className={`w-16 h-16 relative mb-4 p-2 rounded-xl border flex items-center justify-center shrink-0 transition-colors ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-gray-50'}`}>
+                 <div key={s.id} className={`p-4 rounded-3xl border-2 shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] hover:-translate-y-0.5 hover:shadow-[2px_2px_0_0_#3E2723] transition-all flex flex-col items-center text-center duration-300 ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]'}`}>
+                    <div className={`w-16 h-16 relative mb-4 p-2 rounded-2xl border-2 flex items-center justify-center shrink-0 transition-colors ${isDark ? 'bg-[#1E1815] border-[#4E342E]' : 'bg-white border-[#3E2723]'}`}>
                        {s.url ? (
                          <img src={s.url} alt="" className="w-12 h-12 object-contain pointer-events-none" />
                        ) : (
                          <div className="text-xs text-gray-400">Trống</div>
                        )}
                     </div>
-                    <h3 className={`font-bold leading-tight transition-colors ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>{s.name}</h3>
-                    <p className={`text-xs mb-2 mt-1 line-clamp-2 transition-colors ${isDark ? 'text-[#A1887F]' : 'text-gray-500'}`}>{s.description}</p>
+                    <h3 className="font-bold leading-tight text-[#3E2723] dark:text-[#ECE5DC]">{s.name}</h3>
+                    <p className={`text-xs mb-2 mt-1 line-clamp-2 transition-colors ${isDark ? 'text-[#A1887F]' : 'text-[#8D6E63]/80 dark:text-stone-400'}`}>{s.description}</p>
                     <span className={`text-xs font-bold px-2 py-1 rounded transition-colors ${s.type === 'golden' ? 'bg-yellow-500/20 text-yellow-500' : isDark ? 'bg-[#3E2D25] text-[#ECE5DC]' : 'bg-[#D7CCC8]/30 text-[#5D4037]'}`}>
                         {s.price} {s.type === 'golden' ? 'GChoco' : 'Choco'}
                     </span>
@@ -1327,8 +1327,8 @@ export function Admin() {
       {activeTab === 'accessories' && (
          <>
          {editingAccessory ? (
-           <form onSubmit={handleUpdateAccessory} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-4 ${isDark ? 'bg-[#251A15] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8] text-[#3E2723]'}`}>
-             <h2 className={`text-xl font-bold ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Sửa Phụ Kiện Avatar</h2>
+           <form onSubmit={handleUpdateAccessory} className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 transition-all duration-300 ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]'}`}>
+             <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Sửa Phụ Kiện Avatar</h2>
              <div className="flex gap-4">
                <div className={`w-24 h-24 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2 transition-colors ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-gray-50 border-[#D7CCC8]'}`}>
                  {editingAccessory.url && <img src={editingAccessory.url} className="w-16 h-16 object-contain" />}
@@ -1338,11 +1338,11 @@ export function Admin() {
                   <button type="button" onClick={() => editAccessoryFileInputRef.current?.click()} className={`px-4 py-1.5 border text-sm font-bold w-max rounded-lg transition-all ${isDark ? 'bg-[#1D1410] border-[#8D6E63] text-[#ECE5DC] hover:bg-[#251A15]' : 'bg-[#FDF6EC] border-[#8D6E63] text-[#8D6E63] hover:bg-white'}`}>Đổi ảnh phụ kiện (PNG/WebP/GIF)</button>
                </div>
              </div>
-             <input type="text" placeholder="Tên phụ kiện" value={editingAccessory.name} onChange={e => setEditingAccessory({...editingAccessory, name: e.target.value})} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
-             <input type="text" placeholder="Mô tả" value={editingAccessory.description} onChange={e => setEditingAccessory({...editingAccessory, description: e.target.value})} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+             <input type="text" placeholder="Tên phụ kiện" value={editingAccessory.name} onChange={e => setEditingAccessory({...editingAccessory, name: e.target.value})} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
+             <input type="text" placeholder="Mô tả" value={editingAccessory.description} onChange={e => setEditingAccessory({...editingAccessory, description: e.target.value})} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
              <div className="flex gap-4">
-                 <input type="number" placeholder="Giá" value={editingAccessory.price} onChange={e => setEditingAccessory({...editingAccessory, price: e.target.value})} className={`px-4 py-2 border rounded-lg flex-1 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
-                 <select value={editingAccessory.type} onChange={e => setEditingAccessory({...editingAccessory, type: e.target.value})} className={`px-4 py-2 border rounded-lg w-32 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
+                 <input type="number" placeholder="Giá" value={editingAccessory.price} onChange={e => setEditingAccessory({...editingAccessory, price: e.target.value})} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl flex-1 focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
+                 <select value={editingAccessory.type} onChange={e => setEditingAccessory({...editingAccessory, type: e.target.value})} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] w-32 transition-all`}>
                     <option value="choco">Choco</option>
                     <option value="golden">Golden Choco</option>
                  </select>
@@ -1353,22 +1353,22 @@ export function Admin() {
              </div>
            </form>
          ) : (
-           <form onSubmit={handleCreateAccessory} className={`p-6 rounded-2xl border shadow-sm flex flex-col gap-4 ${isDark ? 'bg-[#251A15] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8] text-[#3E2723]'}`}>
-             <h2 className={`text-xl font-bold ${isDark ? 'text-[#ECE5DC]' : 'text-[#3E2723]'}`}>Thêm Phụ Kiện Avatar</h2>
+           <form onSubmit={handleCreateAccessory} className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 transition-all duration-300 ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]'}`}>
+             <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Thêm Phụ Kiện Avatar</h2>
              <div className="flex gap-4">
                <div className={`w-24 h-24 flex items-center justify-center shrink-0 border rounded-xl shadow-sm overflow-hidden p-2 transition-colors ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-gray-50 border-[#D7CCC8]'}`}>
-                 {accUrl ? <img src={accUrl} className="w-16 h-16 object-contain" /> : <div className="text-xs text-gray-500 text-center">Chưa có ảnh</div>}
+                 {accUrl ? <img src={accUrl} className="w-16 h-16 object-contain" /> : <div className="text-xs text-[#8D6E63]/80 dark:text-stone-400 text-center">Chưa có ảnh</div>}
                </div>
                <div className="flex-1 flex flex-col justify-end gap-2">
                   <input type="file" accept="image/png, image/webp, image/gif" onChange={e => handleAccessoryImageChange(e, false)} ref={accessoryFileInputRef} className="hidden" />
                   <button type="button" onClick={() => accessoryFileInputRef.current?.click()} className={`px-4 py-1.5 border text-sm font-bold w-max rounded-lg transition-all ${isDark ? 'bg-[#1D1410] border-[#8D6E63] text-[#ECE5DC] hover:bg-[#251A15]' : 'bg-[#FDF6EC] border-[#8D6E63] text-[#8D6E63] hover:bg-white'}`}>Chọn ảnh phụ kiện (PNG/WebP/GIF trong suốt)</button>
                </div>
              </div>
-             <input type="text" placeholder="Tên phụ kiện" value={accName} onChange={e => setAccName(e.target.value)} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
-             <input type="text" placeholder="Mô tả" value={accDesc} onChange={e => setAccDesc(e.target.value)} className={`px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
+             <input type="text" placeholder="Tên phụ kiện" value={accName} onChange={e => setAccName(e.target.value)} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
+             <input type="text" placeholder="Mô tả" value={accDesc} onChange={e => setAccDesc(e.target.value)} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
              <div className="flex gap-4">
-                 <input type="number" placeholder="Giá" value={accPrice} onChange={e => setAccPrice(Number(e.target.value))} className={`px-4 py-2 border rounded-lg flex-1 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25] text-[#ECE5DC]' : 'bg-white border-[#D7CCC8]'}`} required />
-                 <select value={accType} onChange={e => setAccType(e.target.value as any)} className={`px-4 py-2 border rounded-lg w-32 focus:outline-none focus:border-[#8D6E63] ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
+                 <input type="number" placeholder="Giá" value={accPrice} onChange={e => setAccPrice(Number(e.target.value))} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl flex-1 focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all`} required />
+                 <select value={accType} onChange={e => setAccType(e.target.value as any)} className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] w-32 transition-all`}>
                      <option value="choco">Choco</option>
                      <option value="golden">Golden Choco</option>
                  </select>
@@ -1378,19 +1378,19 @@ export function Admin() {
          )}
     
          <div className="space-y-4 pb-20">
-             <h2 className="text-xl font-bold text-[#3E2723]">Danh sách phụ kiện ({accessories.length})</h2>
+             <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Danh sách phụ kiện ({accessories.length})</h2>
              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                {accessories.map(a => (
-                  <div key={a.id} className={`p-4 rounded-xl border shadow-sm flex flex-col items-center text-center transition-colors ${isDark ? 'bg-[#251A15] border-[#3E2D25]' : 'bg-white border-[#D7CCC8]'}`}>
-                     <div className={`w-16 h-16 relative mb-4 p-2 rounded-xl border flex items-center justify-center shrink-0 transition-colors ${isDark ? 'bg-[#1D1410] border-[#3E2D25]' : 'bg-gray-50'}`}>
+                  <div key={a.id} className={`p-4 rounded-3xl border-2 shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] hover:-translate-y-0.5 hover:shadow-[2px_2px_0_0_#3E2723] transition-all flex flex-col items-center text-center duration-300 ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]'}`}>
+                     <div className={`w-16 h-16 relative mb-4 p-2 rounded-2xl border-2 flex items-center justify-center shrink-0 transition-colors ${isDark ? 'bg-[#1E1815] border-[#4E342E]' : 'bg-white border-[#3E2723]'}`}>
                         {a.url ? (
                           <img src={a.url} alt="" className="w-12 h-12 object-contain pointer-events-none" />
                         ) : (
                           <div className="text-xs text-gray-400">Trống</div>
                         )}
                      </div>
-                     <h3 className="font-bold text-[#3E2723] leading-tight">{a.name}</h3>
-                     <p className="text-xs text-gray-500 mb-2 mt-1 line-clamp-2">{a.description}</p>
+                     <h3 className="font-bold leading-tight text-[#3E2723] dark:text-[#ECE5DC]">{a.name}</h3>
+                     <p className="text-xs mb-2 mt-1 line-clamp-2 text-[#8D6E63]/80 dark:text-[#A1887F]/80">{a.description}</p>
                      <span className={`text-xs font-bold px-2 py-1 rounded ${a.type === 'golden' ? 'bg-yellow-100 text-yellow-800' : 'bg-[#D7CCC8]/30 text-[#5D4037]'}`}>
                          {a.price} {a.type === 'golden' ? 'GChoco' : 'Choco'}
                      </span>
@@ -1408,8 +1408,8 @@ export function Admin() {
       {activeTab === 'stories' && (
          <>
          {editingStory ? (
-           <form onSubmit={handleUpdate} className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-             <h2 className="text-xl font-bold text-[#3E2723]">Sửa Truyện</h2>
+           <form onSubmit={handleUpdate} className="bg-[#FFFDF9] dark:bg-[#211B18] p-6 rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 text-[#3E2723] dark:text-[#ECE5DC]">
+             <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Sửa Truyện</h2>
              <div className="flex gap-4">
                 <div className="w-24 h-32 bg-gray-200 shrink-0 border rounded shadow-sm">
                   {editingStory.coverUrl && <img src={editingStory.coverUrl} className="w-full h-full object-cover rounded" />}
@@ -1419,9 +1419,9 @@ export function Admin() {
                    <button type="button" onClick={() => editFileInputRef.current?.click()} className="px-4 py-1.5 bg-[#FDF6EC] border border-[#8D6E63] text-sm font-bold w-max rounded-lg hover:bg-white transition-colors">Đổi ảnh bìa</button>
                 </div>
              </div>
-             <input type="text" value={editingStory.title} onChange={e => setEditingStory({...editingStory, title: e.target.value})} placeholder="Tên truyện" required className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
-             <input type="text" value={editingStory.author} onChange={e => setEditingStory({...editingStory, author: e.target.value})} placeholder="Tác giả" required className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
-             <input type="text" value={Array.isArray(editingStory.genres) ? editingStory.genres.join(', ') : editingStory.genres} onChange={e => setEditingStory({...editingStory, genres: e.target.value})} placeholder="Thể loại (cách nhau dấu phẩy)" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
+             <input type="text" value={editingStory.title} onChange={e => setEditingStory({...editingStory, title: e.target.value})} placeholder="Tên truyện" required className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all" />
+             <input type="text" value={editingStory.author} onChange={e => setEditingStory({...editingStory, author: e.target.value})} placeholder="Tác giả" required className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all" />
+             <input type="text" value={Array.isArray(editingStory.genres) ? editingStory.genres.join(', ') : editingStory.genres} onChange={e => setEditingStory({...editingStory, genres: e.target.value})} placeholder="Thể loại (cách nhau dấu phẩy)" className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all" />
              <textarea value={editingStory.description || ''} onChange={e => setEditingStory({...editingStory, description: e.target.value})} placeholder="Giới thiệu" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] min-h-[100px]" />
              <label className="flex items-center gap-2 cursor-pointer w-max pl-1">
                 <input type="checkbox" checked={editingStory.completed || false} onChange={e => setEditingStory({...editingStory, completed: e.target.checked})} className="w-4 h-4 text-[#8D6E63] rounded border-gray-300 focus:ring-[#8D6E63]" />
@@ -1429,12 +1429,12 @@ export function Admin() {
              </label>
              <div className="flex gap-2">
                 <button type="submit" className="bg-[#8D6E63] hover:bg-[#5D4037] text-white px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors"><Save className="w-4 h-4"/> Lưu Cập Nhật</button>
-                <button type="button" onClick={() => setEditingStory(null)} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-bold transition-colors">Hủy</button>
+                <button type="button" onClick={() => setEditingStory(null)} className="bg-gray-200 hover:bg-gray-300 text-[#3E2723] dark:text-[#ECE5DC] px-4 py-2 rounded-lg font-bold transition-colors">Hủy</button>
              </div>
            </form>
          ) : (
-           <form onSubmit={handleCreate} className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-             <h2 className="text-xl font-bold text-[#3E2723]">Thêm Truyện Mới</h2>
+           <form onSubmit={handleCreate} className="bg-[#FFFDF9] dark:bg-[#211B18] p-6 rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 text-[#3E2723] dark:text-[#ECE5DC]">
+             <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Thêm Truyện Mới</h2>
              <div className="flex gap-4">
                 <div className="w-24 h-32 bg-gray-200 shrink-0 border rounded shadow-sm">
                   {coverUrl && <img src={coverUrl} className="w-full h-full object-cover rounded" />}
@@ -1444,9 +1444,9 @@ export function Admin() {
                    <button type="button" onClick={() => fileInputRef.current?.click()} className="px-4 py-1.5 bg-[#FDF6EC] border border-[#8D6E63] text-sm font-bold w-max rounded-lg hover:bg-white transition-colors">Chọn ảnh bìa</button>
                 </div>
              </div>
-             <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Tên truyện" required className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
-             <input type="text" value={author} onChange={e => setAuthor(e.target.value)} placeholder="Tác giả" required className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
-             <input type="text" value={genres} onChange={e => setGenres(e.target.value)} placeholder="Thể loại (cách nhau dấu phẩy)" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
+             <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Tên truyện" required className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all" />
+             <input type="text" value={author} onChange={e => setAuthor(e.target.value)} placeholder="Tác giả" required className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all" />
+             <input type="text" value={genres} onChange={e => setGenres(e.target.value)} placeholder="Thể loại (cách nhau dấu phẩy)" className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all" />
              <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Giới thiệu" className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] min-h-[100px]" />
              <label className="flex items-center gap-2 cursor-pointer w-max pl-1">
                 <input type="checkbox" checked={completed} onChange={e => setCompleted(e.target.checked)} className="w-4 h-4 text-[#8D6E63] rounded border-gray-300 focus:ring-[#8D6E63]" />
@@ -1457,10 +1457,10 @@ export function Admin() {
          )}
 
          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-[#3E2723]">Danh sách truyện ({stories.length})</h2>
+            <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Danh sách truyện ({stories.length})</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {stories.map(s => (
-                 <div key={s.id} className="p-4 bg-white rounded-2xl border border-[#D7CCC8]/80 shadow-sm flex gap-4">
+                 <div key={s.id} className="p-4 bg-[#FFFDF9] dark:bg-[#211B18] rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] hover:-translate-y-0.5 hover:shadow-[2px_2px_0_0_#3E2723] transition-all flex gap-4 text-[#3E2723] dark:text-[#ECE5DC]">
                     <div className="w-20 h-28 bg-gray-100 border rounded shrink-0 overflow-hidden">
                        {s.coverUrl ? <img src={s.coverUrl} className="w-full h-full object-cover" /> : <div className="text-xs text-gray-400 p-2 text-center">Trống</div>}
                     </div>
@@ -1470,7 +1470,7 @@ export function Admin() {
                              {s.title}
                              {s.completed && <span className="inline-block text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded uppercase tracking-widest font-bold ml-1.5 align-middle">Full</span>}
                           </h3>
-                          <p className="text-xs text-gray-500 mt-1">Tác giả: {s.author}</p>
+                          <p className="text-xs text-[#8D6E63]/80 dark:text-stone-400 mt-1">Tác giả: {s.author}</p>
                           <div className="flex gap-1 flex-wrap mt-2">
                              {s.genres.map(g => (
                                 <span key={g} className="text-[10px] bg-[#FDF6EC] text-[#8D6E63] font-semibold px-2 py-0.5 rounded-full border border-[#D7CCC8]/30">{g}</span>
@@ -1492,53 +1492,49 @@ export function Admin() {
       )}
 
       {activeTab === 'users' && (
-         <div className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-6">
-            <h2 className="text-xl font-bold text-[#3E2723]">Thành Viên ({users.length})</h2>
-            <input type="text" value={searchEmail} onChange={e => setSearchEmail(e.target.value)} placeholder="Tìm email thành viên..." className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
-            <div className="divide-y max-h-[400px] overflow-y-auto pr-2">
+         <div className="bg-[#FFFDF9] dark:bg-[#211B18] p-6 rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-6 text-[#3E2723] dark:text-[#ECE5DC]">
+            <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Thành Viên ({users.length})</h2>
+            <input type="text" value={searchEmail} onChange={e => setSearchEmail(e.target.value)} placeholder="Tìm email thành viên..." className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all" />
+            <div className="flex flex-col gap-4 max-h-[450px] overflow-y-auto pr-2">
                {users.filter(u => u.email.toLowerCase().includes(searchEmail.toLowerCase())).map(u => (
-                  <div key={u.id} className="py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div key={u.id} className="p-4 rounded-2xl border-2 border-[#3E2723]/60 dark:border-[#4E342E]/70 bg-white dark:bg-[#1A1412] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:-translate-y-0.5 duration-200 transition-all">
                      <div>
-                        <p className="font-bold text-[#3E2723]">
-                           {u.displayName}
+                        <p className="font-bold text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-2 flex-wrap">
+                           <span>{u.displayName}</span>
                            {u.isBanned && (
-                              <span className="ml-2 text-[10px] font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+                              <span className="text-[10px] font-bold bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full">
                                 {u.banExpiresAt ? `Khóa đến ${new Date(u.banExpiresAt).toLocaleString('vi-VN')}` : 'Khóa vĩnh viễn'}
                               </span>
                            )}
                         </p>
-                        <p className="text-xs text-gray-500">{u.email}</p>
+                        <p className="text-xs text-[#8D6E63] dark:text-[#A1887F] opacity-90">{u.email}</p>
                         <div className="flex gap-3 mt-2 text-xs">
-                           <span className="font-semibold text-amber-700">Choco: {u.choco}</span>
-                           <span className="font-semibold text-yellow-600">Golden Choco: {u.goldenChoco}</span>
+                           <span className="font-bold text-amber-700 dark:text-amber-500">Choco: {u.choco}</span>
+                           <span className="font-bold text-yellow-600 dark:text-yellow-500">Golden: {u.goldenChoco}</span>
                         </div>
                         {u.customTitles && u.customTitles.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-2">
                              {u.customTitles.map(t => (
-                               <span key={t.id} style={{ color: t.color, borderColor: t.color }} className="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-white/50 flex items-center gap-1">
+                               <span key={t.id} style={{ color: t.color, borderColor: t.color }} className="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-[#FFFDF9] dark:bg-[#211B18] flex items-center gap-1 shadow-sm">
                                  {t.name}
-                                 <button onClick={() => handleRemoveUserTitle(u.id, t.id)} className="text-gray-400 hover:text-red-500 ml-1"><Trash2 className="w-3 h-3" /></button>
+                                 <button onClick={() => handleRemoveUserTitle(u.id, t.id)} className="text-gray-400 hover:text-red-500 ml-1 transition-colors"><Trash2 className="w-3 h-3" /></button>
                                </span>
                              ))}
                           </div>
                         )}
                      </div>
-                     <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 w-full sm:w-auto">
-                        <div className="flex items-center gap-2">
-                           <button onClick={() => setAssigningTitleUser(u)} className="px-3 py-1 bg-[#FDF6EC] border border-[#8D6E63] text-[#8D6E63] text-xs font-bold rounded hover:bg-white transition-colors whitespace-nowrap">Trao Danh hiệu</button>
+                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+                        <button onClick={() => setAssigningTitleUser(u)} className="px-3 py-1.5 bg-[#FFFDF9] dark:bg-[#1C1613] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#8D6E63] text-xs font-bold rounded-lg hover:bg-[#FDF6EC] dark:hover:bg-[#1E1410] transition-all whitespace-nowrap shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]">Trao Danh hiệu</button>
+                        <div className="flex items-center gap-1.5 bg-[#FDF6EC] dark:bg-[#251A15] p-1 border-2 border-[#3E2723] dark:border-[#4E342E] rounded-xl shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]">
+                           <input type="number" placeholder="Choco" value={givingChoco || ''} onChange={e => setGivingChoco(Number(e.target.value))} className="w-14 px-1.5 py-0.5 text-xs bg-[#FFFDF9] dark:bg-[#1E1815] border border-[#3E2723]/30 dark:border-[#4E342E]/50 text-[#3E2723] dark:text-[#ECE5DC] rounded-md focus:outline-none focus:border-[#8D6E63]" />
+                           <input type="number" placeholder="GChoco" value={givingGChoco || ''} onChange={e => setGivingGChoco(Number(e.target.value))} className="w-14 px-1.5 py-0.5 text-xs bg-[#FFFDF9] dark:bg-[#1E1815] border border-[#3E2723]/30 dark:border-[#4E342E]/50 text-[#3E2723] dark:text-[#ECE5DC] rounded-md focus:outline-none focus:border-[#8D6E63]" />
+                           <button onClick={() => handleGiveCurrency(u.id)} className="px-2 py-0.5 bg-[#8D6E63] hover:bg-[#5D4037] text-white text-xs font-bold rounded-md transition-all">Tặng</button>
                         </div>
-                        <div className="flex items-center gap-2">
-                           <input type="number" placeholder="Choco" value={givingChoco || ''} onChange={e => setGivingChoco(Number(e.target.value))} className="w-20 px-2 py-1 text-xs border rounded focus:outline-none" />
-                           <input type="number" placeholder="GChoco" value={givingGChoco || ''} onChange={e => setGivingGChoco(Number(e.target.value))} className="w-20 px-2 py-1 text-xs border rounded focus:outline-none" />
-                           <button onClick={() => handleGiveCurrency(u.id)} className="px-3 py-1 bg-[#8D6E63] text-white text-xs font-bold rounded hover:bg-[#5D4037] transition-colors">Tặng</button>
-                        </div>
-                        <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                           {u.isBanned ? (
-                              <button onClick={() => handleUnbanUser(u.id)} className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded hover:bg-green-200 transition-colors whitespace-nowrap">Gỡ Ban</button>
-                           ) : (
-                              <button onClick={() => setBanningUser(u)} className="px-3 py-1 bg-red-100 text-red-600 text-xs font-bold rounded hover:bg-red-200 transition-colors whitespace-nowrap">Ban</button>
-                           )}
-                        </div>
+                        {u.isBanned ? (
+                           <button onClick={() => handleUnbanUser(u.id)} className="px-3 py-1.5 bg-green-100 dark:bg-green-950/20 text-green-700 dark:text-green-400 border-2 border-green-700 shadow-[1px_1px_0_0_green] text-xs font-black rounded-lg transition-all whitespace-nowrap">Gỡ Ban</button>
+                        ) : (
+                           <button onClick={() => setBanningUser(u)} className="px-3 py-1.5 bg-red-100 dark:bg-red-950/20 text-red-600 dark:text-red-400 border-2 border-red-600 shadow-[1px_1px_0_0_red] text-xs font-black rounded-lg transition-all whitespace-nowrap">Ban</button>
+                        )}
                      </div>
                   </div>
                ))}
@@ -1547,14 +1543,14 @@ export function Admin() {
       )}
 
       {activeTab === 'comments' && (
-         <div className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-[#3E2723]">Bình Luận Gần Đây</h2>
+         <div className="bg-[#FFFDF9] dark:bg-[#211B18] p-6 rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 text-[#3E2723] dark:text-[#ECE5DC]">
+            <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Bình Luận Gần Đây</h2>
             <div className="divide-y max-h-[500px] overflow-y-auto">
               {comments.map(c => (
-                 <div key={c.id} className="py-3 flex justify-between items-start gap-4">
+                 <div key={c.id} className="py-3 flex justify-between items-start gap-4 border-b border-[#3E2723]/10 dark:border-stone-800">
                     <div className="space-y-1">
-                       <p className="text-xs text-gray-500 font-bold">{c.displayName} <span className="font-normal">• {c.type === 'story' ? 'Truyện' : 'Chương'}</span></p>
-                       <p className="text-sm text-gray-800">{c.content}</p>
+                       <p className="text-xs text-[#8D6E63]/80 dark:text-stone-400 font-bold">{c.displayName} <span className="font-normal">• {c.type === 'story' ? 'Truyện' : 'Chương'}</span></p>
+                       <p className="text-sm text-[#3E2723] dark:text-[#ECE5DC]">{c.content}</p>
                     </div>
                     <button onClick={() => deleteCommentItem(c.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 className="w-4 h-4" /></button>
                  </div>
@@ -1564,14 +1560,14 @@ export function Admin() {
       )}
 
       {activeTab === 'messages' && (
-         <div className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-[#3E2723]">Tin Nhắn Choco Lounge ({messages.length})</h2>
+         <div className="bg-[#FFFDF9] dark:bg-[#211B18] p-6 rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 text-[#3E2723] dark:text-[#ECE5DC]">
+            <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Tin Nhắn Choco Lounge ({messages.length})</h2>
             <div className="divide-y max-h-[500px] overflow-y-auto">
               {messages.map(m => (
-                 <div key={m.id} className="py-3 flex justify-between items-center gap-4">
+                 <div key={m.id} className="py-3 flex justify-between items-center gap-4 border-b border-[#3E2723]/10 dark:border-stone-800">
                     <div className="space-y-1">
-                       <p className="text-xs text-gray-500 font-bold">{m.displayName}</p>
-                       <p className="text-sm text-gray-800">{m.content}</p>
+                       <p className="text-xs text-[#8D6E63]/80 dark:text-stone-400 font-bold">{m.displayName}</p>
+                       <p className="text-sm text-[#3E2723] dark:text-[#ECE5DC]">{m.content}</p>
                     </div>
                     <button onClick={() => deleteMessageItem(m.id)} className="text-red-500 hover:text-red-700 p-1"><Trash2 className="w-4 h-4" /></button>
                  </div>
@@ -1581,39 +1577,39 @@ export function Admin() {
       )}
 
       {activeTab === 'posts' && (
-         <div className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-[#3E2723]">Bản tin Choco ({posts.length})</h2>
+         <div className="bg-[#FFFDF9] dark:bg-[#211B18] p-6 rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 text-[#3E2723] dark:text-[#ECE5DC]">
+            <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Bản tin Choco ({posts.length})</h2>
             <div className="divide-y max-h-[500px] overflow-y-auto">
               {posts.map(post => (
-                 <div key={post.id} className="py-3 flex justify-between items-center gap-4">
+                 <div key={post.id} className="py-3 flex justify-between items-center gap-4 border-b border-[#3E2723]/10 dark:border-stone-800">
                     <div className="space-y-1">
-                       <p className="text-xs text-gray-500 font-bold">{post.displayName}</p>
-                       <p className="text-sm text-gray-800">{post.content}</p>
+                       <p className="text-xs text-[#8D6E63]/80 dark:text-stone-400 font-bold">{post.displayName}</p>
+                       <p className="text-sm text-[#3E2723] dark:text-[#ECE5DC]">{post.content}</p>
                     </div>
                     <button onClick={() => handleDeletePost(post.id, post.uid)} className="text-red-500 hover:text-red-700 p-1"><Trash2 className="w-4 h-4" /></button>
                  </div>
               ))}
-              {posts.length === 0 && <p className="text-center text-gray-500 py-4">Chưa có bài đăng nào.</p>}
+              {posts.length === 0 && <p className="text-center text-[#8D6E63]/80 dark:text-stone-400 py-4">Chưa có bài đăng nào.</p>}
             </div>
          </div>
       )}
 
       {activeTab === 'titles' && (
          <div className="flex flex-col gap-6">
-            <div className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-              <h2 className="text-xl font-bold text-[#3E2723]">Tạo Danh Hiệu Mới</h2>
+            <div className="bg-[#FFFDF9] dark:bg-[#211B18] p-6 rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 text-[#3E2723] dark:text-[#ECE5DC]">
+              <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Tạo Danh Hiệu Mới</h2>
               <div className="flex flex-col md:flex-row gap-4">
                 <input type="text" value={newTitleName} onChange={e => setNewTitleName(e.target.value)} placeholder="Tên danh hiệu (VD: Người Nổi Tiếng)" className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold text-gray-600">Màu viền/chữ:</span>
+                  <span className="text-sm font-bold text-[#5D4037] dark:text-[#ECE5DC]">Màu viền/chữ:</span>
                   <input type="color" value={newTitleColor} onChange={e => setNewTitleColor(e.target.value)} className="w-10 h-10 rounded border" />
                 </div>
                 <button onClick={handleCreateTitle} className="bg-[#8D6E63] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#5D4037] transition-colors whitespace-nowrap">Tạo Danh Hiệu</button>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-[#D7CCC8] shadow-sm flex flex-col gap-4">
-              <h2 className="text-xl font-bold text-[#3E2723]">Danh Hiệu Tự Tạo ({globalTitles.length})</h2>
+            <div className="bg-[#FFFDF9] dark:bg-[#211B18] p-6 rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 text-[#3E2723] dark:text-[#ECE5DC]">
+              <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Danh Hiệu Tự Tạo ({globalTitles.length})</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                  {globalTitles.map(t => (
                    <div key={t.id} className="p-4 border rounded-xl flex items-center justify-between gap-4" style={{ borderColor: t.color }}>
@@ -1622,7 +1618,7 @@ export function Admin() {
                            <input type="text" value={editingTitleName} onChange={e => setEditingTitleName(e.target.value)} className="flex-1 px-2 py-1 border rounded min-w-0" />
                            <input type="color" value={editingTitleColor} onChange={e => setEditingTitleColor(e.target.value)} className="w-8 h-8 shrink-0 rounded border" />
                            <button onClick={handleSaveEditTitle} className="p-1.5 bg-[#8D6E63] text-white rounded hover:bg-[#5D4037]"><Save className="w-4 h-4"/></button>
-                           <button onClick={handleCancelEditTitle} className="p-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">X</button>
+                           <button onClick={handleCancelEditTitle} className="p-1.5 bg-gray-200 text-[#3E2723] dark:text-[#ECE5DC] rounded hover:bg-gray-300">X</button>
                          </div>
                       ) : (
                          <>
@@ -1636,11 +1632,11 @@ export function Admin() {
                       )}
                    </div>
                  ))}
-                 {globalTitles.length === 0 && <p className="text-gray-500 text-sm py-4 col-span-full">Chưa có danh hiệu nào.</p>}
+                 {globalTitles.length === 0 && <p className="text-[#8D6E63]/80 dark:text-stone-400 text-sm py-4 col-span-full">Chưa có danh hiệu nào.</p>}
               </div>
 
               <h2 className="text-xl font-bold text-[#3E2723] mt-6 border-t pt-6">Danh Hiệu Thành Tựu ({ACHIEVEMENTS_LIST.length})</h2>
-              <p className="text-xs text-gray-500 mb-2">Thành tựu người dùng đạt được cũng có thể được hiển thị như một danh hiệu. Bạn có thể đổi màu cho chúng tại đây.</p>
+              <p className="text-xs text-[#8D6E63]/80 dark:text-stone-400 mb-2">Thành tựu người dùng đạt được cũng có thể được hiển thị như một danh hiệu. Bạn có thể đổi màu cho chúng tại đây.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                  {ACHIEVEMENTS_LIST.map(ach => {
                     const tColor = achievementColors[ach.id] || '#8D6E63';
@@ -1649,12 +1645,12 @@ export function Admin() {
                           <div className="flex items-start justify-between gap-2">
                              <div className="flex flex-col flex-1 min-w-0">
                                <span className="font-bold text-sm truncate" style={{ color: tColor }} title={ach.name}>{ach.name}</span>
-                               <span className="text-[10px] text-gray-500 line-clamp-2" title={ach.description}>{ach.description}</span>
+                               <span className="text-[10px] text-[#8D6E63]/80 dark:text-stone-400 line-clamp-2" title={ach.description}>{ach.description}</span>
                              </div>
                              <button onClick={() => setViewingTitleUsers({ id: ach.id, name: ach.name, isAchievement: true })} className="text-[#8D6E63] hover:text-[#5D4037] p-2 rounded-lg hover:bg-orange-50 transition-colors flex-shrink-0" title="Xem người sở hữu"><Users className="w-5 h-5"/></button>
                           </div>
                           <div className="flex items-center justify-between gap-2 border-t pt-2">
-                             <span className="text-xs font-semibold text-gray-600">Đổi màu:</span>
+                             <span className="text-xs font-semibold text-[#5D4037] dark:text-[#ECE5DC]">Đổi màu:</span>
                              <input 
                                 type="color" 
                                 value={tColor} 
@@ -1673,8 +1669,8 @@ export function Admin() {
 
       {assigningTitleUser && (
          <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
-           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl flex flex-col gap-4">
-             <h2 className="text-xl font-bold text-[#3E2723]">Trao Danh Hiệu</h2>
+           <div className={`max-w-sm w-full p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 transition-all ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]'}`}>
+             <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Trao Danh Hiệu</h2>
              <p className="text-sm">Trao danh hiệu cho <strong>{assigningTitleUser.displayName}</strong></p>
              <div>
                <label className="block text-sm font-semibold mb-2">Chọn danh hiệu</label>
@@ -1686,7 +1682,7 @@ export function Admin() {
                </select>
              </div>
              <div className="flex justify-end gap-2 mt-2">
-               <button onClick={() => { setAssigningTitleUser(null); setSelectedTitleIdToAssign(''); }} className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300">Hủy</button>
+               <button onClick={() => { setAssigningTitleUser(null); setSelectedTitleIdToAssign(''); }} className="px-4 py-2 bg-gray-200 text-[#3E2723] dark:text-[#ECE5DC] font-bold rounded-lg hover:bg-gray-300">Hủy</button>
                <button onClick={handleAssignTitle} className="px-4 py-2 bg-[#8D6E63] text-white font-bold rounded-lg hover:bg-[#5D4037]">Xác nhận</button>
              </div>
            </div>
@@ -1695,10 +1691,10 @@ export function Admin() {
 
       {viewingTitleUsers && (
          <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
-           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl flex flex-col gap-4 max-h-[80vh]">
+           <div className={`max-w-lg w-full p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 max-h-[80vh] transition-all ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#ECE5DC]'}`}>
              <div className="flex justify-between items-center border-b pb-3">
                <h2 className="text-lg font-bold text-[#3E2723]">Thành viên có danh hiệu: {viewingTitleUsers.name}</h2>
-               <button onClick={() => setViewingTitleUsers(null)} className="text-gray-400 hover:text-gray-600 font-bold text-xl">&times;</button>
+               <button onClick={() => setViewingTitleUsers(null)} className="text-gray-400 hover:text-[#5D4037] dark:text-[#ECE5DC] font-bold text-xl">&times;</button>
              </div>
              <div className="overflow-y-auto flex-1 flex flex-col gap-2">
                 {(() => {
@@ -1712,14 +1708,14 @@ export function Admin() {
                    });
 
                    if (filteredUsers.length === 0) {
-                      return <p className="text-sm text-gray-500 text-center py-4">Chưa có ai sở hữu danh hiệu này.</p>;
+                      return <p className="text-sm text-[#8D6E63]/80 dark:text-stone-400 text-center py-4">Chưa có ai sở hữu danh hiệu này.</p>;
                    }
 
                    return filteredUsers.map(u => (
                       <div key={u.id} className="flex justify-between items-center p-3 border rounded-lg bg-gray-50">
                          <div>
                             <p className="font-bold text-sm text-[#3E2723]">{u.displayName}</p>
-                            <p className="text-xs text-gray-500">{u.email}</p>
+                            <p className="text-xs text-[#8D6E63]/80 dark:text-stone-400">{u.email}</p>
                          </div>
                             <button onClick={() => {
                                 if (viewingTitleUsers.isAchievement) {
@@ -1739,10 +1735,10 @@ export function Admin() {
       {/* Chapter Manager UI Overlay */}
       {managingStoryChapters && !chapterModalMode && (
          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-           <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-xl max-h-[85vh] flex flex-col">
+           <div className={`max-w-xl w-full p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col max-h-[85vh] transition-all ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]'}`}>
               <div className="flex justify-between items-center pb-4 border-b">
-                 <h2 className="text-xl font-bold text-[#3E2723]">Quản lý chương ({chapters.length})</h2>
-                 <button onClick={() => setManagingStoryChapters(null)} className="text-gray-500 hover:bg-gray-100 p-2 rounded-full">Đóng</button>
+                 <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Quản lý chương ({chapters.length})</h2>
+                 <button onClick={() => setManagingStoryChapters(null)} className="text-[#8D6E63]/80 dark:text-stone-400 hover:bg-gray-100 p-2 rounded-full">Đóng</button>
               </div>
               <div className="flex-1 overflow-y-auto divide-y my-4 pr-2">
                  {chapters.map(c => (
@@ -1768,8 +1764,8 @@ export function Admin() {
       {chapterModalMode && (
          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
            <form onSubmit={submitChapter} className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl flex flex-col gap-4">
-             <h2 className="text-xl font-bold text-[#3E2723]">{chapterModalMode === 'add' ? 'Thêm Chương Mới' : 'Sửa Chương'}</h2>
-             <input type="text" value={cTitle} onChange={e => setCTitle(e.target.value)} placeholder="Tên chương" required className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63]" />
+             <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">{chapterModalMode === 'add' ? 'Thêm Chương Mới' : 'Sửa Chương'}</h2>
+             <input type="text" value={cTitle} onChange={e => setCTitle(e.target.value)} placeholder="Tên chương" required className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all" />
              <textarea value={cContent} onChange={e => setCContent(e.target.value)} placeholder="Nội dung chương" required className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] min-h-[200px]" />
              <div className="flex gap-4 items-center">
                  <label className="flex items-center gap-2 cursor-pointer">
@@ -1782,7 +1778,7 @@ export function Admin() {
                  </label>
              </div>
              <div className="flex gap-2 justify-end mt-2">
-               <button type="button" onClick={() => setChapterModalMode(null)} className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300">Hủy</button>
+               <button type="button" onClick={() => setChapterModalMode(null)} className="px-4 py-2 bg-gray-200 text-[#3E2723] dark:text-[#ECE5DC] font-bold rounded-lg hover:bg-gray-300">Hủy</button>
                <button type="submit" className="px-4 py-2 bg-[#8D6E63] text-white font-bold rounded-lg hover:bg-[#5D4037]">{chapterModalMode === 'add' ? 'Đăng Chương' : 'Lưu Chương'}</button>
              </div>
            </form>
@@ -1791,16 +1787,16 @@ export function Admin() {
 
       {banningUser && (
          <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
-           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl flex flex-col gap-4">
+           <div className={`max-w-sm w-full p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 transition-all ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]'}`}>
              <h2 className="text-xl font-bold text-red-600">Ban Thành Viên</h2>
              <p className="text-sm">Bạn đang chuẩn bị ban <strong>{banningUser.email}</strong></p>
              <div>
                <label className="block text-sm font-semibold mb-2">Thời gian khóa (Giờ)</label>
                <input type="number" min="0" value={banDurationHours} onChange={e => setBanDurationHours(Number(e.target.value))} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-red-500" />
-               <p className="text-xs text-gray-500 mt-1">Ghi chú: Để 0 = Khóa vĩnh viễn</p>
+               <p className="text-xs text-[#8D6E63]/80 dark:text-stone-400 mt-1">Ghi chú: Để 0 = Khóa vĩnh viễn</p>
              </div>
              <div className="flex justify-end gap-2 mt-2">
-               <button onClick={() => { setBanningUser(null); setBanDurationHours(0); }} className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300">Hủy</button>
+               <button onClick={() => { setBanningUser(null); setBanDurationHours(0); }} className="px-4 py-2 bg-gray-200 text-[#3E2723] dark:text-[#ECE5DC] font-bold rounded-lg hover:bg-gray-300">Hủy</button>
                <button onClick={handleBanUser} className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">Xác nhận Khóa</button>
              </div>
            </div>
@@ -1809,11 +1805,11 @@ export function Admin() {
 
       {confirmDialog && (
          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl flex flex-col gap-4">
-              <h2 className="text-xl font-bold text-[#3E2723]">Xác nhận</h2>
-              <p className="text-gray-700">{confirmDialog.text}</p>
+           <div className={`max-w-sm w-full p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 transition-all ${isDark ? 'bg-[#211B18] border-[#4E342E] text-[#ECE5DC]' : 'bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]'}`}>
+              <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">Xác nhận</h2>
+              <p className="text-[#3E2723] dark:text-[#ECE5DC]">{confirmDialog.text}</p>
               <div className="flex gap-2 justify-end mt-2">
-                 <button onClick={() => setConfirmDialog(null)} className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300">Hủy</button>
+                 <button onClick={() => setConfirmDialog(null)} className="px-4 py-2 bg-gray-200 text-[#3E2723] dark:text-[#ECE5DC] font-bold rounded-lg hover:bg-gray-300">Hủy</button>
                  <button onClick={() => { confirmDialog.action(); setConfirmDialog(null); }} className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">Đồng ý</button>
               </div>
            </div>
