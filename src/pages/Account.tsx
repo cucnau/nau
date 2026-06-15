@@ -242,22 +242,22 @@ export function Account() {
 
   return (
     <div className="flex-1 p-4 sm:p-6 lg:p-8 flex flex-col gap-6 max-w-4xl mx-auto w-full">
-      <div className="flex items-center gap-6 border-b border-[#D7CCC8] pb-4">
+      <div className="flex flex-wrap items-center gap-2 border-b-[3px] border-[#3E2723] dark:border-[#4E342E] pb-4">
         <button 
           onClick={() => setTab('profile')} 
-          className={`text-xl font-bold uppercase tracking-tighter ${tab === 'profile' ? 'text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}
+          className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all border-2 shadow-[1px_1px_0_0_#3E2723] ${tab === 'profile' ? 'bg-[#E6D4BF] border-[#3E2723] text-[#3E2723]' : 'bg-transparent border-[#3E2723]/30 text-stone-500 hover:border-[#3E2723]/60 dark:text-stone-400 shadow-none'}`}
         >
           Hồ sơ 
         </button>
         <button 
           onClick={() => setTab('settings')} 
-          className={`text-xl font-bold uppercase tracking-tighter ${tab === 'settings' ? 'text-[#3E2723] dark:text-[#ECE5DC]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+          className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all border-2 shadow-[1px_1px_0_0_#3E2723] ${tab === 'settings' ? 'bg-[#E6D4BF] border-[#3E2723] text-[#3E2723]' : 'bg-transparent border-[#3E2723]/30 text-stone-500 hover:border-[#3E2723]/60 dark:text-stone-400 shadow-none'}`}
         >
           Cài đặt
         </button>
         <button 
           onClick={() => setTab('transactions')} 
-          className={`text-xl font-bold uppercase tracking-tighter ${tab === 'transactions' ? 'text-[#3E2723] dark:text-[#ECE5DC]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+          className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all border-2 shadow-[1px_1px_0_0_#3E2723] ${tab === 'transactions' ? 'bg-[#E6D4BF] border-[#3E2723] text-[#3E2723]' : 'bg-transparent border-[#3E2723]/30 text-stone-500 hover:border-[#3E2723]/60 dark:text-stone-400 shadow-none'}`}
         >
           Lịch sử Choco
         </button>
@@ -267,14 +267,14 @@ export function Account() {
         <div className="bg-white border border-[#D7CCC8] p-6 rounded-2xl shadow-sm max-w-xl mx-auto w-full">
           <h2 className="text-xl font-bold text-[#3E2723] mb-6">Cài đặt Tài khoản</h2>
           <form onSubmit={handleSaveProfile} className="flex flex-col gap-5">
-            <div className="order-1 sticky top-20 z-10 bg-white/95 dark:bg-[#1A1412]/95 backdrop-blur shadow-sm border border-[#D7CCC8]/60 dark:border-[#3C2E27]/60 p-4 -mt-2 -mx-2 md:mx-0 rounded-2xl flex items-center gap-4">
+            <div className="order-1 sticky top-20 z-10 bg-white/95 dark:bg-[#1A1412]/95 backdrop-blur shadow-sm border border-[#D7CCC8]/60 dark:border-[#5D4037]/60 p-4 -mt-2 -mx-2 md:mx-0 rounded-2xl flex items-center gap-4">
               <UserAvatar 
                 avatarUrl={avatar} 
                 equippedAccessory={equippedAccessory}
                 accessoryPosition={accessoryPosition}
                 className="w-16 h-16 pointer-events-none" 
                 fallbackIconSizeClass="w-8 h-8 text-[#A1887F]" 
-                borderClass="border-2 border-[#D7CCC8] dark:border-[#3C2E27]"
+                borderClass="border-2 border-[#D7CCC8] dark:border-[#5D4037]"
               />
               <div className="flex-1">
                 <label className="block text-sm font-semibold mb-1 text-[#5D4037] dark:text-[#ECE5DC]">Ảnh đại diện</label>
@@ -287,35 +287,35 @@ export function Account() {
             </div>
             <div className="order-3">
               <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Tên hiển thị</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)} required className="w-full px-4 py-2 rounded-lg border border-[#D7CCC8] bg-[#FDF6EC]/50 focus:outline-none focus:border-[#8D6E63] text-sm font-semibold" />
+              <input type="text" value={name} onChange={e => setName(e.target.value)} required className="w-full px-4 py-2 rounded-xl border-2 border-[#3E2723] shadow-[inset_0_2px_0_0_#D7CCC8] bg-[#FDF6EC]/50 focus:outline-none focus:border-[#8D6E63] text-sm font-semibold" />
             </div>
             <div className="order-4">
               <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Email</label>
-              <input type="text" value={email || ''} disabled className="w-full px-4 py-2 rounded-lg border border-[#D7CCC8] bg-gray-100 text-gray-500 cursor-not-allowed text-sm" />
+              <input type="text" value={email || ''} disabled className="w-full px-4 py-2 rounded-lg border-2 border-[#3E2723] bg-[#EFEBE9] shadow-[inset_0_2px_0_0_#D7CCC8] text-stone-500 cursor-not-allowed text-sm" />
             </div>
 
             <div className="order-5">
               <label className="block text-sm font-semibold mb-2 text-[#5D4037]">Cài đặt Sticker</label>
               {(ownedStickers || []).length === 0 ? (
-                 <p className="text-xs text-gray-500 italic bg-gray-50 p-3 rounded-lg border">Bạn chưa sở hữu sticker nào. Hãy vào Cửa hàng để mua!</p>
+                 <p className="text-xs text-stone-500 italic bg-stone-50 p-3 rounded-lg border">Bạn chưa sở hữu sticker nào. Hãy vào Cửa hàng để mua!</p>
               ) : (
                 <div className="space-y-4">
-                  <div className="flex border-b border-[#D7CCC8]">
-                     <button type="button" onClick={() => setActiveStickerTab('comment')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'comment' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}>Bình Luận</button>
-                     <button type="button" onClick={() => setActiveStickerTab('chat')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'chat' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}>Chat Bubble</button>
-                     <button type="button" onClick={() => setActiveStickerTab('post')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'post' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-gray-400 hover:text-gray-600'}`}>Bài Đăng</button>
+                  <div className="flex border-b-[3px] border-[#3E2723] dark:border-[#4E342E] px-4">
+                     <button type="button" onClick={() => setActiveStickerTab('comment')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'comment' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-stone-400 hover:text-stone-600'}`}>Bình Luận</button>
+                     <button type="button" onClick={() => setActiveStickerTab('chat')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'chat' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-stone-400 hover:text-stone-600'}`}>Chat Bubble</button>
+                     <button type="button" onClick={() => setActiveStickerTab('post')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'post' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-stone-400 hover:text-stone-600'}`}>Bài Đăng</button>
                   </div>
                   
                   {/* Common sticker picker based on active tab */}
-                  <div className="flex flex-wrap gap-4 p-4 bg-gray-50 border rounded-lg">
+                  <div className="flex flex-wrap gap-4 p-4 bg-stone-50 border rounded-lg">
                     <div 
                        onClick={() => equipSticker(activeStickerTab, null)} 
                        title="Tháo sticker"
                        className={`w-14 h-14 cursor-pointer flex items-center justify-center border-2 border-dashed transition-all rounded-xl ${
                           !(activeStickerTab === 'comment' ? equippedStickerComment : activeStickerTab === 'chat' ? equippedStickerChat : equippedStickerPost) 
-                          ? 'border-[#8D6E63] bg-[#8D6E63]/10 shadow-sm' : 'border-gray-300 hover:border-gray-400 bg-white'}`}
+                          ? 'border-[#8D6E63] bg-[#8D6E63]/10 shadow-sm' : 'border-stone-300 hover:border-stone-400 bg-white'}`}
                     >
-                       <span className="text-xs font-bold text-gray-500">Trống</span>
+                       <span className="text-xs font-bold text-stone-500">Trống</span>
                     </div>
                     {(ownedStickers || []).map(url => {
                        const isEquipped = (activeStickerTab === 'comment' ? equippedStickerComment : activeStickerTab === 'chat' ? equippedStickerChat : equippedStickerPost) === url;
@@ -347,7 +347,7 @@ export function Account() {
                               key={pos.id}
                               type="button"
                               onClick={() => setStickerPosition(activeStickerTab as 'comment' | 'post', pos.id as any)}
-                              className={`py-1.5 px-3 rounded-lg border text-xs font-bold transition-all ${isPosActive ? 'bg-[#8D6E63] text-white border-[#8D6E63]' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                              className={`py-1.5 px-3 rounded-lg border text-xs font-bold transition-all ${isPosActive ? 'bg-[#8D6E63] text-white border-[2px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723]' : 'bg-[#FDF6EC] text-[#3E2723] border-[2px] border-[#3E2723] hover:bg-[#F5E6D3] active:translate-y-0.5 active:shadow-none shadow-[0_2px_0_0_#3E2723]'}`}
                             >
                               {pos.label}
                             </button>
@@ -363,20 +363,20 @@ export function Account() {
             <div className="order-2">
               <label className="block text-sm font-semibold mb-2 text-[#5D4037]">Cài đặt Phụ kiện Avatar</label>
               {(!ownedAccessories || ownedAccessories.length === 0) ? (
-                <p className="text-xs text-gray-400 italic bg-gray-50 border border-[#D7CCC8] p-3 rounded-xl">
+                <p className="text-xs text-stone-400 italic bg-stone-50 border border-[#D7CCC8] p-3 rounded-xl">
                   Bạn chưa sở hữu phụ kiện nào. Hãy vào Cửa hàng để sở hữu phụ kiện!
                 </p>
               ) : (
                 <div className="space-y-4">
                   {/* Accessory selector picker */}
-                  <div className="flex flex-wrap gap-3 p-3 bg-gray-50 border border-[#D7CCC8]/80 rounded-xl">
+                  <div className="flex flex-wrap gap-3 p-3 bg-stone-50 border border-[#D7CCC8]/80 rounded-xl">
                     <div 
                       type="button"
                       onClick={() => equipAccessory(null)}
                       className={`w-14 h-14 cursor-pointer flex flex-col items-center justify-center border-2 border-dashed transition-all rounded-xl ${
                         !equippedAccessory 
                           ? 'border-[#8D6E63] bg-[#8D6E63]/10 text-[#8D6E63]' 
-                          : 'border-gray-300 hover:border-gray-400 bg-white text-gray-500'}`}
+                          : 'border-stone-300 hover:border-stone-400 bg-white text-stone-500'}`}
                     >
                       <span className="text-[10px] font-extrabold uppercase text-center">Tháo ra</span>
                     </div>
@@ -390,7 +390,7 @@ export function Account() {
                           className={`w-14 h-14 cursor-pointer relative p-1 transition-all rounded-xl border flex items-center justify-center ${
                             isEquipped 
                               ? 'ring-2 ring-offset-2 ring-[#8D6E63] bg-white border-transparent' 
-                              : 'hover:scale-105 bg-white shadow-sm border-gray-200'}`}
+                              : 'hover:scale-105 bg-white shadow-sm border-stone-200'}`}
                         >
                           <img src={url} alt="Accessory preview" className="w-10 h-10 object-contain pointer-events-none" referrerPolicy="no-referrer" />
                         </div>
@@ -407,7 +407,7 @@ export function Account() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Horizontal X Slider */}
                         <div>
-                          <div className="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                          <div className="flex justify-between text-xs font-bold text-stone-600 mb-1">
                             <span>Ngang (X)</span>
                             <span className="font-mono text-[#8D6E63]">{accessoryPosition?.x || 0}%</span>
                           </div>
@@ -429,7 +429,7 @@ export function Account() {
 
                         {/* Vertical Y Slider */}
                         <div>
-                          <div className="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                          <div className="flex justify-between text-xs font-bold text-stone-600 mb-1">
                             <span>Dọc (Y)</span>
                             <span className="font-mono text-[#8D6E63]">{accessoryPosition?.y || 0}%</span>
                           </div>
@@ -451,7 +451,7 @@ export function Account() {
 
                         {/* Scale Slider */}
                         <div>
-                          <div className="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                          <div className="flex justify-between text-xs font-bold text-stone-600 mb-1">
                             <span>Kích thước (Scale)</span>
                             <span className="font-mono text-[#8D6E63]">{accessoryPosition?.scale ?? 100}%</span>
                           </div>
@@ -473,7 +473,7 @@ export function Account() {
 
                         {/* Rotate Slider */}
                         <div>
-                          <div className="flex justify-between text-xs font-bold text-gray-600 mb-1">
+                          <div className="flex justify-between text-xs font-bold text-stone-600 mb-1">
                             <span>Xoay (Rotation)</span>
                             <span className="font-mono text-[#8D6E63]">{accessoryPosition?.rotate || 0}°</span>
                           </div>
@@ -494,7 +494,7 @@ export function Account() {
                         </div>
                       </div>
 
-                      <div className="text-[10px] text-gray-500 italic bg-white/60 p-2 rounded border border-dashed border-[#D7CCC8]/60 mt-1">
+                      <div className="text-[10px] text-stone-500 italic bg-white/60 p-2 rounded border border-dashed border-[#D7CCC8]/60 mt-1">
                         * Bạn có thể kéo các thanh trượt trên để dịch chuyển vật phẩm gắn tự do tới bất kỳ tọa độ, xoay góc hoặc thu phóng tùy ý trên avatar của bạn!
                       </div>
                     </div>
@@ -505,10 +505,10 @@ export function Account() {
 
             <div className="order-6">
               <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Đổi mật khẩu</label>
-              <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="Nhập để đổi mật khẩu (Chưa hỗ trợ)" disabled className="w-full px-4 py-2 rounded-lg border border-[#D7CCC8] bg-gray-100 italic text-sm" />
+              <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="Nhập để đổi mật khẩu (Chưa hỗ trợ)" disabled className="w-full px-4 py-2 rounded-lg border-2 border-[#3E2723] bg-[#EFEBE9] shadow-[inset_0_2px_0_0_#D7CCC8] italic text-sm" />
             </div>
-            <button type="submit" disabled={saving || saveSuccess} className="order-last w-full py-2.5 bg-[#3E2723] text-[#FDF6EC] rounded-lg font-bold uppercase tracking-widest text-sm hover:bg-[#5D4037] transition-colors mt-2 disabled:bg-[#8D6E63] disabled:cursor-not-allowed">
-              {saving ? 'Đang lưu...' : saveSuccess ? 'Đã Lưu Thành Công ✓' : 'Lưu Thay Đổi'}
+            <button type="submit" disabled={saving || saveSuccess} className="order-last w-full py-2.5 bg-[#3E2723] text-[#FDF6EC] rounded-lg font-bold uppercase tracking-widest text-[#FFFDF9] hover:bg-[#5D4037] transition-all mt-2 disabled:bg-[#8D6E63]">
+              {saving ? 'Đang lưu...' : saveSuccess ? 'Đã lưu ✓' : 'Lưu Thay Đổi'}
             </button>
           </form>
         </div>
@@ -516,29 +516,31 @@ export function Account() {
 
       {tab === 'profile' && (
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8 items-start">
-           <div className="bg-white dark:bg-[#1A1412] border border-[#D7CCC8] dark:border-[#3C2E27] p-6 rounded-2xl shadow-sm flex flex-col items-center text-center">
-              <UserAvatar 
-                avatarUrl={avatarUrl} 
-                equippedAccessory={equippedAccessory}
-                accessoryPosition={accessoryPosition}
-                className="w-24 h-24 shadow-sm relative mb-4" 
-                fallbackIconSizeClass="w-12 h-12 text-[#A1887F]" 
-                borderClass="border-2 border-[#FDF6EC] dark:border-[#2C221D]"
-              />
+            <div className="bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723] dark:border-[#4E342E] p-6 rounded-3xl shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col items-center text-center">
+              <div className="border-2 border-[#3E2723] dark:border-[#4E342E] rounded-full p-1 shadow-md bg-white mb-4">
+                <UserAvatar 
+                  avatarUrl={avatarUrl} 
+                  equippedAccessory={equippedAccessory}
+                  accessoryPosition={accessoryPosition}
+                  className="w-24 h-24 relative" 
+                  fallbackIconSizeClass="w-12 h-12 text-[#A1887F]" 
+                  borderClass="border-0"
+                />
+              </div>
               <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-1.5 flex-wrap text-[#3E2723] dark:text-[#ECE5DC]" style={{ color: getTitleColor(activeTitle) || undefined }}>
                  {displayName}
                  {activeTitle && (
-                    <span className="px-2 py-0.5 bg-yellow-105 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-400 text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200 dark:border-yellow-700">
+                    <span className="px-2 py-0.5 bg-[#E6D4BF] text-[#3E2723] text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border-2 border-[#3E2723]">
                        🏆 {activeTitle}
                     </span>
                  )}
               </h2>
-              <p className="text-sm text-gray-500 mb-4">{email}</p>
+              <p className="text-xs font-mono text-stone-500 mb-4">{email}</p>
               
               {/* Hệ thống level độc giả */}
-              <div className="w-full mb-4 bg-[#F2E5D5]/40 dark:bg-[#34221A] p-4 rounded-xl border border-[#D7CCC8]/60 dark:border-[#3C2E27] text-left">
+              <div className="w-full mb-4 bg-[#F5E6D3]/40 dark:bg-[#34221A] p-4 rounded-2xl border-2 border-[#3E2723] text-left">
                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037] dark:text-white/90">Level</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#3E2723] dark:text-white/90">Độc giả Level</span>
                     <div className="flex items-center gap-2">
                        {totalBoxes > 0 && (
                           <button 
@@ -550,35 +552,35 @@ export function Account() {
                              <span>Quà Lên Cấp</span>
                           </button>
                        )}
-                       <span className="px-2 py-0.5 bg-[#8D6E63] text-[#FDF6EC] text-xs font-bold rounded-full shadow-sm">Lv. {level || 1}</span>
+                       <span className="px-2 py-0.5 bg-[#3E2723] text-[#FDF6EC] text-xs font-bold rounded-lg border-2 border-[#3E2723] shadow-sm">Lv. {level || 1}</span>
                     </div>
                  </div>
-                 <div className="w-full bg-[#E0D4C5] dark:bg-[#1A1412] rounded-full h-2.5 overflow-hidden shadow-inner relative mb-1 border border-[#D7CCC8]/20 dark:border-[#3C2E27]/40">
+                 <div className="w-full bg-[#E0D4C5] dark:bg-[#1A1412] rounded-full h-3 overflow-hidden shadow-inner relative mb-1 border-2 border-[#3E2723]">
                     <div 
                        style={{ width: `${barWidth}%` }}
-                       className="bg-gradient-to-r from-[#8D6E63] to-[#5D4037] dark:from-[#967C64] dark:to-[#836355] h-full rounded-full transition-all duration-1000 ease-out"
+                       className="bg-[#8D6E63] dark:from-[#967C64] dark:to-[#836355] h-full rounded-full transition-all duration-1000 ease-out"
                     />
                  </div>
-                 <div className="flex justify-between items-center text-[10px] text-gray-500 dark:text-white/80 font-semibold tracking-tight">
+                 <div className="flex justify-between items-center text-[10px] text-stone-600 dark:text-white/80 font-black tracking-tight font-mono">
                     <span>{currentExp} / {nextLevelExp} EXP</span>
                     <span>{percent}%</span>
                  </div>
               </div>
 
-              <div className="w-full bg-[#FDF6EC] dark:bg-[#34221A] rounded-xl p-4 border border-[#D7CCC8] dark:border-[#3C2E27] flex items-center justify-between">
+              <div className="w-full bg-[#FDF6EC] dark:bg-[#34221A] rounded-2xl p-4 border-2 border-[#3E2723] flex items-center justify-between">
                  <div className="flex flex-col items-center flex-1">
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-[#8D6E63] dark:text-gray-400 mb-1">Choco</span>
-                    <span className="font-bold text-[#3E2723] dark:text-white text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}</span>
+                    <span className="text-[9px] uppercase font-black tracking-widest text-[#8D6E63] dark:text-stone-400 mb-1">Choco</span>
+                    <span className="font-black text-[#3E2723] dark:text-white text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}</span>
                  </div>
-                 <div className="w-px h-8 bg-[#D7CCC8]"></div>
+                 <div className="w-[3px] h-8 bg-[#3E2723]/30 rounded-full"></div>
                  <div className="flex flex-col items-center flex-1">
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-[#D4AF37] mb-1">Gchoco</span>
-                    <span className="font-bold text-[#D4AF37] text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : goldenChoco}</span>
+                    <span className="text-[9px] uppercase font-black tracking-widest text-[#D4AF37] mb-1">Gchoco</span>
+                    <span className="font-black text-[#D4AF37] text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : goldenChoco}</span>
                   </div>
                </div>
 
                {/* Trang bị danh hiệu */}
-               <div className="w-full mt-4 bg-[#F5E6D3] dark:bg-[#34221A] p-4 rounded-xl border border-[#D7CCC8]/30 dark:border-[#3C2E27] text-left animate-fade-in">
+               <div className="w-full mt-4 bg-[#F5E6D3] dark:bg-[#34221A] p-4 rounded-xl border border-[#D7CCC8]/30 dark:border-[#5D4037] text-left animate-fade-in">
                   <div className="flex justify-between items-center mb-1.5">
                      <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037] dark:text-white/90">Danh hiệu của tôi</span>
                   </div>
@@ -589,7 +591,7 @@ export function Account() {
                         <select 
                            value={activeTitle || ''} 
                            onChange={(e) => setActiveTitle(e.target.value || null)}
-                           className="w-full text-xs font-bold border border-[#D7CCC8] dark:border-[#3C2E27] rounded-lg p-2 bg-white dark:bg-[#1C1310] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:ring-1 focus:ring-[#8D6E63]"
+                           className="w-full text-xs font-bold border border-[#D7CCC8] dark:border-[#5D4037] rounded-lg p-2 bg-white dark:bg-[#1C1310] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:ring-1 focus:ring-[#8D6E63]"
                         >
                            <option value="">-- Không trang bị --</option>
                            {ACHIEVEMENTS_LIST.filter(a => unlockedAchievements.includes(a.id)).map(a => (
@@ -607,7 +609,7 @@ export function Account() {
                </div>
 
                {/* Danh sách thành tựu đã nhận */}
-               <div className="w-full mt-3 bg-[#F5E6D3] dark:bg-[#34221A] p-4 rounded-xl border border-[#D7CCC8]/30 dark:border-[#3C2E27] text-left">
+               <div className="w-full mt-3 bg-[#F5E6D3] dark:bg-[#34221A] p-4 rounded-xl border border-[#D7CCC8]/30 dark:border-[#5D4037] text-left">
                   <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#5D4037] dark:text-white/90 block mb-2">Thành tựu đã nhận ({unlockedAchievements.length})</span>
                   {unlockedAchievements.length === 0 ? (
                      <p className="text-xs text-[#8D6E63] dark:text-white/60 italic">Chưa đạt thành tựu nào.</p>
@@ -622,18 +624,13 @@ export function Account() {
                   )}
                </div>
             </div>
-            <div className="hidden">
-               <div>
-                  <div>
-                 </div>
-              </div>
-           </div>
+            
 
-           <div className="bg-white dark:bg-[#211B18] border border-[#D7CCC8] dark:border-[#3C2E27] p-6 rounded-2xl shadow-sm flex flex-col min-h-[400px]">
-             <h2 className="text-xl font-bold text-[#3E2723] dark:text-[#ECE5DC] mb-4">Góc cá nhân / Bài viết</h2>
+           <div className="bg-[#FFFDF9] dark:bg-[#211B18] border-2 border-[#3E2723] dark:border-stone-800 p-6 rounded-3xl shadow-[1px_1px_0_0_#3E2723] flex flex-col min-h-[400px]">
+             <h2 className="text-xl font-black text-[#3E2723] dark:text-[#ECE5DC] mb-4 uppercase tracking-tighter">Góc cá nhân / Bài viết</h2>
              <form onSubmit={handlePostReview} className="mb-6 flex flex-col gap-2">
-               <textarea value={review} onChange={e => setReview(e.target.value)} placeholder="Chia sẻ suy nghĩ, review truyện..." className="w-full min-h-[100px] p-3 rounded-xl border border-[#D7CCC8] dark:border-[#3C2E27] bg-[#FDF6EC]/50 dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] resize-none text-sm focus:outline-none focus:border-[#8D6E63]" />
-               <button type="submit" className="self-end px-6 py-2 bg-[#8D6E63] text-white rounded-lg font-bold text-sm uppercase tracking-widest hover:bg-[#5D4037] transition-colors">
+               <textarea value={review} onChange={e => setReview(e.target.value)} placeholder="Chia sẻ suy nghĩ, review truyện..." className="w-full min-h-[100px] p-3 rounded-2xl border-2 border-[#3E2723] bg-[#FDF6EC]/50 dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] resize-none text-sm font-semibold focus:outline-none placeholder-stone-400" />
+               <button type="submit" className="self-end px-6 py-2 bg-[#8D6E63] text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-[#5D4037] border-2 border-[#3E2723] shadow-[1.5px_1.5px_0_0_#3E2723] active:translate-y-[1.5px] active:shadow-none transition-all">
                  Đăng bài
                </button>
              </form>
@@ -646,7 +643,7 @@ export function Account() {
                             <Gift className="w-8 h-8 text-amber-700" />
                          </div>
                          <h3 className="text-xl font-bold uppercase text-[#3E2723] mb-2 font-black tracking-tight">Phần Thưởng Lên Cấp!</h3>
-                         <p className="text-sm text-gray-600 mb-4">
+                         <p className="text-sm text-stone-600 mb-4">
                             Chúc mừng bạn đã đạt cấp độ mới! Bạn có phần thưởng chưa nhận từ level <strong>{lastClaimedRewardLevel || 1}</strong> lên <strong>{level}</strong>:
                          </p>
                          <div className="bg-[#FAF0E6] rounded-2xl p-4 border border-[#D7CCC8]/80 mb-5 flex flex-col gap-2.5 shadow-inner">
@@ -679,17 +676,17 @@ export function Account() {
                       </div>
                    </div>
                 )}
-                {reviews.length === 0 ? <p className="text-gray-400 italic text-sm text-center py-8">Chưa có bài viết nào.</p> : null}
+                {reviews.length === 0 ? <p className="text-stone-400 italic text-sm text-center py-8">Chưa có bài viết nào.</p> : null}
                 {reviews.map(r => (
-                  <div key={r.id} className="p-4 bg-[#F5E6D3]/30 dark:bg-[#251E1B]/30 rounded-xl border border-[#D7CCC8]/50 dark:border-[#3C2E27] flex justify-between items-start gap-4">
+                  <div key={r.id} className="p-4 bg-[#FFFDF9] dark:bg-[#251E1B]/30 rounded-2xl border-2 border-[#3E2723] dark:border-[#5D4037] flex justify-between items-start gap-4 hover:shadow-[1px_1px_0_0_#3E2723] transition-all mb-3 text-left">
                     <div className="flex-1">
                       <p className="text-sm font-semibold whitespace-pre-wrap text-[#3E2723] dark:text-[#ECE5DC]">{r.content}</p>
-                      <p className="text-[10px] text-gray-400 mt-3 uppercase tracking-widest">{r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString() : ''}</p>
+                      <p className="text-[10px] text-stone-400 mt-3 uppercase tracking-widest">{r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString() : ''}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleDeleteReview(r.id)}
-                      className="text-red-500 text-[10px] font-bold uppercase tracking-wider hover:text-red-700 transition-colors shrink-0 bg-red-100/40 hover:bg-red-100/80 px-2 py-1 rounded shadow-xs"
+                      className="text-red-700 text-[10px] font-black uppercase tracking-wider hover:text-red-800 transition-colors shrink-0 bg-red-105 hover:bg-red-200/50 px-3 py-1.5 rounded-xl border-2 border-[#3E2723] shadow-[1.5px_1.5px_0_0_#3E2723] active:translate-y-[1.5px] active:shadow-none transition-all"
                     >
                       Xóa
                     </button>
@@ -701,19 +698,19 @@ export function Account() {
       )}
 
       {tab === 'transactions' && (
-         <div className="bg-[#FFFDF9] dark:bg-[#211B18] border border-[#D7CCC8] dark:border-[#3C2E27] rounded-3xl shadow-sm p-6 w-full">
-            <h2 className="text-xl font-bold text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-tighter mb-6 flex items-center gap-2 border-l-4 border-[#8D6E63] pl-3">
-               Lịch sử giao dịch
+         <div className="bg-[#FFFDF9] dark:bg-[#211B18] border-2 border-[#3E2723] dark:border-stone-800 rounded-3xl shadow-[1px_1px_0_0_#3E2723] p-6 w-full">
+            <h2 className="text-xl font-black text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-tighter mb-6 flex items-center gap-2 border-l-4 border-[#3E2723] pl-3">
+               Lịch sử giao dịch Choco
             </h2>
             <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-2">
                {transactions.length === 0 ? (
-                  <p className="text-gray-400 italic text-sm text-center py-8">Chưa có giao dịch nào.</p>
+                  <p className="text-stone-400 italic text-sm text-center py-8 font-serif">Chưa có giao dịch nào được ghi nhận.</p>
                ) : (
                   transactions.map(t => (
-                     <div key={t.id} className="flex justify-between items-center p-3 bg-white dark:bg-[#1A1412] border border-[#F5E6D3] dark:border-[#3C2E27] rounded-xl hover:border-[#D7CCC8] transition-colors">
+                     <div key={t.id} className="flex justify-between items-center p-4 bg-white dark:bg-[#1A1412] border-[2px] border-[#3E2723] rounded-2xl hover:bg-[#FDF6EC]/55 hover:shadow-[1.5px_1.5px_0_0_#3E2723] hover:-translate-y-0.5 transition-all mb-2">
                         <div className="flex flex-col gap-1">
                            <span className="text-sm font-bold text-[#3E2723] dark:text-[#ECE5DC]">{t.reason}</span>
-                           <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-gray-500">
+                           <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-stone-500">
                               <span className="uppercase tracking-widest">{t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString() : 'Vừa xong'}</span>
                               {t.balanceAfter !== undefined && (
                                  <>
