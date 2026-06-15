@@ -604,14 +604,14 @@ export function AppLayout() {
         </div>
       )}
 
-      <header className="sticky top-0 z-30 bg-[#8D6E63] dark:bg-[#2C221D] text-[#FDF6EC] border-b-[6px] border-[#3E2723] dark:border-[#4E342E] px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <header className="sticky top-0 z-30 bg-[#8D6E63] dark:bg-[#2C221D] text-[#FDF6EC] border-b-[6px] border-[#3E2723] dark:border-[#4E342E] px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between w-full max-w-full overflow-hidden">
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <button 
             onClick={() => setSidebarOpen(true)} 
-            className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#5D4037] hover:bg-[#4E342E] active:translate-y-1 transition-all outline-none border-[3px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723] text-white relative"
+            className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#5D4037] hover:bg-[#4E342E] active:translate-y-1 transition-all outline-none border-[3px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723] text-white relative shrink-0"
             title="Menu Tiện Ích"
           >
-            <Menu className="w-6 h-6" />
+            <Menu className="w-5 h-5 sm:w-6 h-6" />
             {utilityMenuHasRedDot && (
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D7CCC8] opacity-75"></span>
@@ -621,22 +621,22 @@ export function AppLayout() {
           </button>
         </div>
 
-        <div className="font-extrabold tracking-widest text-2xl cursor-pointer text-[#FDF6EC] drop-shadow-[1px_1px_0_#3E2723]" onClick={() => navigate('/')}>
+        <div className="font-extrabold tracking-wider sm:tracking-widest text-lg sm:text-xl md:text-2xl cursor-pointer text-[#FDF6EC] drop-shadow-[1px_1px_0_#3E2723] whitespace-nowrap overflow-hidden text-ellipsis px-1 select-none shrink" onClick={() => navigate('/')}>
           CHOCOATL
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Theme Toggle Button */}
           <button
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="p-2.5 bg-[#5D4037] text-white hover:bg-[#4E342E] rounded-xl transition-all flex items-center justify-center cursor-pointer outline-none border-[3px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723] active:translate-y-1 active:shadow-none"
+            className="p-1.5 sm:p-2.5 bg-[#5D4037] text-white hover:bg-[#4E342E] rounded-xl transition-all flex items-center justify-center cursor-pointer outline-none border-[3px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723] active:translate-y-1 active:shadow-none shrink-0"
             title={theme === 'light' ? 'Chế độ tối' : 'Chế độ sáng'}
           >
-            {theme === 'light' ? <Moon className="w-[20px] h-[20px]" /> : <Sun className="w-[20px] h-[20px]" />}
+            {theme === 'light' ? <Moon className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]" /> : <Sun className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]" />}
           </button>
 
           {isLoggedIn ? (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
               <div className="hidden md:flex items-center gap-3 text-sm font-medium">
                 <span className="bg-[#EFEBE9] dark:bg-[#2C221D] text-[#3E2723] dark:text-[#ECE5DC] px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#3E2723] dark:border-[#ECE5DC] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#ECE5DC]">Lv. {level || 1}</span>
                 <span className="bg-[#FDF6EC] dark:bg-[#1A1412] px-3 py-1.5 rounded-xl text-[#5D4037] dark:text-[#D7CCC8] border-2 border-[#8D6E63] dark:border-[#8D6E63] shadow-[0_2px_0_0_#8D6E63] dark:shadow-[0_2px_0_0_#8D6E63] font-black text-xs">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco} Choco</span>
@@ -644,22 +644,22 @@ export function AppLayout() {
               </div>
 
               {/* Notification Bell */}
-              <div className="relative">
+              <div className="relative shrink-0">
                 <button 
                   onClick={() => setShowNotifDropdown(!showNotifDropdown)}
-                  className="relative p-2.5 bg-[#5D4037] text-white hover:bg-[#4E342E] rounded-xl transition-all flex items-center justify-center cursor-pointer outline-none border-[3px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723] active:translate-y-1 active:shadow-none"
+                  className="relative p-1.5 sm:p-2.5 bg-[#5D4037] text-white hover:bg-[#4E342E] rounded-xl transition-all flex items-center justify-center cursor-pointer outline-none border-[3px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723] active:translate-y-1 active:shadow-none shrink-0"
                   title="Thông báo"
                 >
-                  <Bell className="w-[22px] h-[22px]" />
+                  <Bell className="w-[18px] h-[18px] sm:w-[22px] sm:h-[22px]" />
                   {hasUnreadNotifs && (
-                    <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-[#8D6E63] rounded-full border-[2px] border-[#3E2723] animate-pulse" />
+                    <span className="absolute -top-1 sm:-top-1.5 -right-1 sm:-right-1.5 w-2.5 sm:w-3.5 h-2.5 sm:h-3.5 bg-[#8D6E63] rounded-full border-[2px] border-[#3E2723] animate-pulse" />
                   )}
                 </button>
 
                 {showNotifDropdown && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowNotifDropdown(false)} />
-                    <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-[#FDF6EC] dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] rounded-2xl shadow-2xl border border-[#D7CCC8]/60 dark:border-[#5D4037] z-50 flex flex-col overflow-hidden max-h-[450px]">
+                    <div className="absolute right-0 top-full mt-2 w-72 sm:w-96 bg-[#FDF6EC] dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] rounded-2xl shadow-2xl border border-[#D7CCC8]/60 dark:border-[#5D4037] z-50 flex flex-col overflow-hidden max-h-[450px]">
                       <div className="p-4 border-b border-[#D7CCC8]/60 dark:border-[#5D4037] bg-[#F5E6D3]/40 dark:bg-[#251E1B]/50 flex items-center justify-between">
                         <span className="font-extrabold text-xs uppercase tracking-wider text-[#3E2723] dark:text-[#D7CCC8]">Thông báo ({notifications.filter(n => !n.isRead).length})</span>
                         {hasUnreadNotifs && (
@@ -709,14 +709,14 @@ export function AppLayout() {
                 )}
               </div>
 
-              <div className="relative group cursor-pointer">
-                <div className="flex items-center gap-2 bg-[#5D4037] px-3 py-1.5 rounded-xl transition-all relative group border-[3px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:bg-[#4E342E] active:translate-y-1 active:shadow-none">
+              <div className="relative group cursor-pointer shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 bg-[#5D4037] p-1 sm:px-3 sm:py-1.5 rounded-xl transition-all relative group border-[3px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:bg-[#4E342E] active:translate-y-1 active:shadow-none shrink-0">
                    <UserAvatar 
                      avatarUrl={avatarUrl} 
                      equippedAccessory={equippedAccessory}
                      accessoryPosition={accessoryPosition}
-                     className="w-8 h-8 rounded-lg" 
-                     fallbackIconSizeClass="w-5 h-5" 
+                     className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg" 
+                     fallbackIconSizeClass="w-4.5 h-4.5 sm:w-5 h-5" 
                      borderClass="border-2 border-[#3E2723]"
                    />
                    <span className="hidden sm:inline font-bold text-white tracking-wide" style={{ color: getTitleColor(activeTitle) || undefined }}>{displayName}</span>
