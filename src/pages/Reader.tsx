@@ -40,14 +40,13 @@ const ParagraphCommentNode = ({
    });
 
    return (
-      <div key={comment.id} className="text-xs pt-1 mt-1 border-t border-dashed border-gray-100 dark:border-[#3C2E27]/30 first:border-0">
-         <div className={cn("relative flex gap-2.5 items-start p-2 rounded-xl bg-[#FDF6EC]/40 dark:bg-[#1A1412]/20 border border-[#F5E6D3]/40 dark:border-[#3C2E27]/30", currentSticker ? "pr-10" : "")}>
+      <div key={comment.id} className="text-xs pt-1 mt-1 border-t border-dashed border-stone-100 dark:border-[#5D4037]/30 first:border-0">
+         <div className={cn("relative flex gap-2.5 items-start p-2 rounded-xl bg-[#FDF6EC]/40 dark:bg-[#1A1412]/20 border border-[#F5E6D3]/40 dark:border-[#5D4037]/30", currentSticker ? "pr-10" : "")}>
              {currentSticker && (
                <img 
                  src={currentSticker} 
                  alt="Sticker" 
                  className="absolute w-12 h-12 object-contain pointer-events-none z-10 right-0 top-1/2 -translate-y-1/2" 
-                 style={{ imageRendering: 'pixelated' }}
                  referrerPolicy="no-referrer"
                />
              )}
@@ -64,18 +63,18 @@ const ParagraphCommentNode = ({
                   <span className="flex items-center gap-1">
                      {currentDisplayName}
                      {currentActiveTitle && (
-                        <span className="px-1 py-0.5 bg-yellow-101 text-yellow-800 text-[7px] font-extrabold rounded">
+                        <span className="px-1 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[7px] font-extrabold rounded">
                            🏆 {currentActiveTitle}
                         </span>
                      )}
                   </span>
-                  <span className="text-[9px] text-gray-400 font-mono">
+                  <span className="text-[9px] text-stone-400 font-mono">
                      {comment.createdAt?.toDate 
                         ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                         : 'Vừa xong'}
                   </span>
                </div>
-               <p className={cn("text-xs leading-relaxed text-justify break-words", isDark ? "text-[#ECE5DC]" : "text-gray-700")}>
+               <p className={cn("text-xs leading-relaxed text-justify break-words", isDark ? "text-[#ECE5DC]" : "text-stone-700")}>
                   {comment.content}
                </p>
                
@@ -192,7 +191,6 @@ const ChapterCommentNode = ({
              src={currentSticker} 
              alt="Sticker" 
              className="absolute w-14 h-14 object-contain pointer-events-none z-10 right-0 top-1/2 -translate-y-1/2" 
-             style={{ imageRendering: 'pixelated' }}
              referrerPolicy="no-referrer"
            />
          )}
@@ -210,19 +208,19 @@ const ChapterCommentNode = ({
                   <span className="font-extrabold text-xs flex items-center gap-1.5" style={{ color: getTitleColor(currentActiveTitle) || undefined }}>
                      {currentDisplayName}
                      {currentActiveTitle && (
-                        <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-850 text-[9px] font-black rounded uppercase tracking-tight select-none border border-yellow-200 inline-block align-middle">
+                        <span className="px-1.5 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[9px] font-black rounded uppercase tracking-tight select-none border border-[#D7CCC8] inline-block align-middle">
                            🏆 {currentActiveTitle}
                         </span>
                      )}
                   </span>
                   
-                  <span className="text-[9px] text-gray-400 font-mono shrink-0">
+                  <span className="text-[9px] text-stone-400 font-mono shrink-0">
                      {comment.createdAt?.toDate 
                         ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                         : 'Vừa xong'}
                   </span>
                </div>
-               <p className={cn("text-xs leading-relaxed text-justify break-words", isDark ? "text-[#ECE5DC]" : "text-gray-700")}>
+               <p className={cn("text-xs leading-relaxed text-justify break-words", isDark ? "text-[#ECE5DC]" : "text-stone-700")}>
                   {comment.content}
                </p>
 
@@ -268,7 +266,7 @@ const ChapterCommentNode = ({
                      <button 
                         onClick={() => handleSendReply(comment)}
                         disabled={submittingReply || !replyText.trim()}
-                        className={cn("px-4 py-1.5 rounded-xl text-xs font-bold transition-colors disabled:bg-gray-300 disabled:text-gray-400", isDark ? "bg-[#3C2E27] hover:bg-[#5D4037] text-white" : "bg-[#3E2723] dark:bg-[#3E2723] hover:bg-[#2D1B19] dark:hover:bg-[#2D1B19] text-[#FDF6EC] dark:text-[#FDF6EC]")}
+                        className={cn("px-4 py-1.5 rounded-xl text-xs font-bold transition-colors disabled:bg-stone-300 disabled:text-stone-400", isDark ? "bg-[#3C2E27] hover:bg-[#5D4037] text-white" : "bg-[#3E2723] dark:bg-[#3E2723] hover:bg-[#2D1B19] dark:hover:bg-[#2D1B19] text-[#FDF6EC] dark:text-[#FDF6EC]")}
                      >
                         Gửi
                      </button>
@@ -754,7 +752,7 @@ export function Reader() {
 
                   {needsEarlyAccess && (
                     <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#D4AF37] bg-[#2C221D]/50" : "border-[#D4AF37] dark:border-[#D4AF37] bg-[#FFFDE7] dark:bg-[#FFFDE7]")}>
-                       <Zap className="w-12 h-12 mb-4 text-[#D4AF37] animate-pulse fill-yellow-100" />
+                       <Zap className="w-12 h-12 mb-4 text-[#D4AF37] animate-pulse fill-[#F5E6D3]" />
                        <h2 className="text-xl font-bold mb-2 uppercase tracking-tighter text-[#827717]">Chương Đọc Sớm</h2>
                        <p className="opacity-70 mb-4 italic text-[#827717]">Bạn cần dùng "Vé Ưu Tiên" để đọc ngay, hoặc chờ hết 24h.</p>
                        <p className="text-sm font-bold mb-6 text-[#827717]">Bạn đang có: {ownedPriorityTickets || 0} Vé</p>
@@ -800,17 +798,16 @@ export function Reader() {
                                            <div className="text-center italic text-sm opacity-50 py-2">Chưa có bình luận. Hãy là người đầu tiên!</div>
                                        ) : (
                                            pComments.map(c => { return <ParagraphCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={isDark} />; if (false) { return (
-                                               <div key={c.id} className="flex flex-col gap-1 w-full border-b border-gray-100/15 pb-3 last:border-0 last:pb-0">
+                                               <div key={c.id} className="flex flex-col gap-1 w-full border-b border-stone-100/15 pb-3 last:border-0 last:pb-0">
                                                    <div className="flex gap-3">
                                                        <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="hidden" />
-                                                        <div className="w-8 h-8 shrink-0 relative bg-gray-200 rounded-full">
+                                                        <div className="w-8 h-8 shrink-0 relative bg-stone-200 rounded-full">
                                                             <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-full h-full rounded-full object-cover" />
                                                             {c.equippedSticker && (
                                                                 <img 
                                                                     src={c.equippedSticker} 
                                                                     alt="Sticker" 
                                                                     className="absolute w-8 h-8 object-contain pointer-events-none z-10 -right-3 top-1/2 -translate-y-1/2" 
-                                                                    style={{ imageRendering: 'pixelated' }}
                                                                     referrerPolicy="no-referrer"
                                                                 />
                                                             )}
@@ -819,7 +816,7 @@ export function Reader() {
                                                            <div className="text-xs font-bold mb-0.5 flex items-center gap-1" style={{ color: getTitleColor(c.activeTitle) || undefined }}>
                                                                {c.displayName}
                                                                {c.activeTitle && (
-                                                                   <span className="px-1.5 py-0.5 bg-yellow-100/80 text-yellow-800 text-[8px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200">
+                                                                   <span className="px-1.5 py-0.5 bg-[#F5E6D3]/80 text-[#5D4037] text-[8px] font-extrabold rounded-md uppercase tracking-tight select-none border border-[#D7CCC8]">
                                                                        🏆 {c.activeTitle}
                                                                    </span>
                                                                )}
@@ -886,18 +883,18 @@ export function Reader() {
                                                       return (
                                                          <div className="mt-2 pl-11 space-y-2 border-l border-[#D7CCC8]/40">
                                                             {subReplies.map(reply => (
-                                                               <div key={reply.id} className={cn("flex gap-2 p-2 rounded-lg", isDark ? "bg-[#2C221D]/40" : "bg-gray-50/50 dark:bg-gray-50/50")}>
+                                                               <div key={reply.id} className={cn("flex gap-2 p-2 rounded-lg", isDark ? "bg-[#2C221D]/40" : "bg-stone-50/50 dark:bg-stone-50/50")}>
                                                                   <img src={reply.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-6 h-6 rounded-full object-cover shrink-0" />
                                                                   <div className="flex-1 min-w-0">
                                                                      <div className="text-[11px] font-bold mb-0.5 flex items-center gap-1" style={{ color: getTitleColor(reply.activeTitle) || undefined }}>
                                                                         {reply.displayName}
                                                                         {reply.activeTitle && (
-                                                                           <span className="px-1 py-0.5 bg-yellow-100 text-yellow-850 text-[7px] font-extrabold rounded">
+                                                                           <span className="px-1 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[7px] font-extrabold rounded">
                                                                               🏆 {reply.activeTitle}
                                                                            </span>
                                                                         )}
                                                                      </div>
-                                                                     <div className="text-xs text-gray-700 break-words">{reply.content}</div>
+                                                                     <div className="text-xs text-stone-700 break-words">{reply.content}</div>
                                                                   </div>
                                                                </div>
                                                             ))}
@@ -978,7 +975,6 @@ export function Reader() {
                                        src={c.equippedSticker} 
                                        alt="Decor sticker" 
                                        className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 object-contain pointer-events-none hover:scale-125 transition-transform z-10" 
-                                       style={{ imageRendering: 'pixelated' }}
                                        referrerPolicy="no-referrer"
                                    />
                                )}
@@ -990,7 +986,7 @@ export function Reader() {
                                        <div className="font-bold text-sm tracking-wide flex items-center gap-1.5" style={{ color: getTitleColor(c.activeTitle) || undefined }}>
                                            {c.displayName}
                                            {c.activeTitle && (
-                                               <span className="px-1.5 py-0.5 bg-yellow-100 text-yellow-800 text-[8px] font-extrabold rounded-md uppercase tracking-tight select-none border border-yellow-200">
+                                               <span className="px-1.5 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[8px] font-extrabold rounded-md uppercase tracking-tight select-none border border-[#D7CCC8]">
                                                    🏆 {c.activeTitle}
                                                </span>
                                            )}
@@ -1044,14 +1040,14 @@ export function Reader() {
                                           type="button"
                                           onClick={() => handleSendReply(c)}
                                           disabled={submittingReply || !replyText.trim()}
-                                          className={cn("disabled:bg-gray-300 disabled:text-gray-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors", isDark ? "bg-[#3C2E27] hover:bg-[#5D4037] text-white" : "bg-[#3E2723] dark:bg-[#3E2723] hover:bg-[#2D1B19] dark:hover:bg-[#2D1B19] text-[#FDF6EC] dark:text-[#FDF6EC]")}
+                                          className={cn("disabled:bg-stone-300 disabled:text-stone-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors", isDark ? "bg-[#3C2E27] hover:bg-[#5D4037] text-white" : "bg-[#3E2723] dark:bg-[#3E2723] hover:bg-[#2D1B19] dark:hover:bg-[#2D1B19] text-[#FDF6EC] dark:text-[#FDF6EC]")}
                                        >
                                           Gửi
                                        </button>
                                        <button 
                                           type="button"
                                           onClick={() => setReplyingToId(null)}
-                                          className="text-gray-400 hover:text-gray-500 border border-gray-200 px-2 rounded-xl text-xs"
+                                          className="text-stone-400 hover:text-stone-500 border border-stone-200 px-2 rounded-xl text-xs"
                                        >
                                           Hủy
                                        </button>
@@ -1069,25 +1065,25 @@ export function Reader() {
                                     return (
                                        <div className="mt-2 pl-3.5 border-l-2 border-[#D7CCC8]/40 space-y-3">
                                           {replies.map((reply: any) => (
-                                             <div key={reply.id} className={cn("flex gap-2.5 items-start p-3 rounded-xl border", isDark ? "bg-[#1A1412]/40 border-[#3C2E27]" : "bg-gray-50/40 dark:bg-gray-50/40 border-gray-100 dark:border-gray-100")}>
-                                                <img src={reply.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 border border-gray-200" referrerPolicy="no-referrer" />
+                                             <div key={reply.id} className={cn("flex gap-2.5 items-start p-3 rounded-xl border", isDark ? "bg-[#1A1412]/40 border-[#3C2E27]" : "bg-stone-50/40 dark:bg-stone-50/40 border-stone-100 dark:border-stone-100")}>
+                                                <img src={reply.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 border border-stone-200" referrerPolicy="no-referrer" />
                                                 <div className="flex-1 min-w-0">
                                                    <div className="flex items-center justify-between gap-2 mb-0.5">
                                                       <span className="font-bold text-xs" style={{ color: getTitleColor(reply.activeTitle) || undefined }}>
                                                          {reply.displayName}
                                                          {reply.activeTitle && (
-                                                            <span className="px-1 py-0.5 bg-yellow-101 text-yellow-800 text-[8px] font-black rounded uppercase ml-1 shadow-sm border border-yellow-250 inline-block align-middle">
+                                                            <span className="px-1 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[8px] font-black rounded uppercase ml-1 shadow-sm border border-[#D7CCC8] inline-block align-middle">
                                                                🏆 {reply.activeTitle}
                                                             </span>
                                                          )}
                                                       </span>
-                                                      <span className="text-[9px] text-gray-400 font-mono">
+                                                      <span className="text-[9px] text-stone-400 font-mono">
                                                          {reply.createdAt?.toDate 
                                                             ? new Date(reply.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                                                             : 'Vừa xong'}
                                                       </span>
                                                    </div>
-                                                   <p className="text-xs text-gray-700 break-words leading-relaxed text-justify">
+                                                   <p className="text-xs text-stone-700 break-words leading-relaxed text-justify">
                                                       {reply.content}
                                                    </p>
                                                 </div>
@@ -1111,13 +1107,13 @@ export function Reader() {
                ? "bg-[#2C221D]/95 border-[#3C2E27] text-[#ECE5DC]" 
                : "bg-white/95 border-[#8D6E63]/30 text-[#3E2723]"
           )}>
-             {isFinished ? ( <div className="flex items-center gap-1.5 text-emerald-500 font-bold dark:text-emerald-400"><CheckCircle className="w-4 h-4 text-emerald-500" /><span>Đã xong (+1 lượt đọc)</span></div> ) : false ? (
+             {isFinished ? ( <div className="flex items-center gap-1.5 text-[#8D6E63] font-bold dark:text-emerald-400"><CheckCircle className="w-4 h-4 text-[#8D6E63]" /><span>Đã xong (+1 lượt đọc)</span></div> ) : false ? (
                 <div className="flex items-center gap-2">
-                   <div className="w-9 h-9 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-500 animate-pulse">
+                   <div className="w-9 h-9 rounded-full bg-[#8D6E63]/15 flex items-center justify-center text-[#8D6E63] animate-pulse">
                       <CheckCircle className="w-5 h-5" />
                    </div>
                    <div className="text-left">
-                      <p className="text-xs font-bold text-emerald-500">Hoàn thành đọc chương!</p>
+                      <p className="text-xs font-bold text-[#8D6E63]">Hoàn thành đọc chương!</p>
                       <p className="text-[10px] opacity-70 leading-tight">Lượt đọc & nhiệm vụ ngày đã được ghi nhận.</p>
                    </div>
                 </div>
@@ -1138,7 +1134,7 @@ export function Reader() {
                             cx="20" 
                             cy="20" 
                             r="16" 
-                            className={cn(isIdle ? "stroke-amber-500" : "stroke-[#8D6E63] dark:stroke-[#D4AF37] transition-all duration-300")}
+                            className={cn(isIdle ? "stroke-[#8D6E63]" : "stroke-[#8D6E63] dark:stroke-[#D4AF37] transition-all duration-300")}
                             strokeWidth="3" 
                             fill="transparent" 
                             strokeDasharray={2 * Math.PI * 16}
@@ -1146,7 +1142,7 @@ export function Reader() {
                          />
                       </svg>
                       {isIdle ? (
-                         <Pause className="w-3.5 h-3.5 absolute text-amber-500 animate-pulse" />
+                         <Pause className="w-3.5 h-3.5 absolute text-[#8D6E63] animate-pulse" />
                       ) : (
                          <Clock className="w-3.5 h-3.5 absolute text-[#8D6E63] dark:text-[#D4AF37] animate-pulse" />
                       )}
@@ -1154,7 +1150,7 @@ export function Reader() {
                    <div className="flex items-center gap-1.5">
 
                       {isIdle ? (
-                         <span className="flex items-center gap-1 text-amber-500 font-bold animate-pulse text-[11px] sm:text-xs">
+                         <span className="flex items-center gap-1 text-[#8D6E63] font-bold animate-pulse text-[11px] sm:text-xs">
                              <Pause className="w-3.5 h-3.5 flex-shrink-0" />
                              <span>Dừng (cuộn để tiếp tục)</span>
                           </span>
