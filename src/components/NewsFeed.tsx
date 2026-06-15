@@ -56,29 +56,32 @@ export function NewsFeed() {
   };
 
   return (
-    <div className="flex flex-col bg-white dark:bg-[#1A1412] rounded-3xl border border-[#D7CCC8]/80 dark:border-[#3C2E27] p-5 shadow-sm">
-      <div className="flex justify-between items-center mb-4 pb-2 border-b border-[#D7CCC8]/30 dark:border-[#3C2E27]/50">
-        <h2 className="font-bold text-sm border-l-4 border-[#8D6E63] dark:border-[#C29D70] pl-2.5 text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wider flex items-center gap-2">
-          <Newspaper className="w-4 h-4 text-[#8D6E63] dark:text-[#C29D70]" />
+    <div className="flex flex-col bg-[#FDF6EC] dark:bg-[#2C221D] rounded-3xl border-2 border-[#3E2723] p-5 shadow-[1px_1px_0_0_#8D6E63] dark:shadow-[1px_1px_0_0_#0D0907] relative overflow-hidden">
+      {/* Decorative top bar like a game menu */}
+      <div className="absolute top-0 left-0 right-0 h-4 bg-[#8D6E63] dark:bg-[#1A1412] border-b-[3px] border-[#3E2723]" />
+      
+      <div className="flex justify-between items-center mb-4 mt-2 pb-3 border-b-4 border-[#3E2723] dark:border-[#4E342E]/50 border-dotted">
+        <h2 className="font-black text-lg text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-widest flex items-center gap-2 drop-shadow-[1px_1px_0_#D7CCC8] dark:drop-shadow-[1px_1px_0_#1A1412]">
+          <Newspaper className="w-5 h-5 text-[#8D6E63] dark:text-[#C29D70]" />
           Bản tin Choco
         </h2>
         {isLoggedIn && (
           <button 
             type="button"
             onClick={() => navigate('/tai-khoan')}
-            className="text-[10px] sm:text-xs font-bold text-[#8D6E63] dark:text-[#A1887F] hover:text-[#5D4037] dark:hover:text-[#ECE5DC] flex items-center gap-1 transition-all"
+            className="text-[10px] sm:text-xs font-black bg-[#E6D8C9] text-[#5D4037] hover:bg-[#D7CCC8] px-3 py-1.5 rounded-lg border-2 border-[#5D4037] shadow-[0_2px_0_0_#5D4037] active:translate-y-0.5 active:shadow-none flex items-center gap-1 transition-all"
           >
             Đăng bài ngay <ExternalLink className="w-3 h-3" />
           </button>
         )}
       </div>
 
-      <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto overflow-x-hidden pr-1 px-2 pt-6 pb-6 -mx-2">
+      <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto overflow-x-hidden py-4 px-1 custom-scrollbar">
         {posts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 bg-[#FDF6EC]/40 dark:bg-[#2C221D]/40 rounded-2xl border border-dashed border-[#D7CCC8]/50 dark:border-[#3C2E27]/50 text-center">
+          <div className="flex flex-col items-center justify-center p-8 bg-[#FDF6EC]/40 dark:bg-[#2C221D]/40 rounded-2xl border border-dashed border-[#D7CCC8]/50 dark:border-[#5D4037]/50 text-center">
             <MessageSquareQuote className="w-8 h-8 text-[#D7CCC8] dark:text-[#5D4037] mb-1 opacity-70" />
-            <p className="text-xs text-gray-400 dark:text-gray-500 italic">Chưa có bài đăng nào trên Bản tin.</p>
-            <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">Hãy vào trang Hồ sơ của bạn để đăng bài viết đầu tiên!</p>
+            <p className="text-xs text-stone-400 dark:text-stone-500 italic">Chưa có bài đăng nào trên Bản tin.</p>
+            <p className="text-[10px] text-stone-400 dark:text-stone-500 mt-1">Hãy vào trang Hồ sơ của bạn để đăng bài viết đầu tiên!</p>
           </div>
         ) : (
           posts.map((post) => {
@@ -93,14 +96,13 @@ export function NewsFeed() {
             return (
               <div 
                 key={post.id} 
-                className={cn("flex gap-3 p-3 bg-[#FDF6EC]/30 dark:bg-[#2C221D]/30 hover:bg-[#FDF6EC]/50 dark:hover:bg-[#2C221D]/60 rounded-2xl border border-[#F5E6D3]/60 dark:border-[#3C2E27] transition-colors relative overflow-visible", currentSticker ? "pr-10" : "")}
+                className={cn("flex gap-3 p-4 bg-[#FFFDF9] dark:bg-[#1E1815] rounded-3xl border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] transition-transform hover:-translate-y-1 relative mb-2", currentSticker ? "pr-10" : "")}
               >
                 {currentSticker && (
                   <img 
                     src={currentSticker} 
                     alt="Decor sticker" 
                     className="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-12 object-contain pointer-events-none hover:scale-125 transition-transform z-10" 
-                    style={{ imageRendering: 'pixelated' }}
                     referrerPolicy="no-referrer"
                   />
                 )}
@@ -119,14 +121,14 @@ export function NewsFeed() {
                         {currentDisplayName}
                       </span>
                       {currentActiveTitle && (
-                        <span className="px-1 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 text-[7px] font-black rounded uppercase shadow-xs border border-yellow-200 dark:border-yellow-700/50 inline-block">
+                        <span className="px-1 py-0.5 bg-[#F5E6D3] dark:bg-[#3C2E27] text-[#5D4037] dark:text-[#E6D8C9] text-[7px] font-black rounded uppercase shadow-xs border border-[#D7CCC8] dark:border-[#5D4037] inline-block">
                           🏆 {currentActiveTitle}
                         </span>
                       )}
                     </div>
                     
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="text-[9px] text-gray-400 dark:text-gray-500 font-mono">
+                      <span className="text-[9px] text-stone-400 dark:text-stone-500 font-mono">
                         {post.createdAt?.toDate 
                           ? new Date(post.createdAt.toDate()).toLocaleDateString('vi-VN', { 
                               month: 'numeric', 
