@@ -81,16 +81,17 @@ export function GlobalChat() {
   };
 
   return (
-    <div className="flex flex-col bg-[#3E2723] rounded-3xl shadow-xl overflow-hidden border-4 border-[#8D6E63] h-full min-h-[400px]">
-      <div className="p-4 bg-[#2D1B19] text-[#FDF6EC] flex items-center justify-between">
-        <span className="font-bold text-sm tracking-widest flex items-center gap-2">
-            <MessageSquare className="w-4 h-4" /> Choco Lounge
+    <div className="flex flex-col bg-[#5D4037] dark:bg-[#2C221D] rounded-3xl overflow-hidden border-2 border-[#3E2723] dark:border-[#4E342E] h-full min-h-[400px] shadow-[1px_1px_0_0_#8D6E63] dark:shadow-[1px_1px_0_0_#0D0907] relative">
+      <div className="absolute top-0 left-0 right-0 h-4 bg-[#8D6E63] dark:bg-[#3C2E27] border-b-[3px] border-[#3E2723] dark:border-[#4E342E]" />
+      <div className="pt-6 pb-3 px-4 bg-[#4E342E] dark:bg-[#251E1B] text-[#FDF6EC] flex items-center justify-between border-b-[3px] border-[#3E2723] dark:border-[#4E342E]">
+        <span className="font-extrabold text-lg tracking-widest flex items-center gap-2 drop-shadow-[1px_1px_0_#3E2723]">
+            <MessageSquare className="w-5 h-5 text-[#D7CCC8]" /> Choco Lounge
         </span>
-        <span className="text-[10px] opacity-60">Thế giới</span>
+        <span className="text-xs font-bold opacity-60 uppercase bg-[#3E2723] px-2 py-0.5 rounded-lg border-2 border-[#1A1412]">Thế giới</span>
       </div>
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4 pb-8 flex flex-col gap-3 text-xs"
+        className="flex-1 overflow-y-auto p-4 pb-8 flex flex-col gap-4 text-xs bg-[#5D4037] dark:bg-[#2C221D]"
       >
         {messages.map((msg, i) => {
           const isMe = msg.uid === uid;
@@ -117,13 +118,13 @@ export function GlobalChat() {
                             {currentDisplayName}
                          </span>
                          {currentActiveTitle && (
-                            <span className="px-1 py-0.5 bg-yellow-100 text-yellow-800 text-[8px] font-extrabold rounded uppercase tracking-tighter select-none border border-yellow-200">
+                            <span className="px-1 py-0.5 bg-[#F5E6D3] dark:bg-[#3C2E27] text-[#5D4037] dark:text-[#E6D8C9] text-[8px] font-extrabold rounded uppercase tracking-tighter select-none border border-[#D7CCC8] dark:border-[#5D4037]">
                                🏆 {currentActiveTitle}
                             </span>
                          )}
                       </div>
                       
-                      <div className={cn("p-2.5 rounded-2xl relative text-[13px] leading-relaxed shadow-sm break-words text-white rounded-tl-sm overflow-visible flex-1", isMe ? "bg-[#8D6E63]" : "bg-[#5D4037]")}>
+                      <div className={cn("p-3 rounded-2xl relative text-[13px] leading-relaxed break-words rounded-tl-md flex-1 font-bold border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]", isMe ? "bg-[#8D6E63] text-white" : "bg-[#FDF6EC] text-[#3E2723] dark:bg-[#3C2E27] dark:text-[#ECE5DC]")}>
                           <div className={currentSticker ? "pr-10" : ""}>
                              <p>{msg.content}</p>
                           </div>
@@ -132,7 +133,6 @@ export function GlobalChat() {
                                src={currentSticker} 
                                alt="Sticker" 
                                className="absolute -right-3 top-1/2 -translate-y-1/2 w-12 h-12 object-contain pointer-events-none hover:scale-110 transition-transform z-10" 
-                               style={{ imageRendering: 'pixelated' }}
                                referrerPolicy="no-referrer"
                              />
                           )}
@@ -142,23 +142,23 @@ export function GlobalChat() {
              </div>
           );
         })}
-        {messages.length === 0 && <p className="text-center text-[#D7CCC8]/50 mt-auto mb-auto italic">Chưa có tin nhắn nào</p>}
+        {messages.length === 0 && <p className="text-center text-[#D7CCC8]/50 mt-auto mb-auto italic font-bold">Chưa có tin nhắn nào</p>}
       </div>
-      <form onSubmit={send} className="p-3 bg-[#2D1B19] flex gap-2">
+      <form onSubmit={send} className="p-4 bg-[#4E342E] dark:bg-[#1A1412] flex gap-3 border-t-[3px] border-[#3E2723] dark:border-[#4E342E]">
         <input 
           type="text" 
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={isLoggedIn ? "Nhắn gì đó..." : "Đăng nhập để chat"}
           disabled={!isLoggedIn}
-          className="flex-1 bg-[#3E2723] border border-[#5D4037] rounded-full px-4 py-2 text-white text-xs outline-none focus:border-[#8D6E63] disabled:opacity-50"
+          className="flex-1 bg-[#FDF6EC] dark:bg-[#2C221D] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl px-4 py-2 text-[#3E2723] dark:text-[#ECE5DC] text-xs font-bold outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] shadow-[inset_0_2px_0_0_#D7CCC8] dark:shadow-[inset_0_2px_0_0_#3C2E27] disabled:opacity-50"
         />
         <button 
           disabled={!isLoggedIn || !input.trim()}
           type="submit"
-          className="w-9 h-9 bg-[#8D6E63] rounded-full flex items-center justify-center text-white disabled:opacity-50 transition-colors hover:bg-[#A1887F] shrink-0"
+          className="w-10 h-10 bg-[#E6D8C9] dark:bg-[#5D4037] border-[3px] border-[#D7CCC8] dark:border-[#5D4037] shadow-[0_3px_0_0_#D7CCC8] dark:shadow-[0_3px_0_0_#0D0907] rounded-xl flex items-center justify-center text-[#3E2723] dark:text-[#FDF6EC] disabled:opacity-50 transition-all hover:bg-[#F5E6D3] dark:hover:bg-[#8D6E63] hover:-translate-y-1 active:translate-y-1 active:shadow-none shrink-0"
         >
-           <Send className="w-4 h-4 -ml-0.5" />
+           <Send className="w-5 h-5 -ml-0.5" />
         </button>
       </form>
     </div>
