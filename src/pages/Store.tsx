@@ -167,7 +167,7 @@ export function Store() {
 
   return (
     <div ref={containerRef} className="p-4 sm:p-6 lg:p-10 max-w-5xl mx-auto w-full flex flex-col gap-8">
-       <div className="bg-[#3E2723] text-[#FDF6EC] p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md border-2 border-[#8D6E63]">
+       <div className="bg-[#3E2723] text-[#FDF6EC] p-6 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-[1.5px_1.5px_0_0_#1A1412] border-2 border-[#1A1412]">
           <div>
              <h1 className="text-xl sm:text-2xl font-bold mb-1 flex items-center gap-2 uppercase tracking-tighter">
                 <ShoppingBag className="w-6 h-6"/> Cửa Hàng
@@ -187,22 +187,22 @@ export function Store() {
           </div>
        </div>
 
-      <div className="inline-flex bg-[#FDF6EC] dark:bg-[#1A1412] border border-[#D7CCC8] dark:border-[#3C2E27] p-1 rounded-xl font-bold uppercase text-sm tracking-wide self-center sm:self-start my-4">
+      <div className="inline-flex bg-[#FDF6EC] dark:bg-[#1A1412] border-[3px] border-[#3E2723] p-1.5 rounded-2xl font-black uppercase text-xs tracking-wide self-center sm:self-start my-4 shadow-[1.5px_1.5px_0_0_#3E2723]">
           <button 
              onClick={() => { setActiveTab('items'); setCurrentPage(1); }} 
-             className={cn("px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2", activeTab === 'items' ? 'bg-[#3E2723] dark:bg-[#C29D70] text-[#FDF6EC] dark:text-[#181311] shadow-md' : 'text-[#8D6E63] dark:text-gray-400 hover:bg-[#FDF6EC]/80 dark:hover:bg-[#2C221D] hover:text-[#5D4037] dark:hover:text-[#ECE5DC]')}
+             className={cn("px-4 py-2 rounded-xl transition-all flex items-center justify-center gap-2 font-black text-xs uppercase tracking-wide", activeTab === 'items' ? 'bg-[#E6D4BF] border-2 border-[#3E2723] text-[#3E2723] shadow-inner' : 'text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] hover:text-[#5D4037]')}
           >
              <ShoppingBag className="w-4 h-4" /> Vật Phẩm
           </button>
           <button 
              onClick={() => { setActiveTab('stickers'); setCurrentPage(1); }} 
-             className={cn("px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2", activeTab === 'stickers' ? 'bg-[#3E2723] dark:bg-[#C29D70] text-[#FDF6EC] dark:text-[#181311] shadow-md' : 'text-[#8D6E63] dark:text-gray-400 hover:bg-[#FDF6EC]/80 dark:hover:bg-[#2C221D] hover:text-[#5D4037] dark:hover:text-[#ECE5DC]')}
+             className={cn("px-4 py-2 rounded-xl transition-all flex items-center justify-center gap-2 font-black text-xs uppercase tracking-wide", activeTab === 'stickers' ? 'bg-[#E6D4BF] border-2 border-[#3E2723] text-[#3E2723] shadow-inner' : 'text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] hover:text-[#5D4037]')}
           >
              <Smile className="w-4 h-4" /> Sticker
           </button>
           <button 
              onClick={() => { setActiveTab('accessories'); setCurrentPage(1); }} 
-             className={cn("px-4 py-2 rounded-lg transition-colors flex items-center justify-center gap-2", activeTab === 'accessories' ? 'bg-[#3E2723] dark:bg-[#C29D70] text-[#FDF6EC] dark:text-[#181311] shadow-md' : 'text-[#8D6E63] dark:text-gray-400 hover:bg-[#FDF6EC]/80 dark:hover:bg-[#2C221D] hover:text-[#5D4037] dark:hover:text-[#ECE5DC]')}
+             className={cn("px-4 py-2 rounded-xl transition-all flex items-center justify-center gap-2 font-black text-xs uppercase tracking-wide", activeTab === 'accessories' ? 'bg-[#E6D4BF] border-2 border-[#3E2723] text-[#3E2723] shadow-inner' : 'text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] hover:text-[#5D4037]')}
           >
              <Smile className="w-4 h-4" /> Phụ kiện Avatar
           </button>
@@ -211,39 +211,39 @@ export function Store() {
        {activeTab === 'items' && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
              {/* Exchange Card */}
-             <div className="bg-white border-2 border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
+             <div className="bg-[#FFFDF9] dark:bg-[#1A1412] border-[3px] border-[#3E2723] rounded-3xl p-5 flex flex-col items-center text-center shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden group hover:-translate-y-1 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all">
                 <div className="absolute top-0 right-0 bg-[#3E2723] text-[#FDF6EC] text-[8px] sm:text-[10px] uppercase font-bold tracking-widest px-2 sm:px-3 py-1 rounded-bl-xl shadow-sm">Quy đổi</div>
                 <Shuffle className="w-8 h-8 sm:w-10 sm:h-10 text-[#8D6E63] mt-2 mb-2 sm:mb-4 group-hover:rotate-180 transition-transform duration-500" />
                 <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 text-[#3E2723]">Đổi Gchoco</h3>
-                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">3 Choco = 1 Gchoco.</p>
+                <p className="text-stone-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">3 Choco = 1 Gchoco.</p>
                 <button onClick={handleExchange} className="bg-[#FDF6EC] text-[#3E2723] border border-[#8D6E63] p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#3E2723] hover:text-[#FDF6EC] transition-colors w-full mt-auto uppercase text-[10px] sm:text-xs tracking-widest">
                    Đổi
                 </button>
              </div>
 
-             <div className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#D4AF37] transition-colors">
+             <div className="bg-[#FFFDF9] dark:bg-[#1A1412] border-[3px] border-[#3E2723] rounded-3xl p-5 flex flex-col items-center text-center shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden group hover:-translate-y-1 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all">
                 <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-[#D4AF37] mb-2 sm:mb-4 group-hover:-translate-y-1 transition-transform" />
-                <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Pass Truyện</h3>
-                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Mở khoá 1 chương truyện bị đặt password.</p>
-                <button onClick={() => buyTicketWithQuantity('Vé Pass Truyện', 5, 'golden', 'pass')} className="bg-[#D4AF37] text-white p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
+                <h3 className="text-sm sm:text-base font-black mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Pass Truyện</h3>
+                <p className="text-stone-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Mở khoá 1 chương truyện bị đặt password.</p>
+                <button onClick={() => buyTicketWithQuantity('Vé Pass Truyện', 5, 'golden', 'pass')} className="bg-[#D4AF37] text-[#3E2723] p-2 sm:px-4 sm:py-2.5 rounded-2xl font-black border-2 border-[#3E2723] shadow-[1px_1px_0_0_#3E2723] active:translate-y-[2px] active:shadow-none hover:bg-[#B5952F] transition-all w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1 uppercase text-[10px] sm:text-xs tracking-widest">
                    <span>Mua</span> <span className="bg-black/10 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">5 Gchoco</span>
                 </button>
              </div>
 
-             <div className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#D4AF37] transition-colors">
+             <div className="bg-[#FFFDF9] dark:bg-[#1A1412] border-[3px] border-[#3E2723] rounded-3xl p-5 flex flex-col items-center text-center shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden group hover:-translate-y-1 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all">
                 <Zap className="w-8 h-8 sm:w-10 sm:h-10 text-[#D4AF37] mb-2 sm:mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Ưu Tiên</h3>
-                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Đọc sớm các chương truyện vừa đăng.</p>
-                <button onClick={() => buyTicketWithQuantity('Vé Ưu Tiên', 3, 'golden', 'priority')} className="bg-[#D4AF37] text-white p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#B5952F] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
+                <h3 className="text-sm sm:text-base font-black mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Ưu Tiên</h3>
+                <p className="text-stone-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Đọc sớm các chương truyện vừa đăng.</p>
+                <button onClick={() => buyTicketWithQuantity('Vé Ưu Tiên', 3, 'golden', 'priority')} className="bg-[#D4AF37] text-[#3E2723] p-2 sm:px-4 sm:py-2.5 rounded-2xl font-black border-2 border-[#3E2723] shadow-[1px_1px_0_0_#3E2723] active:translate-y-[2px] active:shadow-none hover:bg-[#B5952F] transition-all w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1 uppercase text-[10px] sm:text-xs tracking-widest">
                    <span>Mua</span> <span className="bg-black/10 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">3 Gchoco</span>
                 </button>
              </div>
 
-             <div className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
+             <div className="bg-[#FFFDF9] dark:bg-[#1A1412] border-[3px] border-[#3E2723] rounded-3xl p-5 flex flex-col items-center text-center shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden group hover:-translate-y-1 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all">
                 <CalendarCheck className="w-8 h-8 sm:w-10 sm:h-10 text-[#8D6E63] mb-2 sm:mb-4 group-hover:-translate-y-1 transition-transform" />
-                <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Giữ Chuỗi</h3>
-                <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Tự động tiêu hao để bảo vệ chuỗi khi quên điểm danh.</p>
-                <button onClick={() => buyTicketWithQuantity('Vé Giữ Chuỗi', 5, 'choco', 'streak')} className="bg-[#3E2723] text-[#FDF6EC] p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-[#2D1B19] transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md">
+                <h3 className="text-sm sm:text-base font-black mb-1 sm:mb-2 uppercase text-[#3E2723]">Vé Giữ Chuỗi</h3>
+                <p className="text-stone-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">Tự động tiêu hao để bảo vệ chuỗi khi quên điểm danh.</p>
+                <button onClick={() => buyTicketWithQuantity('Vé Giữ Chuỗi', 5, 'choco', 'streak')} className="bg-[#3E2723] text-[#FDF6EC] p-2 sm:px-4 sm:py-2.5 rounded-2xl font-black border-2 border-[#1A1412] shadow-[1px_1px_0_0_#1A1412] active:translate-y-[2px] active:shadow-none hover:bg-[#2D1B19] transition-all w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1 uppercase text-[10px] sm:text-xs tracking-widest">
                    <span>Mua</span> <span className="bg-[#FDF6EC]/20 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap">5 Choco</span>
                 </button>
              </div>
@@ -258,34 +258,34 @@ export function Store() {
                    placeholder="Tìm kiếm sticker theo tên..." 
                    value={searchQuery}
                    onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                   className="w-full pl-10 pr-4 py-2 border-2 border-[#D7CCC8] dark:border-[#3C2E27] rounded-xl bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-[#8D6E63] transition-colors font-medium"
+                   className="w-full pl-10 pr-4 py-2 border-2 border-[#D7CCC8] dark:border-[#5D4037] rounded-xl bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-[#8D6E63] transition-colors font-medium"
                 />
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                <Search className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
              </div>
 
              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
                 {displayedItems.length === 0 && (
-                   <div className="col-span-full text-center text-gray-500 py-8 italic border border-dashed border-[#D7CCC8] rounded-2xl bg-white/50 dark:bg-black/20">
+                   <div className="col-span-full text-center text-stone-500 py-8 italic border border-dashed border-[#D7CCC8] rounded-2xl bg-white/50 dark:bg-black/20">
                       {searchQuery ? "Không tìm thấy sticker nào phù hợp từ khóa tìm kiếm." : "Cửa hàng hiện chưa có sticker nào."}
                    </div>
                 )}
                 {displayedItems.map((sticker) => (
-                   <div key={sticker.id} className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 relative mb-2 sm:mb-4 p-1 sm:p-2 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center shrink-0">
+                   <div key={sticker.id} className="bg-[#FFFDF9] dark:bg-[#1A1412] border-[3px] border-[#3E2723] rounded-3xl p-5 flex flex-col items-center text-center shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden group hover:-translate-y-1 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 relative mb-2 sm:mb-4 p-1 sm:p-2 bg-stone-50 rounded-xl border border-stone-100 flex items-center justify-center shrink-0">
                          {sticker.url ? (
                            <img src={sticker.url} alt="Sticker" className="w-10 h-10 sm:w-12 sm:h-12 object-contain pointer-events-none" />
                          ) : (
                            <Smile className="w-6 h-6 sm:w-8 sm:h-8 text-[#A1887F]" />
                          )}
                       </div>
-                      <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">{sticker.name}</h3>
-                      <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">{sticker.description}</p>
+                      <h3 className="text-sm sm:text-base font-black mb-1 sm:mb-2 uppercase text-[#3E2723]">{sticker.name}</h3>
+                      <p className="text-stone-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">{sticker.description}</p>
                       {ownedStickers?.includes(sticker.url) ? (
-                         <button disabled className="p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest bg-gray-300 text-gray-500 cursor-not-allowed">
+                         <button disabled className="p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest bg-stone-300 text-stone-500 cursor-not-allowed">
                             Đã có
                          </button>
                       ) : (
-                         <button onClick={() => buySticker(sticker)} className={cn("p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold transition-colors w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest shadow-md", sticker.type === 'golden' ? "bg-[#D4AF37] text-white hover:bg-[#B5952F]" : "bg-[#3E2723] text-[#FDF6EC] hover:bg-[#2D1B19]")}>
+                         <button onClick={() => buySticker(sticker)} className={cn("p-2 sm:px-4 sm:py-2.5 rounded-2xl font-black border-2 border-[#3E2723] shadow-[1px_1px_0_0_#3E2723] active:translate-y-[2px] active:shadow-none transition-all w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1 uppercase text-[10px] sm:text-xs tracking-widest", sticker.type === 'golden' ? "bg-[#D4AF37] text-[#3E2723]" : "bg-[#3E2723] text-[#FDF6EC]")}>
                             <span>Mua</span> <span className={cn("px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] whitespace-nowrap", sticker.type === 'golden' ? "bg-black/10" : "bg-[#FDF6EC]/20")}>{sticker.price} {sticker.type === 'golden' ? 'GChoco' : 'Choco'}</span>
                          </button>
                       )}
@@ -298,7 +298,7 @@ export function Store() {
                    <button
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                      className="p-2 rounded-xl border border-[#D7CCC8] dark:border-[#3C2E27] bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-[#2C221D] transition-colors"
+                      className="p-2 rounded-xl border border-[#D7CCC8] dark:border-[#5D4037] bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-50 dark:hover:bg-[#2C221D] transition-colors"
                    >
                       <ChevronLeft className="w-4 h-4" />
                    </button>
@@ -310,7 +310,7 @@ export function Store() {
                             "w-8 h-8 rounded-xl font-bold text-xs transition-colors border",
                             currentPage === pg
                                ? "bg-[#3E2723] dark:bg-[#C29D70] border-[#3E2723] dark:border-[#C29D70] text-[#FDF6EC] dark:text-[#181311]"
-                               : "bg-white dark:bg-[#1A1412] border-[#D7CCC8] dark:border-[#3C2E27] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-gray-50 dark:hover:bg-[#2C221D]"
+                               : "bg-white dark:bg-[#1A1412] border-[#D7CCC8] dark:border-[#5D4037] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-stone-50 dark:hover:bg-[#2C221D]"
                          )}
                       >
                          {pg}
@@ -319,7 +319,7 @@ export function Store() {
                    <button
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                      className="p-2 rounded-xl border border-[#D7CCC8] dark:border-[#3C2E27] bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-[#2C221D] transition-colors"
+                      className="p-2 rounded-xl border border-[#D7CCC8] dark:border-[#5D4037] bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-50 dark:hover:bg-[#2C221D] transition-colors"
                    >
                       <ChevronRight className="w-4 h-4" />
                    </button>
@@ -336,30 +336,30 @@ export function Store() {
                    placeholder="Tìm kiếm phụ kiện theo tên..." 
                    value={searchQuery}
                    onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                   className="w-full pl-10 pr-4 py-2 border-2 border-[#D7CCC8] dark:border-[#3C2E27] rounded-xl bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-[#8D6E63] transition-colors font-medium"
+                   className="w-full pl-10 pr-4 py-2 border-2 border-[#D7CCC8] dark:border-[#5D4037] rounded-xl bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-[#8D6E63] transition-colors font-medium"
                 />
-                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+                <Search className="w-4 h-4 text-stone-400 absolute left-3 top-3" />
              </div>
 
              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
                 {displayedItems.length === 0 && (
-                   <div className="col-span-full text-center text-gray-500 py-8 italic border border-dashed border-[#D7CCC8] rounded-2xl bg-white/50 dark:bg-black/20">
+                   <div className="col-span-full text-center text-stone-500 py-8 italic border border-dashed border-[#D7CCC8] rounded-2xl bg-white/50 dark:bg-black/20">
                       {searchQuery ? "Không tìm thấy phụ kiện nào phù hợp từ khóa tìm kiếm." : "Cửa hàng hiện chưa có phụ kiện nào."}
                    </div>
                 )}
                 {displayedItems.map((accessory) => (
-                   <div key={accessory.id} className="bg-white border border-[#D7CCC8] rounded-2xl p-4 sm:p-5 flex flex-col items-center text-center shadow-sm relative overflow-hidden group hover:border-[#8D6E63] transition-colors">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 relative mb-2 sm:mb-4 p-1 sm:p-2 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center shrink-0">
+                   <div key={accessory.id} className="bg-[#FFFDF9] dark:bg-[#1A1412] border-[3px] border-[#3E2723] rounded-3xl p-5 flex flex-col items-center text-center shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden group hover:-translate-y-1 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 relative mb-2 sm:mb-4 p-1 sm:p-2 bg-stone-50 rounded-xl border border-stone-100 flex items-center justify-center shrink-0">
                          {accessory.url ? (
                            <img src={accessory.url} alt="Accessory" className="w-10 h-10 sm:w-12 sm:h-12 object-contain pointer-events-none" referrerPolicy="no-referrer" />
                          ) : (
                            <Smile className="w-6 h-6 sm:w-8 sm:h-8 text-[#A1887F]" />
                          )}
                       </div>
-                      <h3 className="text-sm sm:text-base font-bold mb-1 sm:mb-2 uppercase text-[#3E2723]">{accessory.name}</h3>
-                      <p className="text-gray-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">{accessory.description}</p>
+                      <h3 className="text-sm sm:text-base font-black mb-1 sm:mb-2 uppercase text-[#3E2723]">{accessory.name}</h3>
+                      <p className="text-stone-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">{accessory.description}</p>
                       {ownedAccessories?.includes(accessory.url) ? (
-                         <button disabled className="p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest bg-gray-300 text-gray-500 cursor-not-allowed">
+                         <button disabled className="p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold w-full mt-auto flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 uppercase text-[10px] sm:text-xs tracking-widest bg-stone-300 text-stone-500 cursor-not-allowed">
                             Đã sở hữu
                          </button>
                       ) : (
@@ -376,7 +376,7 @@ export function Store() {
                    <button
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                      className="p-2 rounded-xl border border-[#D7CCC8] dark:border-[#3C2E27] bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-[#2C221D] transition-colors"
+                      className="p-2 rounded-xl border border-[#D7CCC8] dark:border-[#5D4037] bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-50 dark:hover:bg-[#2C221D] transition-colors"
                    >
                       <ChevronLeft className="w-4 h-4" />
                    </button>
@@ -388,7 +388,7 @@ export function Store() {
                             "w-8 h-8 rounded-xl font-bold text-xs transition-colors border",
                             currentPage === pg
                                ? "bg-[#3E2723] dark:bg-[#C29D70] border-[#3E2723] dark:border-[#C29D70] text-[#FDF6EC] dark:text-[#181311]"
-                               : "bg-white dark:bg-[#1A1412] border-[#D7CCC8] dark:border-[#3C2E27] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-gray-50 dark:hover:bg-[#2C221D]"
+                               : "bg-white dark:bg-[#1A1412] border-[#D7CCC8] dark:border-[#5D4037] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-stone-50 dark:hover:bg-[#2C221D]"
                          )}
                       >
                          {pg}
@@ -397,7 +397,7 @@ export function Store() {
                    <button
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                      className="p-2 rounded-xl border border-[#D7CCC8] dark:border-[#3C2E27] bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-[#2C221D] transition-colors"
+                      className="p-2 rounded-xl border border-[#D7CCC8] dark:border-[#5D4037] bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-stone-50 dark:hover:bg-[#2C221D] transition-colors"
                    >
                       <ChevronRight className="w-4 h-4" />
                    </button>
