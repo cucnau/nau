@@ -784,7 +784,7 @@ export function AppLayout() {
           <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-3xl h-[85vh] rounded-3xl overflow-y-auto border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] dark:border-[#5D4037] shadow-2xl flex flex-col z-10 transition-all">
             <button 
               onClick={() => setMissionsOpen(false)} 
-              className="absolute top-4 right-4 p-1.5 bg-[#3E2723] hover:bg-[#2D1B19] text-white rounded-full transition-colors z-20 shadow"
+              className="absolute top-4 right-4 p-2 bg-[#FDF6EC] hover:bg-[#E6D8C9] border-[3px] border-[#3E2723] shadow-[0_3px_0_0_#3E2723] text-[#3E2723] rounded-xl active:translate-y-0.5 active:shadow-none transition-all z-20"
             >
               <X className="w-5 h-5" />
             </button>
