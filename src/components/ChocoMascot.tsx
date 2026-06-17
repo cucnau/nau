@@ -429,304 +429,166 @@ export function ChocoMascot() {
     return "bg-pink-500";
   };
 
-  return (
+  const renderMascotVisual = (isModal: boolean = false) => (
     <>
-      <div ref={dragConstraintsRef} className="fixed inset-4 pointer-events-none z-30" />
-      <motion.div
-        drag
-        style={{ x: dragX, y: dragY }}
-        dragConstraints={dragConstraintsRef}
-        dragElastic={0.5}
-        dragTransition={{ bounceStiffness: 300, bounceDamping: 10 }}
-        dragMomentum={true}
-        onDragStart={() => {
-          isDraggingRef.current = true;
-        }}
-        onDragEnd={handleDragEnd}
-        whileDrag={{ scale: 1.1, rotate: Math.random() > 0.5 ? 5 : -5 }}
-        className="fixed bottom-6 right-6 z-40 flex flex-col items-center justify-center pointer-events-auto w-16 h-16 sm:w-20 sm:h-20"
-      >
-        <AnimatePresence>
-          {showSpeech && speechBubble && (
-            <motion.div
-              style={{ x: bubbleX, left: "50%" }}
-              initial={{ opacity: 0, y: 15, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              onClick={() => {
-                triggerAudio("click");
-                setIsOpen(true);
-              }}
-              className="absolute bottom-[110%] w-[160px] sm:w-[220px] p-2 sm:p-3 rounded-2xl bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] text-[#3E2723] dark:text-[#ECE5DC] shadow-[3px_3px_0_0_#3E2723] cursor-pointer text-xs font-black tracking-normal leading-snug text-left z-50 select-none"
-            >
-              <div className="line-clamp-3">{speechBubble}</div>
-              <motion.div style={{ left: pointerLeft }} className="absolute -translate-x-1/2 -bottom-[12px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#3E2723]" />
-              <motion.div style={{ left: pointerLeft }} className="absolute -translate-x-1/2 -bottom-[8px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#FFFDF9] dark:border-t-[#1E1815]" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <motion.div
-          onClick={() => {
-            if (isDraggingRef.current) return;
-            triggerAudio("click");
-            setIsOpen(!isOpen);
-          }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.9 }}
-          title="Bé Chucu đáng yêu tinh nghịch"
-          className="relative w-full h-full cursor-grab active:cursor-grabbing group drop-shadow-xl"
-        >
-          <div className="absolute inset-0 pointer-events-none z-20">
-            {particles.map((p) => (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 1, y: 10, scale: 0.5, x: p.x }}
-                animate={{ opacity: 0, y: -65, scale: 1.4 }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                className="absolute text-lg font-bold select-none"
-              >
-                {p.emoji}
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.svg
-            viewBox="0 0 100 100"
-            className="w-full h-full drop-shadow-[2px_2px_0_rgba(62,39,35,0.7)]"
-            animate={
-              mood === "happy"
-                ? { y: [0, -15, 0, -10, 0], rotate: [0, 8, -8, 8, 0] }
-                : mood === "dizzy"
-                  ? { rotate: [0, 360], scale: [1, 1.2, 0.8, 1] }
-                  : mood === "eating"
-                    ? { scaleY: [1, 0.8, 1.1, 1], scaleX: [1, 1.1, 0.9, 1] }
-                    : mood === "angry"
-                      ? { x: [-2, 2, -2, 2, 0], y: [-2, 2, -1, 1, 0] }
-                      : { y: [0, -6, 0] }
-            }
-            transition={
-              mood === "happy"
-                ? { duration: 1 }
-                : mood === "dizzy"
-                  ? { duration: 0.6, ease: "easeInOut" }
-                  : mood === "eating"
-                    ? { repeat: 3, duration: 0.3 }
-                    : mood === "angry"
-                      ? { repeat: 3, duration: 0.2 }
-                      : mood === "sleeping"
-                        ? { repeat: Infinity, duration: 4, ease: "easeInOut" }
-                        : { repeat: Infinity, duration: 3, ease: "easeInOut" }
+      <AnimatePresence>
+        {((!isModal && showSpeech && speechBubble) || (isModal && showSpeech && speechBubble)) && (
+          <motion.div
+            style={isModal ? { left: "50%" } : { x: bubbleX, left: "50%" }}
+            initial={{ opacity: 0, y: 15, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={() => {
+              triggerAudio("click");
+              if (!isModal) setIsOpen(true);
+            }}
+            className={
+              isModal 
+                ? "absolute bottom-[100%] w-[160px] sm:w-[220px] p-2 sm:p-3 rounded-2xl bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] text-[#3E2723] dark:text-[#ECE5DC] shadow-[3px_3px_0_0_#3E2723] cursor-pointer text-xs font-black tracking-normal leading-snug text-left z-50 select-none mb-2 -translate-x-1/2"
+                : "absolute bottom-[110%] w-[160px] sm:w-[220px] p-2 sm:p-3 rounded-2xl bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] text-[#3E2723] dark:text-[#ECE5DC] shadow-[3px_3px_0_0_#3E2723] cursor-pointer text-xs font-black tracking-normal leading-snug text-left z-50 select-none"
             }
           >
-            <ellipse
-              cx="50"
-              cy="85"
-              rx="30"
-              ry="10"
-              fill="#000"
-              opacity="0.2"
-              stroke="none"
-            />
+            <div className="line-clamp-3">{speechBubble}</div>
+            <motion.div style={isModal ? { left: "50%" } : { left: pointerLeft }} className="absolute -translate-x-1/2 -bottom-[12px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#3E2723]" />
+            <motion.div style={isModal ? { left: "50%" } : { left: pointerLeft }} className="absolute -translate-x-1/2 -bottom-[8px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#FFFDF9] dark:border-t-[#1E1815]" />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            {/* Rice Cake Body */}
-            <ellipse
-              cx="50"
-              cy="53"
-              rx="26"
-              ry="23"
-              fill="#8D6E63"
-              stroke="#3E2723"
-              strokeWidth="4"
-            />
-            <path
-              d="M 35 30 Q 50 20 65 30"
-              fill="none"
-              stroke="#3E2723"
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
+      <motion.div
+        onClick={(e) => {
+          if (isDraggingRef.current) return;
+          triggerAudio("click");
+          if (!isModal) {
+            setIsOpen(!isOpen);
+          } else {
+            handlePoke(e as any);
+          }
+        }}
+        whileHover={!isModal ? { scale: 1.05 } : {}}
+        whileTap={{ scale: 0.9 }}
+        title={!isModal ? "Bé Chucu đáng yêu tinh nghịch" : "Chọc ghẹo Chucu!"}
+        className={!isModal ? "relative w-full h-full cursor-grab active:cursor-grabbing group drop-shadow-xl" : "relative w-32 h-32 mx-auto cursor-pointer drop-shadow-md z-30"}
+      >
+        <div className="absolute inset-0 pointer-events-none z-20">
+          {particles.map((p) => (
+            <motion.div
+              key={p.id}
+              initial={{ opacity: 1, y: 10, scale: 0.5, x: p.x }}
+              animate={{ opacity: 0, y: -65, scale: 1.4 }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className="absolute text-lg font-bold select-none"
+            >
+              {p.emoji}
+            </motion.div>
+          ))}
+        </div>
 
-            {/* Cheeks */}
-            <ellipse
-              cx="32"
-              cy="52"
-              rx="4"
-              ry="2"
-              fill="#FF8A80"
-              opacity="0.6"
-            />
-            <ellipse
-              cx="68"
-              cy="52"
-              rx="4"
-              ry="2"
-              fill="#FF8A80"
-              opacity="0.6"
-            />
-
-            {/* Eyes */}
-            {(mood === "idle" || mood === "eating") && (
-              <>
-                <line
-                  x1="38"
-                  y1="46"
-                  x2="48"
-                  y2="46"
-                  stroke="#3E2723"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="52"
-                  y1="46"
-                  x2="62"
-                  y2="46"
-                  stroke="#3E2723"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-              </>
-            )}
-            {mood === "happy" && (
-              <>
-                <path
-                  d="M 38 46 Q 43 42 48 46"
-                  stroke="#3E2723"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-                <path
-                  d="M 52 46 Q 57 42 62 46"
-                  stroke="#3E2723"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-              </>
-            )}
-            {mood === "angry" && (
-              <>
-                <line
-                  x1="36"
-                  y1="42"
-                  x2="44"
-                  y2="46"
-                  stroke="#3E2723"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="64"
-                  y1="42"
-                  x2="56"
-                  y2="46"
-                  stroke="#3E2723"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                <circle cx="42" cy="48" r="2.5" fill="#3E2723" />
-                <circle cx="58" cy="48" r="2.5" fill="#3E2723" />
-              </>
-            )}
-            {mood === "dizzy" && (
-              <>
-                <path
-                  d="M 38 43 L 44 49 M 44 43 L 38 49"
-                  stroke="#3E2723"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M 56 43 L 62 49 M 62 43 L 56 49"
-                  stroke="#3E2723"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-              </>
-            )}
-            {mood === "sleeping" && (
-              <>
-                <line
-                  x1="38"
-                  y1="46"
-                  x2="46"
-                  y2="46"
-                  stroke="#3E2723"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="54"
-                  y1="46"
-                  x2="62"
-                  y2="46"
-                  stroke="#3E2723"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                <text
-                  x="75"
-                  y="30"
-                  fill="#3E2723"
-                  fontSize="14"
-                  fontWeight="950"
-                  className="drop-shadow-sm"
-                >
-                  zZ
-                </text>
-              </>
-            )}
-
-            {/* Mouth & Tongue */}
-            {mood !== "sleeping" && mood !== "angry" && (
-              <>
-                {/* Blank Mouth */}
-                <line
-                  x1="45"
-                  y1="55"
-                  x2="55"
-                  y2="55"
-                  stroke="#3E2723"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-                {/* Tongue sticking out */}
-                <path
-                  d="M 48 55 L 48 65 Q 50 68 52 65 L 52 55"
-                  fill="#FF8A80"
-                  stroke="#3E2723"
-                  strokeWidth="2.5"
-                />
-              </>
-            )}
-            {mood === "angry" && (
-              <path
-                d="M 45 57 Q 50 54 55 57"
-                fill="none"
-                stroke="#3E2723"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-            )}
-            {equippedChucuAccessory &&
-              equippedChucuAccessory.startsWith("chucu_acc_") &&
-              renderChucuAccessorySvg(equippedChucuAccessory)}
-          </motion.svg>
-
-          {/* Chucu Accessory Overlay - Fallback for legacy external URLs */}
-          {equippedChucuAccessory &&
-            !equippedChucuAccessory.startsWith("chucu_acc_") && (
-              <img
-                src={equippedChucuAccessory}
-                alt="Accessory"
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] object-contain pointer-events-none drop-shadow-sm"
-                referrerPolicy="no-referrer"
-              />
-            )}
-        </motion.div>
+        <motion.svg
+          viewBox="0 0 100 100"
+          className="w-full h-full drop-shadow-[2px_2px_0_rgba(62,39,35,0.7)]"
+          animate={
+            mood === "happy"
+              ? { y: [0, -15, 0, -10, 0], rotate: [0, 8, -8, 8, 0] }
+              : mood === "dizzy"
+                ? { rotate: [0, 360], scale: [1, 1.2, 0.8, 1] }
+                : mood === "eating"
+                  ? { scaleY: [1, 0.8, 1.1, 1], scaleX: [1, 1.1, 0.9, 1] }
+                  : mood === "angry"
+                    ? { x: [-2, 2, -2, 2, 0], y: [-2, 2, -1, 1, 0] }
+                    : { y: [0, -6, 0] }
+          }
+          transition={
+            mood === "happy"
+              ? { duration: 1 }
+              : mood === "dizzy"
+                ? { duration: 0.6, ease: "easeInOut" }
+                : mood === "eating"
+                  ? { repeat: 3, duration: 0.3 }
+                  : mood === "angry"
+                    ? { repeat: 3, duration: 0.2 }
+                    : mood === "sleeping"
+                      ? { repeat: Infinity, duration: 4, ease: "easeInOut" }
+                      : { repeat: Infinity, duration: 3, ease: "easeInOut" }
+          }
+        >
+          <ellipse cx="50" cy="85" rx="30" ry="10" fill="#000" opacity="0.2" stroke="none" />
+          <ellipse cx="50" cy="53" rx="26" ry="23" fill="#8D6E63" stroke="#3E2723" strokeWidth="4" />
+          <path d="M 35 30 Q 50 20 65 30" fill="none" stroke="#3E2723" strokeWidth="4" strokeLinecap="round" />
+          <ellipse cx="32" cy="52" rx="4" ry="2" fill="#FF8A80" opacity="0.6" />
+          <ellipse cx="68" cy="52" rx="4" ry="2" fill="#FF8A80" opacity="0.6" />
+          {(mood === "idle" || mood === "eating") && (
+            <>
+              <line x1="38" y1="46" x2="48" y2="46" stroke="#3E2723" strokeWidth="4" strokeLinecap="round" />
+              <line x1="52" y1="46" x2="62" y2="46" stroke="#3E2723" strokeWidth="4" strokeLinecap="round" />
+            </>
+          )}
+          {mood === "happy" && (
+            <>
+              <path d="M 38 46 Q 43 42 48 46" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" fill="none" />
+              <path d="M 52 46 Q 57 42 62 46" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" fill="none" />
+            </>
+          )}
+          {mood === "angry" && (
+            <>
+              <line x1="36" y1="42" x2="44" y2="46" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" />
+              <line x1="64" y1="42" x2="56" y2="46" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" />
+              <circle cx="42" cy="48" r="2.5" fill="#3E2723" />
+              <circle cx="58" cy="48" r="2.5" fill="#3E2723" />
+            </>
+          )}
+          {mood === "dizzy" && (
+            <>
+              <path d="M 38 43 L 44 49 M 44 43 L 38 49" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" />
+              <path d="M 56 43 L 62 49 M 62 43 L 56 49" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" />
+            </>
+          )}
+          {mood === "sleeping" && (
+            <>
+              <line x1="38" y1="46" x2="46" y2="46" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" />
+              <line x1="54" y1="46" x2="62" y2="46" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" />
+              <text x="75" y="30" fill="#3E2723" fontSize="14" fontWeight="950" className="drop-shadow-sm">zZ</text>
+            </>
+          )}
+          {mood !== "sleeping" && mood !== "angry" && (
+            <>
+              <line x1="45" y1="55" x2="55" y2="55" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" />
+              <path d="M 48 55 L 48 65 Q 50 68 52 65 L 52 55" fill="#FF8A80" stroke="#3E2723" strokeWidth="2.5" />
+            </>
+          )}
+          {mood === "angry" && (
+            <path d="M 45 57 Q 50 54 55 57" fill="none" stroke="#3E2723" strokeWidth="2.5" strokeLinecap="round" />
+          )}
+          {equippedChucuAccessory && equippedChucuAccessory.startsWith("chucu_acc_") && renderChucuAccessorySvg(equippedChucuAccessory)}
+        </motion.svg>
+        {equippedChucuAccessory && !equippedChucuAccessory.startsWith("chucu_acc_") && (
+          <img src={equippedChucuAccessory} alt="Accessory" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] object-contain pointer-events-none drop-shadow-sm" referrerPolicy="no-referrer" />
+        )}
       </motion.div>
+    </>
+  );
+
+  return (
+    <>
+      <div ref={dragConstraintsRef} className="fixed top-32 bottom-4 left-4 right-4 pointer-events-none z-30" />
+      <div className={isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 transition-opacity'}>
+        <motion.div
+           drag
+           style={{ x: dragX, y: dragY }}
+           dragConstraints={dragConstraintsRef}
+           dragElastic={0.2}
+           dragTransition={{ bounceStiffness: 300, bounceDamping: 10 }}
+          dragMomentum={true}
+          onDragStart={() => {
+            isDraggingRef.current = true;
+          }}
+          onDragEnd={handleDragEnd}
+          whileDrag={{ scale: 1.1, rotate: Math.random() > 0.5 ? 5 : -5 }}
+          className="fixed bottom-6 right-6 z-40 flex flex-col items-center justify-center pointer-events-auto w-16 h-16 sm:w-20 sm:h-20"
+        >
+          {renderMascotVisual(false)}
+        </motion.div>
+      </div>
 
       {/* Control Drawer Container */}
       <AnimatePresence>
@@ -755,6 +617,9 @@ export function ChocoMascot() {
                   <h3 className="text-2xl font-black text-[#3E2723] dark:text-[#ECE5DC] mb-1">
                     CHUCU STATION
                   </h3>
+                  <div className="mb-4 mt-20">
+                    {renderMascotVisual(true)}
+                  </div>
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <span className="bg-[#8D6E63] text-white px-3 py-[2px] rounded-full text-xs font-bold font-mono">
                       Lvl {chucuLevel}
