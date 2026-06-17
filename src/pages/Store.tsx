@@ -336,8 +336,8 @@ export function Store() {
             className={cn(
               "px-4 py-2 rounded-xl transition-all flex items-center justify-center gap-2 font-black text-xs uppercase tracking-wide",
               activeTab === "items"
-                ? "bg-[#E6D4BF] border-2 border-[#3E2723] text-[#3E2723] shadow-inner"
-                : "text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] hover:text-[#5D4037]",
+                ? "bg-[#E6D4BF] dark:bg-[#C29D70] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#181311] shadow-inner"
+                : "text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] dark:hover:bg-[#2C221D] hover:text-[#5D4037] dark:hover:text-[#ECE5DC]",
             )}
           >
             <ShoppingBag className="w-4 h-4" /> Vật Phẩm
@@ -350,8 +350,8 @@ export function Store() {
             className={cn(
               "px-4 py-2 rounded-xl transition-all flex items-center justify-center gap-2 font-black text-xs uppercase tracking-wide",
               activeTab === "stickers"
-                ? "bg-[#E6D4BF] border-2 border-[#3E2723] text-[#3E2723] shadow-inner"
-                : "text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] hover:text-[#5D4037]",
+                ? "bg-[#E6D4BF] dark:bg-[#C29D70] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#181311] shadow-inner"
+                : "text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] dark:hover:bg-[#2C221D] hover:text-[#5D4037] dark:hover:text-[#ECE5DC]",
             )}
           >
             <Smile className="w-4 h-4" /> Sticker
@@ -364,8 +364,8 @@ export function Store() {
             className={cn(
               "px-4 py-2 rounded-xl transition-all flex items-center justify-center gap-2 font-black text-xs uppercase tracking-wide",
               activeTab === "accessories"
-                ? "bg-[#E6D4BF] border-2 border-[#3E2723] text-[#3E2723] shadow-inner"
-                : "text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] hover:text-[#5D4037]",
+                ? "bg-[#E6D4BF] dark:bg-[#C29D70] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#181311] shadow-inner"
+                : "text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] dark:hover:bg-[#2C221D] hover:text-[#5D4037] dark:hover:text-[#ECE5DC]",
             )}
           >
             <Smile className="w-4 h-4" /> Phụ kiện Avatar
@@ -378,8 +378,8 @@ export function Store() {
             className={cn(
               "px-4 py-2 rounded-xl transition-all flex items-center justify-center gap-2 font-black text-xs uppercase tracking-wide",
               activeTab === "chucu_accessories"
-                ? "bg-[#E6D4BF] border-2 border-[#3E2723] text-[#3E2723] shadow-inner"
-                : "text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] hover:text-[#5D4037]",
+                ? "bg-[#E6D4BF] dark:bg-[#C29D70] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#181311] shadow-inner"
+                : "text-[#8D6E63] dark:text-stone-400 hover:bg-[#FFFDF9] dark:hover:bg-[#2C221D] hover:text-[#5D4037] dark:hover:text-[#ECE5DC]",
             )}
           >
             <ShoppingBag className="w-4 h-4" /> Phụ kiện Chucu
@@ -645,8 +645,8 @@ export function Store() {
                     className={cn(
                       "text-[9px] sm:text-[10px] font-bold mb-3 px-2 py-0.5 rounded-full uppercase tracking-wider",
                       chucuLevel >= accessory.requiredLevel
-                        ? "bg-[#E6D4BF] text-[#5D4037]"
-                        : "bg-red-100 text-red-600",
+                        ? "bg-[#E6D4BF] dark:bg-[#C29D70] text-[#5D4037] dark:text-[#181311]"
+                        : "bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400",
                     )}
                   >
                     Yêu cầu Chucu Lv.{accessory.requiredLevel}
@@ -782,8 +782,8 @@ export function Store() {
                     className={cn(
                       "text-[9px] sm:text-[10px] font-bold mb-3 px-2 py-0.5 rounded-full uppercase tracking-wider",
                       chucuLevel >= accessory.requiredLevel
-                        ? "bg-[#E6D4BF] text-[#5D4037]"
-                        : "bg-red-100 text-red-600",
+                        ? "bg-[#E6D4BF] dark:bg-[#C29D70] text-[#5D4037] dark:text-[#181311]"
+                        : "bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400",
                     )}
                   >
                     Yêu cầu Chucu Lv.{accessory.requiredLevel}
