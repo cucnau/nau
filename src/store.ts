@@ -115,6 +115,8 @@ interface UserState {
   updateChucuStats: (stats: Partial<{chucuLevel: number, chucuExp: number, chucuSatiety: number, chucuHappiness: number, chucuInteractions: number, chucuLastTime: number | null}>) => void;
   ownedChucuAccessories: string[];
   equippedChucuAccessory: string | null;
+  showChucu: boolean;
+  setShowChucu: (show: boolean) => void;
 
   // Per-uid historical record dictionaries
   allUsersMissions: Record<string, Mission[]>;
@@ -246,6 +248,7 @@ export const useStore = create<UserState>()(
       ownedAccessories: [],
       ownedChucuAccessories: [],
       equippedChucuAccessory: null,
+      showChucu: true,
       ownedPassTickets: 0,
       ownedPriorityTickets: 0,
       ownedMysteryBoxes: 0,
@@ -481,6 +484,7 @@ export const useStore = create<UserState>()(
             ownedAccessories: data.ownedAccessories !== undefined ? data.ownedAccessories : state.ownedAccessories,
             ownedChucuAccessories: data.ownedChucuAccessories !== undefined ? data.ownedChucuAccessories : state.ownedChucuAccessories,
             equippedChucuAccessory: data.equippedChucuAccessory !== undefined ? data.equippedChucuAccessory : state.equippedChucuAccessory,
+            showChucu: data.showChucu !== undefined ? data.showChucu : true,
             ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
             ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
             ownedMysteryBoxes: data.ownedMysteryBoxes !== undefined ? data.ownedMysteryBoxes : state.ownedMysteryBoxes,
@@ -1203,6 +1207,14 @@ export const useStore = create<UserState>()(
          if (!state.isLoggedIn) return;
          set({ equippedChucuAccessory: url });
          get().updateUserDoc({ equippedChucuAccessory: url });
+      },
+
+      setShowChucu: (show: boolean) => {
+         const state = get();
+         set({ showChucu: show });
+         if (state.isLoggedIn) {
+            get().updateUserDoc({ showChucu: show });
+         }
       },
 
       setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => {
