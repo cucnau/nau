@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, FormEvent } from 'react';
 import { useStore } from '../store';
 import { cn } from './Layout';
-import { MessageSquare, Send, User } from 'lucide-react';
+import { MessageSquare, Send, User, Sparkles, Gift } from 'lucide-react';
 import { db, checkIfQuotaError } from '../lib/firebase';
-import { collection, query, orderBy, limit, addDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { collection, query, orderBy, limit, addDoc, onSnapshot, serverTimestamp, doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { UserAvatar } from './UserAvatar';
 
 interface ChatMessage {
@@ -14,12 +14,15 @@ interface ChatMessage {
   content: string;
   createdAt: number | any;
   activeTitle?: string | null;
+  isRain?: boolean;
+  chocoAmount?: number;
+  claimedBy?: string[];
 }
 
 export function GlobalChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const { isLoggedIn, uid, displayName, avatarUrl, incrementSentMessages, activeTitle, getTitleColor, equippedStickerChat, equippedAccessory, accessoryPosition } = useStore();
+  const { isLoggedIn, uid, displayName, avatarUrl, incrementSentMessages, activeTitle, getTitleColor, equippedStickerChat, equippedAccessory, accessoryPosition, email, firebaseUser, addChoco } = useStore();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,30 +49,63 @@ export function GlobalChat() {
     }
   }, [messages]);
 
+  const handleClaimRain = async (msgId: string, amount: number, claimedBy: string[] = []) => {
+     if (!isLoggedIn || !uid) return;
+     if (claimedBy.includes(uid)) {
+        alert("Bạn đã nhặt phần Choco này rồi!");
+        return;
+     }
+     try {
+        await updateDoc(doc(db, 'chatMessages', msgId), {
+           claimedBy: arrayUnion(uid)
+        });
+        addChoco(amount, 'Nhặt mưa Choco từ Chucu');
+        alert(`Bạn đã nhặt được ${amount} Choco từ cơn mưa của bé Chucu!`);
+     } catch (err) {
+        console.error(err);
+        alert("Lỗi khi nhặt Choco!");
+     }
+  };
+
   const send = async (e: FormEvent) => {
     e.preventDefault();
     if (!input.trim() || !isLoggedIn || !uid || !displayName) return;
     
-    // Save locally to clear in UI quickly
     const text = input.trim();
     setInput('');
+    
+    const isAdmin = email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com';
+    let isRain = false;
+    let chocoAmount = 0;
+    
+    if (isAdmin && text.startsWith('/rain ')) {
+       const parts = text.split(' ');
+       const amountStr = parts[1];
+       if (amountStr && !isNaN(Number(amountStr))) {
+          isRain = true;
+          chocoAmount = Number(amountStr);
+       }
+    }
     
     try {
       await addDoc(collection(db, 'chatMessages'), {
         uid,
-        displayName,
-        avatarUrl: avatarUrl || null,
-        content: text,
-        activeTitle: activeTitle || null,
+        displayName: isRain ? 'Chucu (Hệ thống)' : displayName,
+        avatarUrl: isRain ? null : (avatarUrl || null),
+        content: isRain ? `Ê mấy người kia!! Tui đang vui nên rắc mưa ${chocoAmount} Choco dằn mặt nè! Nhặt nhanh trước khi tui đổi ý! ☔🍫` : text,
+        activeTitle: isRain ? 'Mascot' : (activeTitle || null),
         createdAt: serverTimestamp(),
         equippedStickerChat: useStore.getState().equippedStickerChat || null,
         equippedAccessory: useStore.getState().equippedAccessory || null,
-        accessoryPosition: useStore.getState().accessoryPosition || null
+        accessoryPosition: useStore.getState().accessoryPosition || null,
+        isRain,
+        chocoAmount,
+        claimedBy: []
       });
       incrementSentMessages();
     } catch (e) {
       console.error('Lỗi khi gửi tin nhắn:', e);
-      setInput(text); // reset input if failed
+      setInput(text);
       if (checkIfQuotaError(e)) {
         (window as any).__setQuotaExceeded?.(true);
         alert("Hệ thống đạt giới hạn lưu trữ đám mây (Quota Exceeded) hôm nay. Gửi tin nhắn mới tạm thời chưa lưu trữ được.");
@@ -80,20 +116,66 @@ export function GlobalChat() {
     }
   };
 
-  return (
+      const activeRain = messages.find(m => {
+        if (!m.isRain || !m.createdAt) return false;
+        let ts = m.createdAt;
+        if (typeof ts === 'object' && ts.toMillis) {
+           ts = ts.toMillis();
+        }
+        return (Date.now() - ts) < 3 * 60 * 1000;
+      });
+
+      return (
     <div className="flex flex-col bg-[#5D4037] dark:bg-[#2C221D] rounded-3xl overflow-hidden border-2 border-[#3E2723] dark:border-[#4E342E] h-full min-h-[400px] shadow-[1px_1px_0_0_#8D6E63] dark:shadow-[1px_1px_0_0_#0D0907] relative">
       <div className="absolute top-0 left-0 right-0 h-4 bg-[#8D6E63] dark:bg-[#3C2E27] border-b-[3px] border-[#3E2723] dark:border-[#4E342E]" />
-      <div className="pt-6 pb-3 px-4 bg-[#4E342E] dark:bg-[#251E1B] text-[#FDF6EC] flex items-center justify-between border-b-[3px] border-[#3E2723] dark:border-[#4E342E]">
+      <div className="pt-6 pb-3 px-4 bg-[#4E342E] dark:bg-[#251E1B] text-[#FDF6EC] flex items-center justify-between border-b-[3px] border-[#3E2723] dark:border-[#4E342E] z-10 relative">
         <span className="font-extrabold text-lg tracking-widest flex items-center gap-2 drop-shadow-[1px_1px_0_#3E2723]">
             <MessageSquare className="w-5 h-5 text-[#D7CCC8]" /> Choco Lounge
         </span>
         <span className="text-xs font-bold opacity-60 uppercase bg-[#3E2723] px-2 py-0.5 rounded-lg border-2 border-[#1A1412]">Thế giới</span>
       </div>
+      
+      {activeRain && (
+        <div className="absolute inset-0 top-16 z-20 pointer-events-none overflow-hidden flex flex-col pt-4 items-center">
+           <div className="absolute inset-0 bg-gradient-to-b from-[#FFF9C4]/20 to-transparent pointer-events-none" />
+           <div className="flex gap-4">
+              <div className="w-12 h-12 bg-[#5D4037] rounded-xl border-2 border-[#3E2723] overflow-hidden flex items-center justify-center animate-bounce shadow-[2px_2px_0_0_#3E2723]">
+                <svg viewBox="0 0 100 100" className="w-[120%] h-[120%] translate-y-1">
+                  <ellipse cx="50" cy="53" rx="26" ry="23" fill="#8D6E63" stroke="#3E2723" strokeWidth="4" />
+                  <path d="M 35 30 Q 50 20 65 30" fill="none" stroke="#3E2723" strokeWidth="4" strokeLinecap="round" />
+                  <ellipse cx="32" cy="52" rx="4" ry="2" fill="#FF8A80" opacity="0.6" />
+                  <ellipse cx="68" cy="52" rx="4" ry="2" fill="#FF8A80" opacity="0.6" />
+                  <path d="M 38 46 Q 43 42 48 46" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" fill="none" />
+                  <path d="M 52 46 Q 57 42 62 46" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" fill="none" />
+                  <path d="M 48 55 L 48 65 Q 50 68 52 65 L 52 55" fill="#FF8A80" stroke="#3E2723" strokeWidth="2.5" />
+                </svg>
+              </div>
+              <div className="bg-[#FFF9C4] dark:bg-[#D4AF37] border-[3px] border-[#D4AF37] dark:border-[#FFF9C4] text-[#5D4037] dark:text-[#3E2723] px-4 py-1.5 rounded-2xl font-black shadow-lg animate-bounce pointer-events-auto cursor-pointer" onClick={() => handleClaimRain(activeRain.id, activeRain.chocoAmount || 5, activeRain.claimedBy || [])} style={{ animationDelay: '0.2s' }}>
+                Cơn Mưa Choco Đang Rơi! Nhấn nhặt lẹ!! ☔🍫
+              </div>
+           </div>
+           {/* Falling chocos visual effect */}
+           {Array.from({ length: 15 }).map((_, i) => (
+              <div 
+                key={i} 
+                onClick={() => handleClaimRain(activeRain.id, activeRain.chocoAmount || 5, activeRain.claimedBy || [])}
+                className="absolute text-2xl animate-fall pointer-events-auto cursor-pointer hover:scale-125 transition-transform" 
+                style={{ 
+                   left: `${Math.random() * 90}%`, 
+                   animationDuration: `${Math.random() * 2 + 2}s`, 
+                   animationDelay: `${Math.random() * 2}s` 
+                }}>🍫</div>
+           ))}
+        </div>
+      )}
+
       <div 
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-4 pb-8 flex flex-col gap-4 text-xs bg-[#5D4037] dark:bg-[#2C221D]"
       >
         {messages.map((msg, i) => {
+          if (msg.isRain) return null;
+
           const isMe = msg.uid === uid;
           const currentSticker = isMe ? equippedStickerChat : (msg.equippedStickerChat || msg.equippedSticker);
           const currentDisplayName = isMe ? displayName : msg.displayName;
@@ -124,11 +206,23 @@ export function GlobalChat() {
                          )}
                       </div>
                       
-                      <div className={cn("p-3 rounded-2xl relative text-[13px] leading-relaxed break-words rounded-tl-md flex-1 font-bold border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]", isMe ? "bg-[#8D6E63] text-white" : "bg-[#FDF6EC] text-[#3E2723] dark:bg-[#3C2E27] dark:text-[#ECE5DC]")}>
+                      <div className={cn("p-3 rounded-2xl relative text-[13px] leading-relaxed break-words rounded-tl-md flex-1 font-bold border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]", isMe ? "bg-[#8D6E63] text-white" : "bg-[#FDF6EC] text-[#3E2723] dark:bg-[#3C2E27] dark:text-[#ECE5DC]", msg.isRain && "bg-[#FFF9C4] dark:bg-[#4E3A1D] border-[#D4AF37] animate-pulse")}>
                           <div className={currentSticker ? "pr-10" : ""}>
                              <p>{msg.content}</p>
+                             {msg.isRain && (
+                                <div className="mt-3">
+                                   <button 
+                                     onClick={() => handleClaimRain(msg.id, msg.chocoAmount || 0, msg.claimedBy)}
+                                     disabled={msg.claimedBy?.includes(uid || '')}
+                                     className={cn("w-full p-2 flex items-center justify-center gap-2 rounded-xl border-2 uppercase text-[10px] tracking-widest font-black transition-all", msg.claimedBy?.includes(uid || '') ? "bg-stone-300 text-stone-500 border-stone-400 cursor-not-allowed" : "bg-[#D4AF37] text-[#3E2723] border-[#3E2723] shadow-[1px_1px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none hover:bg-[#F2C94C]")}
+                                   >
+                                     <Gift className="w-4 h-4" />
+                                     {msg.claimedBy?.includes(uid || '') ? "Đã nhặt" : `Nhặt ${msg.chocoAmount} Choco`}
+                                   </button>
+                                </div>
+                             )}
                           </div>
-                          {currentSticker && (
+                          {currentSticker && !msg.isRain && (
                              <img 
                                src={currentSticker} 
                                alt="Sticker" 
