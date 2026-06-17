@@ -1527,7 +1527,7 @@ export const useStore = create<UserState>()(
 
       _checkResetMissions: () => {
          const state = get();
-         if (!state.isLoggedIn || !state.uid) return;
+         if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
 
          const todayStr = format(new Date(), 'yyyy-MM-dd');
          const currentWeekId = getWeeklyId();
