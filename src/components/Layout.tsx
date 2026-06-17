@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   Menu, Search, User, Key, LogOut, X, Trophy, BookOpen, Zap, Flame, ShieldCheck, 
   Camera, Calendar, Mail, Clock, Settings, Copy, Home, ClipboardList, ShoppingBag, List, Edit2, Library,
-  Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck, Sun, Moon
+  Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck, Sun, Moon, Eye, EyeOff
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
@@ -70,7 +70,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   const { 
     isLoggedIn, email, missions, level, lastClaimedRewardLevel,
     setStoreOpen, setMissionsOpen, setAchievementsOpen,
-    firebaseUser
+    firebaseUser, showChucu, setShowChucu
   } = useStore();
 
   if (!isOpen) return null;
@@ -236,6 +236,19 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                       <ShieldCheck className="w-5 h-5 text-[#8D6E63]" />
                    </div>
                    <span className="text-xs font-black leading-normal uppercase tracking-tight">Quản Trị</span>
+                </button>
+             )}
+
+             {/* Chucu Visibility Toggle */}
+             {!showChucu && (
+                <button 
+                   onClick={() => { onClose(); setShowChucu(true); }}
+                   className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 group"
+                >
+                   <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
+                      <Eye className="w-5 h-5 text-[#8D6E63]" />
+                   </div>
+                   <span className="text-xs font-black leading-normal uppercase tracking-tight">Hiện Chucu</span>
                 </button>
              )}
 
