@@ -34,7 +34,7 @@ const CommentNode: React.FC<CommentNodeProps> = ({
    isLoggedIn,
    depth = 0
 }) => {
-   const { uid: storeUid, equippedStickerComment, stickerPositionComment, displayName: storeDisplayName, avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle, equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition } = useStore();
+   const { uid: storeUid, equippedStickerComment, stickerPositionComment, displayName: storeDisplayName, avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle, equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition, theme } = useStore();
    const isGift = comment.type === 'choco_gift';
    const isMe = comment.uid === storeUid;
    
@@ -60,11 +60,11 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                   ? cn(
                      "p-4 rounded-2xl flex gap-3.5 border transition-all shadow-sm relative overflow-visible pr-8",
                      isGift 
-                        ? "bg-[#FDF6EC]/70 border-[#D7CCC8]/80 hover:bg-[#F5E6D3]" 
-                        : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50"
+                        ? "bg-[#FDF6EC]/70 border-[#D7CCC8]/80 hover:bg-[#F5E6D3] dark:bg-[#3E2723]/30 dark:border-[#5D4037]/60 dark:hover:bg-[#3E2723]/50" 
+                        : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50 dark:bg-[#2C221D] dark:border-[#3C2E27] dark:hover:border-[#4E342E]/60"
                     )
                   : cn(
-                     "p-3.5 rounded-2xl flex gap-3 bg-[#FAF7F2]/60 dark:bg-stone-850/10 border border-[#F5E6D3]/40 hover:border-[#D7CCC8]/40 transition-colors relative block",
+                     "p-3.5 rounded-2xl flex gap-3 bg-[#FAF7F2]/60 dark:bg-[#1E1512]/50 border border-[#F5E6D3]/40 dark:border-[#3C2E27]/50 hover:border-[#D7CCC8]/40 transition-colors relative block",
                      currentSticker ? "pr-12 pb-6" : ""
                   )
             )}
@@ -89,18 +89,18 @@ const CommentNode: React.FC<CommentNodeProps> = ({
             <div className="flex-1 min-w-0">
                <div className="flex items-center justify-between gap-2 mb-1">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                     <span className="font-extrabold text-sm shrink-0" style={{ color: getTitleColor(currentActiveTitle) || '#3E2723' }}>
+                     <span className="font-extrabold text-sm shrink-0" style={{ color: getTitleColor(currentActiveTitle) || (theme === 'dark' ? '#E6D4BF' : '#3E2723') }}>
                         {currentDisplayName}
                         {currentActiveTitle && (
-                           <span className="px-1.5 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-[#D7CCC8] ml-1.5 inline-block align-middle">
+                           <span className="px-1.5 py-0.5 bg-[#F5E6D3] dark:bg-[#3E2723] text-[#5D4037] dark:text-[#E6D4BF] text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border border-[#D7CCC8] dark:border-[#5D4037]/60 ml-1.5 inline-block align-middle">
                               🏆 {currentActiveTitle}
                            </span>
                         )}
                      </span>
                      
                      {isGift && (
-                        <span className="bg-[#F5E6D3] text-[#3E2723] text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-[#D7CCC8] flex items-center gap-1 shadow-sm">
-                           <Sparkles className="w-3 h-3 text-[#8D6E63] inline shrink-0" />
+                        <span className="bg-[#F5E6D3] dark:bg-[#3E2723] text-[#3E2723] dark:text-[#E6D4BF] text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-[#D7CCC8] dark:border-[#5D4037]/60 flex items-center gap-1 shadow-sm">
+                           <Sparkles className="w-3 h-3 text-[#8D6E63] dark:text-[#C29D70] inline shrink-0" />
                            Tặng {comment.giftAmount} Choco 🍫
                         </span>
                      )}
@@ -114,10 +114,10 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                </div>
                <p className={cn(
                   "text-sm break-words leading-relaxed text-justify",
-                  isGift ? "text-[#5D4037] font-medium italic" : "text-stone-700"
+                  isGift ? "text-[#5D4037] dark:text-[#ECE5DC] font-medium italic" : "text-stone-700 dark:text-stone-300"
                )}>
                   {comment.replyToUser && (
-                     <span className="text-[#8D6E63] font-bold text-[10px] uppercase mr-1.5 bg-[#8D6E63]/10 px-2 py-0.5 rounded-md select-none border border-[#8D6E63]/25 align-middle inline-block">
+                     <span className="text-[#8D6E63] dark:text-[#C29D70] font-bold text-[10px] uppercase mr-1.5 bg-[#8D6E63]/10 dark:bg-[#8D6E63]/25 px-2 py-0.5 rounded-md select-none border border-[#8D6E63]/25 dark:border-[#8D6E63]/40 align-middle inline-block">
                         @{comment.replyToUser}
                      </span>
                   )}
@@ -153,7 +153,7 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                         value={replyText}
                         disabled={submittingReply}
                         onChange={(e) => setReplyText(e.target.value)}
-                        className="flex-1 bg-[#FDF6EC] border border-[#D7CCC8]/80 text-[#3E2723] focus:border-[#8D6E63] focus:outline-none focus:ring-1 focus:ring-[#8D6E63] rounded-xl px-3.5 py-1.5 placeholder-gray-400 text-xs sm:text-sm"
+                        className="flex-1 bg-[#FDF6EC] dark:bg-[#1E1512] border border-[#D7CCC8]/80 dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] focus:border-[#8D6E63] focus:outline-none focus:ring-1 focus:ring-[#8D6E63] rounded-xl px-3.5 py-1.5 placeholder-gray-400 dark:placeholder-stone-500 text-xs sm:text-sm"
                         onKeyDown={(e) => {
                            if (e.key === 'Enter' && replyText.trim() && !submittingReply) {
                               handleSendReply(comment);
@@ -163,13 +163,13 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                      <button 
                         onClick={() => handleSendReply(comment)}
                         disabled={submittingReply || !replyText.trim()}
-                        className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-stone-300 disabled:text-stone-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
+                        className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-stone-300 disabled:text-stone-400 dark:disabled:bg-stone-800 dark:disabled:text-stone-600 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
                      >
                         {submittingReply ? 'Gửi...' : 'Gửi'}
                      </button>
                      <button 
                         onClick={() => setReplyingToId(null)}
-                        className="text-stone-400 hover:text-stone-500 border border-stone-200 px-2 rounded-xl text-xs"
+                        className="text-stone-400 hover:text-stone-500 dark:hover:text-stone-300 border border-stone-200 dark:border-[#3C2E27] px-2 rounded-xl text-xs"
                      >
                         Hủy
                      </button>
@@ -180,7 +180,7 @@ const CommentNode: React.FC<CommentNodeProps> = ({
 
          {replies.length > 0 && (
             <div className={cn(
-               "pl-4 space-y-3 border-l-2 border-[#D7CCC8]/40 mt-1",
+               "pl-4 space-y-3 border-l-2 border-[#D7CCC8]/40 dark:border-[#4E342E]/40 mt-1",
                depth > 4 ? "pl-1 border-0" : ""
             )}>
                {replies.map(r => (
@@ -452,7 +452,7 @@ export function StoryView() {
             <div className="flex-1 flex flex-col">
                 <h1 className="text-2xl lg:text-4xl font-black mb-3 text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wider leading-snug">
                    {story.title}
-                   {story.completed && <span className="inline-block text-[10px] lg:text-xs bg-[#E6D4BF] text-[#3E2723] px-2.5 py-1 rounded-lg uppercase tracking-widest font-black ml-3 align-middle border-[2px] border-[#3E2723]">Full</span>}
+                   {story.completed && <span className="inline-block text-[10px] lg:text-xs bg-[#E6D4BF] dark:bg-[#3C2E27]/50 text-[#3E2723] dark:text-[#E6D8C9] px-2.5 py-1 rounded-lg uppercase tracking-widest font-black ml-3 align-middle border-[2px] border-[#3E2723] dark:border-[#5D4037]">Full</span>}
                 </h1>
                 <div className="text-[#8D6E63] font-bold mb-4 flex items-center gap-2">
                     <Users className="w-4.5 h-4.5" />
@@ -490,7 +490,7 @@ export function StoryView() {
                 <div className="mt-auto flex flex-wrap gap-3 pt-4">
                     <button 
                       onClick={() => navigate(`/doc/${story.id}/${chapters[0]?.id}`)} 
-                      className="bg-[#8D6E63] hover:bg-[#5D4037] text-white px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none transition-all"
+                      className="bg-[#8D6E63] dark:bg-[#5D4037] hover:bg-[#5D4037] dark:hover:bg-[#4E342E] text-white px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none transition-all"
                     >
                         <BookOpen className="w-4 h-4" />
                         Đọc từ đầu
@@ -499,21 +499,21 @@ export function StoryView() {
                     <button 
                       onClick={handleSaveToggle} 
                       className={cn(
-                        "px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none",
+                        "px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none",
                         isSaved 
-                          ? "bg-[#E6D8C9] text-[#3E2723]" 
-                          : "bg-white text-[#5D4037]"
+                          ? "bg-[#E6D8C9] dark:bg-[#3C2E27]/80 text-[#3E2723] dark:text-[#E6D8C9]" 
+                          : "bg-white dark:bg-[#2C221D] text-[#5D4037] dark:text-stone-300"
                       )}
                     >
-                        <Bookmark className={cn("w-4 h-4", isSaved && "fill-[#8D6E63] text-[#8D6E63]")} />
+                        <Bookmark className={cn("w-4 h-4", isSaved && "fill-[#8D6E63] text-[#8D6E63] dark:text-[#C29D70] dark:fill-[#C29D70]")} />
                         {isSaved ? 'Đã Lưu' : 'Lưu Thư Viện'}
                     </button>
     
                     <button 
                       onClick={() => setShowGiftModal(true)} 
-                      className="bg-[#E6D4BF] hover:bg-[#5D4037] hover:text-white text-[#3E2723] px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none"
+                      className="bg-[#E6D4BF] dark:bg-[#C29D70] hover:bg-[#5D4037] dark:hover:bg-[#8D6E63] hover:text-white dark:hover:text-[#ECE5DC] text-[#3E2723] dark:text-[#181311] px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none"
                     >
-                        <Gift className="w-4 h-4 text-[#3E2723] animate-bounce shrink-0" />
+                        <Gift className="w-4 h-4 text-[#3E2723] dark:text-[#181311] animate-bounce shrink-0" />
                         Tặng Choco
                     </button>
                 </div>
@@ -608,12 +608,12 @@ export function StoryView() {
                      disabled={!isLoggedIn || submittingComment}
                      value={commentText}
                      onChange={(e) => setCommentText(e.target.value)}
-                     className="flex-1 bg-[#FDF6EC] border border-[#D7CCC8]/80 text-[#3E2723] focus:border-[#8D6E63] focus:outline-none focus:ring-1 focus:ring-[#8D6E63] rounded-xl px-4 py-3 placeholder-gray-400 text-sm"
+                     className="flex-1 bg-[#FDF6EC] dark:bg-[#1E1512] border border-[#D7CCC8]/80 dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] focus:border-[#8D6E63] focus:outline-none focus:ring-1 focus:ring-[#8D6E63] rounded-xl px-4 py-3 placeholder-gray-400 dark:placeholder-stone-500 text-sm"
                   />
                   <button
                      type="submit"
                      disabled={submittingComment || !commentText.trim() || !isLoggedIn}
-                     className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-stone-300 disabled:text-stone-400 px-5 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1"
+                     className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-stone-300 disabled:text-stone-400 dark:disabled:bg-stone-800 dark:disabled:text-stone-600 px-5 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1"
                   >
                      <Send className="w-3.5 h-3.5" />
                      Gửi
@@ -734,7 +734,7 @@ export function StoryView() {
                                        <button 
                                           onClick={() => handleSendReply(comment)}
                                           disabled={submittingReply || !replyText.trim()}
-                                          className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-stone-300 disabled:text-stone-400 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
+                                          className="bg-[#3E2723] hover:bg-[#2D1B19] text-[#FDF6EC] disabled:bg-stone-300 disabled:text-stone-400 dark:disabled:bg-stone-800 dark:disabled:text-stone-600 px-4 py-1.5 rounded-xl text-xs font-bold transition-colors"
                                        >
                                           {submittingReply ? 'Gửi...' : 'Gửi'}
                                        </button>
