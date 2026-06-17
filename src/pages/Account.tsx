@@ -245,19 +245,19 @@ export function Account() {
       <div className="flex flex-wrap items-center gap-2 border-b-[3px] border-[#3E2723] dark:border-[#4E342E] pb-4">
         <button 
           onClick={() => setTab('profile')} 
-          className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all border-2 shadow-[1px_1px_0_0_#3E2723] ${tab === 'profile' ? 'bg-[#E6D4BF] border-[#3E2723] text-[#3E2723]' : 'bg-transparent border-[#3E2723]/30 text-stone-500 hover:border-[#3E2723]/60 dark:text-stone-400 shadow-none'}`}
+          className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all border-2 shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] ${tab === 'profile' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#181311]' : 'bg-transparent border-[#3E2723]/30 dark:border-stone-700 text-stone-500 hover:border-[#3E2723]/60 dark:hover:border-stone-500 dark:text-stone-400 shadow-none'}`}
         >
           Hồ sơ 
         </button>
         <button 
           onClick={() => setTab('settings')} 
-          className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all border-2 shadow-[1px_1px_0_0_#3E2723] ${tab === 'settings' ? 'bg-[#E6D4BF] border-[#3E2723] text-[#3E2723]' : 'bg-transparent border-[#3E2723]/30 text-stone-500 hover:border-[#3E2723]/60 dark:text-stone-400 shadow-none'}`}
+          className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all border-2 shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] ${tab === 'settings' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#181311]' : 'bg-transparent border-[#3E2723]/30 dark:border-stone-700 text-stone-500 hover:border-[#3E2723]/60 dark:hover:border-stone-500 dark:text-stone-400 shadow-none'}`}
         >
           Cài đặt
         </button>
         <button 
           onClick={() => setTab('transactions')} 
-          className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all border-2 shadow-[1px_1px_0_0_#3E2723] ${tab === 'transactions' ? 'bg-[#E6D4BF] border-[#3E2723] text-[#3E2723]' : 'bg-transparent border-[#3E2723]/30 text-stone-500 hover:border-[#3E2723]/60 dark:text-stone-400 shadow-none'}`}
+          className={`px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all border-2 shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] ${tab === 'transactions' ? 'bg-[#E6D4BF] dark:bg-[#C29D70] border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#181311]' : 'bg-transparent border-[#3E2723]/30 dark:border-stone-700 text-stone-500 hover:border-[#3E2723]/60 dark:hover:border-stone-500 dark:text-stone-400 shadow-none'}`}
         >
           Lịch sử Choco
         </button>
@@ -530,7 +530,7 @@ export function Account() {
               <h2 className="text-xl font-bold mb-1 flex items-center justify-center gap-1.5 flex-wrap text-[#3E2723] dark:text-[#ECE5DC]" style={{ color: getTitleColor(activeTitle) || undefined }}>
                  {displayName}
                  {activeTitle && (
-                    <span className="px-2 py-0.5 bg-[#E6D4BF] text-[#3E2723] text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border-2 border-[#3E2723]">
+                    <span className="px-2 py-0.5 bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] text-[9px] font-extrabold rounded-md uppercase tracking-tight select-none border-2 border-[#3E2723] dark:border-[#4E342E]">
                        🏆 {activeTitle}
                     </span>
                  )}
