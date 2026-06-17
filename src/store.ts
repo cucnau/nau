@@ -164,6 +164,7 @@ interface UserState {
 
   login: (name: string) => void;
   logout: () => void;
+  isFirebaseSynced: boolean;
   setFirebaseUser: (user: FirebaseUser | null) => void;
   syncFromFirebase: (data: any) => void;
   
@@ -228,6 +229,7 @@ const getPermanentMissions = (): Mission[] => [
 export const useStore = create<UserState>()(
   persist(
     (set, get) => ({
+      isFirebaseSynced: false,
       isLoggedIn: false,
       uid: null,
       displayName: null,
@@ -330,6 +332,7 @@ export const useStore = create<UserState>()(
       
       login: (name: string) => set({ isLoggedIn: true, displayName: name }),
       logout: () => set({ 
+        isFirebaseSynced: false,
         isLoggedIn: false, 
         uid: null, 
         displayName: null, 
@@ -407,6 +410,7 @@ export const useStore = create<UserState>()(
             const userClaimed = allClaimed[uid] || [];
 
             set({ 
+               isFirebaseSynced: false,
                firebaseUser: user, 
                isLoggedIn: true, 
                uid,
@@ -430,6 +434,7 @@ export const useStore = create<UserState>()(
             });
          } else {
             set({ 
+               isFirebaseSynced: false,
                firebaseUser: null, 
                isLoggedIn: false, 
                uid: null,
@@ -453,6 +458,7 @@ export const useStore = create<UserState>()(
       syncFromFirebase: (data) => {
          set((state) => {
             return {
+            isFirebaseSynced: true,
             choco: data.choco !== undefined ? data.choco : state.choco,
             goldenChoco: data.goldenChoco !== undefined ? data.goldenChoco : state.goldenChoco,
             level: data.level !== undefined ? data.level : state.level,
@@ -549,8 +555,9 @@ export const useStore = create<UserState>()(
 
       updateUserDoc: async (updates: any, transactionReason?: string) => {
          const state = get();
+         if (!state.isFirebaseSynced || !state.uid) return;
+         
          const { uid, choco: prevChoco, goldenChoco: prevGChoco } = state;
-         if (uid) {
             // Optimistically update local state
             set((currentState) => {
                const newState: any = {};
@@ -618,7 +625,6 @@ export const useStore = create<UserState>()(
                }
                throw err;
             }
-         }
       },
       
       useMysteryBox: async () => {
