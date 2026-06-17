@@ -331,7 +331,7 @@ export function Home() {
                           <div>
                              <p className="font-extrabold text-sm text-[#3E2723] hover:text-[#8D6E63] transition-colors truncate">
                                 {story.title}
-                                {story.completed && <span className="inline-block text-[8px] bg-[#D7CCC8] text-[#5D4037] px-1 py-0.5 rounded uppercase tracking-widest font-bold ml-1.5 align-middle">Full</span>}
+                                {story.completed && <span className="inline-block text-[8px] bg-[#D7CCC8] dark:bg-[#3C2E27]/50 text-[#5D4037] dark:text-[#E6D8C9] px-1 py-0.5 rounded uppercase tracking-widest font-bold ml-1.5 align-middle">Full</span>}
                              </p>
                              <p className="text-[10px] text-stone-500 italic truncate mt-0.5">Tác giả: {story.author || 'Ẩn danh'}</p>
                           </div>
