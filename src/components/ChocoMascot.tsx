@@ -13,6 +13,7 @@ import {
   Volume2,
   VolumeX,
   Flame,
+  EyeOff,
 } from "lucide-react";
 import { useStore } from "../store";
 import { FortuneWidget } from "./FortuneWidget";
@@ -48,6 +49,8 @@ export function ChocoMascot() {
     equippedChucuAccessory,
     ownedChucuAccessories,
     equipChucuAccessory,
+    showChucu,
+    setShowChucu,
   } = useStore();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -568,6 +571,8 @@ export function ChocoMascot() {
     </>
   );
 
+  if (!showChucu) return null;
+
   return (
     <>
       <div ref={dragConstraintsRef} className="fixed top-32 bottom-4 left-4 right-4 pointer-events-none z-30" />
@@ -610,6 +615,17 @@ export function ChocoMascot() {
                 className="absolute top-4 right-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all active:translate-y-1 active:shadow-none z-20"
               >
                 <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#3E2723] dark:text-[#ECE5DC]" />
+              </button>
+
+              <button 
+                onClick={() => {
+                  setIsOpen(false);
+                  setShowChucu(false);
+                }} 
+                className="absolute top-4 left-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all active:translate-y-1 active:shadow-none z-20"
+                title="Ẩn Chucu"
+              >
+                <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-stone-500" />
               </button>
 
               <div className="overflow-y-auto flex-1 pr-1 -mr-1 mt-4 scrollbar-thin scrollbar-thumb-stone-300">
