@@ -105,6 +105,17 @@ interface UserState {
   isQuotaExceeded: boolean;
   setQuotaExceeded: (exceeded: boolean) => void;
   
+  // Chucu State
+  chucuLevel: number;
+  chucuExp: number;
+  chucuSatiety: number;
+  chucuHappiness: number;
+  chucuInteractions: number;
+  chucuLastTime: number | null;
+  updateChucuStats: (stats: Partial<{chucuLevel: number, chucuExp: number, chucuSatiety: number, chucuHappiness: number, chucuInteractions: number, chucuLastTime: number | null}>) => void;
+  ownedChucuAccessories: string[];
+  equippedChucuAccessory: string | null;
+
   // Per-uid historical record dictionaries
   allUsersMissions: Record<string, Mission[]>;
   allUsersStoryProgress: Record<string, Record<string, number>>;
@@ -175,7 +186,9 @@ interface UserState {
   equipSticker: (type: 'comment' | 'chat' | 'post', stickerUrl: string | null) => void;
   setStickerPosition: (type: 'comment' | 'post', pos: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => void;
   addOwnedAccessory: (accessoryUrl: string) => void;
+  addOwnedChucuAccessory: (url: string) => void;
   equipAccessory: (accessoryUrl: string | null) => void;
+  equipChucuAccessory: (url: string | null) => void;
   setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => void;
   
   claimMission: (id: string) => void;
@@ -229,6 +242,8 @@ export const useStore = create<UserState>()(
       equippedAccessory: null,
       accessoryPosition: { x: 0, y: 0, scale: 100, rotate: 0 },
       ownedAccessories: [],
+      ownedChucuAccessories: [],
+      equippedChucuAccessory: null,
       ownedPassTickets: 0,
       ownedPriorityTickets: 0,
       ownedMysteryBoxes: 0,
@@ -252,6 +267,13 @@ export const useStore = create<UserState>()(
       unlockedEarlyAccessChapters: [],
       firebaseUser: null,
       
+      chucuLevel: 1,
+      chucuExp: 0,
+      chucuSatiety: 70,
+      chucuHappiness: 50,
+      chucuInteractions: 0,
+      chucuLastTime: null,
+
       isQuotaExceeded: false,
       setQuotaExceeded: (exceeded) => set({ isQuotaExceeded: exceeded }),
       allUsersMissions: {},
@@ -451,6 +473,8 @@ export const useStore = create<UserState>()(
             equippedAccessory: data.equippedAccessory !== undefined ? data.equippedAccessory : state.equippedAccessory,
             accessoryPosition: data.accessoryPosition !== undefined ? data.accessoryPosition : state.accessoryPosition,
             ownedAccessories: data.ownedAccessories !== undefined ? data.ownedAccessories : state.ownedAccessories,
+            ownedChucuAccessories: data.ownedChucuAccessories !== undefined ? data.ownedChucuAccessories : state.ownedChucuAccessories,
+            equippedChucuAccessory: data.equippedChucuAccessory !== undefined ? data.equippedChucuAccessory : state.equippedChucuAccessory,
             ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
             ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
             ownedMysteryBoxes: data.ownedMysteryBoxes !== undefined ? data.ownedMysteryBoxes : state.ownedMysteryBoxes,
@@ -461,6 +485,13 @@ export const useStore = create<UserState>()(
             savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
             unlockedPassChapters: data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters,
             unlockedEarlyAccessChapters: data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters,
+            chucuLevel: data.chucuLevel !== undefined ? data.chucuLevel : state.chucuLevel,
+            chucuExp: data.chucuExp !== undefined ? data.chucuExp : state.chucuExp,
+            chucuSatiety: data.chucuSatiety !== undefined ? data.chucuSatiety : state.chucuSatiety,
+            chucuHappiness: data.chucuHappiness !== undefined ? data.chucuHappiness : state.chucuHappiness,
+            chucuInteractions: data.chucuInteractions !== undefined ? data.chucuInteractions : state.chucuInteractions,
+            chucuLastTime: data.chucuLastTime !== undefined ? data.chucuLastTime : state.chucuLastTime,
+
 
             unlockedAchievements: data.unlockedAchievements !== undefined ? data.unlockedAchievements : state.unlockedAchievements,
             claimedAchievements: data.claimedAchievements !== undefined ? data.claimedAchievements : state.claimedAchievements,
@@ -506,6 +537,14 @@ export const useStore = create<UserState>()(
          
          set({ exp: newExp, level: newLevel });
          get().updateUserDoc({ exp: newExp, level: newLevel });
+      },
+
+      updateChucuStats: (stats) => {
+         const state = get();
+         set({ ...stats });
+         if (state.isLoggedIn && state.uid) {
+            state.updateUserDoc(stats);
+         }
       },
 
       updateUserDoc: async (updates: any, transactionReason?: string) => {
@@ -1142,6 +1181,22 @@ export const useStore = create<UserState>()(
          get().updateUserDoc({ equippedAccessory: accessoryUrl }).then(() => {
             get().propagateEquipmentChanges();
          });
+      },
+
+      addOwnedChucuAccessory: (url: string) => {
+         const state = get();
+         if (!state.isLoggedIn || !state.uid) return;
+         if ((state.ownedChucuAccessories || []).includes(url)) return;
+         const newOwned = [...(state.ownedChucuAccessories || []), url];
+         set({ ownedChucuAccessories: newOwned });
+         get().updateUserDoc({ ownedChucuAccessories: newOwned });
+      },
+
+      equipChucuAccessory: (url: string | null) => {
+         const state = get();
+         if (!state.isLoggedIn) return;
+         set({ equippedChucuAccessory: url });
+         get().updateUserDoc({ equippedChucuAccessory: url });
       },
 
       setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => {
