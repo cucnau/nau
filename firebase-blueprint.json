@@ -198,6 +198,10 @@
       "schema": { "$ref": "#/entities/AvatarAccessory" },
       "description": "Collectible avatar accessories"
     },
+    "store_chucu_accessories/{accessoryId}": {
+      "schema": { "$ref": "#/entities/AvatarAccessory" },
+      "description": "Collectible custom AI-generated avatar accessories for Chucu"
+    },
     "notifications/{notificationId}": {
       "schema": { "$ref": "#/entities/Notification" },
       "description": "User notifications"
