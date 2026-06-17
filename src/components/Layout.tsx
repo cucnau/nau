@@ -16,6 +16,7 @@ import { Store } from '../pages/Store';
 import { Missions } from '../pages/Missions';
 import { Inventory } from '../pages/Inventory';
 import { UserAvatar } from './UserAvatar';
+import { ChocoMascot } from './ChocoMascot';
 
 export function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -116,7 +117,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   return (
     <>
       {/* Blurred overlay */}
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-45 transition-opacity" onClick={onClose} />
       
       {/* Navigation Drawer Container */}
       <div className="fixed left-0 top-0 bottom-0 w-80 sm:w-[360px] bg-[#FDF6EC] dark:bg-[#161311] z-50 shadow-2xl flex flex-col border-r-4 border-[#3E2723] dark:border-[#261E1A] overflow-hidden animate-in slide-in-from-left duration-300 font-sans">
@@ -470,6 +471,7 @@ function AchievementsModal() {
 
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [showQuotaWarning, setShowQuotaWarning] = useState(true);
   const { 
     isLoggedIn, uid, displayName, avatarUrl, 
@@ -604,7 +606,7 @@ export function AppLayout() {
         </div>
       )}
 
-      <header className="sticky top-0 z-30 bg-[#8D6E63] dark:bg-[#2C221D] text-[#FDF6EC] border-b-[6px] border-[#3E2723] dark:border-[#4E342E] px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between w-full max-w-full overflow-hidden">
+      <header className="sticky top-0 z-40 bg-[#8D6E63] dark:bg-[#2C221D] text-[#FDF6EC] border-b-[6px] border-[#3E2723] dark:border-[#4E342E] px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between w-full max-w-full">
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <button 
             onClick={() => setSidebarOpen(true)} 
@@ -621,8 +623,24 @@ export function AppLayout() {
           </button>
         </div>
 
-        <div className="font-extrabold tracking-wider sm:tracking-widest text-lg sm:text-xl md:text-2xl cursor-pointer text-[#FDF6EC] drop-shadow-[1px_1px_0_#3E2723] whitespace-nowrap overflow-hidden text-ellipsis px-1 select-none shrink" onClick={() => navigate('/')}>
-          CHOCOATL
+        <div className="flex items-center gap-2 cursor-pointer select-none shrink" onClick={() => navigate('/')}>
+          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#5D4037] rounded-xl border-2 border-[#3E2723] overflow-hidden flex items-center justify-center -rotate-6 hover:rotate-6 transition-transform shadow-[2px_2px_0_0_#3E2723]">
+             <svg viewBox="0 0 100 100" className="w-full h-full scale-125 translate-y-1">
+                {/* Body */}
+                <ellipse cx="50" cy="53" rx="26" ry="23" fill="#8D6E63" stroke="#3E2723" strokeWidth="4" />
+                <path d="M 35 30 Q 50 20 65 30" fill="none" stroke="#3E2723" strokeWidth="4" strokeLinecap="round" />
+                {/* Poker Face Eyes */}
+                <line x1="38" y1="46" x2="48" y2="46" stroke="#3E2723" strokeWidth="4" strokeLinecap="round" />
+                <line x1="52" y1="46" x2="62" y2="46" stroke="#3E2723" strokeWidth="4" strokeLinecap="round" />
+                {/* Blank Mouth */}
+                <line x1="45" y1="55" x2="55" y2="55" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" />
+                {/* Tongue sticking out */}
+                <path d="M 48 55 L 48 65 Q 50 68 52 65 L 52 55" fill="#FF8A80" stroke="#3E2723" strokeWidth="2.5" />
+             </svg>
+          </div>
+          <div className="font-extrabold tracking-wider sm:tracking-widest text-lg sm:text-xl md:text-2xl text-[#FDF6EC] drop-shadow-[1px_1px_0_#3E2723] whitespace-nowrap overflow-hidden text-ellipsis px-1">
+            CHOCOATL
+          </div>
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
@@ -709,8 +727,13 @@ export function AppLayout() {
                 )}
               </div>
 
-              <div className="relative group cursor-pointer shrink-0">
-                <div className="flex items-center gap-1.5 sm:gap-2 bg-[#5D4037] p-1 sm:px-3 sm:py-1.5 rounded-xl transition-all relative group border-[3px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:bg-[#4E342E] active:translate-y-1 active:shadow-none shrink-0">
+              <div className="relative shrink-0">
+                <div 
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     setIsUserMenuOpen(!isUserMenuOpen);
+                   }}
+                   className="flex items-center gap-1.5 sm:gap-2 bg-[#5D4037] p-1 sm:px-3 sm:py-1.5 rounded-xl transition-all relative hover:bg-[#4E342E] border-[3px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723] active:translate-y-1 active:shadow-none shrink-0 cursor-pointer">
                    <UserAvatar 
                      avatarUrl={avatarUrl} 
                      equippedAccessory={equippedAccessory}
@@ -721,29 +744,34 @@ export function AppLayout() {
                    />
                    <span className="hidden sm:inline font-bold text-white tracking-wide" style={{ color: getTitleColor(activeTitle) || undefined }}>{displayName}</span>
                 </div>
-                <div className="absolute right-0 top-full mt-3 w-48 bg-[#FDF6EC] dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] rounded-2xl shadow-[0_2px_0_0_#3E2723] border-2 border-[#3E2723] dark:border-[#5D4037] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all flex flex-col overflow-hidden">
-                   <div className="px-4 py-3 border-b-[3px] border-[#3E2723] dark:border-[#5D4037] mb-1 bg-white dark:bg-black/20">
-                      <div className="flex items-center gap-1.5 mb-1">
-                         <p className="font-extrabold truncate text-base" style={{ color: getTitleColor(activeTitle) || undefined }}>{displayName}</p>
-                         <span className="px-2 py-0.5 bg-[#8D6E63] text-white text-[10px] font-black rounded-lg border-2 border-[#3E2723]">Lv. {level || 1}</span>
-                      </div>
-                      <p className="font-mono text-[10px] opacity-70 truncate">{uid}</p>
-                   </div>
-                   <button className="flex items-center text-sm font-bold gap-3 px-4 py-3 hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] text-left transition-colors border-b-2 border-transparent hover:border-[#D7CCC8]" onClick={() => navigate('/tai-khoan')}>
-                     <User className="w-5 h-5" />
-                     <span>Hồ sơ & Cài đặt</span>
-                   </button>
-                   {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') && (
-                     <button className="flex items-center text-sm font-bold gap-3 px-4 py-3 hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] text-left text-[#5D4037] dark:text-[#A1887F] transition-colors border-b-2 border-transparent hover:border-[#D7CCC8]" onClick={() => navigate('/admin')}>
-                       <Key className="w-5 h-5" />
-                       <span>Quản lý Truyện</span>
-                     </button>
-                   )}
-                   <button onClick={handleLogout} className="flex items-center text-sm font-bold gap-3 px-4 py-3 hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] text-left text-[#3E2723] dark:text-[#ECE5DC] transition-colors">
-                     <LogOut className="w-5 h-5" />
-                     <span>Đăng xuất</span>
-                   </button>
-                </div>
+                {isUserMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)} />
+                    <div className="absolute right-0 top-full mt-3 w-48 bg-[#FDF6EC] dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] rounded-2xl shadow-[0_2px_0_0_#3E2723] border-2 border-[#3E2723] dark:border-[#5D4037] z-50 flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-2">
+                       <div className="px-4 py-3 border-b-[3px] border-[#3E2723] dark:border-[#5D4037] mb-1 bg-white dark:bg-black/20">
+                          <div className="flex items-center gap-1.5 mb-1">
+                             <p className="font-extrabold truncate text-base" style={{ color: getTitleColor(activeTitle) || undefined }}>{displayName}</p>
+                             <span className="px-2 py-0.5 bg-[#8D6E63] text-white text-[10px] font-black rounded-lg border-2 border-[#3E2723]">Lv. {level || 1}</span>
+                          </div>
+                          <p className="font-mono text-[10px] opacity-70 truncate">{uid}</p>
+                       </div>
+                       <button className="flex items-center text-sm font-bold gap-3 px-4 py-3 hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] text-left transition-colors border-b-2 border-transparent hover:border-[#D7CCC8]" onClick={() => { setIsUserMenuOpen(false); navigate('/tai-khoan'); }}>
+                         <User className="w-5 h-5" />
+                         <span>Hồ sơ & Cài đặt</span>
+                       </button>
+                       {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') && (
+                         <button className="flex items-center text-sm font-bold gap-3 px-4 py-3 hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] text-left text-[#5D4037] dark:text-[#A1887F] transition-colors border-b-2 border-transparent hover:border-[#D7CCC8]" onClick={() => { setIsUserMenuOpen(false); navigate('/admin'); }}>
+                           <Key className="w-5 h-5" />
+                           <span>Quản lý Truyện</span>
+                         </button>
+                       )}
+                       <button onClick={() => { setIsUserMenuOpen(false); handleLogout(); }} className="flex items-center text-sm font-bold gap-3 px-4 py-3 hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] text-left text-[#3E2723] dark:text-[#ECE5DC] transition-colors">
+                         <LogOut className="w-5 h-5" />
+                         <span>Đăng xuất</span>
+                       </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           ) : (
@@ -766,9 +794,9 @@ export function AppLayout() {
           <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-4xl h-[85vh] rounded-3xl overflow-y-auto border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] dark:border-[#5D4037] shadow-2xl flex flex-col z-10 transition-all">
             <button 
               onClick={() => setStoreOpen(false)} 
-              className="absolute top-4 right-4 p-2 bg-[#FDF6EC] hover:bg-[#E6D8C9] border-[3px] border-[#3E2723] shadow-[0_3px_0_0_#3E2723] text-[#3E2723] rounded-xl active:translate-y-0.5 active:shadow-none transition-all z-20"
+              className="absolute top-4 right-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all active:translate-y-1 active:shadow-none z-20"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#3E2723] dark:text-[#ECE5DC]" />
             </button>
             <div className="p-2 sm:p-4 flex-1">
               <Store />
@@ -784,9 +812,9 @@ export function AppLayout() {
           <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-3xl h-[85vh] rounded-3xl overflow-y-auto border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] dark:border-[#5D4037] shadow-2xl flex flex-col z-10 transition-all">
             <button 
               onClick={() => setMissionsOpen(false)} 
-              className="absolute top-4 right-4 p-2 bg-[#FDF6EC] hover:bg-[#E6D8C9] border-[3px] border-[#3E2723] shadow-[0_3px_0_0_#3E2723] text-[#3E2723] rounded-xl active:translate-y-0.5 active:shadow-none transition-all z-20"
+              className="absolute top-4 right-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all active:translate-y-1 active:shadow-none z-20"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#3E2723] dark:text-[#ECE5DC]" />
             </button>
             <div className="p-2 sm:p-4 flex-1">
               <Missions />
@@ -802,9 +830,9 @@ export function AppLayout() {
           <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-2xl max-h-[85vh] rounded-3xl overflow-y-auto border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] dark:border-[#5D4037] shadow-2xl flex flex-col z-10 p-6 sm:p-8 transition-all">
             <button 
               onClick={() => setAchievementsOpen(false)} 
-              className="absolute top-4 right-4 p-2 bg-[#FDF6EC] hover:bg-[#E6D8C9] border-[3px] border-[#3E2723] shadow-[0_3px_0_0_#3E2723] text-[#3E2723] rounded-xl active:translate-y-0.5 active:shadow-none transition-all z-20"
+              className="absolute top-4 right-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all active:translate-y-1 active:shadow-none z-20"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#3E2723] dark:text-[#ECE5DC]" />
             </button>
             <AchievementsModal />
           </div>
@@ -818,9 +846,9 @@ export function AppLayout() {
           <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-4xl h-[85vh] rounded-3xl overflow-y-auto border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] dark:border-[#5D4037] shadow-2xl flex flex-col z-10 transition-all">
             <button 
               onClick={() => setInventoryOpen(false)} 
-              className="absolute top-4 right-4 p-2 bg-[#FDF6EC] hover:bg-[#E6D8C9] border-[3px] border-[#3E2723] shadow-[0_3px_0_0_#3E2723] text-[#3E2723] rounded-xl active:translate-y-0.5 active:shadow-none transition-all z-20"
+              className="absolute top-4 right-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all active:translate-y-1 active:shadow-none z-20"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#3E2723] dark:text-[#ECE5DC]" />
             </button>
             <div className="p-2 sm:p-4 flex-1">
               <Inventory />
@@ -832,6 +860,7 @@ export function AppLayout() {
       <main className="flex-1 w-full max-w-7xl mx-auto flex flex-col">
         <Outlet />
       </main>
+      <ChocoMascot />
     </div>
   );
 }
