@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useDragControls } from "framer-motion";
+import { motion, AnimatePresence, useDragControls, useMotionValue, useTransform } from "framer-motion";
 import {
   Heart,
   Smile,
@@ -58,6 +58,26 @@ export function ChocoMascot() {
   const [speechBubble, setSpeechBubble] = useState<string>(
     "Tránh ra, tui đang bận! 🙄",
   );
+  const dragConstraintsRef = useRef<HTMLDivElement>(null);
+  const dragX = useMotionValue(0);
+  const dragY = useMotionValue(0);
+  
+  const bubbleX = useTransform(dragX, (x) => {
+    if (typeof window === "undefined") return "-50%";
+    const w = window.innerWidth;
+    const minX = -(w - 100);
+    const percent = Math.max(0, Math.min(1, (x - minX) / (0 - minX)));
+    return `-${20 + percent * 60}%`;
+  });
+
+  const pointerLeft = useTransform(dragX, (x) => {
+    if (typeof window === "undefined") return "50%";
+    const w = window.innerWidth;
+    const minX = -(w - 100);
+    const percent = Math.max(0, Math.min(1, (x - minX) / (0 - minX)));
+    return `${20 + percent * 60}%`;
+  });
+
   const [particles, setParticles] = useState<Particle[]>([]);
   const [showSpeech, setShowSpeech] = useState<boolean>(true);
 
@@ -411,9 +431,14 @@ export function ChocoMascot() {
 
   return (
     <>
+      <div ref={dragConstraintsRef} className="fixed inset-4 pointer-events-none z-30" />
       <motion.div
         drag
-        dragMomentum={false}
+        style={{ x: dragX, y: dragY }}
+        dragConstraints={dragConstraintsRef}
+        dragElastic={0.5}
+        dragTransition={{ bounceStiffness: 300, bounceDamping: 10 }}
+        dragMomentum={true}
         onDragStart={() => {
           isDraggingRef.current = true;
         }}
@@ -424,6 +449,7 @@ export function ChocoMascot() {
         <AnimatePresence>
           {showSpeech && speechBubble && (
             <motion.div
+              style={{ x: bubbleX, left: "50%" }}
               initial={{ opacity: 0, y: 15, scale: 0.8 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
@@ -431,11 +457,11 @@ export function ChocoMascot() {
                 triggerAudio("click");
                 setIsOpen(true);
               }}
-              className="absolute bottom-[110%] w-[160px] sm:w-[220px] p-2 sm:p-3 rounded-2xl bg-[#FFFDF9] dark:bg-[#1E1815] border-3 border-[#3E2723] text-[#3E2723] dark:text-[#ECE5DC] shadow-[3px_3px_0_0_#3E2723] cursor-pointer text-xs font-black tracking-normal leading-snug text-left z-50 select-none"
+              className="absolute bottom-[110%] w-[160px] sm:w-[220px] p-2 sm:p-3 rounded-2xl bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] text-[#3E2723] dark:text-[#ECE5DC] shadow-[3px_3px_0_0_#3E2723] cursor-pointer text-xs font-black tracking-normal leading-snug text-left z-50 select-none"
             >
               <div className="line-clamp-3">{speechBubble}</div>
-              <div className="absolute left-1/2 -translate-x-1/2 -bottom-[12px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#3E2723]" />
-              <div className="absolute left-1/2 -translate-x-1/2 -bottom-[8px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#FFFDF9] dark:border-t-[#1E1815]" />
+              <motion.div style={{ left: pointerLeft }} className="absolute -translate-x-1/2 -bottom-[12px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#3E2723]" />
+              <motion.div style={{ left: pointerLeft }} className="absolute -translate-x-1/2 -bottom-[8px] w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#FFFDF9] dark:border-t-[#1E1815]" />
             </motion.div>
           )}
         </AnimatePresence>
