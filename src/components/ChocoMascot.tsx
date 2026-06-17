@@ -35,6 +35,7 @@ interface Particle {
 export function ChocoMascot() {
   const {
     isLoggedIn,
+    isFirebaseSynced,
     displayName,
     choco,
     spendChoco,
@@ -87,10 +88,15 @@ export function ChocoMascot() {
   const bubbleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const moodTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isDraggingRef = useRef(false);
+  const decayCalculatedRef = useRef(false);
 
   const dragControls = useDragControls();
 
   useEffect(() => {
+    if (!isLoggedIn || !isFirebaseSynced) return;
+    if (decayCalculatedRef.current) return;
+    decayCalculatedRef.current = true;
+
     let currentSatiety = chucuSatiety;
     let currentHappiness = chucuHappiness;
 
@@ -130,7 +136,7 @@ export function ChocoMascot() {
     } else {
       setSpeechBubble(`Vào chi giờ này? Lại kiếm tui chứ gì... hứ. 😒`);
     }
-  }, [isLoggedIn, displayName]);
+  }, [isLoggedIn, isFirebaseSynced, displayName]);
 
   const saveStats = (
     newSat: number,
