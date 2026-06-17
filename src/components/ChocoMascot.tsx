@@ -717,11 +717,11 @@ export function ChocoMascot() {
               exit={{ scale: 0.9, opacity: 0, y: 30 }}
               className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-sm max-h-[90vh] rounded-[2rem] overflow-hidden border-4 border-[#3E2723] shadow-[0_4px_0_0_#3E2723] dark:border-[#5D4037] flex flex-col z-10 p-6"
             >
-              <button
-                onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 p-2 bg-[#FFFDF9] hover:bg-[#F5E6D3] dark:bg-[#2C221D] dark:hover:bg-[#3E2D25] border-2 border-[#3E2723] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl active:translate-y-0.5 transition-all z-20"
+              <button 
+                onClick={() => setIsOpen(false)} 
+                className="absolute top-4 right-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all active:translate-y-1 active:shadow-none z-20"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#3E2723] dark:text-[#ECE5DC]" />
               </button>
 
               <div className="overflow-y-auto flex-1 pr-1 -mr-1 mt-4 scrollbar-thin scrollbar-thumb-stone-300">
