@@ -126,7 +126,7 @@ export function GlobalChat() {
       });
 
       return (
-    <div className="flex flex-col bg-[#5D4037] dark:bg-[#2C221D] rounded-3xl overflow-hidden border-2 border-[#3E2723] dark:border-[#4E342E] h-full min-h-[400px] shadow-[1px_1px_0_0_#8D6E63] dark:shadow-[1px_1px_0_0_#0D0907] relative">
+    <div className="flex flex-col bg-[#5D4037] dark:bg-[#2C221D] rounded-3xl overflow-hidden border-2 border-[#3E2723] dark:border-[#4E342E] h-[500px] shadow-[1px_1px_0_0_#8D6E63] dark:shadow-[1px_1px_0_0_#0D0907] relative">
       <div className="absolute top-0 left-0 right-0 h-4 bg-[#8D6E63] dark:bg-[#3C2E27] border-b-[3px] border-[#3E2723] dark:border-[#4E342E]" />
       <div className="pt-6 pb-3 px-4 bg-[#4E342E] dark:bg-[#251E1B] text-[#FDF6EC] flex items-center justify-between border-b-[3px] border-[#3E2723] dark:border-[#4E342E] z-10 relative">
         <span className="font-extrabold text-lg tracking-widest flex items-center gap-2 drop-shadow-[1px_1px_0_#3E2723]">
