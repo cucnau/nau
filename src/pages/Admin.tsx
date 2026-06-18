@@ -131,6 +131,10 @@ export function Admin() {
     string | null
   >(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [adminChapterPage, setAdminChapterPage] = useState(0);
+  const [adminChapterSortDesc, setAdminChapterSortDesc] = useState(false);
+  const ADMIN_CHAPTERS_PER_PAGE = 50;
+
   const [chapterModalMode, setChapterModalMode] = useState<
     "add" | "edit" | null
   >(null);
@@ -3386,8 +3390,39 @@ export function Admin() {
                 Đóng
               </button>
             </div>
+            
+            {chapters.length > 0 && (
+               <div className="flex items-center gap-2 mt-4 justify-end">
+                  <select
+                     value={adminChapterPage}
+                     onChange={(e) => setAdminChapterPage(Number(e.target.value))}
+                     className="bg-[#FDF6EC] dark:bg-[#1A1412] text-[#3E2723] dark:text-[#A1887F] font-bold text-xs sm:text-sm px-2 py-1.5 rounded-lg border border-[#3E2723]/20 dark:border-[#4E342E]/50"
+                  >
+                     {Array.from({ length: Math.ceil(chapters.length / ADMIN_CHAPTERS_PER_PAGE) }).map((_, i) => {
+                        const start = i * ADMIN_CHAPTERS_PER_PAGE + 1;
+                        const end = Math.min((i + 1) * ADMIN_CHAPTERS_PER_PAGE, chapters.length);
+                        return (
+                           <option key={i} value={i}>
+                              Chương {start} - {end}
+                           </option>
+                        );
+                     })}
+                  </select>
+
+                  <button 
+                     onClick={() => {
+                        setAdminChapterSortDesc(!adminChapterSortDesc);
+                        setAdminChapterPage(0);
+                     }}
+                     className="bg-stone-200 dark:bg-stone-800 text-[#3E2723] dark:text-[#ECE5DC] px-3 py-1.5 rounded-lg font-bold text-xs sm:text-sm hover:bg-stone-300 dark:hover:bg-stone-700 transition"
+                  >
+                     {adminChapterSortDesc ? '↓ Số lớn -> bé' : '↑ Số bé -> lớn'}
+                  </button>
+               </div>
+            )}
+            
             <div className="flex-1 overflow-y-auto divide-y my-4 pr-2">
-              {chapters.map((c) => (
+              {[...chapters].sort((a, b) => adminChapterSortDesc ? b.order - a.order : a.order - b.order).slice(adminChapterPage * ADMIN_CHAPTERS_PER_PAGE, (adminChapterPage + 1) * ADMIN_CHAPTERS_PER_PAGE).map((c) => (
                 <div
                   key={c.id}
                   className="py-3 flex justify-between items-center"
