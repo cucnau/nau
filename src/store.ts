@@ -417,21 +417,21 @@ export const useStore = create<UserState>()(
                firebaseUser: user, 
                isLoggedIn: true, 
                uid,
-               email: user.email || state.email || '',
-               displayName: user.displayName || state.displayName || 'Reader ' + uid.slice(0,4),
-               avatarUrl: user.photoURL || state.avatarUrl || '',
+               email: state.email || user.email || '',
+               displayName: state.displayName || user.displayName || 'Reader ' + uid.slice(0,4),
+               avatarUrl: state.avatarUrl || user.photoURL || '',
                missions: userMissions,
                storyProgress: userProgress,
                readHistoryList: userHistory,
                savedStories: userSaved,
-               unlockedPassChapters: (user as any).unlockedPassChapters || [],
-               unlockedEarlyAccessChapters: (user as any).unlockedEarlyAccessChapters || [],
+               unlockedPassChapters: state.unlockedPassChapters || [],
+               unlockedEarlyAccessChapters: state.unlockedEarlyAccessChapters || [],
                ownedStickers: userOwnedStickers,
-               equippedAccessory: (user as any).equippedAccessory || null,
-               accessoryPosition: (user as any).accessoryPosition || { x: 0, y: 0, scale: 100, rotate: 0 },
+               equippedAccessory: state.equippedAccessory || null,
+               accessoryPosition: state.accessoryPosition || { x: 0, y: 0, scale: 100, rotate: 0 },
                ownedAccessories: userOwnedAccessories,
-               ownedPassTickets: (user as any).ownedPassTickets || 0,
-               ownedPriorityTickets: (user as any).ownedPriorityTickets || 0,
+               ownedPassTickets: state.ownedPassTickets || 0,
+               ownedPriorityTickets: state.ownedPriorityTickets || 0,
                unlockedAchievements: userUnlocked,
                claimedAchievements: userClaimed
             });
@@ -495,6 +495,9 @@ export const useStore = create<UserState>()(
             savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
             unlockedPassChapters: data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters,
             unlockedEarlyAccessChapters: data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters,
+            missions: data.missions !== undefined ? data.missions : state.missions,
+            storyProgress: data.storyProgress !== undefined ? data.storyProgress : state.storyProgress,
+            readHistoryList: data.readHistoryList !== undefined ? data.readHistoryList : state.readHistoryList,
             chucuLevel: data.chucuLevel !== undefined ? data.chucuLevel : state.chucuLevel,
             chucuExp: data.chucuExp !== undefined ? data.chucuExp : state.chucuExp,
             chucuSatiety: data.chucuSatiety !== undefined ? data.chucuSatiety : state.chucuSatiety,
@@ -777,6 +780,7 @@ export const useStore = create<UserState>()(
             $chocoDiff: dailyChoco,
             totalEarnedChoco: newTotalEarnedChoco,
             totalCheckIns: newTotalCheckins,
+            missions: ms,
             ...updateStreakRecoveryStats
         }, "Điểm danh hàng ngày");
         
@@ -919,6 +923,9 @@ export const useStore = create<UserState>()(
           genresRead: uniqueGenres,
           activePoints: finalActivePoints,
           totalChaptersRead: newTotalChaptersRead,
+          storyProgress: newProgress,
+          readHistoryList: newHistory,
+          missions: ms,
         });
 
         get()._checkPerfectDailyDay();
@@ -965,6 +972,7 @@ export const useStore = create<UserState>()(
            totalEarnedChoco: newTotalEarned,
            totalCommentsCount: newCommentsCount,
            activePoints: finalActivePoints,
+           missions: ms,
          }, "Hoàn thành bình luận");
 
          get().gainExp(5);
@@ -1004,7 +1012,8 @@ export const useStore = create<UserState>()(
                  goldenChoco: newGolden,
                  $gchocoDiff: m.goldenReward,
                  totalEarnedChoco: newTotalEarnedC,
-                 totalEarnedGChoco: newTotalEarnedG
+                 totalEarnedGChoco: newTotalEarnedG,
+                 missions: ms
               };
               get().updateUserDoc(updates, "Nhận thưởng nhiệm vụ");
               
@@ -1579,7 +1588,8 @@ export const useStore = create<UserState>()(
 
             get().updateUserDoc({
                lastDailyResetDate: nextDailyResetDate,
-               lastWeeklyResetId: nextWeeklyResetId
+               lastWeeklyResetId: nextWeeklyResetId,
+               missions: nextMissions
             });
          }
       }
