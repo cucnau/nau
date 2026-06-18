@@ -438,25 +438,10 @@ export const useStore = create<UserState>()(
                claimedAchievements: userClaimed
             });
          } else {
+            // Bao toan du lieu tren may nguoi dung khi load lai trang hoac mat session tam thoi o Vercel/Iframe sandboxed.
+            // Chi dang xuat, xoa trang luc nguoi dung chu dong an button "Dang xuat" duoc thuc hien thong qua logout() han hoi.
             set({ 
-               isFirebaseSynced: false,
-               firebaseUser: null, 
-               isLoggedIn: false, 
-               uid: null,
-               missions: [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()],
-               storyProgress: {},
-               readHistoryList: [],
-               savedStories: [],
-               unlockedPassChapters: [],
-               unlockedEarlyAccessChapters: [],
-               ownedStickers: [],
-               equippedAccessory: null,
-               accessoryPosition: { x: 0, y: 0, scale: 100, rotate: 0 },
-               ownedAccessories: [],
-               ownedPassTickets: 0,
-               ownedPriorityTickets: 0,
-               unlockedAchievements: [],
-               claimedAchievements: []
+               firebaseUser: null
             });
          }
       },
@@ -568,76 +553,78 @@ export const useStore = create<UserState>()(
 
       updateUserDoc: async (updates: any, transactionReason?: string) => {
          const state = get();
-         if (!state.uid || !state.isFirebaseSynced) return;
+         const uid = state.uid;
          
-         const { uid, choco: prevChoco, goldenChoco: prevGChoco } = state;
-            // Optimistically update local state
-            set((currentState) => {
-               const newState: any = {};
-               Object.keys(updates).forEach(key => {
-                  if (key in currentState) {
-                     newState[key] = updates[key];
-                  }
-               });
-               return newState;
+         // Luon cap nhat Zustand State cuc bo ngay va luon de luu xuong LocalStorage tuc thi
+         set((currentState) => {
+            const newState: any = {};
+            Object.keys(updates).forEach(key => {
+               if (key in currentState) {
+                  newState[key] = updates[key];
+               }
             });
+            return newState;
+         });
 
-            // Log transactions if amounts changed
-            if (transactionReason) {
-               let cDiff = 0;
-               let gDiff = 0;
-               
-               if (updates.$chocoDiff !== undefined) {
-                  cDiff = updates.$chocoDiff;
-               } else if (updates.choco !== undefined) {
-                  cDiff = updates.choco - prevChoco;
-               }
-               
-               if (updates.$gchocoDiff !== undefined) {
-                  gDiff = updates.$gchocoDiff;
-               } else if (updates.goldenChoco !== undefined) {
-                  gDiff = updates.goldenChoco - prevGChoco;
-               }
+         if (!uid) return;
+         
+         const { choco: prevChoco, goldenChoco: prevGChoco } = state;
 
-               if (cDiff !== 0) {
-                  const bal = updates.choco !== undefined ? updates.choco : prevChoco + cDiff;
-                  logTransaction(uid, Math.abs(cDiff), 'choco', cDiff > 0 ? 'earn' : 'spend', transactionReason, bal);
-               }
-               if (gDiff !== 0) {
-                  const bal = updates.goldenChoco !== undefined ? updates.goldenChoco : prevGChoco + gDiff;
-                  logTransaction(uid, Math.abs(gDiff), 'gchoco', gDiff > 0 ? 'earn' : 'spend', transactionReason, bal);
-               }
+         // Log transactions if amounts changed
+         if (transactionReason) {
+            let cDiff = 0;
+            let gDiff = 0;
+            
+            if (updates.$chocoDiff !== undefined) {
+               cDiff = updates.$chocoDiff;
+            } else if (updates.choco !== undefined) {
+               cDiff = updates.choco - prevChoco;
+            }
+            
+            if (updates.$gchocoDiff !== undefined) {
+               gDiff = updates.$gchocoDiff;
+            } else if (updates.goldenChoco !== undefined) {
+               gDiff = updates.goldenChoco - prevGChoco;
             }
 
-            try {
-               const docUpdates = { ...updates };
-               delete docUpdates.$chocoDiff;
-               delete docUpdates.$gchocoDiff;
-
-               // Tự động kiểm tra và phục hồi: nếu avatarUrl hiện tại quá lớn (>80KB Base64),
-               // ta sẽ đè lên bằng một phiên bản nén siêu nhỏ để cứu document khỏi giới hạn 1MB của Firestore.
-               const currentAvatarUrl = state.avatarUrl;
-               if (currentAvatarUrl && currentAvatarUrl.startsWith('data:image/') && currentAvatarUrl.length > 80000) {
-                  const compressed = await compressBase64Image(currentAvatarUrl);
-                  docUpdates.avatarUrl = compressed;
-                  set({ avatarUrl: compressed });
-               }
-
-               // Nếu bản thân payload/updates chứa avatarUrl mới siêu lớn, nén ngay lập tức trước khi lưu
-               if (docUpdates.avatarUrl && docUpdates.avatarUrl.startsWith('data:image/') && docUpdates.avatarUrl.length > 80000) {
-                  const compressed = await compressBase64Image(docUpdates.avatarUrl);
-                  docUpdates.avatarUrl = compressed;
-                  set({ avatarUrl: compressed });
-               }
-
-               await updateDoc(doc(db, 'users', uid), docUpdates);
-            } catch (err) {
-               console.error('Lỗi khi update user doc:', err);
-               if (checkIfQuotaError(err)) {
-                  set({ isQuotaExceeded: true });
-               }
-               throw err;
+            if (cDiff !== 0) {
+               const bal = updates.choco !== undefined ? updates.choco : prevChoco + cDiff;
+               logTransaction(uid, Math.abs(cDiff), 'choco', cDiff > 0 ? 'earn' : 'spend', transactionReason, bal);
             }
+            if (gDiff !== 0) {
+               const bal = updates.goldenChoco !== undefined ? updates.goldenChoco : prevGChoco + gDiff;
+               logTransaction(uid, Math.abs(gDiff), 'gchoco', gDiff > 0 ? 'earn' : 'spend', transactionReason, bal);
+            }
+         }
+
+         try {
+            const docUpdates = { ...updates };
+            delete docUpdates.$chocoDiff;
+            delete docUpdates.$gchocoDiff;
+
+            // Tự động kiểm tra và phục hồi: nếu avatarUrl hiện tại quá lớn (>80KB Base64),
+            // ta sẽ đè lên bằng một phiên bản nén siêu nhỏ để cứu document khỏi giới hạn 1MB của Firestore.
+            const currentAvatarUrl = state.avatarUrl;
+            if (currentAvatarUrl && currentAvatarUrl.startsWith('data:image/') && currentAvatarUrl.length > 80000) {
+               const compressed = await compressBase64Image(currentAvatarUrl);
+               docUpdates.avatarUrl = compressed;
+               set({ avatarUrl: compressed });
+            }
+
+            // Nếu bản thân payload/updates chứa avatarUrl mới siêu lớn, nén ngay lập tức trước khi lưu
+            if (docUpdates.avatarUrl && docUpdates.avatarUrl.startsWith('data:image/') && docUpdates.avatarUrl.length > 80000) {
+               const compressed = await compressBase64Image(docUpdates.avatarUrl);
+               docUpdates.avatarUrl = compressed;
+               set({ avatarUrl: compressed });
+            }
+
+            await updateDoc(doc(db, 'users', uid), docUpdates);
+         } catch (err) {
+            console.error('Lỗi khi update user doc:', err);
+            if (checkIfQuotaError(err)) {
+               set({ isQuotaExceeded: true });
+            }
+         }
       },
       
       useMysteryBox: async () => {
