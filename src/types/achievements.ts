@@ -218,6 +218,66 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     goldenReward: 0,
     progressTarget: 100,
     category: 'legend'
+  },
+  {
+    id: 'choco_mot_sach',
+    name: 'Choco Mọt Sách',
+    description: 'Tích lũy đọc tổng cộng 500 chương truyện.',
+    rewardText: '+50 Choco',
+    chocoReward: 50,
+    goldenReward: 0,
+    progressTarget: 500,
+    category: 'reading'
+  },
+  {
+    id: 'choco_tuong_tac',
+    name: 'Choco Tương Tác',
+    description: 'Viết tổng cộng 500 bình luận hoặc phản hồi các chương truyện bất kỳ.',
+    rewardText: '+50 Choco',
+    chocoReward: 50,
+    goldenReward: 0,
+    progressTarget: 500,
+    category: 'community'
+  },
+  {
+    id: 'chucu_friend_500',
+    name: 'Bạn Thân Của Chucu',
+    description: 'Thực hiện tương tác vui chơi hoặc cho ăn thành công 500 lần với bé Chucu.',
+    rewardText: '+50 Choco',
+    chocoReward: 50,
+    goldenReward: 0,
+    progressTarget: 500,
+    category: 'challenge'
+  },
+  {
+    id: 'chucu_an_sang',
+    name: 'Chucu Ăn Sang',
+    description: 'Cho Chucu mlem mlem hảo hạng 100 lần.',
+    rewardText: '+10 GChoco',
+    chocoReward: 0,
+    goldenReward: 10,
+    progressTarget: 100,
+    category: 'challenge'
+  },
+  {
+    id: 'chucu_master_100',
+    name: 'Huấn Luyện Viên Chucu',
+    description: 'Yêu thương và nuôi nấng bé Chucu đạt đến Cấp độ (Level) 100.',
+    rewardText: '+100 Choco',
+    chocoReward: 100,
+    goldenReward: 0,
+    progressTarget: 100,
+    category: 'challenge'
+  },
+  {
+    id: 'chucu_fashion_5',
+    name: 'Fashionista Chucu',
+    description: 'Sắm sửa và sở hữu từ 5 phụ kiện đáng yêu trở lên cho Chucu.',
+    rewardText: '+50 Choco',
+    chocoReward: 50,
+    goldenReward: 0,
+    progressTarget: 5,
+    category: 'collection'
   }
 ];
 
