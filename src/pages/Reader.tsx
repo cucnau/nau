@@ -8,6 +8,7 @@ import { db, checkIfQuotaError } from '../lib/firebase';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, doc, getDoc, updateDoc, increment, limit } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { getWeeklyId } from '../types/achievements';
+import { useUserProfilesCache } from '../hooks/useUserProfilesCache';
 
 const ParagraphCommentNode = ({
    comment,
@@ -21,17 +22,20 @@ const ParagraphCommentNode = ({
    getTitleColor,
    isLoggedIn,
    isDark,
-   depth = 0
+   depth = 0,
+   profilesCache = {}
 }: any) => {
    const { uid: storeUid, equippedStickerComment, stickerPositionComment, displayName: storeDisplayName, avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle, equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition } = useStore();
    const isMe = comment.uid === storeUid;
-   const currentSticker = isMe ? equippedStickerComment : comment.equippedSticker;
-   const currentStickerPos = isMe ? stickerPositionComment : comment.stickerPosition;
-   const currentDisplayName = isMe ? storeDisplayName : comment.displayName;
-   const currentAvatarUrl = isMe ? storeAvatarUrl : comment.avatarUrl;
-   const currentActiveTitle = isMe ? storeActiveTitle : comment.activeTitle;
-   const currentAccessory = isMe ? storeEquippedAccessory : comment.equippedAccessory;
-   const currentAccessoryPos = isMe ? storeAccessoryPosition : comment.accessoryPosition;
+
+   const cached = comment.uid ? profilesCache[comment.uid] : null;
+   const currentSticker = isMe ? equippedStickerComment : (cached?.equippedStickerComment ?? cached?.equippedSticker ?? comment.equippedSticker);
+   const currentStickerPos = isMe ? stickerPositionComment : (cached?.stickerPositionComment ?? cached?.stickerPosition ?? comment.stickerPosition);
+   const currentDisplayName = isMe ? storeDisplayName : (cached?.displayName ?? comment.displayName);
+   const currentAvatarUrl = isMe ? storeAvatarUrl : (cached?.avatarUrl ?? comment.avatarUrl);
+   const currentActiveTitle = isMe ? storeActiveTitle : (cached?.activeTitle ?? comment.activeTitle);
+   const currentAccessory = isMe ? storeEquippedAccessory : (cached?.equippedAccessory ?? comment.equippedAccessory);
+   const currentAccessoryPos = isMe ? storeAccessoryPosition : (cached?.accessoryPosition ?? comment.accessoryPosition);
 
    const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
       const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
@@ -166,17 +170,20 @@ const ChapterCommentNode = ({
    getTitleColor,
    isLoggedIn,
    isDark,
-   depth = 0
+   depth = 0,
+   profilesCache = {}
 }: any) => {
    const { uid: storeUid, equippedStickerComment, stickerPositionComment, displayName: storeDisplayName, avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle, equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition } = useStore();
    const isMe = comment.uid === storeUid;
-   const currentSticker = isMe ? equippedStickerComment : comment.equippedSticker;
-   const currentStickerPos = isMe ? stickerPositionComment : comment.stickerPosition;
-   const currentDisplayName = isMe ? storeDisplayName : comment.displayName;
-   const currentAvatarUrl = isMe ? storeAvatarUrl : comment.avatarUrl;
-   const currentActiveTitle = isMe ? storeActiveTitle : comment.activeTitle;
-   const currentAccessory = isMe ? storeEquippedAccessory : comment.equippedAccessory;
-   const currentAccessoryPos = isMe ? storeAccessoryPosition : comment.accessoryPosition;
+
+   const cached = comment.uid ? profilesCache[comment.uid] : null;
+   const currentSticker = isMe ? equippedStickerComment : (cached?.equippedStickerComment ?? cached?.equippedSticker ?? comment.equippedSticker);
+   const currentStickerPos = isMe ? stickerPositionComment : (cached?.stickerPositionComment ?? cached?.stickerPosition ?? comment.stickerPosition);
+   const currentDisplayName = isMe ? storeDisplayName : (cached?.displayName ?? comment.displayName);
+   const currentAvatarUrl = isMe ? storeAvatarUrl : (cached?.avatarUrl ?? comment.avatarUrl);
+   const currentActiveTitle = isMe ? storeActiveTitle : (cached?.activeTitle ?? comment.activeTitle);
+   const currentAccessory = isMe ? storeEquippedAccessory : (cached?.equippedAccessory ?? comment.equippedAccessory);
+   const currentAccessoryPos = isMe ? storeAccessoryPosition : (cached?.accessoryPosition ?? comment.accessoryPosition);
 
    const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
       const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
@@ -426,6 +433,9 @@ export function Reader() {
   const nextChapter = chapters[currentChapterIndex + 1];
 
   const [comments, setComments] = useState<any[]>([]);
+
+  const userIds = comments.map(c => c.uid).filter(Boolean) as string[];
+  const profilesCache = useUserProfilesCache(userIds);
 
   useEffect(() => {
     if (!currentChapter) return;
@@ -847,7 +857,7 @@ export function Reader() {
                                        {pComments.length === 0 ? (
                                            <div className="text-center italic text-sm opacity-50 py-2">Chưa có bình luận. Hãy là người đầu tiên!</div>
                                        ) : (
-                                           pComments.map(c => { return <ParagraphCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={isDark} />; if (false) { return (
+                                           pComments.map(c => { return <ParagraphCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={isDark} profilesCache={profilesCache} />; if (false) { return (
                                                <div key={c.id} className="flex flex-col gap-1 w-full border-b border-stone-100/15 pb-3 last:border-0 last:pb-0">
                                                    <div className="flex gap-3">
                                                        <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="hidden" />
@@ -1018,7 +1028,7 @@ export function Reader() {
                    {chapterComments.length === 0 ? (
                        <p className="text-center italic opacity-50">Chưa có bình luận nào cho chương này.</p>
                    ) : (
-                       chapterComments.map(c => { return <ChapterCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={isDark} />; if (false) { return (
+                       chapterComments.map(c => { return <ChapterCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={isDark} profilesCache={profilesCache} />; if (false) { return (
                            <div key={c.id} className={cn("p-5 rounded-2xl border relative overflow-visible", isDark ? "bg-[#2C221D]/80 border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8] shadow-sm pr-8")}>
                                {c.equippedSticker && (
                                    <img 
