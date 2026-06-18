@@ -111,8 +111,9 @@ interface UserState {
   chucuSatiety: number;
   chucuHappiness: number;
   chucuInteractions: number;
+  chucuPremiumFeeds: number;
   chucuLastTime: number | null;
-  updateChucuStats: (stats: Partial<{chucuLevel: number, chucuExp: number, chucuSatiety: number, chucuHappiness: number, chucuInteractions: number, chucuLastTime: number | null}>) => void;
+  updateChucuStats: (stats: Partial<{chucuLevel: number, chucuExp: number, chucuSatiety: number, chucuHappiness: number, chucuInteractions: number, chucuPremiumFeeds: number, chucuLastTime: number | null}>) => void;
   ownedChucuAccessories: string[];
   equippedChucuAccessory: string | null;
   showChucu: boolean;
@@ -277,6 +278,7 @@ export const useStore = create<UserState>()(
       chucuSatiety: 70,
       chucuHappiness: 50,
       chucuInteractions: 0,
+      chucuPremiumFeeds: 0,
       chucuLastTime: null,
 
       isQuotaExceeded: false,
@@ -503,6 +505,7 @@ export const useStore = create<UserState>()(
             chucuSatiety: data.chucuSatiety !== undefined ? data.chucuSatiety : state.chucuSatiety,
             chucuHappiness: data.chucuHappiness !== undefined ? data.chucuHappiness : state.chucuHappiness,
             chucuInteractions: data.chucuInteractions !== undefined ? data.chucuInteractions : state.chucuInteractions,
+            chucuPremiumFeeds: data.chucuPremiumFeeds !== undefined ? data.chucuPremiumFeeds : state.chucuPremiumFeeds,
             chucuLastTime: data.chucuLastTime !== undefined ? data.chucuLastTime : state.chucuLastTime,
 
 
@@ -557,12 +560,15 @@ export const useStore = create<UserState>()(
          set({ ...stats });
          if (state.isLoggedIn && state.uid) {
             state.updateUserDoc(stats);
+            setTimeout(() => {
+               get()._triggerCountAchievementsCheck();
+            }, 50);
          }
       },
 
       updateUserDoc: async (updates: any, transactionReason?: string) => {
          const state = get();
-         if (!state.isFirebaseSynced || !state.uid) return;
+         if (!state.uid || !state.isFirebaseSynced) return;
          
          const { uid, choco: prevChoco, goldenChoco: prevGChoco } = state;
             // Optimistically update local state
@@ -1209,6 +1215,10 @@ export const useStore = create<UserState>()(
          const newOwned = [...(state.ownedChucuAccessories || []), url];
          set({ ownedChucuAccessories: newOwned });
          get().updateUserDoc({ ownedChucuAccessories: newOwned });
+         
+         setTimeout(() => {
+            get()._triggerCountAchievementsCheck();
+         }, 50);
       },
 
       equipChucuAccessory: (url: string | null) => {
@@ -1356,6 +1366,7 @@ export const useStore = create<UserState>()(
          if (state.accessoryPosition !== undefined) stickerUpdates.accessoryPosition = state.accessoryPosition;
          if (state.avatarUrl !== undefined) stickerUpdates.avatarUrl = state.avatarUrl;
          if (state.activeTitle !== undefined) stickerUpdates.activeTitle = state.activeTitle;
+         if (state.displayName !== undefined) stickerUpdates.displayName = state.displayName;
 
          if (Object.keys(stickerUpdates).length === 0) return;
 
@@ -1372,21 +1383,19 @@ export const useStore = create<UserState>()(
             };
 
             // Update News Feed
-            const feedQ = query(collection(db, 'newsFeed'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(100));
+            const feedQ = query(collection(db, 'newsFeed'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(500));
             const feedSnaps = await getDocs(feedQ);
-            feedSnaps.forEach(d => { batch.update(d.ref, stickerUpdates); writeCount++; });
-            await commitBatchIfNeeded();
+            for (const d of feedSnaps.docs) { batch.update(d.ref, stickerUpdates); writeCount++; await commitBatchIfNeeded(); }
 
             // Update Chat
-            const chatQ = query(collection(db, 'chatMessages'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(150));
+            const chatQ = query(collection(db, 'chatMessages'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(500));
             const chatSnaps = await getDocs(chatQ);
-            chatSnaps.forEach(d => { batch.update(d.ref, stickerUpdates); writeCount++; });
-            await commitBatchIfNeeded();
+            for (const d of chatSnaps.docs) { batch.update(d.ref, stickerUpdates); writeCount++; await commitBatchIfNeeded(); }
 
             // Update Comments
-            const commQ = query(collection(db, 'comments'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(150));
+            const commQ = query(collection(db, 'comments'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(500));
             const commSnaps = await getDocs(commQ);
-            commSnaps.forEach(d => { batch.update(d.ref, stickerUpdates); writeCount++; });
+            for (const d of commSnaps.docs) { batch.update(d.ref, stickerUpdates); writeCount++; await commitBatchIfNeeded(); }
             
             if (writeCount > 0) {
                 await batch.commit();
@@ -1511,6 +1520,36 @@ export const useStore = create<UserState>()(
          // 15. Choco Thích Thú: ownedStickers.length >= 30
          if (!currentUnlocked.includes('sticker_collector') && (state.ownedStickers || []).length >= 30) {
             get().unlockAchievement('sticker_collector');
+         }
+
+         // 16. Choco Mọt Sách: totalChaptersRead >= 500
+         if (!currentUnlocked.includes('choco_mot_sach') && (state.totalChaptersRead || 0) >= 500) {
+            get().unlockAchievement('choco_mot_sach');
+         }
+
+         // 17. Choco Tương Tác: totalCommentsCount >= 500
+         if (!currentUnlocked.includes('choco_tuong_tac') && (state.totalCommentsCount || 0) >= 500) {
+            get().unlockAchievement('choco_tuong_tac');
+         }
+
+         // 18. Bạn Thân Của Chucu: chucuInteractions >= 500
+         if (!currentUnlocked.includes('chucu_friend_500') && (state.chucuInteractions || 0) >= 500) {
+            get().unlockAchievement('chucu_friend_500');
+         }
+
+         // 19. Chucu Ăn Sang: chucuPremiumFeeds >= 100
+         if (!currentUnlocked.includes('chucu_an_sang') && (state.chucuPremiumFeeds || 0) >= 100) {
+            get().unlockAchievement('chucu_an_sang');
+         }
+
+         // 20. Huấn Luyện Viên Chucu: chucuLevel >= 100
+         if (!currentUnlocked.includes('chucu_master_100') && (state.chucuLevel || 1) >= 100) {
+            get().unlockAchievement('chucu_master_100');
+         }
+
+         // 21. Fashionista Chucu: ownedChucuAccessories.length >= 5
+         if (!currentUnlocked.includes('chucu_fashion_5') && (state.ownedChucuAccessories || []).length >= 5) {
+            get().unlockAchievement('chucu_fashion_5');
          }
       },
 
