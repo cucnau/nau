@@ -19,11 +19,16 @@ interface ChatMessage {
   claimedBy?: string[];
 }
 
+import { useUserProfilesCache } from '../hooks/useUserProfilesCache';
+
 export function GlobalChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const { isLoggedIn, uid, displayName, avatarUrl, incrementSentMessages, activeTitle, getTitleColor, equippedStickerChat, equippedAccessory, accessoryPosition, email, firebaseUser, addChoco } = useStore();
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const userIds = messages.map(m => m.uid).filter(Boolean) as string[];
+  const profilesCache = useUserProfilesCache(userIds);
 
   useEffect(() => {
     const q = query(
@@ -176,13 +181,15 @@ export function GlobalChat() {
         {messages.map((msg, i) => {
           if (msg.isRain) return null;
 
+          const cached = msg.uid ? profilesCache[msg.uid] : null;
+          
           const isMe = msg.uid === uid;
-          const currentSticker = isMe ? equippedStickerChat : (msg.equippedStickerChat || msg.equippedSticker);
-          const currentDisplayName = isMe ? displayName : msg.displayName;
-          const currentAvatarUrl = isMe ? avatarUrl : msg.avatarUrl;
-          const currentActiveTitle = isMe ? activeTitle : msg.activeTitle;
-          const currentAccessory = isMe ? equippedAccessory : msg.equippedAccessory;
-          const currentAccessoryPos = isMe ? accessoryPosition : msg.accessoryPosition;
+          const currentSticker = isMe ? equippedStickerChat : (cached?.equippedStickerChat ?? cached?.equippedSticker ?? msg.equippedStickerChat ?? msg.equippedSticker);
+          const currentDisplayName = isMe ? displayName : (cached?.displayName ?? msg.displayName);
+          const currentAvatarUrl = isMe ? avatarUrl : (cached?.avatarUrl ?? msg.avatarUrl);
+          const currentActiveTitle = isMe ? activeTitle : (cached?.activeTitle ?? msg.activeTitle);
+          const currentAccessory = isMe ? equippedAccessory : (cached?.equippedAccessory ?? msg.equippedAccessory);
+          const currentAccessoryPos = isMe ? accessoryPosition : (cached?.accessoryPosition ?? msg.accessoryPosition);
 
           return (
              <div key={msg.id || i} className="flex flex-col w-full text-white items-start">
