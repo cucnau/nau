@@ -45,6 +45,7 @@ export function ChocoMascot() {
     chucuSatiety,
     chucuHappiness,
     chucuInteractions,
+    chucuPremiumFeeds,
     chucuLastTime,
     updateChucuStats,
     equippedChucuAccessory,
@@ -377,13 +378,15 @@ export function ChocoMascot() {
     }
     spendChoco(1, "Nuôi Chucu");
     const { newLevel, newExp } = addExp(3);
-    saveStats(
-      Math.min(100, chucuSatiety + 40),
-      Math.min(100, chucuHappiness + 30),
-      chucuInteractions + 1,
-      newLevel,
-      newExp,
-    );
+    updateChucuStats({
+      chucuSatiety: Math.min(100, chucuSatiety + 40),
+      chucuHappiness: Math.min(100, chucuHappiness + 30),
+      chucuInteractions: chucuInteractions + 1,
+      chucuPremiumFeeds: (chucuPremiumFeeds || 0) + 1,
+      chucuLevel: newLevel,
+      chucuExp: newExp,
+      chucuLastTime: Date.now(),
+    });
     triggerMood("happy");
     triggerAudio("chomp");
     spawnParticle("🌟");
