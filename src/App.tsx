@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { AppLayout } from './components/Layout';
 import { Home } from './pages/Home';
 import { StoryView } from './pages/StoryView';
@@ -45,6 +46,7 @@ export default function App() {
           </Route>
         </Routes>
       </AuthProvider>
+      <Analytics />
     </BrowserRouter>
   );
 }
