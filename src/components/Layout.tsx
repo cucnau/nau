@@ -70,7 +70,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   const { 
     isLoggedIn, email, missions, level, lastClaimedRewardLevel,
     setStoreOpen, setMissionsOpen, setAchievementsOpen,
-    firebaseUser, showChucu, setShowChucu
+    firebaseUser, showChucu, setShowChucu, logout
   } = useStore();
 
   if (!isOpen) return null;
@@ -106,6 +106,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      logout();
     } catch (error) {
       console.error('Logout failed', error);
     }
@@ -506,7 +507,7 @@ export function AppLayout() {
     isStoreOpen, isMissionsOpen, isAchievementsOpen, isInventoryOpen,
     setStoreOpen, setMissionsOpen, setAchievementsOpen, setInventoryOpen,
     isQuotaExceeded, firebaseUser, activeTitle, getTitleColor,
-    theme, setTheme
+    theme, setTheme, logout
   } = useStore();
   const navigate = useNavigate();
 
@@ -609,6 +610,7 @@ export function AppLayout() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      logout();
     } catch (error) {
       console.error('Logout failed', error);
     }
