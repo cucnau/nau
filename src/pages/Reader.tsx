@@ -5,7 +5,7 @@ import { UserAvatar } from '../components/UserAvatar';
 import { cn } from '../components/Layout';
 import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare, Clock, Pause, CheckCircle } from 'lucide-react';
 import { db, checkIfQuotaError } from '../lib/firebase';
-import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, doc, getDoc, updateDoc, increment } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, doc, getDoc, updateDoc, increment, limit } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { getWeeklyId } from '../types/achievements';
 
@@ -332,6 +332,36 @@ export function Reader() {
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState<string>('');
   const [submittingReply, setSubmittingReply] = useState<boolean>(false);
+
+  const notifyAdminOfComment = async (commentData: {
+    authorName: string;
+    storyTitle: string;
+    chapterTitle?: string | null;
+    content: string;
+  }) => {
+    try {
+      const currentEmail = useStore.getState().email;
+      if (currentEmail?.toLowerCase() === 'cucnau01@gmail.com') return;
+
+      const qAdmin = query(collection(db, 'users'), where('email', '==', 'cucnau01@gmail.com'), limit(1));
+      const adminSnap = await getDocs(qAdmin);
+      if (!adminSnap.empty) {
+        const adminUid = adminSnap.docs[0].id;
+        await addDoc(collection(db, 'notifications'), {
+          userId: adminUid,
+          type: 'new_comment',
+          authorName: commentData.authorName,
+          storyTitle: commentData.storyTitle,
+          chapterTitle: commentData.chapterTitle || null,
+          content: commentData.content,
+          isRead: false,
+          createdAt: Date.now()
+        });
+      }
+    } catch (err) {
+      console.error("Error creating admin notification:", err);
+    }
+  };
   
   const [story, setStory] = useState<any>(null);
   const [chapters, setChapters] = useState<any[]>([]);
@@ -425,6 +455,10 @@ export function Reader() {
              content,
              type,
              activeTitle: useStore.getState().activeTitle || null,
+             storyId: story.id,
+             storyTitle: story.title || 'Truyện',
+             chapterId: currentChapter?.id || null,
+             chapterTitle: currentChapter?.title || 'Chương',
              paragraphIdx: paragraphIdx ?? null,
              createdAt: serverTimestamp(),
              equippedSticker: useStore.getState().equippedStickerComment || null,
@@ -433,6 +467,12 @@ export function Reader() {
             accessoryPosition: useStore.getState().accessoryPosition || null
          });
          addCommentProgress();
+         notifyAdminOfComment({
+            authorName: displayName || 'Nhà lữ hành ẩn danh',
+            storyTitle: story?.title || 'Truyện',
+            chapterTitle: currentChapter?.title || 'Chương',
+            content: type === 'sticker' ? '💬 [Bình luận nhãn dán]' : content
+         });
      } catch (err) {
          console.error(err);
          if (checkIfQuotaError(err)) {
@@ -475,6 +515,10 @@ export function Reader() {
            content: replyText.trim(),
            type: 'comment_reply',
            replyToUser: parentComment.displayName || null,
+           storyId: story.id,
+           storyTitle: story.title || 'Truyện',
+           chapterId: currentChapter?.id || null,
+           chapterTitle: currentChapter?.title || 'Chương',
            parentId: parentComment.id,
            activeTitle: useStore.getState().activeTitle || null,
            giftAmount: 0,
@@ -486,6 +530,12 @@ export function Reader() {
            createdAt: serverTimestamp()
         });
 
+        notifyAdminOfComment({
+           authorName: displayName || 'Nhà lữ hành ẩn danh',
+           storyTitle: story?.title || 'Truyện',
+           chapterTitle: currentChapter?.title || 'Chương',
+           content: `↩️ Trả lời [${parentComment.displayName || 'Vô danh'}]: ${replyText.trim()}`
+        });
         if (parentComment.uid && parentComment.uid !== uid) {
            await addDoc(collection(db, 'notifications'), {
               userId: parentComment.uid,
