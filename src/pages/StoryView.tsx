@@ -4,7 +4,7 @@ import { BookOpen, Users, Lock, Unlock, Zap, ChevronRight, Bookmark, Gift, Heart
 import { cn } from '../components/Layout';
 import React, { useEffect, useState } from 'react';
 import { db, checkIfQuotaError } from '../lib/firebase';
-import { doc, getDoc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where } from 'firebase/firestore';
+import { doc, getDoc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, limit } from 'firebase/firestore';
 import { UserAvatar } from '../components/UserAvatar';
 
 interface CommentNodeProps {
@@ -243,6 +243,36 @@ export function StoryView() {
   const [replyText, setReplyText] = useState<string>('');
   const [submittingReply, setSubmittingReply] = useState<boolean>(false);
 
+  const notifyAdminOfComment = async (commentData: {
+    authorName: string;
+    storyTitle: string;
+    chapterTitle?: string | null;
+    content: string;
+  }) => {
+    try {
+      const currentEmail = useStore.getState().email;
+      if (currentEmail?.toLowerCase() === 'cucnau01@gmail.com') return;
+
+      const qAdmin = query(collection(db, 'users'), where('email', '==', 'cucnau01@gmail.com'), limit(1));
+      const adminSnap = await getDocs(qAdmin);
+      if (!adminSnap.empty) {
+        const adminUid = adminSnap.docs[0].id;
+        await addDoc(collection(db, 'notifications'), {
+          userId: adminUid,
+          type: 'new_comment',
+          authorName: commentData.authorName,
+          storyTitle: commentData.storyTitle,
+          chapterTitle: commentData.chapterTitle || null,
+          content: commentData.content,
+          isRead: false,
+          createdAt: Date.now()
+        });
+      }
+    } catch (err) {
+      console.error("Error creating admin notification:", err);
+    }
+  };
+
   useEffect(() => {
     if (!id) return;
     const fetchStory = async () => {
@@ -319,6 +349,10 @@ export function StoryView() {
              avatarUrl: avatarUrl || '',
              content: giftMessage.trim() || 'Gửi tặng Choco ngọt ngào ủng hộ tác phẩm!',
              type: 'choco_gift',
+             storyId: story.id,
+             storyTitle: story.title || 'Truyện',
+             chapterId: null,
+             chapterTitle: null,
              activeTitle: useStore.getState().activeTitle || null,
             equippedSticker: useStore.getState().equippedStickerComment || null,
             stickerPosition: useStore.getState().stickerPositionComment || 'top-right',
@@ -330,6 +364,11 @@ export function StoryView() {
           });
           setShowGiftModal(false);
           setGiftMessage('');
+          notifyAdminOfComment({
+             authorName: displayName || 'Nhà lữ hành ẩn danh',
+             storyTitle: story.title || 'Truyện',
+             content: `🎁 Tặng ${giftAmount} Choco: ${giftMessage.trim() || 'Gửi tặng Choco ngọt ngào ủng hộ tác phẩm!'}`
+          });
           alert(`Tặng ${giftAmount} Choco thành công! Cám ơn bạn đã tiếp sức cho tác phẩm.`);
        } catch (err) {
           console.error(err);
@@ -363,6 +402,10 @@ export function StoryView() {
            content: replyText.trim(),
            type: 'comment_reply',
            parentId: parentComment.id,
+           storyId: story.id,
+           storyTitle: story.title || 'Truyện',
+           chapterId: null,
+           chapterTitle: null,
            replyToUser: parentComment.displayName || null,
            activeTitle: useStore.getState().activeTitle || null,
            giftAmount: 0,
@@ -382,9 +425,9 @@ export function StoryView() {
               storyTitle: story.title || 'Truyện',
               chapterTitle: null,
               replierName: displayName || 'Nhà lữ hành ẩn danh',
-              isRead: false,
-              createdAt: Date.now(),
-              type: 'comment_reply'
+               isRead: false,
+               createdAt: Date.now(),
+               type: 'comment_reply',
            });
         }
 
@@ -418,6 +461,10 @@ export function StoryView() {
            avatarUrl: avatarUrl || '',
            content: commentText.trim(),
            type: 'story_review',
+            storyId: story.id,
+            storyTitle: story.title || 'Truyện',
+            chapterId: null,
+            chapterTitle: null,
            activeTitle: useStore.getState().activeTitle || null,
            equippedSticker: useStore.getState().equippedStickerComment || null,
            stickerPosition: useStore.getState().stickerPositionComment || 'top-right',
@@ -426,6 +473,11 @@ export function StoryView() {
            giftAmount: 0,
            paragraphIdx: null,
            createdAt: serverTimestamp()
+        });
+        notifyAdminOfComment({
+           authorName: displayName || 'Nhà lữ hành ẩn danh',
+           storyTitle: story.title || 'Truyện',
+           content: commentText.trim()
         });
         setCommentText('');
      } catch (err) {
