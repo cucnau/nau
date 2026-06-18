@@ -19,6 +19,7 @@ interface CommentNodeProps {
    getTitleColor: (title: string | null) => string | undefined;
    isLoggedIn: boolean;
    depth?: number;
+   profilesCache?: Record<string, any>;
 }
 
 const CommentNode: React.FC<CommentNodeProps> = ({
@@ -32,19 +33,22 @@ const CommentNode: React.FC<CommentNodeProps> = ({
    handleSendReply,
    getTitleColor,
    isLoggedIn,
-   depth = 0
+   depth = 0,
+   profilesCache = {}
 }) => {
    const { uid: storeUid, equippedStickerComment, stickerPositionComment, displayName: storeDisplayName, avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle, equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition, theme } = useStore();
    const isGift = comment.type === 'choco_gift';
    const isMe = comment.uid === storeUid;
    
-   const currentSticker = isMe ? equippedStickerComment : comment.equippedSticker;
-   const currentStickerPos = isMe ? stickerPositionComment : comment.stickerPosition;
-   const currentDisplayName = isMe ? storeDisplayName : comment.displayName;
-   const currentAvatarUrl = isMe ? storeAvatarUrl : comment.avatarUrl;
-   const currentActiveTitle = isMe ? storeActiveTitle : comment.activeTitle;
-   const currentAccessory = isMe ? storeEquippedAccessory : comment.equippedAccessory;
-   const currentAccessoryPos = isMe ? storeAccessoryPosition : comment.accessoryPosition;
+   const cached = comment.uid ? profilesCache[comment.uid] : null;
+
+   const currentSticker = isMe ? equippedStickerComment : (cached?.equippedStickerComment ?? cached?.equippedSticker ?? comment.equippedSticker);
+   const currentStickerPos = isMe ? stickerPositionComment : (cached?.stickerPositionComment ?? cached?.stickerPosition ?? comment.stickerPosition);
+   const currentDisplayName = isMe ? storeDisplayName : (cached?.displayName ?? comment.displayName);
+   const currentAvatarUrl = isMe ? storeAvatarUrl : (cached?.avatarUrl ?? comment.avatarUrl);
+   const currentActiveTitle = isMe ? storeActiveTitle : (cached?.activeTitle ?? comment.activeTitle);
+   const currentAccessory = isMe ? storeEquippedAccessory : (cached?.equippedAccessory ?? comment.equippedAccessory);
+   const currentAccessoryPos = isMe ? storeAccessoryPosition : (cached?.accessoryPosition ?? comment.accessoryPosition);
 
    const replies = comments.filter(r => r.parentId === comment.id).sort((a: any, b: any) => {
       const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0));
@@ -197,6 +201,7 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                      getTitleColor={getTitleColor}
                      isLoggedIn={isLoggedIn}
                      depth={depth + 1}
+                     profilesCache={profilesCache}
                   />
                ))}
             </div>
@@ -204,6 +209,8 @@ const CommentNode: React.FC<CommentNodeProps> = ({
       </div>
    );
 };
+
+import { useUserProfilesCache } from '../hooks/useUserProfilesCache';
 
 export function StoryView() {
   const { id } = useParams();
@@ -228,6 +235,12 @@ export function StoryView() {
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'chapters' | 'comments'>('chapters');
+
+  const userIds = comments.map(c => c.uid).filter(Boolean) as string[];
+  const profilesCache = useUserProfilesCache(userIds);
+  const [chapterPage, setChapterPage] = useState(0);
+  const [chapterSortDesc, setChapterSortDesc] = useState(false);
+  const CHAPTERS_PER_PAGE = 50;
   
   // Gift State
   const [showGiftModal, setShowGiftModal] = useState(false);
@@ -614,7 +627,44 @@ export function StoryView() {
          {/* Tab Content */}
          {activeTab === 'chapters' ? (
             <div className="flex flex-col">
-               {chapters.map(chap => {
+               {chapters.length > 0 && (
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between xl:justify-end gap-3 mb-4 bg-[#F5F2EB]/50 dark:bg-[#1C1613]/50 p-2 sm:p-3 rounded-xl border border-stone-200/50 dark:border-[#3E2D25]/50">
+                     <span className="text-xs font-bold text-[#8D6E63] uppercase tracking-wider hidden sm:inline-block mr-auto">
+                        {chapters.length} Chương
+                     </span>
+                     
+                     <div className="flex items-center gap-2 justify-between sm:justify-start w-full sm:w-auto">
+                        <select
+                           value={chapterPage}
+                           onChange={(e) => setChapterPage(Number(e.target.value))}
+                           className="bg-[#FDF6EC] dark:bg-[#1A1412] text-[#3E2723] dark:text-[#A1887F] font-bold text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border-2 border-[#3E2723]/20 dark:border-[#4E342E]/50 focus:border-[#8D6E63] flex-1 sm:flex-none"
+                        >
+                           {Array.from({ length: Math.ceil(chapters.length / CHAPTERS_PER_PAGE) }).map((_, i) => {
+                              const start = i * CHAPTERS_PER_PAGE + 1;
+                              const end = Math.min((i + 1) * CHAPTERS_PER_PAGE, chapters.length);
+                              return (
+                                 <option key={i} value={i}>
+                                    Chương {start} - {end}
+                                 </option>
+                              );
+                           })}
+                        </select>
+   
+                        <button 
+                           onClick={() => {
+                              setChapterSortDesc(!chapterSortDesc);
+                              setChapterPage(0);
+                           }}
+                           className="bg-[#3E2723] dark:bg-[#2C221D] text-[#FDF6EC] px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold text-xs sm:text-sm transition-all hover:bg-[#2D1B19] flex-shrink-0"
+                        >
+                           {chapterSortDesc ? '↓ Số lớn -> bé' : '↑ Số bé -> lớn'}
+                        </button>
+                     </div>
+                  </div>
+               )}
+
+               <div className="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+               {[...chapters].sort((a, b) => chapterSortDesc ? b.order - a.order : a.order - b.order).slice(chapterPage * CHAPTERS_PER_PAGE, (chapterPage + 1) * CHAPTERS_PER_PAGE).map(chap => {
                   const isRead = chap.order <= progressOrder;
                   const isPassRequired = chap.requiresPass;
                   const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
@@ -649,6 +699,7 @@ export function StoryView() {
                      </button>
                   )
                })}
+               </div>
             </div>
          ) : (
             <div className="space-y-6">
@@ -693,6 +744,7 @@ export function StoryView() {
                               handleSendReply={handleSendReply}
                               getTitleColor={getTitleColor}
                               isLoggedIn={isLoggedIn}
+                              profilesCache={profilesCache}
                            />
                         );
                         const isGift = comment.type === 'choco_gift';
