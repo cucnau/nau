@@ -247,7 +247,7 @@ export function Home() {
 
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {topActiveUsers.length === 0 && <p className="text-stone-400 italic text-sm text-center py-4 col-span-2">Chưa có dữ liệu tích cực.</p>}
-                  {topActiveUsers.slice(0, 4).map((u, i) => {
+                  {topActiveUsers.slice(0, 10).map((u, i) => {
                      const isMe = u.id === uid;
                      const isTop3 = i < 3;
                      return (
@@ -290,8 +290,8 @@ export function Home() {
                 Đại Gia Choco
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 {topUsers.length === 0 && <p className="text-stone-400 italic text-sm text-center py-4">Chưa có dữ liệu.</p>}
-                 {topUsers.slice(0, 4).map((u, i) => {
+                 {topUsers.length === 0 && <p className="text-stone-400 italic text-sm text-center py-4 col-span-2">Chưa có dữ liệu.</p>}
+                 {topUsers.slice(0, 10).map((u, i) => {
                     const isMe = u.id === uid;
                     return (
                        <div key={u.id} className={`flex items-center gap-3 p-3 rounded-2xl border-2 shadow-[1px_1px_0_0_#3E2723] hover:-translate-y-0.5 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all cursor-pointer ${isMe ? 'bg-[#F5E6D3] border-[#8D6E63] dark:bg-[#322420] dark:border-[#8D6E63]' : 'bg-[#FDF6EC] border-[#3E2723] hover:border-[#8D6E63] dark:bg-[#1C1613] dark:border-[#5D4037] dark:hover:border-[#C29D70]'}`}>
