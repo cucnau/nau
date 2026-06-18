@@ -649,9 +649,9 @@ export function Reader() {
 
   // Split into words to get Vietnamese word count
   const wordCount = currentChapter?.content ? currentChapter.content.split(/\s+/).filter(Boolean).length : 0;
-  // Calculate average reading speed: 4 words per second (240 words/min).
-  // Clamp between 15 seconds (minimum) and 90 seconds (maximum) to prevent boredom but fully block immediate spam.
-  const timeRequired = Math.max(15, Math.min(90, Math.ceil(wordCount / 4)));
+  // Tính tốc độ đọc trung bình: 5 từ/giây (khoảng 300 từ/phút, phù hợp để đọc lướt nhanh truyện mạng).
+  // Giới hạn trong khoảng từ 5 giây (với chương cực ngắn/thông báo) đến tối đa 60 giây (với chương siêu dài) để tối ưu hóa trải nghiệm đọc và chống click-farm.
+  const timeRequired = Math.max(5, Math.min(60, Math.ceil(wordCount / 5)));
 
   const handleReadingFinished = () => {
     if (storyId && currentChapter) {
@@ -1217,7 +1217,7 @@ export function Reader() {
                       ) : (
                          <span className="flex items-center gap-1.5 text-[#3E2723] dark:text-[#ECE5DC] text-[11px] sm:text-xs">
                              <Clock className="w-3.5 h-3.5 text-[#8D6E63] dark:text-[#D4AF37] animate-pulse flex-shrink-0" />
-                             <span>Còn <span className="font-mono text-xs sm:text-sm font-black text-[#8D6E63] dark:text-[#D4AF37]">{timeRequired - secondsRead}</span> giây</span>
+                             <span>Còn <span className="font-mono text-xs sm:text-sm font-black text-[#8D6E63] dark:text-[#D4AF37]">{timeRequired - secondsRead}</span> giây <span className="text-[10px] opacity-75 font-normal">({wordCount} từ)</span></span>
                           </span>
                       )}
                    </div>
