@@ -243,7 +243,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         useStore.getState()._ensureActiveWeekCalculations();
       } else {
         setFirebaseUser(null);
-        logout();
+        // Bao ve du lieu: Khong tu dong reset / logout de tranh loi mat sach du lieu khi reload (F5) trong moi truong iframe/Vercel
+        // Chi thuc su xoa sach nho vao logout() cua nut bam Dang xet chu dong.
       }
     });
 
