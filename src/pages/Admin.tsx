@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useStore } from "../store";
+import { format, subDays } from "date-fns";
 import { CHUCU_PRESET_ACCESSORIES, getChucuAccessoryPreview } from "../components/ChucuPresetAccessories";
 import {
   collection,
@@ -3853,8 +3854,27 @@ export function Admin() {
                     placeholder="Ví dụ: 2026-06-18"
                     value={editStatLastCheckInDate}
                     onChange={(e) => setEditStatLastCheckInDate(e.target.value)}
-                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 font-mono"
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 font-mono mb-1.5"
                   />
+                  <div className="flex gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setEditStatLastCheckInDate(format(subDays(new Date(), 1), 'yyyy-MM-dd'))}
+                      className="flex-1 py-1 px-1 text-[9px] font-black bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-all border border-amber-800 shadow-[0_1px_0_0_#5D4037] active:translate-y-0.5 active:shadow-none"
+                    >
+                      ↩️ Đặt hôm qua (GỢI Ý)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditStatLastCheckInDate(format(new Date(), 'yyyy-MM-dd'))}
+                      className="flex-1 py-1 px-1 text-[9px] font-black bg-stone-600 hover:bg-stone-700 text-white rounded-lg transition-all border border-stone-800 shadow-[0_1px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none"
+                    >
+                      ✅ Đặt hôm nay
+                    </button>
+                  </div>
+                  <p className="text-[9px] text-[#8D6E63] italic mt-1 leading-snug">
+                    * Chọn <strong>Đặt hôm qua</strong> để hôm nay user tự điểm danh tiếp được. Chọn <strong>Đặt hôm nay</strong> nếu muốn tính là đã điểm danh hôm nay rồi.
+                  </p>
                 </div>
 
                 <div>
