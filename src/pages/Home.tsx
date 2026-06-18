@@ -34,13 +34,13 @@ export function Home() {
     const qUsers = query(collection(db, 'users'), orderBy('choco', 'desc'), limit(15));
     const unsubUsers = onSnapshot(qUsers, (snap) => {
       const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((u: any) => u.email?.toLowerCase() !== 'cucnau01@gmail.com');
-      setTopUsers(users.slice(0, 10));
+      setTopUsers(users.slice(0, 4));
     });
 
     const qActiveUsers = query(collection(db, 'users'), orderBy('activePoints', 'desc'), limit(15));
     const unsubActiveUsers = onSnapshot(qActiveUsers, (snap) => {
       const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((u: any) => u.email?.toLowerCase() !== 'cucnau01@gmail.com');
-      setTopActiveUsers(users.slice(0, 10));
+      setTopActiveUsers(users.slice(0, 4));
     });
 
     return () => {
@@ -247,7 +247,7 @@ export function Home() {
 
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {topActiveUsers.length === 0 && <p className="text-stone-400 italic text-sm text-center py-4 col-span-2">Chưa có dữ liệu tích cực.</p>}
-                  {topActiveUsers.slice(0, 10).map((u, i) => {
+                  {topActiveUsers.slice(0, 4).map((u, i) => {
                      const isMe = u.id === uid;
                      const isTop3 = i < 3;
                      return (
@@ -291,7 +291,7 @@ export function Home() {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  {topUsers.length === 0 && <p className="text-stone-400 italic text-sm text-center py-4 col-span-2">Chưa có dữ liệu.</p>}
-                 {topUsers.slice(0, 10).map((u, i) => {
+                 {topUsers.slice(0, 4).map((u, i) => {
                     const isMe = u.id === uid;
                     return (
                        <div key={u.id} className={`flex items-center gap-3 p-3 rounded-2xl border-2 shadow-[1px_1px_0_0_#3E2723] hover:-translate-y-0.5 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all cursor-pointer ${isMe ? 'bg-[#F5E6D3] border-[#8D6E63] dark:bg-[#322420] dark:border-[#8D6E63]' : 'bg-[#FDF6EC] border-[#3E2723] hover:border-[#8D6E63] dark:bg-[#1C1613] dark:border-[#5D4037] dark:hover:border-[#C29D70]'}`}>
