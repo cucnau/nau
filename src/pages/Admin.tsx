@@ -87,6 +87,9 @@ interface AdminUser {
   chucuPremiumFeeds?: number;
   totalChaptersRead?: number;
   totalCommentsCount?: number;
+  checkInStreak?: number;
+  lastCheckInDate?: string | null;
+  ownedStreakTickets?: number;
 }
 
 interface AdminComment {
@@ -178,6 +181,9 @@ export function Admin() {
   const [editStatChucuPremiumFeeds, setEditStatChucuPremiumFeeds] = useState<number>(0);
   const [editStatTotalChaptersRead, setEditStatTotalChaptersRead] = useState<number>(0);
   const [editStatTotalCommentsCount, setEditStatTotalCommentsCount] = useState<number>(0);
+  const [editStatCheckInStreak, setEditStatCheckInStreak] = useState<number>(0);
+  const [editStatLastCheckInDate, setEditStatLastCheckInDate] = useState<string>("");
+  const [editStatOwnedStreakTickets, setEditStatOwnedStreakTickets] = useState<number>(0);
 
   const openEditUserStats = (u: AdminUser) => {
     setEditingUserStats(u);
@@ -194,6 +200,9 @@ export function Admin() {
     setEditStatChucuPremiumFeeds(u.chucuPremiumFeeds ?? 0);
     setEditStatTotalChaptersRead(u.totalChaptersRead ?? 0);
     setEditStatTotalCommentsCount(u.totalCommentsCount ?? 0);
+    setEditStatCheckInStreak(u.checkInStreak ?? 0);
+    setEditStatLastCheckInDate(u.lastCheckInDate ?? "");
+    setEditStatOwnedStreakTickets(u.ownedStreakTickets ?? 0);
   };
 
   const handleSaveUserStats = async () => {
@@ -213,6 +222,9 @@ export function Admin() {
         chucuPremiumFeeds: editStatChucuPremiumFeeds,
         totalChaptersRead: editStatTotalChaptersRead,
         totalCommentsCount: editStatTotalCommentsCount,
+        checkInStreak: editStatCheckInStreak,
+        lastCheckInDate: editStatLastCheckInDate ? editStatLastCheckInDate : null,
+        ownedStreakTickets: editStatOwnedStreakTickets,
       });
       alert(`Đã khôi phục và cập nhật chỉ số cho thành viên ${editingUserStats.displayName} thành công!`);
       setEditingUserStats(null);
@@ -3813,6 +3825,46 @@ export function Admin() {
                     value={editStatTotalCommentsCount}
                     onChange={(e) => setEditStatTotalCommentsCount(Number(e.target.value))}
                     className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600"
+                  />
+                </div>
+              </div>
+
+              {/* CỘT 3: CHUỖI ĐIỂM DANH & VÉ KHÔI PHỤC */}
+              <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3.5 p-3 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                <h3 className="sm:col-span-3 text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 border-b pb-1">
+                  📅 Chuỗi Điểm Danh & Vé Khôi Phục (Streak)
+                </h3>
+                
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1 text-amber-600">Chuỗi điểm danh hiện tại</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatCheckInStreak}
+                    onChange={(e) => setEditStatCheckInStreak(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 text-amber-600 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1">Ngày điểm danh cuối (YYYY-MM-DD)</label>
+                  <input
+                    type="text"
+                    placeholder="Ví dụ: 2026-06-18"
+                    value={editStatLastCheckInDate}
+                    onChange={(e) => setEditStatLastCheckInDate(e.target.value)}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1 text-[#8D6E63]">Vé khôi phục chuỗi sở hữu</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatOwnedStreakTickets}
+                    onChange={(e) => setEditStatOwnedStreakTickets(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 text-[#8D6E63] font-bold"
                   />
                 </div>
               </div>
