@@ -15,6 +15,7 @@ import {
   writeBatch,
   serverTimestamp,
   onSnapshot,
+  collectionGroup,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import {
@@ -83,8 +84,12 @@ interface AdminComment {
   uid: string;
   displayName: string;
   content: string;
-  type: "story" | "chapter";
+  type: string;
   createdAt: any;
+  storyTitle?: string;
+  storyId?: string;
+  chapterTitle?: string;
+  giftAmount?: number;
 }
 
 export function Admin() {
@@ -526,8 +531,13 @@ export function Admin() {
       const q = query(collection(db, "comments"), orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
       const list: AdminComment[] = [];
+      const missingTargetIds = new Set<string>();
+
       querySnapshot.forEach((docSnap) => {
         const data = docSnap.data();
+        if (!data.storyTitle && data.targetId && data.targetId !== 'Hệ thống') {
+           missingTargetIds.add(data.targetId);
+        }
         list.push({
           id: docSnap.id,
           targetId: data.targetId,
@@ -536,8 +546,49 @@ export function Admin() {
           content: data.content,
           type: data.type || "story",
           createdAt: data.createdAt,
+          storyTitle: data.storyTitle,
+          storyId: data.storyId,
+          chapterTitle: data.chapterTitle,
+          giftAmount: data.giftAmount || 0,
         });
       });
+
+      if (missingTargetIds.size > 0) {
+         try {
+            const sdocs = await getDocs(collection(db, "stories"));
+            const allChaptersMap: Record<string, { storyId: string, storyTitle: string, chapterTitle: string }> = {};
+            for (const s of sdocs.docs) {
+               const sid = s.id;
+               const stitle = s.data().title;
+               allChaptersMap[sid] = { storyId: sid, storyTitle: stitle, chapterTitle: '' };
+               const cdocs = await getDocs(collection(db, "stories", sid, "chapters"));
+               cdocs.forEach(c => {
+                  allChaptersMap[c.id] = { storyId: sid, storyTitle: stitle, chapterTitle: c.data().title || "Chương" };
+               });
+            }
+
+            for (let i = 0; i < list.length; i++) {
+               const c = list[i];
+               if (!c.storyTitle && c.targetId && allChaptersMap[c.targetId]) {
+                  const info = allChaptersMap[c.targetId];
+                  c.storyTitle = info.storyTitle;
+                  c.storyId = info.storyId;
+                  if (!c.chapterTitle && info.chapterTitle) {
+                     c.chapterTitle = info.chapterTitle;
+                  }
+                  
+                  updateDoc(doc(db, "comments", c.id), {
+                     storyTitle: c.storyTitle,
+                     storyId: c.storyId,
+                     chapterTitle: c.chapterTitle || null
+                  }).catch(console.error);
+               }
+            }
+         } catch (e) {
+            console.error("Lỗi fix chapters:", e);
+         }
+      }
+
       setComments(list);
     } catch (err: any) {
       console.error("Lỗi tải bình luận:", err);
@@ -2851,31 +2902,85 @@ export function Admin() {
           <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC]">
             Bình Luận Gần Đây
           </h2>
-          <div className="divide-y max-h-[500px] overflow-y-auto">
-            {comments.map((c) => (
-              <div
-                key={c.id}
-                className="py-3 flex justify-between items-start gap-4 border-b border-[#3E2723]/10 dark:border-stone-800"
-              >
-                <div className="space-y-1">
-                  <p className="text-xs text-[#8D6E63]/80 dark:text-stone-400 font-bold">
-                    {c.displayName}{" "}
-                    <span className="font-normal">
-                      • {c.type === "story" ? "Truyện" : "Chương"}
-                    </span>
-                  </p>
-                  <p className="text-sm text-[#3E2723] dark:text-[#ECE5DC]">
-                    {c.content}
-                  </p>
-                </div>
-                <button
-                  onClick={() => deleteCommentItem(c.id)}
-                  className="text-red-500 hover:text-red-700 p-1"
+          <div className="divide-y max-h-[600px] overflow-y-auto">
+            {comments.map((c) => {
+              const formatCommentTime = (createdAt: any) => {
+                if (!createdAt) return "---";
+                let d: Date | null = null;
+                if (typeof createdAt === "number") d = new Date(createdAt);
+                else if (createdAt?.seconds) d = new Date(createdAt.seconds * 1000);
+                else if (createdAt?.toDate) d = createdAt.toDate();
+                else d = new Date(createdAt);
+
+                if (!d || isNaN(d.getTime())) return "---";
+                return d.toLocaleDateString("vi-VN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric"
+                });
+              };
+
+              return (
+                <div
+                  key={c.id}
+                  className="py-4 flex justify-between items-start gap-4 border-b border-[#3E2723]/10 dark:border-stone-800 hover:bg-[#D7CCC8]/10 dark:hover:bg-stone-900/30 px-3 rounded-xl transition-all"
                 >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
+                  <div className="space-y-2 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <span className="font-bold text-[#3E2723] dark:text-[#ECE5DC] text-[13px]">
+                        {c.displayName || 'Nhà lữ hành ẩn danh'}
+                      </span>
+                      <span className="text-[#8D6E63]/60 dark:text-stone-500">•</span>
+                      <span className="text-stone-500 dark:text-stone-400 font-mono">
+                        ⏱️ {formatCommentTime(c.createdAt)}
+                      </span>
+                      {c.type && (
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          c.type === 'choco_gift' 
+                            ? 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                            : c.type === 'comment_reply'
+                            ? 'bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800'
+                            : 'bg-stone-100 dark:bg-stone-900 text-stone-700 dark:text-stone-300 border border-stone-300 dark:border-stone-700'
+                        }`}>
+                          {c.type === 'choco_gift' ? 'Quà tặng 🎁' : c.type === 'comment_reply' ? 'Trả lời ↩️' : 'Bình luận 💬'}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Metadata: Story, Chapter */}
+                    <div className="flex flex-col gap-1 bg-[#F5F2EB] dark:bg-[#1C1613] p-2.5 rounded-xl border border-stone-200 dark:border-[#3E2D25] text-xs font-mono text-[#5D4037] dark:text-[#A1887F]">
+                      <div className="truncate">
+                        <span className="font-bold text-[#3E2723] dark:text-[#ECE5DC]">Truyện:</span> {c.storyTitle || (stories.find(s => s.id === c.storyId || s.id === c.targetId)?.title) || (c.targetId?.length > 15 ? 'Truyện đã xoá/Chưa rõ' : (c.targetId || 'Truyện hệ thống'))}
+                      </div>
+                      {c.chapterTitle && (
+                        <div className="truncate">
+                          <span className="font-bold text-[#3E2723] dark:text-[#ECE5DC]">Chương:</span> {c.chapterTitle}
+                        </div>
+                      )}
+                      {c.giftAmount > 0 && (
+                        <div className="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
+                          ✨ Đã tặng {c.giftAmount} Choco!
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-sm text-[#3E2723] dark:text-[#ECE5DC] bg-white/40 dark:bg-black/10 p-2.5 rounded-xl border border-[#3E2723]/5 dark:border-white/5 break-words">
+                      {c.content}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => deleteCommentItem(c.id)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-500/10 p-2 rounded-xl transition-all"
+                    title="Xóa bình luận"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
