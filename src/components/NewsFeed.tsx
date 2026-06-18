@@ -19,11 +19,16 @@ interface FeedPost {
   stickerPosition?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | null;
 }
 
+import { useUserProfilesCache } from '../hooks/useUserProfilesCache';
+
 export function NewsFeed() {
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const { isLoggedIn, uid, email, getTitleColor, displayName, activeTitle, avatarUrl, equippedStickerPost, stickerPositionPost, equippedAccessory, accessoryPosition } = useStore();
   const navigate = useNavigate();
   const isAdmin = email?.toLowerCase() === 'cucnau01@gmail.com';
+
+  const userIds = posts.map(p => p.uid).filter(Boolean) as string[];
+  const profilesCache = useUserProfilesCache(userIds);
 
   useEffect(() => {
     const q = query(
@@ -85,13 +90,18 @@ export function NewsFeed() {
           </div>
         ) : (
           posts.map((post) => {
+            const cached = post.uid ? profilesCache[post.uid] : null;
+
             const isAuthor = post.uid === uid;
             const canDelete = isAuthor || isAdmin;
             
-            const currentSticker = isAuthor ? equippedStickerPost : (post.equippedStickerPost || post.equippedSticker);
-            const currentStickerPos = isAuthor ? stickerPositionPost : (post.stickerPositionPost || post.stickerPosition);
-            const currentDisplayName = isAuthor ? displayName : post.displayName;
-            const currentActiveTitle = isAuthor ? activeTitle : post.activeTitle;
+            const currentSticker = isAuthor ? equippedStickerPost : (cached?.equippedStickerPost ?? cached?.equippedSticker ?? post.equippedStickerPost ?? post.equippedSticker);
+            const currentStickerPos = isAuthor ? stickerPositionPost : (cached?.stickerPositionPost ?? cached?.stickerPosition ?? post.stickerPositionPost ?? post.stickerPosition);
+            const currentDisplayName = isAuthor ? displayName : (cached?.displayName ?? post.displayName);
+            const currentActiveTitle = isAuthor ? activeTitle : (cached?.activeTitle ?? post.activeTitle);
+            const currentAvatarUrl = isAuthor ? avatarUrl : (cached?.avatarUrl ?? post.avatarUrl);
+            const currentAccessory = isAuthor ? equippedAccessory : (cached?.equippedAccessory ?? post.equippedAccessory);
+            const currentAccessoryPos = isAuthor ? accessoryPosition : (cached?.accessoryPosition ?? post.accessoryPosition);
 
             return (
               <div 
@@ -107,9 +117,9 @@ export function NewsFeed() {
                   />
                 )}
                 <UserAvatar 
-                  avatarUrl={isAuthor ? avatarUrl : post.avatarUrl} 
-                  equippedAccessory={isAuthor ? equippedAccessory : post.equippedAccessory}
-                  accessoryPosition={isAuthor ? accessoryPosition : post.accessoryPosition}
+                  avatarUrl={currentAvatarUrl} 
+                  equippedAccessory={currentAccessory}
+                  accessoryPosition={currentAccessoryPos}
                   className="w-10 h-10" 
                   fallbackIconSizeClass="w-5 h-5" 
                 />
