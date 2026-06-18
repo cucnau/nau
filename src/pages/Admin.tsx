@@ -76,6 +76,17 @@ interface AdminUser {
   customTitles?: CustomTitle[];
   claimedAchievements?: string[];
   unlockedAchievements?: string[];
+  level?: number;
+  exp?: number;
+  activePoints?: number;
+  chucuLevel?: number;
+  chucuExp?: number;
+  chucuSatiety?: number;
+  chucuHappiness?: number;
+  chucuInteractions?: number;
+  chucuPremiumFeeds?: number;
+  totalChaptersRead?: number;
+  totalCommentsCount?: number;
 }
 
 interface AdminComment {
@@ -151,6 +162,65 @@ export function Admin() {
   const [givingGChoco, setGivingGChoco] = useState<number>(0);
   const [banningUser, setBanningUser] = useState<AdminUser | null>(null);
   const [banDurationHours, setBanDurationHours] = useState<number>(0); // 0 means permanent
+
+  // User Stats Recovery Editor React State
+  const [editingUserStats, setEditingUserStats] = useState<AdminUser | null>(null);
+  const [editStatLevel, setEditStatLevel] = useState<number>(1);
+  const [editStatExp, setEditStatExp] = useState<number>(0);
+  const [editStatActivePoints, setEditStatActivePoints] = useState<number>(0);
+  const [editStatChoco, setEditStatChoco] = useState<number>(0);
+  const [editStatGoldenChoco, setEditStatGoldenChoco] = useState<number>(0);
+  const [editStatChucuLevel, setEditStatChucuLevel] = useState<number>(1);
+  const [editStatChucuExp, setEditStatChucuExp] = useState<number>(0);
+  const [editStatChucuSatiety, setEditStatChucuSatiety] = useState<number>(70);
+  const [editStatChucuHappiness, setEditStatChucuHappiness] = useState<number>(50);
+  const [editStatChucuInteractions, setEditStatChucuInteractions] = useState<number>(0);
+  const [editStatChucuPremiumFeeds, setEditStatChucuPremiumFeeds] = useState<number>(0);
+  const [editStatTotalChaptersRead, setEditStatTotalChaptersRead] = useState<number>(0);
+  const [editStatTotalCommentsCount, setEditStatTotalCommentsCount] = useState<number>(0);
+
+  const openEditUserStats = (u: AdminUser) => {
+    setEditingUserStats(u);
+    setEditStatLevel(u.level ?? 1);
+    setEditStatExp(u.exp ?? 0);
+    setEditStatActivePoints(u.activePoints ?? 0);
+    setEditStatChoco(u.choco ?? 0);
+    setEditStatGoldenChoco(u.goldenChoco ?? 0);
+    setEditStatChucuLevel(u.chucuLevel ?? 1);
+    setEditStatChucuExp(u.chucuExp ?? 0);
+    setEditStatChucuSatiety(u.chucuSatiety ?? 70);
+    setEditStatChucuHappiness(u.chucuHappiness ?? 50);
+    setEditStatChucuInteractions(u.chucuInteractions ?? 0);
+    setEditStatChucuPremiumFeeds(u.chucuPremiumFeeds ?? 0);
+    setEditStatTotalChaptersRead(u.totalChaptersRead ?? 0);
+    setEditStatTotalCommentsCount(u.totalCommentsCount ?? 0);
+  };
+
+  const handleSaveUserStats = async () => {
+    if (!editingUserStats) return;
+    try {
+      await updateDoc(doc(db, "users", editingUserStats.id), {
+        level: editStatLevel,
+        exp: editStatExp,
+        activePoints: editStatActivePoints,
+        choco: editStatChoco,
+        goldenChoco: editStatGoldenChoco,
+        chucuLevel: editStatChucuLevel,
+        chucuExp: editStatChucuExp,
+        chucuSatiety: editStatChucuSatiety,
+        chucuHappiness: editStatChucuHappiness,
+        chucuInteractions: editStatChucuInteractions,
+        chucuPremiumFeeds: editStatChucuPremiumFeeds,
+        totalChaptersRead: editStatTotalChaptersRead,
+        totalCommentsCount: editStatTotalCommentsCount,
+      });
+      alert(`Đã khôi phục và cập nhật chỉ số cho thành viên ${editingUserStats.displayName} thành công!`);
+      setEditingUserStats(null);
+      fetchUsers();
+    } catch (err: any) {
+      alert("Lỗi khi cập nhật chỉ số: " + (err.message || err));
+    }
+  };
 
   const handleBanUser = async () => {
     if (!banningUser) return;
@@ -521,6 +591,17 @@ export function Admin() {
           customTitles: data.customTitles || [],
           claimedAchievements: data.claimedAchievements || [],
           unlockedAchievements: data.unlockedAchievements || [],
+          level: data.level !== undefined ? data.level : 1,
+          exp: data.exp !== undefined ? data.exp : 0,
+          activePoints: data.activePoints !== undefined ? data.activePoints : 0,
+          chucuLevel: data.chucuLevel !== undefined ? data.chucuLevel : 1,
+          chucuExp: data.chucuExp !== undefined ? data.chucuExp : 0,
+          chucuSatiety: data.chucuSatiety !== undefined ? data.chucuSatiety : 70,
+          chucuHappiness: data.chucuHappiness !== undefined ? data.chucuHappiness : 50,
+          chucuInteractions: data.chucuInteractions !== undefined ? data.chucuInteractions : 0,
+          chucuPremiumFeeds: data.chucuPremiumFeeds !== undefined ? data.chucuPremiumFeeds : 0,
+          totalChaptersRead: data.totalChaptersRead !== undefined ? data.totalChaptersRead : 0,
+          totalCommentsCount: data.totalCommentsCount !== undefined ? data.totalCommentsCount : 0,
         });
       });
       setUsers(list);
@@ -2820,12 +2901,21 @@ export function Admin() {
                     <p className="text-xs text-[#8D6E63] dark:text-[#A1887F] opacity-90">
                       {u.email}
                     </p>
-                    <div className="flex gap-3 mt-2 text-xs">
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-xs">
                       <span className="font-bold text-amber-700 dark:text-amber-500">
                         Choco: {u.choco}
                       </span>
                       <span className="font-bold text-yellow-600 dark:text-yellow-500">
                         Golden: {u.goldenChoco}
+                      </span>
+                      <span className="font-semibold text-blue-700 dark:text-blue-400">
+                        Cập độ: {u.level} (Exp: {u.exp})
+                      </span>
+                      <span className="font-semibold text-emerald-700 dark:text-emerald-400 font-mono">
+                        Tích cực: {u.activePoints}
+                      </span>
+                      <span className="font-semibold text-purple-700 dark:text-purple-400">
+                        🧸 Level Chucu: {u.chucuLevel}
                       </span>
                     </div>
                     {u.customTitles && u.customTitles.length > 0 && (
@@ -2849,6 +2939,12 @@ export function Admin() {
                     )}
                   </div>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+                    <button
+                      onClick={() => openEditUserStats(u)}
+                      className="px-3 py-1.5 bg-[#8D6E63] text-white border-2 border-[#3E2723] dark:border-[#4E342E] text-xs font-bold rounded-lg hover:bg-[#5D4037] transition-all whitespace-nowrap shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex items-center gap-1"
+                    >
+                      🛠️ Sửa Chỉ Số
+                    </button>
                     <button
                       onClick={() => setAssigningTitleUser(u)}
                       className="px-3 py-1.5 bg-[#FFFDF9] dark:bg-[#1C1613] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#8D6E63] text-xs font-bold rounded-lg hover:bg-[#FDF6EC] dark:hover:bg-[#1E1410] transition-all whitespace-nowrap shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]"
@@ -3600,6 +3696,214 @@ export function Admin() {
                 className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700"
               >
                 Đồng ý
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editingUserStats && (
+        <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4 overflow-y-auto">
+          <div
+            className={`max-w-xl w-full p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 my-8 transition-all relative ${isDark ? "bg-[#211B18] border-[#4E342E] text-[#ECE5DC]" : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]"}`}
+          >
+            <div className="flex justify-between items-center border-b pb-3 border-[#3E2723]/10 dark:border-[#4E342E]/30">
+              <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-1.5">
+                🛠️ Sửa Chỉ Số & Khôi Phục
+              </h2>
+              <button
+                onClick={() => setEditingUserStats(null)}
+                className="text-stone-400 hover:text-red-500 font-extrabold text-xl font-mono leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="text-xs space-y-1 bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl">
+              <p>📍 Đang hiệu chỉnh tài khoản: <strong className="text-amber-800 dark:text-amber-400">{editingUserStats.displayName}</strong></p>
+              <p>✉️ Email: <strong className="font-mono">{editingUserStats.email}</strong></p>
+              <p className="text-[#8D6E63] dark:text-amber-300/80">⚠️ Chú ý: Trực tiếp thay đổi các thông số này trên cơ sở dữ liệu Firestore. Dữ liệu sẽ cập nhật thời gian thực đến người dùng!</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[50vh] overflow-y-auto pr-1">
+              {/* CỘT 1: CHỈ SỐ CÁ NHÂN */}
+              <div className="space-y-3.5 p-3 rounded-2xl bg-stone-500/5 border border-stone-500/10">
+                <h3 className="text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 border-b pb-1">
+                  👤 Chỉ số cá nhân & Tích cực
+                </h3>
+                
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1">Cấp độ (Level)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={editStatLevel}
+                    onChange={(e) => setEditStatLevel(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1">Kinh nghiệm (Exp)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatExp}
+                    onChange={(e) => setEditStatExp(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1 text-emerald-600">Điểm tích cực (activePoints)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatActivePoints}
+                    onChange={(e) => setEditStatActivePoints(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 font-mono text-[#2E7D32] dark:text-emerald-400 font-bold"
+                  />
+                </div>
+              </div>
+
+              {/* CỘT 2: SỐ DƯ & QUÁ TRÌNH */}
+              <div className="space-y-3.5 p-3 rounded-2xl bg-stone-500/5 border border-stone-500/10">
+                <h3 className="text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 border-b pb-1">
+                  💰 Ví tiền & Hoạt động
+                </h3>
+                
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1 text-amber-600">Xu Choco</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatChoco}
+                    onChange={(e) => setEditStatChoco(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 text-amber-600 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1 text-yellow-600">Xu Golden Choco</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatGoldenChoco}
+                    onChange={(e) => setEditStatGoldenChoco(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 text-yellow-600 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1">Số chương đã đọc</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatTotalChaptersRead}
+                    onChange={(e) => setEditStatTotalChaptersRead(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1">Bình luận đã viết</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatTotalCommentsCount}
+                    onChange={(e) => setEditStatTotalCommentsCount(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600"
+                  />
+                </div>
+              </div>
+
+              {/* HÀNG TOÀN DIỆN CHO CHUCU COMPANION */}
+              <div className="sm:col-span-2 space-y-3 p-3 rounded-2xl bg-[#FDF6EC] dark:bg-[#251A15] border border-[#3E2723]/10 dark:border-[#4E342E]/40">
+                <h3 className="text-xs font-black uppercase tracking-wider text-[#3E2723] dark:text-amber-400 border-b pb-1">
+                  🧸 Chỉ số người bạn Chucu
+                </h3>
+                
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <label className="block text-[9px] font-extrabold mb-1">Cấp thú cưng (Chucu Level)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={editStatChucuLevel}
+                      onChange={(e) => setEditStatChucuLevel(Number(e.target.value))}
+                      className="w-full px-3 py-1 bg-white dark:bg-[#1E1815] border-2 border-[#3E2723]/20 dark:border-[#4E342E]/50 text-xs rounded-xl text-[#3E2723] dark:text-[#ECE5DC]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-extrabold mb-1">Exp thú cưng (Chucu Exp)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editStatChucuExp}
+                      onChange={(e) => setEditStatChucuExp(Number(e.target.value))}
+                      className="w-full px-3 py-1 bg-white dark:bg-[#1E1815] border-2 border-[#3E2723]/20 dark:border-[#4E342E]/50 text-xs rounded-xl text-[#3E2723] dark:text-[#ECE5DC]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-extrabold mb-1">Độ no Chucu (Satiety)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={editStatChucuSatiety}
+                      onChange={(e) => setEditStatChucuSatiety(Number(e.target.value))}
+                      className="w-full px-3 py-1 bg-white dark:bg-[#1E1815] border-2 border-[#3E2723]/20 dark:border-[#4E342E]/50 text-xs rounded-xl text-[#3E2723] dark:text-[#ECE5DC]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-extrabold mb-1">Hạnh phúc Chucu (Happiness)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={editStatChucuHappiness}
+                      onChange={(e) => setEditStatChucuHappiness(Number(e.target.value))}
+                      className="w-full px-3 py-1 bg-white dark:bg-[#1E1815] border-2 border-[#3E2723]/20 dark:border-[#4E342E]/50 text-xs rounded-xl text-[#3E2723] dark:text-[#ECE5DC]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-extrabold mb-1">Tương tác Chucu</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editStatChucuInteractions}
+                      onChange={(e) => setEditStatChucuInteractions(Number(e.target.value))}
+                      className="w-full px-3 py-1 bg-white dark:bg-[#1E1815] border-2 border-[#3E2723]/20 dark:border-[#4E342E]/50 text-xs rounded-xl text-[#3E2723] dark:text-[#ECE5DC]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-extrabold mb-1">Ăn sang mlem hảo hạng (Premium)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editStatChucuPremiumFeeds}
+                      onChange={(e) => setEditStatChucuPremiumFeeds(Number(e.target.value))}
+                      className="w-full px-3 py-1 bg-white dark:bg-[#1E1815] border-2 border-[#3E2723]/20 dark:border-[#4E342E]/50 text-xs rounded-xl text-[#3E2723] dark:text-[#ECE5DC]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2.5 border-t pt-3 border-[#3E2723]/10 dark:border-[#4E342E]/30 mt-1">
+              <button
+                type="button"
+                onClick={() => setEditingUserStats(null)}
+                className="px-4 py-2 bg-stone-200 dark:bg-[#1C1613] text-[#3E2723] dark:text-[#ECE5DC] border border-[#3E2723]/20 dark:border-[#4E342E] font-bold text-sm rounded-xl transition-all"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveUserStats}
+                className="px-5 py-2 bg-[#8D6E63] hover:bg-[#5D4037] text-white font-bold text-sm rounded-xl transition-all shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]"
+              >
+                💾 Khôi Phục & Cập Nhật
               </button>
             </div>
           </div>
