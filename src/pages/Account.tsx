@@ -180,6 +180,7 @@ export function Account() {
         avatarUrl: avatar,
       });
       console.log('Firestore and Store updated.');
+      useStore.getState().propagateEquipmentChanges().catch(console.error);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       // Remove alert to fix the hanging problem in iframe
