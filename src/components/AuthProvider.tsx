@@ -84,6 +84,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               prevActivePoints: 0,
               prevActiveWeek: '',
               activeTitle: null,
+              chucuLevel: 1,
+              chucuExp: 0,
+              chucuSatiety: 70,
+              chucuHappiness: 50,
+              chucuInteractions: 0,
+              chucuPremiumFeeds: 0,
+              chucuLastTime: Date.now(),
             };
             try {
               await setDoc(userRef, newUser);
