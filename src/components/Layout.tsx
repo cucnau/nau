@@ -286,7 +286,8 @@ function AchievementsModal() {
     isLoggedIn, uid, unlockedAchievements, claimedAchievements,
     totalEarnedChoco, totalEarnedGChoco, totalSpentChoco, totalCheckIns,
     perfectDailyDates, sentMessagesCount, genresRead, checkInStreak,
-    claimAchievement, savedStories, totalChaptersRead, totalCommentsCount, ownedStickers
+    claimAchievement, savedStories, totalChaptersRead, totalCommentsCount, ownedStickers,
+    chucuInteractions, chucuPremiumFeeds, chucuLevel, ownedChucuAccessories
   } = useStore();
 
   const [activeCategory, setActiveCategory] = useState('all');
@@ -338,6 +339,18 @@ function AchievementsModal() {
         return totalEarnedGChoco || 0;
       case 'choco_cute':
         return unlockedAchievements.includes('choco_cute') ? 1 : 0;
+      case 'choco_mot_sach':
+        return totalChaptersRead || 0;
+      case 'choco_tuong_tac':
+        return totalCommentsCount || 0;
+      case 'chucu_friend_500':
+        return chucuInteractions || 0;
+      case 'chucu_an_sang':
+        return chucuPremiumFeeds || 0;
+      case 'chucu_master_100':
+        return chucuLevel || 1;
+      case 'chucu_fashion_5':
+        return (ownedChucuAccessories || []).length;
       default:
         return 0;
     }
@@ -721,12 +734,16 @@ export function AppLayout() {
                               <div className="w-2 h-2 rounded-full shrink-0 mt-1.5 bg-[#8D6E63] opacity-95" style={{ visibility: notif.isRead ? 'hidden' : 'visible' }} />
                               <div className="flex-1">
                                 {notif.type === 'comment_reply' ? (
-                                  <p className="leading-relaxed text-[#3E2723]">
-                                     <span className="font-bold text-[#5D4037]">{notif.replierName}</span> đã trả lời bình luận của bạn trong truyện <span className="font-bold text-[#5D4037]">{notif.storyTitle}</span>{notif.chapterTitle ? ` (Chương: ${notif.chapterTitle})` : ''}
+                                  <p className="leading-relaxed text-[#3E2723] dark:text-[#ECE5DC]">
+                                     <span className="font-bold text-[#5D4037] dark:text-[#D7CCC8]">{notif.replierName}</span> đã trả lời bình luận của bạn trong truyện <span className="font-bold text-[#5D4037] dark:text-[#D7CCC8]">{notif.storyTitle}</span>{notif.chapterTitle ? ` (Chương: ${notif.chapterTitle})` : ''}
+                                  </p>
+                                ) : notif.type === 'new_comment' ? (
+                                  <p className="leading-relaxed text-[#3E2723] dark:text-[#ECE5DC]">
+                                     <span className="font-bold text-[#5D4037] dark:text-[#D7CCC8]">{notif.authorName}</span> đã bình luận về truyện <span className="font-bold text-[#5D4037] dark:text-[#D7CCC8]">{notif.storyTitle}</span>{notif.chapterTitle ? ` (Chương: ${notif.chapterTitle})` : ''}: <span className="italic text-stone-500 dark:text-stone-300">"{notif.content}"</span>
                                   </p>
                                 ) : (
-                                  <p className="leading-relaxed">
-                                     Truyện <span className="font-bold text-[#5D4037]">{notif.storyTitle}</span> vừa có chương mới: <span className="italic text-[#8D6E63]">{notif.chapterTitle}</span>
+                                  <p className="leading-relaxed text-[#3E2723] dark:text-[#ECE5DC]">
+                                     Truyện <span className="font-bold text-[#5D4037] dark:text-[#D7CCC8]">{notif.storyTitle}</span> vừa có chương mới: <span className="italic text-[#8D6E63] dark:text-[#D7CCC8] font-semibold">{notif.chapterTitle}</span>
                                   </p>
                                 )}
                                 <span className="text-[10px] text-stone-400 font-mono block mt-1">{formatRelativeTime(notif.createdAt)}</span>
