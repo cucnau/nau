@@ -331,7 +331,7 @@ export function Home() {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  {stories.length === 0 && <p className="text-stone-400 italic text-sm text-center py-4">Chưa có truyện mới.</p>}
-                 {stories.slice(0, 6).map((story) => (
+                 {stories.slice(0, 4).map((story) => (
                     <div key={story.id} className="group flex gap-3.5 p-3 bg-[#FDF6EC] dark:bg-[#1C1613] rounded-2xl border-[3px] border-[#F5E6D3] dark:border-[#5D4037] cursor-pointer hover:border-[#8D6E63] dark:hover:border-[#C29D70] transition-all hover:-translate-y-1 shadow-[0_2px_0_0_#F5E6D3] dark:shadow-[0_2px_0_0_#0D0907] hover:shadow-[0_2px_0_0_#8D6E63] dark:hover:shadow-[0_2px_0_0_#C29D70] active:translate-y-1 active:shadow-none" onClick={() => navigate(`/truyen/${story.id}`)}>
                        <img src={story.coverUrl} alt={story.title} className="w-12 h-16 object-cover rounded-xl shadow-xs border border-white/50 dark:border-black/50 shrink-0 group-hover:scale-105 transition-all duration-300" />
                        <div className="flex flex-col justify-between min-w-0 flex-1 py-0.5">
