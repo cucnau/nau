@@ -7,14 +7,14 @@ import firebaseConfig from '../../firebase-applet-config.json';
 
 // Use env vars if they exist (Vercel), otherwise fallback to the hardcoded config (AI Studio)
 const config = {
-  apiKey: (import.meta.env.VITE_FIREBASE_API_KEY as string) || firebaseConfig.apiKey,
-  authDomain: (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string) || firebaseConfig.authDomain,
-  projectId: (import.meta.env.VITE_FIREBASE_PROJECT_ID as string) || firebaseConfig.projectId,
-  storageBucket: (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string) || firebaseConfig.storageBucket,
-  messagingSenderId: (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string) || firebaseConfig.messagingSenderId,
-  appId: (import.meta.env.VITE_FIREBASE_APP_ID as string) || firebaseConfig.appId,
-  measurementId: (import.meta.env.VITE_FIREBASE_MEASUREMENT_ID as string) || firebaseConfig.measurementId,
-  firestoreDatabaseId: (import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID as string) || firebaseConfig.firestoreDatabaseId || '(default)'
+  apiKey: firebaseConfig.apiKey || (import.meta.env.VITE_FIREBASE_API_KEY as string),
+  authDomain: firebaseConfig.authDomain || (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string),
+  projectId: firebaseConfig.projectId || (import.meta.env.VITE_FIREBASE_PROJECT_ID as string),
+  storageBucket: firebaseConfig.storageBucket || (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string),
+  messagingSenderId: firebaseConfig.messagingSenderId || (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string),
+  appId: firebaseConfig.appId || (import.meta.env.VITE_FIREBASE_APP_ID as string),
+  measurementId: firebaseConfig.measurementId || (import.meta.env.VITE_FIREBASE_MEASUREMENT_ID as string),
+  firestoreDatabaseId: firebaseConfig.firestoreDatabaseId || (import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID as string) || '(default)'
 };
 
 export const app = initializeApp(config);
