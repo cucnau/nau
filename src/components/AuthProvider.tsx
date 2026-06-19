@@ -321,9 +321,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error fetching achievement colors:', err);
     });
 
+    // 3. Subscribe to maintenance mode
+    const unsubMaintenance = onSnapshot(doc(db, 'settings', 'system'), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (typeof data.isMaintenance === 'boolean') {
+          useStore.getState().setMaintenance(data.isMaintenance);
+        }
+      }
+    }, (err) => {
+      console.error('Error fetching maintenance settings:', err);
+    });
+
     return () => {
       unsubCustoms();
       unsubAchColors();
+      unsubMaintenance();
     };
   }, []);
 
