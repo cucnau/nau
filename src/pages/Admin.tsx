@@ -17,6 +17,7 @@ import {
   serverTimestamp,
   onSnapshot,
   collectionGroup,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import {
@@ -35,6 +36,7 @@ import {
   FileText,
   MessageCircle,
   ShoppingBag,
+  Wrench,
 } from "lucide-react";
 import { ACHIEVEMENTS_LIST } from "../types/achievements";
 
@@ -108,7 +110,7 @@ interface AdminComment {
 }
 
 export function Admin() {
-  const { email, firebaseUser, theme } = useStore();
+  const { email, firebaseUser, theme, isMaintenance } = useStore();
   const isDark = theme === "dark";
 
   const [activeTab, setActiveTab] = useState<
@@ -1742,6 +1744,22 @@ export function Admin() {
             <ShoppingBag className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Thanh dọc phân cách */}
+        <div
+          className={`h-6 w-[2px] mx-1 transition-colors ${isDark ? "bg-[#3E2D25]" : "bg-[#3E2723]/30"}`}
+        />
+
+        {/* Nhóm 4: Hệ thống */}
+        <div className="flex gap-1">
+          <button
+            onClick={() => setActiveTab("system")}
+            title="Hệ thống"
+            className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === "system" ? "bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm" : "border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]"}`}
+          >
+            <Wrench className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Tiêu đề mục quản trị hiện tại */}
@@ -1758,8 +1776,61 @@ export function Admin() {
           {activeTab === "stickers" && "✨ Quản lý Stickers"}
           {activeTab === "accessories" && "👑 Quản lý Phụ kiện"}
           {activeTab === "chucu_accessories" && "🧸 Quản lý Phụ kiện Chucu"}
+          {activeTab === "system" && "🛠️ Quản lý Hệ thống"}
         </span>
       </div>
+
+      {activeTab === "system" && (
+        <div className={`p-6 sm:p-8 rounded-[32px] border-4 shadow-[4px_4px_0_0_#3E2723] dark:shadow-[4px_4px_0_0_#0D0907] flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-500 ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}>
+          <div className="flex items-center gap-3 border-b-2 border-[#3E2723]/10 pb-4">
+            <Wrench className="w-8 h-8 text-[#8D6E63] dark:text-[#A1887F]" />
+            <div>
+              <h2 className="text-2xl font-black uppercase text-[#3E2723] dark:text-[#ECE5DC] tracking-tighter">
+                Hệ Thống
+              </h2>
+              <p className="text-sm font-medium text-[#8D6E63] dark:text-[#A1887F]">
+                Quản lý các trạng thái hoạt động của Website
+              </p>
+            </div>
+          </div>
+          
+          <div className={`p-6 rounded-2xl border-2 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all ${isMaintenance ? 'bg-amber-500/10 border-amber-500/30' : 'bg-[#FDF6EC] dark:bg-[#1A1412] border-[#3E2723]/10 dark:border-[#4E342E]/30'}`}>
+            <div className="flex-1 space-y-2">
+              <h3 className="text-xl font-bold text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-2">
+                Chế độ Bảo Trì
+                {isMaintenance ? (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black uppercase tracking-wider">Đang Bật</span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full bg-green-500 text-white text-[10px] font-black uppercase tracking-wider">Đang Tắt</span>
+                )}
+              </h3>
+              <p className="text-[#5D4037] dark:text-[#A1887F] text-sm">
+                Khi chế độ này được bật, tất cả người dùng (ngoại trừ <strong>cucnau01@gmail.com</strong>) sẽ chỉ thấy màn hình hình nền Chucu với thông báo bảo trì, và không thể tương tác hay dùng tính năng gì. Mọi thay đổi dữ liệu của người dùng sẽ bị đóng băng. Thích hợp để bảo trì web.
+              </p>
+            </div>
+            
+            <button
+              onClick={() => {
+                setConfirmDialog({
+                  text: isMaintenance 
+                    ? "Bạn có chắc chắn muốn TẮT chế độ bảo trì và mở lại website cho tất cả mọi người?" 
+                    : "Bạn có chắc chắn muốn BẬT chế độ bảo trì? Thao tác này sẽ khóa tương tác của mọi người dùng thông thường.",
+                  action: async () => {
+                    try {
+                      await setDoc(doc(db, 'settings', 'system'), { isMaintenance: !isMaintenance }, { merge: true });
+                    } catch (e: any) {
+                      console.error("Lỗi khi thay đổi trạng thái bảo trì: ", e);
+                    }
+                  }
+                });
+              }}
+              className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap ${isMaintenance ? 'bg-stone-500 hover:bg-stone-600 border-2 border-stone-800' : 'bg-red-600 hover:bg-red-700 border-2 border-red-900'}`}
+            >
+              {isMaintenance ? "Tắt Bảo Trì" : "Bật Bảo Trì"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {activeTab === "stickers" && (
         <>
