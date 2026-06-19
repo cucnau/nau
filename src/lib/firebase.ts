@@ -14,16 +14,13 @@ const config = {
   messagingSenderId: (import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string) || firebaseConfig.messagingSenderId,
   appId: (import.meta.env.VITE_FIREBASE_APP_ID as string) || firebaseConfig.appId,
   measurementId: (import.meta.env.VITE_FIREBASE_MEASUREMENT_ID as string) || firebaseConfig.measurementId,
-  firestoreDatabaseId: (import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID as string) || firebaseConfig.firestoreDatabaseId
+  firestoreDatabaseId: (import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID as string) || firebaseConfig.firestoreDatabaseId || '(default)'
 };
-
-import { getStorage } from 'firebase/storage';
 
 export const app = initializeApp(config);
 console.log('Firebase App initialized with Project ID:', config.projectId);
-export const db = getFirestore(app);
+export const db = getFirestore(app, config.firestoreDatabaseId);
 export const auth = getAuth(app);
-export const storage = getStorage(app);
 
 export enum OperationType {
   CREATE = 'create',
