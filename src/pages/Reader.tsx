@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
 import { UserAvatar } from '../components/UserAvatar';
 import { cn } from '../components/Layout';
-import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare, Clock, Pause, CheckCircle } from 'lucide-react';
+import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare, Clock, Pause, CheckCircle, ExternalLink } from 'lucide-react';
 import { db, checkIfQuotaError } from '../lib/firebase';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, doc, getDoc, updateDoc, increment, limit } from 'firebase/firestore';
 import { format } from 'date-fns';
@@ -653,7 +653,7 @@ export function Reader() {
   const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(currentChapter?.id);
   const needsEarlyAccess = isStillEarlyAccess && !hasEarlyAccessUnlocked && !isEarlyAccessUnlockedLocal;
 
-  const isLocked = !!(needsPass || needsEarlyAccess);
+  const isLocked = !!(needsPass || needsEarlyAccess || currentChapter?.isLockedRead);
 
   // Split into words to get Vietnamese word count
   const wordCount = currentChapter?.content ? currentChapter.content.split(/\s+/).filter(Boolean).length : 0;
@@ -827,6 +827,28 @@ export function Reader() {
                        <button onClick={handleUnlockEarlyAccess} className="bg-[#D4AF37] hover:bg-[#B5952F] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2">
                           Mở khoá bằng 1 Vé Ưu Tiên
                        </button>
+                    </div>
+                  )}
+
+                  {currentChapter?.isLockedRead && (
+                    <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#3E2723] bg-[#2C221D]/50" : "border-amber-600 bg-[#FDF6EC]")}>
+                       <Lock className={cn("w-12 h-12 mb-4 animate-bounce text-amber-600")} />
+                       <h2 className={cn("text-xl font-bold mb-4 uppercase tracking-tighter text-amber-800 dark:text-amber-400")}>Đã khóa chương</h2>
+                       { (currentChapter?.externalUrl || story?.externalUrl) ? (
+                          <div className="flex flex-col items-center gap-3">
+                             <a 
+                               href={currentChapter?.externalUrl || story?.externalUrl} 
+                               target="_blank" 
+                               rel="noreferrer" 
+                               className="bg-[#8D6E63] hover:bg-[#7d5e53] dark:bg-[#5D4037] dark:hover:bg-[#4e342e] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2"
+                             >
+                                <ExternalLink className="w-4 h-4" />
+                                Đọc {currentChapter?.title || "chương này"}
+                             </a>
+                          </div>
+                       ) : (
+                          <p className="text-sm font-semibold opacity-60">Tác giả chưa cấu hình Link trang gốc cho chương hoặc bộ truyện này.</p>
+                       )}
                     </div>
                   )}
               </div>
