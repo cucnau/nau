@@ -49,6 +49,7 @@ interface Book {
   genres: string[];
   chapterCount: number;
   completed?: boolean;
+  externalUrl?: string;
 }
 
 interface Chapter {
@@ -59,6 +60,8 @@ interface Chapter {
   isPasswordProtected?: boolean;
   requiresPass?: boolean;
   requiresEarlyAccess?: boolean;
+  isLockedRead?: boolean;
+  externalUrl?: string;
 }
 
 interface CustomTitle {
@@ -139,6 +142,7 @@ export function Admin() {
   const [description, setDescription] = useState("");
   const [genres, setGenres] = useState("");
   const [completed, setCompleted] = useState(false);
+  const [externalUrl, setExternalUrl] = useState("");
   const [editingStory, setEditingStory] = useState<Book | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
@@ -160,6 +164,8 @@ export function Admin() {
   const [cContent, setCContent] = useState("");
   const [cRequiresPass, setCRequiresPass] = useState(false);
   const [cRequiresEarlyAccess, setCRequiresEarlyAccess] = useState(false);
+  const [cIsLockedRead, setCIsLockedRead] = useState(false);
+  const [cExternalUrl, setCExternalUrl] = useState("");
 
   // Users Management
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -380,6 +386,8 @@ export function Admin() {
             description: data.description || "",
             genres: data.genres || [],
             chapterCount: data.chapterCount || 0,
+            completed: data.completed || false,
+            externalUrl: data.externalUrl || "",
           });
         });
         setStories(list);
@@ -941,6 +949,7 @@ export function Admin() {
         genres: genreArray,
         chapterCount: 0,
         completed,
+        externalUrl: externalUrl.trim(),
         createdAt: serverTimestamp(),
       });
       setTitle("");
@@ -949,6 +958,7 @@ export function Admin() {
       setDescription("");
       setGenres("");
       setCompleted(false);
+      setExternalUrl("");
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (err: any) {
       console.error(err);
@@ -981,6 +991,7 @@ export function Admin() {
         description: editingStory.description || "",
         genres: genreArray,
         completed: editingStory.completed || false,
+        externalUrl: editingStory.externalUrl || "",
       });
       setEditingStory(null);
       if (editFileInputRef.current) editFileInputRef.current.value = "";
@@ -1030,6 +1041,10 @@ export function Admin() {
           content: data.content,
           order: data.order,
           isPasswordProtected: data.isPasswordProtected || false,
+          requiresPass: data.requiresPass || false,
+          requiresEarlyAccess: data.requiresEarlyAccess || false,
+          isLockedRead: data.isLockedRead || false,
+          externalUrl: data.externalUrl || "",
         });
       });
       setChapters(list);
@@ -1046,6 +1061,8 @@ export function Admin() {
     setCContent("");
     setCRequiresPass(false);
     setCRequiresEarlyAccess(false);
+    setCIsLockedRead(false);
+    setCExternalUrl("");
   };
 
   const openEditChapter = (storyId: string, chapter: Chapter) => {
@@ -1056,6 +1073,8 @@ export function Admin() {
     setCContent(chapter.content);
     setCRequiresPass(chapter.requiresPass || false);
     setCRequiresEarlyAccess(chapter.requiresEarlyAccess || false);
+    setCIsLockedRead(chapter.isLockedRead || false);
+    setCExternalUrl(chapter.externalUrl || "");
   };
 
   const submitChapter = async (e: React.FormEvent) => {
@@ -1077,6 +1096,8 @@ export function Admin() {
             storyId: managingStoryChapters,
             requiresPass: cRequiresPass,
             requiresEarlyAccess: cRequiresEarlyAccess,
+            isLockedRead: cIsLockedRead,
+            externalUrl: cExternalUrl.trim(),
             createdAt: Date.now(),
           },
         );
@@ -1126,6 +1147,8 @@ export function Admin() {
             content: cContent,
             requiresPass: cRequiresPass,
             requiresEarlyAccess: cRequiresEarlyAccess,
+            isLockedRead: cIsLockedRead,
+            externalUrl: cExternalUrl.trim(),
           },
         );
       }
@@ -2754,6 +2777,15 @@ export function Admin() {
                 placeholder="Giới thiệu"
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] min-h-[100px]"
               />
+              <input
+                type="text"
+                value={editingStory.externalUrl || ""}
+                onChange={(e) =>
+                  setEditingStory({ ...editingStory, externalUrl: e.target.value })
+                }
+                placeholder="Link gốc (Nếu truyện đăng ở nền tảng khác - ví dụ Wattpad, ...)"
+                className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all"
+              />
               <label className="flex items-center gap-2 cursor-pointer w-max pl-1">
                 <input
                   type="checkbox"
@@ -2848,6 +2880,13 @@ export function Admin() {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Giới thiệu"
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] min-h-[100px]"
+              />
+              <input
+                type="text"
+                value={externalUrl}
+                onChange={(e) => setExternalUrl(e.target.value)}
+                placeholder="Link gốc (Nếu truyện đăng ở nền tảng khác - ví dụ Wattpad, ...)"
+                className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all"
               />
               <label className="flex items-center gap-2 cursor-pointer w-max pl-1">
                 <input
@@ -3692,7 +3731,30 @@ export function Admin() {
                 />
                 <span className="text-sm font-medium">Yêu cầu vé đọc sớm</span>
               </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={cIsLockedRead}
+                  onChange={(e) => setCIsLockedRead(e.target.checked)}
+                  className="rounded text-[#8D6E63] focus:ring-[#8D6E63]"
+                />
+                <span className="text-sm font-medium text-red-600 dark:text-red-400 font-bold">Khóa hoàn toàn (Đọc ở trang khác)</span>
+              </label>
             </div>
+            {cIsLockedRead && (
+              <div className="flex flex-col gap-1 transition-all">
+                <label className="text-xs font-bold text-[#8D6E63] dark:text-[#C29D70] uppercase tracking-wider">
+                  Link gốc dành riêng cho chương này
+                </label>
+                <input
+                  type="url"
+                  value={cExternalUrl}
+                  onChange={(e) => setCExternalUrl(e.target.value)}
+                  placeholder="Ví dụ: https://webgoc.com/truyen-xyz/chuong-12"
+                  className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all text-sm"
+                />
+              </div>
+            )}
             <div className="flex gap-2 justify-end mt-2">
               <button
                 type="button"
