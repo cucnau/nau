@@ -106,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               storyProgress: state.storyProgress || {},
               readHistoryList: state.readHistoryList || [],
               savedStories: state.savedStories || [],
-              ownedStickers: state.ownedStickers || [],
+              
               equippedStickerComment: state.equippedStickerComment || null,
               stickerPositionComment: state.stickerPositionComment || 'top-right',
               equippedStickerChat: state.equippedStickerChat || null,
@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               stickerPositionPost: state.stickerPositionPost || 'top-right',
               equippedAccessory: state.equippedAccessory || null,
               accessoryPosition: state.accessoryPosition || { x: 0, y: 0, scale: 100, rotate: 0 },
-              ownedAccessories: state.ownedAccessories || [],
+              
               ownedChucuAccessories: state.ownedChucuAccessories || [],
               equippedChucuAccessory: state.equippedChucuAccessory || null,
               showChucu: state.showChucu !== false,
@@ -243,7 +243,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   return;
                 }
               }
-              // Sync state to local Zustand store in real-time
+              // Sync state to local Zustand store in real-time (leaving subcollection data out of root doc sync)
+              if (latestData) {
+                delete latestData.ownedStickers;
+                delete latestData.ownedAccessories;
+              }
               syncFromFirebase(latestData);
             }
           }, (err) => {
@@ -253,14 +257,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Mount subcollection snapshot listeners to load owned items in real-time
           unsubSubStickers = onSnapshot(collection(db, 'users', user.uid, 'owned_stickers'), (snap) => {
              const urls = snap.docs.map(d => d.data().url).filter(Boolean);
-             useStore.setState({ ownedStickers: urls });
+             const uniqueUrls = Array.from(new Set(urls));
+              useStore.setState({ ownedStickers: uniqueUrls });
           }, (err) => {
              console.error('Error listening to user owned_stickers updates:', err);
           });
 
           unsubSubAccessories = onSnapshot(collection(db, 'users', user.uid, 'owned_accessories'), (snap) => {
              const urls = snap.docs.map(d => d.data().url).filter(Boolean);
-             useStore.setState({ ownedAccessories: urls });
+             const uniqueUrls = Array.from(new Set(urls));
+             useStore.setState({ ownedAccessories: uniqueUrls });
           }, (err) => {
               console.error('Error listening to user owned_accessories updates:', err);
           });
