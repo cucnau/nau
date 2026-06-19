@@ -152,6 +152,7 @@ export function Admin() {
     string | null
   >(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [selectedChapterIds, setSelectedChapterIds] = useState<string[]>([]);
   const [adminChapterPage, setAdminChapterPage] = useState(0);
   const [adminChapterSortDesc, setAdminChapterSortDesc] = useState(false);
   const ADMIN_CHAPTERS_PER_PAGE = 50;
@@ -1027,6 +1028,7 @@ export function Admin() {
   // Chapter handlers
   const fetchChaptersForAdmin = async (storyId: string) => {
     try {
+      setSelectedChapterIds([]);
       const q = query(
         collection(db, "stories", storyId, "chapters"),
         orderBy("order", "asc"),
@@ -1051,6 +1053,42 @@ export function Admin() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleBulkLock = (lock: boolean) => {
+    if (!managingStoryChapters) return;
+    if (selectedChapterIds.length === 0) {
+      alert("Vui lòng chọn ít nhất một chương!");
+      return;
+    }
+    const actionName = lock ? "khóa" : "bỏ khóa";
+    const confirmMsg = `Bạn có chắc chắn muốn ${actionName} ${selectedChapterIds.length} chương đã chọn?`;
+
+    setConfirmDialog({
+      text: confirmMsg,
+      action: async () => {
+        try {
+          const batch = writeBatch(db);
+          selectedChapterIds.forEach((chapterId) => {
+            const docRef = doc(
+              db,
+              "stories",
+              managingStoryChapters,
+              "chapters",
+              chapterId,
+            );
+            batch.update(docRef, { isLockedRead: lock });
+          });
+          await batch.commit();
+          alert("Cập nhật thành công!");
+          setSelectedChapterIds([]);
+          fetchChaptersForAdmin(managingStoryChapters);
+        } catch (err: any) {
+          console.error(err);
+          alert("Có lỗi xảy ra khi cập nhật hàng loạt: " + (err.message || err));
+        }
+      },
+    });
   };
 
   const openAddChapter = (storyId: string) => {
@@ -3614,59 +3652,150 @@ export function Admin() {
             </div>
             
             {chapters.length > 0 && (
-               <div className="flex items-center gap-2 mt-4 justify-end">
-                  <select
-                     value={adminChapterPage}
-                     onChange={(e) => setAdminChapterPage(Number(e.target.value))}
-                     className="bg-[#FDF6EC] dark:bg-[#1A1412] text-[#3E2723] dark:text-[#A1887F] font-bold text-xs sm:text-sm px-2 py-1.5 rounded-lg border border-[#3E2723]/20 dark:border-[#4E342E]/50"
-                  >
-                     {Array.from({ length: Math.ceil(chapters.length / ADMIN_CHAPTERS_PER_PAGE) }).map((_, i) => {
-                        const start = i * ADMIN_CHAPTERS_PER_PAGE + 1;
-                        const end = Math.min((i + 1) * ADMIN_CHAPTERS_PER_PAGE, chapters.length);
-                        return (
-                           <option key={i} value={i}>
-                              Chương {start} - {end}
-                           </option>
-                        );
-                     })}
-                  </select>
+              <div className="flex flex-col gap-2 mt-4">
+                <div className="flex items-center gap-2 justify-between">
+                  <span className="text-xs font-semibold text-stone-500">Hành động hàng loạt</span>
+                  <div className="flex items-center gap-2">
+                     <select
+                        value={adminChapterPage}
+                        onChange={(e) => setAdminChapterPage(Number(e.target.value))}
+                        className="bg-[#FDF6EC] dark:bg-[#1A1412] text-[#3E2723] dark:text-[#A1887F] font-bold text-xs sm:text-sm px-2 py-1.5 rounded-lg border border-[#3E2723]/20 dark:border-[#4E342E]/50"
+                     >
+                        {Array.from({ length: Math.ceil(chapters.length / ADMIN_CHAPTERS_PER_PAGE) }).map((_, i) => {
+                           const start = i * ADMIN_CHAPTERS_PER_PAGE + 1;
+                           const end = Math.min((i + 1) * ADMIN_CHAPTERS_PER_PAGE, chapters.length);
+                           return (
+                              <option key={i} value={i}>
+                                 Chương {start} - {end}
+                              </option>
+                           );
+                        })}
+                     </select>
 
-                  <button 
-                     onClick={() => {
-                        setAdminChapterSortDesc(!adminChapterSortDesc);
-                        setAdminChapterPage(0);
-                     }}
-                     className="bg-stone-200 dark:bg-stone-800 text-[#3E2723] dark:text-[#ECE5DC] px-3 py-1.5 rounded-lg font-bold text-xs sm:text-sm hover:bg-stone-300 dark:hover:bg-stone-700 transition"
-                  >
-                     {adminChapterSortDesc ? '↓ Số lớn -> bé' : '↑ Số bé -> lớn'}
-                  </button>
-               </div>
+                     <button 
+                        onClick={() => {
+                           setAdminChapterSortDesc(!adminChapterSortDesc);
+                           setAdminChapterPage(0);
+                        }}
+                        className="bg-stone-200 dark:bg-stone-800 text-[#3E2723] dark:text-[#ECE5DC] px-3 py-1.5 rounded-lg font-bold text-xs sm:text-sm hover:bg-stone-300 dark:hover:bg-stone-700 transition"
+                     >
+                        {adminChapterSortDesc ? '↓ Số lớn -> bé' : '↑ Số bé -> lớn'}
+                     </button>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-stone-50 dark:bg-stone-900/60 rounded-2xl border border-stone-200 dark:border-stone-800 flex flex-wrap gap-2 items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="bulk-select-all-chapters"
+                      className="w-4 h-4 rounded border-[#3E2723]/20 dark:border-stone-700 text-[#8D6E63] focus:ring-[#8D6E63] cursor-pointer"
+                      checked={chapters.length > 0 && selectedChapterIds.length === chapters.length}
+                      onChange={() => {
+                        if (selectedChapterIds.length === chapters.length) {
+                          setSelectedChapterIds([]);
+                        } else {
+                          setSelectedChapterIds(chapters.map((c) => c.id));
+                        }
+                      }}
+                    />
+                    <label htmlFor="bulk-select-all-chapters" className="text-xs font-bold text-stone-600 dark:text-stone-300 cursor-pointer">
+                      Chọn tất cả ({chapters.length})
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 ml-auto">
+                    {selectedChapterIds.length > 0 && (
+                      <span className="text-[11px] font-semibold text-[#8D6E63] dark:text-[#C29D70] mr-1">
+                        Đã chọn {selectedChapterIds.length}
+                      </span>
+                    )}
+                    <button
+                      onClick={() => handleBulkLock(true)}
+                      disabled={
+                        selectedChapterIds.length === 0 ||
+                        !chapters
+                          .filter((c) => selectedChapterIds.includes(c.id))
+                          .every((c) => !c.isLockedRead)
+                      }
+                      className="text-[10px] font-black uppercase tracking-wider bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400 px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-900 hover:bg-red-100 dark:hover:bg-red-950/60 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      title={
+                        selectedChapterIds.length > 0 &&
+                        !chapters
+                          .filter((c) => selectedChapterIds.includes(c.id))
+                          .every((c) => !c.isLockedRead)
+                          ? "Chỉ có thể khóa khi tất cả các chương được chọn chưa bị khóa"
+                          : ""
+                      }
+                    >
+                      Khóa chương
+                    </button>
+                    <button
+                      onClick={() => handleBulkLock(false)}
+                      disabled={
+                        selectedChapterIds.length === 0 ||
+                        !chapters
+                          .filter((c) => selectedChapterIds.includes(c.id))
+                          .every((c) => c.isLockedRead)
+                      }
+                      className="text-[10px] font-black uppercase tracking-wider bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400 px-3 py-1.5 rounded-lg border border-green-200 dark:border-green-900 hover:bg-green-100 dark:hover:bg-green-950/60 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      title={
+                        selectedChapterIds.length > 0 &&
+                        !chapters
+                          .filter((c) => selectedChapterIds.includes(c.id))
+                          .every((c) => c.isLockedRead)
+                          ? "Chỉ có thể bỏ khóa khi tất cả các chương được chọn đang bị khóa"
+                          : ""
+                      }
+                    >
+                      Bỏ khóa chương
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
             
             <div className="flex-1 overflow-y-auto divide-y my-4 pr-2">
               {[...chapters].sort((a, b) => adminChapterSortDesc ? b.order - a.order : a.order - b.order).slice(adminChapterPage * ADMIN_CHAPTERS_PER_PAGE, (adminChapterPage + 1) * ADMIN_CHAPTERS_PER_PAGE).map((c) => (
                 <div
                   key={c.id}
-                  className="py-3 flex justify-between items-center"
+                  className="py-3 flex justify-between items-center gap-3"
                 >
-                  <div>
-                    <p className="font-bold text-[#3E2723] text-sm">
-                      Chương {c.order}: {c.title}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
-                      {c.content}
-                    </p>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={selectedChapterIds.includes(c.id)}
+                      onChange={() => {
+                        setSelectedChapterIds(prev => 
+                          prev.includes(c.id) ? prev.filter(id => id !== c.id) : [...prev, c.id]
+                        );
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 dark:border-stone-700 text-[#8D6E63] focus:ring-[#8D6E63] cursor-pointer flex-shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-[#3E2723] dark:text-[#ECE5DC] text-sm flex items-center gap-2 flex-wrap">
+                        <span>Chương {c.order}: {c.title}</span>
+                        {c.isLockedRead && (
+                          <span className="text-[9px] uppercase font-bold tracking-wider bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 px-1.5 py-0.5 rounded border border-red-200 dark:border-red-900 flex-shrink-0">
+                            Đã khóa
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5 truncate">
+                        {c.content}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-shrink-0">
                     <button
                       onClick={() => openEditChapter(managingStoryChapters, c)}
-                      className="text-[10px] font-bold px-2 py-1 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+                      className="text-[10px] font-bold px-2 py-1 bg-stone-100 dark:bg-stone-800 text-[#3E2723] dark:text-[#ECE5DC] rounded hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors"
                     >
                       Sửa
                     </button>
                     <button
                       onClick={() => deleteChapter(managingStoryChapters, c.id)}
-                      className="text-[10px] font-bold px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors"
+                      className="text-[10px] font-bold px-2 py-1 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 rounded hover:bg-red-100 dark:hover:bg-red-950/40 transition-colors"
                     >
                       Xóa
                     </button>
