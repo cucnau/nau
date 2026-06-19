@@ -10,7 +10,7 @@ import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { signInWithPopup, signInWithRedirect, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
-import { getDocs, collection, query, where, orderBy, onSnapshot, updateDoc, doc, writeBatch } from 'firebase/firestore';
+import { getDocs, collection, query, where, orderBy, onSnapshot, updateDoc, doc, writeBatch, limit } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST, getWeeklyId, getPreviousWeeklyId, ACHIEVEMENT_CATEGORIES } from '../types/achievements';
 import { Store } from '../pages/Store';
 import { Missions } from '../pages/Missions';
@@ -569,10 +569,37 @@ export function AppLayout() {
         await updateDoc(doc(db, 'notifications', notif.id), { isRead: true });
       }
       setShowNotifDropdown(false);
-      if (notif.chapterId) {
-        navigate(`/doc/${notif.storyId}/${notif.chapterId}`);
+
+      let sId = notif.storyId;
+      let cId = notif.chapterId;
+
+      if (!sId || sId === 'undefined') {
+        if (notif.storyTitle) {
+          const storiesRef = collection(db, 'stories');
+          const qStories = query(storiesRef, where('title', '==', notif.storyTitle), limit(1));
+          const snap = await getDocs(qStories);
+          if (!snap.empty) {
+            sId = snap.docs[0].id;
+            if ((!cId || cId === 'undefined') && notif.chapterTitle) {
+              const chaptersRef = collection(db, `stories/${sId}/chapters`);
+              const qChaps = query(chaptersRef, where('title', '==', notif.chapterTitle), limit(1));
+              const snapChap = await getDocs(qChaps);
+              if (!snapChap.empty) {
+                cId = snapChap.docs[0].id;
+              }
+            }
+          }
+        }
+      }
+
+      if (sId && sId !== 'undefined') {
+        if (cId && cId !== 'undefined') {
+          navigate(`/doc/${sId}/${cId}`);
+        } else {
+          navigate(`/truyen/${sId}`);
+        }
       } else {
-        navigate(`/truyen/${notif.storyId}`);
+        alert("Thông báo này không có mã ID truyện (hoặc truyện đã bị xóa).");
       }
     } catch (err) {
       console.error("Lỗi khi click notification:", err);
