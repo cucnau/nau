@@ -101,7 +101,14 @@ export function Home() {
               let isBroken = false;
               let isProtected = false;
               if (!isCheckedInToday && lastCheckInDate) {
-                const diffDays = Math.round(Math.abs(new Date(todayStr).getTime() - new Date(lastCheckInDate).getTime()) / (1000 * 60 * 60 * 24));
+                let diffDays = 1;
+                try {
+                  const d1 = new Date(todayStr + "T00:00:00Z").getTime();
+                  const d2 = new Date(lastCheckInDate + "T00:00:00Z").getTime();
+                  diffDays = Math.round(Math.abs(d1 - d2) / (1000 * 60 * 60 * 24));
+                } catch (e) {
+                  console.error("Error parsing checkin dates in Home:", e);
+                }
                 if (diffDays > 1) {
                    const missedDays = diffDays - 1;
                    let remaining = missedDays;
