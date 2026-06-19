@@ -345,6 +345,8 @@ export function Reader() {
     storyTitle: string;
     chapterTitle?: string | null;
     content: string;
+    storyId: string;
+    chapterId?: string | null;
   }) => {
     try {
       const currentEmail = useStore.getState().email;
@@ -359,6 +361,8 @@ export function Reader() {
           type: 'new_comment',
           authorName: commentData.authorName,
           storyTitle: commentData.storyTitle,
+          storyId: commentData.storyId,
+          chapterId: commentData.chapterId || null,
           chapterTitle: commentData.chapterTitle || null,
           content: commentData.content,
           isRead: false,
@@ -480,6 +484,8 @@ export function Reader() {
          notifyAdminOfComment({
             authorName: displayName || 'Nhà lữ hành ẩn danh',
             storyTitle: story?.title || 'Truyện',
+            storyId: storyId!,
+            chapterId: currentChapter?.id || null,
             chapterTitle: currentChapter?.title || 'Chương',
             content: type === 'sticker' ? '💬 [Bình luận nhãn dán]' : content
          });
@@ -543,6 +549,8 @@ export function Reader() {
         notifyAdminOfComment({
            authorName: displayName || 'Nhà lữ hành ẩn danh',
            storyTitle: story?.title || 'Truyện',
+           storyId: storyId!,
+           chapterId: currentChapter?.id || null,
            chapterTitle: currentChapter?.title || 'Chương',
            content: `↩️ Trả lời [${parentComment.displayName || 'Vô danh'}]: ${replyText.trim()}`
         });
