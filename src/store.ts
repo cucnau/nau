@@ -147,6 +147,8 @@ interface UserState {
   prevActiveWeek: string;
   activeTitle: string | null;
   setActiveTitle: (title: string | null) => void;
+  isMaintenance: boolean;
+  setMaintenance: (val: boolean) => void;
   customTitles: any[];
   customTitleColors: Record<string, string>;
   achTitleColors: Record<string, string>;
@@ -313,6 +315,8 @@ export const useStore = create<UserState>()(
          set({ activeTitle: title });
          get().updateUserDoc({ activeTitle: title });
       },
+      isMaintenance: false,
+      setMaintenance: (val) => set({ isMaintenance: val }),
       customTitles: [],
       customTitleColors: {},
       achTitleColors: {},
