@@ -23,7 +23,7 @@ function ScrollToTop() {
   return null;
 }
 
-function MaintenanceGuard({ children }: { children: React.ReactNode }) {
+function MaintenanceGuard({ children }: { children: import('react').ReactNode }) {
   const { isMaintenance, email, isLoggedIn } = useStore();
   
   const isAdmin = email?.toLowerCase() === 'cucnau01@gmail.com';
