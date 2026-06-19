@@ -326,7 +326,7 @@ export function Store() {
         </div>
       </div>
 
-      <div className="w-full overflow-x-auto no-scrollbar py-2 -mx-2 px-2 sm:mx-0 sm:px-0 flex justify-center sm:justify-start">
+      <div className="w-full overflow-x-auto no-scrollbar py-2 -mx-2 px-2 sm:mx-0 sm:px-0 flex justify-start md:justify-center">
         <div className="inline-flex bg-[#FDF6EC] dark:bg-[#1A1412] border-[3px] border-[#3E2723] p-1.5 rounded-2xl font-black uppercase text-xs tracking-wide shadow-[1.5px_1.5px_0_0_#3E2723] min-w-max my-1">
           <button
             onClick={() => {
