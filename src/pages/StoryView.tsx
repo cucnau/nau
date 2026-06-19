@@ -261,6 +261,8 @@ export function StoryView() {
     storyTitle: string;
     chapterTitle?: string | null;
     content: string;
+    storyId: string;
+    chapterId?: string | null;
   }) => {
     try {
       const currentEmail = useStore.getState().email;
@@ -275,6 +277,8 @@ export function StoryView() {
           type: 'new_comment',
           authorName: commentData.authorName,
           storyTitle: commentData.storyTitle,
+          storyId: commentData.storyId,
+          chapterId: commentData.chapterId || null,
           chapterTitle: commentData.chapterTitle || null,
           content: commentData.content,
           isRead: false,
@@ -380,6 +384,7 @@ export function StoryView() {
           notifyAdminOfComment({
              authorName: displayName || 'Nhà lữ hành ẩn danh',
              storyTitle: story.title || 'Truyện',
+             storyId: story.id,
              content: `🎁 Tặng ${giftAmount} Choco: ${giftMessage.trim() || 'Gửi tặng Choco ngọt ngào ủng hộ tác phẩm!'}`
           });
           alert(`Tặng ${giftAmount} Choco thành công! Cám ơn bạn đã tiếp sức cho tác phẩm.`);
@@ -490,6 +495,7 @@ export function StoryView() {
         notifyAdminOfComment({
            authorName: displayName || 'Nhà lữ hành ẩn danh',
            storyTitle: story.title || 'Truyện',
+           storyId: story.id,
            content: commentText.trim()
         });
         setCommentText('');
@@ -640,6 +646,7 @@ export function StoryView() {
                               setChapterPage(Number(e.target.value));
                               setTimeout(() => {
                                  document.getElementById('chapters-list-container')?.scrollTo({ top: 0, behavior: 'smooth' });
+                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }, 50);
                            }}
                            className="bg-[#FDF6EC] dark:bg-[#1A1412] text-[#3E2723] dark:text-[#A1887F] font-bold text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border-2 border-[#3E2723]/20 dark:border-[#4E342E]/50 focus:border-[#8D6E63] flex-1 sm:flex-none"
@@ -661,6 +668,7 @@ export function StoryView() {
                               setChapterPage(0);
                               setTimeout(() => {
                                  document.getElementById('chapters-list-container')?.scrollTo({ top: 0, behavior: 'smooth' });
+                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }, 50);
                            }}
                            className="bg-[#3E2723] dark:bg-[#2C221D] text-[#FDF6EC] px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold text-xs sm:text-sm transition-all hover:bg-[#2D1B19] flex-shrink-0"
