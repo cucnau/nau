@@ -683,7 +683,14 @@ export const useStore = create<UserState>()(
         let newStreak = 1;
         let updateStreakRecoveryStats: any = {};
         if (state.lastCheckInDate) {
-           const daysDiff = Math.round(Math.abs(new Date(todayStr).getTime() - new Date(state.lastCheckInDate).getTime()) / (1000 * 60 * 60 * 24));
+           let daysDiff = 1;
+           try {
+              const d1 = new Date(todayStr + 'T00:00:00Z').getTime();
+              const d2 = new Date(state.lastCheckInDate + 'T00:00:00Z').getTime();
+              daysDiff = Math.round(Math.abs(d1 - d2) / (1000 * 60 * 60 * 24));
+           } catch (e) {
+              console.error('Error parsing checkin dates:', e);
+           }
            if (daysDiff === 1) {
                newStreak = state.checkInStreak + 1;
            } else if (daysDiff > 1) {
@@ -739,8 +746,10 @@ export const useStore = create<UserState>()(
         const wCheck = ms.find(m => m.id === 'w1');
         if (wCheck) { wCheck.progress += 1; if (wCheck.progress >= wCheck.target) wCheck.completed = true; }
         
+        const newTotalCheckins = (state.totalCheckIns || 0) + 1;
+        
         ms.filter(m => m.type === 'permanent' && m.description.includes('Điểm danh')).forEach(pCheck => {
-           pCheck.progress = newStreak;
+           pCheck.progress = newTotalCheckins;
            if (pCheck.progress >= pCheck.target) pCheck.completed = true;
         });
 
@@ -753,7 +762,6 @@ export const useStore = create<UserState>()(
 
         const newChoco = state.choco + dailyChoco;
         const newTotalEarnedChoco = (state.totalEarnedChoco || 0) + dailyChoco;
-        const newTotalCheckins = (state.totalCheckIns || 0) + 1;
 
         set({ 
             lastCheckInDate: todayStr, 
