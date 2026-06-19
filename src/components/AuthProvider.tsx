@@ -3,7 +3,7 @@ import { onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, collection, updateDoc, deleteField, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 import { auth, db } from '../lib/firebase';
-import { useStore } from '../store';
+import { useStore, getDailyMissions, getWeeklyMissions, getPermanentMissions } from '../store';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { login, logout, setFirebaseUser, syncFromFirebase } = useStore();
@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (!userSnap.exists()) {
             // Create new user profile in Firestore
             const isEditor = user.email?.toLowerCase() === 'cucnau01@gmail.com';
-            const state = get();
+            const state = useStore.getState();
             
             const localChoco = state.choco || 0;
             const localGChoco = state.goldenChoco || 0;
