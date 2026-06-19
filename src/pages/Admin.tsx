@@ -615,6 +615,9 @@ export function Admin() {
           chucuPremiumFeeds: data.chucuPremiumFeeds !== undefined ? data.chucuPremiumFeeds : 0,
           totalChaptersRead: data.totalChaptersRead !== undefined ? data.totalChaptersRead : 0,
           totalCommentsCount: data.totalCommentsCount !== undefined ? data.totalCommentsCount : 0,
+          checkInStreak: data.checkInStreak !== undefined ? data.checkInStreak : 0,
+          lastCheckInDate: data.lastCheckInDate !== undefined ? data.lastCheckInDate : "",
+          ownedStreakTickets: data.ownedStreakTickets !== undefined ? data.ownedStreakTickets : 0,
         });
       });
       setUsers(list);
