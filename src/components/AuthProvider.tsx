@@ -54,43 +54,76 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (!userSnap.exists()) {
             // Create new user profile in Firestore
             const isEditor = user.email?.toLowerCase() === 'cucnau01@gmail.com';
+            const state = get();
+            
+            const localChoco = state.choco || 0;
+            const localGChoco = state.goldenChoco || 0;
+            const localLevel = state.level || 1;
+            const localExp = state.exp || 0;
+            const localStreak = state.checkInStreak || 0;
+            const localTotalCheckIns = state.totalCheckIns || 0;
+            const localLastCheckInDate = state.lastCheckInDate || null;
+            
             const newUser = {
               uid: user.uid,
-              choco: isEditor ? 9999999 : 0,
-              goldenChoco: isEditor ? 9999999 : 0,
-              level: 1,
-              exp: 0,
+              choco: isEditor ? 9999999 : localChoco,
+              goldenChoco: isEditor ? 9999999 : localGChoco,
+              level: localLevel,
+              exp: localExp,
               createdAt: serverTimestamp(),
-              displayName: user.displayName || 'Reader ' + user.uid.slice(0,4),
+              displayName: state.displayName || user.displayName || 'Reader ' + user.uid.slice(0,4),
               email: user.email || '',
-              avatarUrl: user.photoURL || '',
-              checkInStreak: 0,
-              lastCheckInDate: '',
-              lastDailyResetDate: '',
-              lastWeeklyResetId: '',
+              avatarUrl: state.avatarUrl || user.photoURL || '',
+              checkInStreak: localStreak,
+              lastCheckInDate: localLastCheckInDate || '',
+              lastDailyResetDate: state.lastDailyResetDate || '',
+              lastWeeklyResetId: state.lastWeeklyResetId || '',
               
               // Initializing Achievements and Active Points fields
-              unlockedAchievements: [],
-              claimedAchievements: [],
-              totalEarnedChoco: isEditor ? 9999999 : 0,
-              totalEarnedGChoco: isEditor ? 9999999 : 0,
-              totalSpentChoco: 0,
-              totalCheckIns: 0,
-              perfectDailyDates: [],
-              sentMessagesCount: 0,
-              genresRead: [],
-              activePoints: 0,
-              lastActiveWeek: '',
-              prevActivePoints: 0,
-              prevActiveWeek: '',
-              activeTitle: null,
-              chucuLevel: 1,
-              chucuExp: 0,
-              chucuSatiety: 70,
-              chucuHappiness: 50,
-              chucuInteractions: 0,
-              chucuPremiumFeeds: 0,
-              chucuLastTime: Date.now(),
+              unlockedAchievements: state.unlockedAchievements || [],
+              claimedAchievements: state.claimedAchievements || [],
+              totalEarnedChoco: isEditor ? 9999999 : (state.totalEarnedChoco || 0),
+              totalEarnedGChoco: isEditor ? 9999999 : (state.totalEarnedGChoco || 0),
+              totalSpentChoco: state.totalSpentChoco || 0,
+              totalCheckIns: localTotalCheckIns,
+              perfectDailyDates: state.perfectDailyDates || [],
+              sentMessagesCount: state.sentMessagesCount || 0,
+              genresRead: state.genresRead || [],
+              activePoints: state.activePoints || 0,
+              lastActiveWeek: state.lastActiveWeek || '',
+              prevActivePoints: state.prevActivePoints || 0,
+              prevActiveWeek: state.prevActiveWeek || '',
+              activeTitle: state.activeTitle || null,
+              chucuLevel: state.chucuLevel || 1,
+              chucuExp: state.chucuExp || 0,
+              chucuSatiety: state.chucuSatiety || 70,
+              chucuHappiness: state.chucuHappiness || 50,
+              chucuInteractions: state.chucuInteractions || 0,
+              chucuPremiumFeeds: state.chucuPremiumFeeds || 0,
+              chucuLastTime: state.chucuLastTime || Date.now(),
+              
+              missions: state.missions || [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()],
+              storyProgress: state.storyProgress || {},
+              readHistoryList: state.readHistoryList || [],
+              savedStories: state.savedStories || [],
+              ownedStickers: state.ownedStickers || [],
+              equippedStickerComment: state.equippedStickerComment || null,
+              stickerPositionComment: state.stickerPositionComment || 'top-right',
+              equippedStickerChat: state.equippedStickerChat || null,
+              equippedStickerPost: state.equippedStickerPost || null,
+              stickerPositionPost: state.stickerPositionPost || 'top-right',
+              equippedAccessory: state.equippedAccessory || null,
+              accessoryPosition: state.accessoryPosition || { x: 0, y: 0, scale: 100, rotate: 0 },
+              ownedAccessories: state.ownedAccessories || [],
+              ownedChucuAccessories: state.ownedChucuAccessories || [],
+              equippedChucuAccessory: state.equippedChucuAccessory || null,
+              showChucu: state.showChucu !== false,
+              ownedPassTickets: state.ownedPassTickets || 0,
+              ownedPriorityTickets: state.ownedPriorityTickets || 0,
+              ownedMysteryBoxes: state.ownedMysteryBoxes || 0,
+              ownedStreakTickets: state.ownedStreakTickets || 0,
+              activeStreakProtection: state.activeStreakProtection || false,
+              lastFreeStreakRecoveryMonth: state.lastFreeStreakRecoveryMonth || null
             };
             try {
               await setDoc(userRef, newUser);
