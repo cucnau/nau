@@ -213,19 +213,19 @@ interface UserState {
   _checkResetMissions: () => void;
 }
 
-const getDailyMissions = (): Mission[] => [
+export const getDailyMissions = (): Mission[] => [
   { id: 'd1', type: 'daily', description: 'Điểm danh ngày', chocoReward: 1, goldenReward: 0, progress: 0, target: 1,  completed: false, claimed: false },
   { id: 'd2', type: 'daily', description: 'Đọc 1 chương truyện', chocoReward: 1, goldenReward: 0, progress: 0, target: 1, completed: false, claimed: false },
   { id: 'd3', type: 'daily', description: 'Bình luận truyện 1 lần', chocoReward: 2, goldenReward: 0, progress: 0, target: 1, completed: false, claimed: false },
 ];
 
-const getWeeklyMissions = (): Mission[] => [
+export const getWeeklyMissions = (): Mission[] => [
   { id: 'w1', type: 'weekly', description: 'Điểm danh 5 ngày trong tuần', chocoReward: 5, goldenReward: 1, progress: 0, target: 5, completed: false, claimed: false },
   { id: 'w2', type: 'weekly', description: 'Đọc 10 chương truyện', chocoReward: 10, goldenReward: 1, progress: 0, target: 10, completed: false, claimed: false },
   { id: 'w3', type: 'weekly', description: 'Bình luận 10 lần', chocoReward: 20, goldenReward: 1, progress: 0, target: 10, completed: false, claimed: false },
 ];
 
-const getPermanentMissions = (): Mission[] => [
+export const getPermanentMissions = (): Mission[] => [
   { id: 'p1', type: 'permanent', description: 'Điểm danh 30 ngày', chocoReward: 30, goldenReward: 3, progress: 0, target: 30, completed: false, claimed: false },
   { id: 'p2', type: 'permanent', description: 'Điểm danh 60 ngày', chocoReward: 60, goldenReward: 6, progress: 0, target: 60, completed: false, claimed: false },
   { id: 'p3', type: 'permanent', description: 'Điểm danh 90 ngày', chocoReward: 90, goldenReward: 9, progress: 0, target: 90, completed: false, claimed: false },
