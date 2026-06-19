@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
-import { BookOpen, Users, Lock, Unlock, Zap, ChevronRight, Bookmark, Gift, Heart, Sparkles, Send, MessageSquare } from 'lucide-react';
+import { BookOpen, Users, Lock, Unlock, Zap, ChevronRight, Bookmark, Gift, Heart, Sparkles, Send, MessageSquare, ExternalLink } from 'lucide-react';
 import { cn } from '../components/Layout';
 import React, { useEffect, useState } from 'react';
 import { db, checkIfQuotaError } from '../lib/firebase';
@@ -567,6 +567,18 @@ export function StoryView() {
                         Đọc từ đầu
                     </button>
                     
+                    {story?.externalUrl && (
+                        <a 
+                           href={story.externalUrl} 
+                           target="_blank" 
+                           rel="noreferrer" 
+                           className="bg-[#A1887F] dark:bg-[#6D4C41] hover:bg-[#8D6E63] dark:hover:bg-[#5D4037] text-white px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none transition-all flex h-max items-center"
+                        >
+                            <ExternalLink className="w-4 h-4" />
+                            Đọc truyện
+                        </a>
+                    )}
+                    
                     <button 
                       onClick={handleSaveToggle} 
                       className={cn(
@@ -709,6 +721,7 @@ export function StoryView() {
                             {(isEarlyAccess && isStillEarlyAccess) && (hasEarlyAccessUnlocked ? <Zap className="w-4 h-4 text-stone-400" title="Đã đọc sớm" /> : <Zap className="w-4 h-4 text-[#D4AF37] fill-[#F5E6D3]" title="Cần vé Ưu Tiên" />)}
                             {(isEarlyAccess && !isStillEarlyAccess) && <Zap className="w-4 h-4 text-stone-400" title="Đã chuyển sang đọc miễn phí" />}
                             
+                            {chap.isLockedRead && <span className="text-[10px] uppercase font-bold tracking-wider bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 px-2 py-0.5 rounded-full border border-red-200 dark:border-red-900">Đã khóa</span>}
                             {isRead && <span className="text-[10px] uppercase font-bold tracking-wider bg-[#F5E6D3] text-[#8D6E63] px-2 py-0.5 rounded-full">Đã đọc</span>}
                             <ChevronRight className={cn("w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity", !isRead && "text-[#8D6E63]")} />
                         </div>
