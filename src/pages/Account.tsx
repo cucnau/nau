@@ -113,6 +113,12 @@ export function Account() {
   // Tự động đồng bộ các bài viết cũ của user sang newsFeed toàn cục bằng cách so khớp ID
   useEffect(() => {
     if (!uid || reviews.length === 0) return;
+    
+    // Retroactively unlock achievement if missed
+    if (!unlockedAchievements?.includes('blogger_choco_new')) {
+       unlockAchievement('blogger_choco_new');
+    }
+
     const syncExistingReviews = async () => {
       try {
         for (const r of reviews) {
