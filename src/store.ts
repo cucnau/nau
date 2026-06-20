@@ -95,7 +95,7 @@ interface UserState {
   lastDailyResetDate: string | null;
   lastWeeklyResetId: string | null;
   missions: Mission[];
-  storyProgress: Record<string, number>; // storyId -> maxChapterRead
+  storyProgress: Record<string, number | number[]>; // storyId -> maxChapterRead or read chapters array
   readHistoryList: string[]; // storyIds
   savedStories: string[]; // saved storyIds
   unlockedPassChapters: string[]; // chapterIds
@@ -121,7 +121,7 @@ interface UserState {
 
   // Per-uid historical record dictionaries
   allUsersMissions: Record<string, Mission[]>;
-  allUsersStoryProgress: Record<string, Record<string, number>>;
+  allUsersStoryProgress: Record<string, Record<string, number | number[]>>;
   allUsersReadHistoryList: Record<string, string[]>;
   allUsersSavedStories: Record<string, string[]>;
   allUsersUnlockedAchievements: Record<string, string[]>;
@@ -476,7 +476,7 @@ export const useStore = create<UserState>()(
             let computedChapters = data.totalChaptersRead;
             if (computedChapters === undefined || computedChapters === 0) {
                const prog = data.storyProgress || state.storyProgress || {};
-               computedChapters = Object.values(prog).reduce((a: any, b: any) => a + (typeof b === 'number' ? b : 0), 0);
+               computedChapters = Object.values(prog).reduce((a: any, b: any) => a + (Array.isArray(b) ? b.length : (typeof b === 'number' ? b : 0)), 0);
             }
             
             let computedCheckIns = data.totalCheckIns;
@@ -914,14 +914,23 @@ export const useStore = create<UserState>()(
         const state = get();
         if (!state.isLoggedIn) return;
         
-        const currentProgress = state.storyProgress[storyId] || 0;
+        const prevProgress = state.storyProgress[storyId];
+        let currentArray: number[] = [];
+        if (typeof prevProgress === 'number') {
+           if (prevProgress > 0) {
+              currentArray = Array.from({length: prevProgress}, (_, i) => i + 1);
+           }
+        } else if (Array.isArray(prevProgress)) {
+           currentArray = prevProgress;
+        }
+
         let isNewChapter = false;
-        
-        if (chapterOrder > currentProgress) {
+        if (!currentArray.includes(chapterOrder)) {
              isNewChapter = true;
         }
 
-        const newProgress = { ...state.storyProgress, [storyId]: Math.max(currentProgress, chapterOrder) };
+        const newProgressArray = Array.from(new Set([...currentArray, chapterOrder])).sort((a,b)=>a-b);
+        const newProgress = { ...state.storyProgress, [storyId]: newProgressArray };
         const newHistory = Array.from(new Set([storyId, ...state.readHistoryList]));
         
         let newTotalChaptersRead = state.totalChaptersRead || 0;
