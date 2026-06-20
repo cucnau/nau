@@ -3,7 +3,8 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   Menu, Search, User, Key, LogOut, X, Trophy, BookOpen, Zap, Flame, ShieldCheck, 
   Camera, Calendar, Mail, Clock, Settings, Copy, Home, ClipboardList, ShoppingBag, List, Edit2, Library,
-  Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck, Sun, Moon, Eye, EyeOff
+  Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck, Sun, Moon, Eye, EyeOff,
+  RefreshCw
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
@@ -288,11 +289,22 @@ function AchievementsModal() {
     totalEarnedChoco, totalEarnedGChoco, totalSpentChoco, totalCheckIns,
     perfectDailyDates, sentMessagesCount, genresRead, checkInStreak,
     claimAchievement, savedStories, totalChaptersRead, totalCommentsCount, ownedStickers,
-    chucuInteractions, chucuPremiumFeeds, chucuLevel, ownedChucuAccessories, readHistoryList
+    chucuInteractions, chucuPremiumFeeds, chucuLevel, ownedChucuAccessories, readHistoryList,
+    syncCommentsCountFromDB
   } = useStore();
 
   const [activeCategory, setActiveCategory] = useState('all');
+  const [isSyncing, setIsSyncing] = useState(false);
   const listContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isLoggedIn && uid) {
+      setIsSyncing(true);
+      syncCommentsCountFromDB().finally(() => {
+        setIsSyncing(false);
+      });
+    }
+  }, [isLoggedIn, uid, syncCommentsCountFromDB]);
 
   useEffect(() => {
     if (listContainerRef.current) {
@@ -364,12 +376,28 @@ function AchievementsModal() {
   return (
     <div className="text-[#3E2723] dark:text-[#ECE5DC] flex-1 flex flex-col h-full">
       {/* Title Header */}
-      <div className="mb-4 text-center border-b-[3px] border-[#3E2723] dark:border-[#5D4037] pb-4 w-full shrink-0">
+      <div className="mb-4 text-center border-b-[3px] border-[#3E2723] dark:border-[#5D4037] pb-4 w-full shrink-0 relative">
           <Trophy className="w-10 h-10 text-[#8D6E63] mx-auto mb-1 drop-shadow" />
           <h2 className="text-xl font-black uppercase tracking-widest font-sans">Khu Thành Tựu</h2>
           <p className="text-xs text-[#6D4C41] dark:text-[#A1887F] mt-1 font-bold">
             Đạt các cột mốc danh giá để nhận quà tặng ({unlockedAchievements.length}/{ACHIEVEMENTS_LIST.length})
           </p>
+          <button
+             onClick={() => {
+                if (isSyncing) return;
+                setIsSyncing(true);
+                syncCommentsCountFromDB().finally(() => {
+                   setIsSyncing(false);
+                });
+             }}
+             title="Cập nhật lại số liệu từ máy chủ"
+             className={cn(
+                "absolute right-2 top-2 p-1.5 rounded-lg border-[2px] border-[#3E2723] bg-white text-[#3E2723] dark:bg-[#1E1815] dark:text-[#ECE5DC] hover:bg-[#EFEBE9]/40 hover:border-[#3E2723]/80 transition-all cursor-pointer shadow-[0_2px_0_0_#3E2723]/30",
+                isSyncing && "opacity-50 pointer-events-none"
+             )}
+          >
+             <RefreshCw className={cn("w-3.5 h-3.5", isSyncing && "animate-spin")} />
+          </button>
       </div>
 
       {/* Category Carousel / Tabs */}
