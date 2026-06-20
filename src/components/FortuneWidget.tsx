@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sparkles, Dices, ArrowRight } from 'lucide-react';
 import { useStore } from '../store';
 import { format } from 'date-fns';
+import { getGMT7Date } from '../types/achievements';
 
 const FORTUNES = [
   "Hôm nay bạn sẽ nhặt được tiền... âm phủ.",
@@ -62,7 +63,7 @@ export function FortuneWidget() {
   const [genre, setGenre] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   
-  const dateStr = format(new Date(), 'yyyy-MM-dd');
+  const dateStr = format(getGMT7Date(), 'yyyy-MM-dd');
 
   useEffect(() => {
     // Generate daily fortune based on UID + Date String
