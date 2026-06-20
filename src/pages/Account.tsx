@@ -331,32 +331,6 @@ export function Account() {
                        )
                     })}
                   </div>
-
-                  {(activeStickerTab === 'comment' || activeStickerTab === 'post') && (activeStickerTab === 'comment' ? equippedStickerComment : equippedStickerPost) && (
-                    <div>
-                      <label className="block text-xs font-bold mb-1.5 text-[#5D4037] uppercase tracking-wider">Vị trí gắn Sticker cho {activeStickerTab === 'comment' ? 'Bình Luận' : 'Bài Đăng'}</label>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        {[
-                          { id: 'top-left', label: 'Trên - Trái' },
-                          { id: 'top-right', label: 'Trên - Phải' },
-                          { id: 'bottom-left', label: 'Dưới - Trái' },
-                          { id: 'bottom-right', label: 'Dưới - Phải' }
-                        ].map(pos => {
-                          const isPosActive = (activeStickerTab === 'comment' ? stickerPositionComment : stickerPositionPost) === pos.id;
-                          return (
-                            <button
-                              key={pos.id}
-                              type="button"
-                              onClick={() => setStickerPosition(activeStickerTab as 'comment' | 'post', pos.id as any)}
-                              className={`py-1.5 px-3 rounded-lg border text-xs font-bold transition-all ${isPosActive ? 'bg-[#8D6E63] text-white border-[2px] border-[#3E2723] shadow-[0_2px_0_0_#3E2723]' : 'bg-[#FDF6EC] text-[#3E2723] border-[2px] border-[#3E2723] hover:bg-[#F5E6D3] active:translate-y-0.5 active:shadow-none shadow-[0_2px_0_0_#3E2723]'}`}
-                            >
-                              {pos.label}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
