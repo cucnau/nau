@@ -567,6 +567,8 @@ export function Reader() {
               type: 'comment_reply'
            });
         }
+        
+        addCommentProgress();
 
         setReplyText('');
         setReplyingToId(null);
