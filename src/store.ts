@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { format, differenceInDays } from 'date-fns';
 import { User as FirebaseUser } from 'firebase/auth';
 import { db, checkIfQuotaError } from './lib/firebase';
-import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit, writeBatch, addDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit, writeBatch, addDoc, deleteField } from 'firebase/firestore';
 import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement } from './types/achievements';
 import { logTransaction } from './lib/transactions';
 
@@ -186,6 +186,7 @@ interface UserState {
   
   markStoryRead: (storyId: string, chapterOrder: number, genres?: string[]) => void;
   addCommentProgress: () => void;
+  syncCommentsCountFromDB: () => Promise<void>;
   toggleSaveStory: (storyId: string) => void;
   giftChoco: (storyId: string, amount: number) => boolean;
   addOwnedSticker: (stickerUrl: string) => void;
@@ -651,7 +652,6 @@ export const useStore = create<UserState>()(
             const obsolete = ['allUsersUnlockedAchievements', 'allUsersClaimedAchievements', 'allUsersMissions', 'allUsersStoryProgress', 'allUsersReadHistoryList', 'allUsersSavedStories', 'allUsersOwnedStickers', 'allUsersOwnedAccessories'];
             obsolete.forEach(k => {
                 if (k in docUpdates) {
-                   const { deleteField } = require('firebase/firestore');
                    docUpdates[k] = deleteField();
                 }
             });
@@ -1057,6 +1057,24 @@ export const useStore = create<UserState>()(
          get().gainExp(5);
          get()._checkPerfectDailyDay();
          get()._triggerCountAchievementsCheck();
+      },
+      
+      syncCommentsCountFromDB: async () => {
+         const state = get();
+         const uid = state.uid;
+         if (!uid) return;
+         try {
+            const commenterQuery = query(collection(db, 'comments'), where('uid', '==', uid));
+            const snap = await getDocs(commenterQuery);
+            const count = snap.size;
+            if (count !== state.totalCommentsCount) {
+               set({ totalCommentsCount: count });
+               await state.updateUserDoc({ totalCommentsCount: count });
+               get()._triggerCountAchievementsCheck();
+            }
+         } catch (e) {
+            console.error("Lỗi đồng bộ số bình luận:", e);
+         }
       },
       
       claimMission: (id: string) => {
