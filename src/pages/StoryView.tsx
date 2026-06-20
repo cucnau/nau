@@ -326,7 +326,13 @@ export function StoryView() {
   if (loading) return <div className="p-10 text-center">Đang tải truyện...</div>;
   if (!story) return <div className="p-10 text-center">Không tìm thấy truyện</div>;
 
-  const progressOrder = storyProgress[story.id] || 0;
+  const progressData = storyProgress[story.id];
+  let readChapters: number[] = [];
+  if (typeof progressData === 'number') {
+     readChapters = Array.from({length: progressData}, (_, i) => i + 1);
+  } else if (Array.isArray(progressData)) {
+     readChapters = progressData;
+  }
   const isSaved = (savedStories || []).includes(story.id);
 
   // Calculate total gifted choco from comments feed real-time
@@ -661,7 +667,6 @@ export function StoryView() {
                               setChapterPage(Number(e.target.value));
                               setTimeout(() => {
                                  document.getElementById('chapters-list-container')?.scrollTo({ top: 0, behavior: 'smooth' });
-                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }, 50);
                            }}
                            className="bg-[#FDF6EC] dark:bg-[#1A1412] text-[#3E2723] dark:text-[#A1887F] font-bold text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border-2 border-[#3E2723]/20 dark:border-[#4E342E]/50 focus:border-[#8D6E63] flex-1 sm:flex-none"
@@ -683,7 +688,6 @@ export function StoryView() {
                               setChapterPage(0);
                               setTimeout(() => {
                                  document.getElementById('chapters-list-container')?.scrollTo({ top: 0, behavior: 'smooth' });
-                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                               }, 50);
                            }}
                            className="bg-[#3E2723] dark:bg-[#2C221D] text-[#FDF6EC] px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold text-xs sm:text-sm transition-all hover:bg-[#2D1B19] flex-shrink-0"
@@ -696,7 +700,7 @@ export function StoryView() {
 
                <div id="chapters-list-container" className="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                {[...chapters].sort((a, b) => chapterSortDesc ? b.order - a.order : a.order - b.order).slice(chapterPage * CHAPTERS_PER_PAGE, (chapterPage + 1) * CHAPTERS_PER_PAGE).map(chap => {
-                  const isRead = chap.order <= progressOrder;
+                  const isRead = readChapters.includes(chap.order);
                   const isPassRequired = chap.requiresPass;
                   const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
                   
