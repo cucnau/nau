@@ -4,7 +4,7 @@ import { format, differenceInDays } from 'date-fns';
 import { User as FirebaseUser } from 'firebase/auth';
 import { db, checkIfQuotaError } from './lib/firebase';
 import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit, writeBatch, addDoc, deleteField } from 'firebase/firestore';
-import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement } from './types/achievements';
+import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement, getGMT7Date } from './types/achievements';
 import { logTransaction } from './lib/transactions';
 
 export function compressBase64Image(dataUrl: string, maxWidth = 180, maxHeight = 180, quality = 0.85): Promise<string> {
@@ -187,6 +187,7 @@ interface UserState {
   markStoryRead: (storyId: string, chapterOrder: number, genres?: string[]) => void;
   addCommentProgress: () => void;
   syncCommentsCountFromDB: () => Promise<void>;
+  syncUserDataStatsFromDB: () => Promise<void>;
   toggleSaveStory: (storyId: string) => void;
   giftChoco: (storyId: string, amount: number) => boolean;
   addOwnedSticker: (stickerUrl: string) => void;
@@ -231,6 +232,26 @@ export const getPermanentMissions = (): Mission[] => [
   { id: 'p2', type: 'permanent', description: 'Điểm danh 60 ngày', chocoReward: 60, goldenReward: 6, progress: 0, target: 60, completed: false, claimed: false },
   { id: 'p3', type: 'permanent', description: 'Điểm danh 90 ngày', chocoReward: 90, goldenReward: 9, progress: 0, target: 90, completed: false, claimed: false },
 ];
+
+export const reconcileMissions = (loadedMissions: Mission[]): Mission[] => {
+  const defaults = [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()];
+  if (!Array.isArray(loadedMissions) || loadedMissions.length === 0) {
+    return defaults;
+  }
+  const loadedMap = new Map(loadedMissions.map(m => [m.id, m]));
+  return defaults.map(def => {
+    if (loadedMap.has(def.id)) {
+      const loaded = loadedMap.get(def.id)!;
+      return {
+        ...def,
+        progress: loaded.progress !== undefined ? loaded.progress : def.progress,
+        completed: loaded.completed !== undefined ? loaded.completed : def.completed,
+        claimed: loaded.claimed !== undefined ? loaded.claimed : def.claimed,
+      };
+    }
+    return def;
+  });
+};
 
 export const useStore = create<UserState>()(
   persist(
@@ -467,7 +488,6 @@ export const useStore = create<UserState>()(
              
              if (data.unlockedAchievements !== undefined) newAllUsersUnlocked[uid] = data.unlockedAchievements;
              if (data.claimedAchievements !== undefined) newAllUsersClaimed[uid] = data.claimedAchievements;
-             if (data.missions !== undefined) newAllMissions[uid] = data.missions;
              if (data.storyProgress !== undefined) newAllProgress[uid] = data.storyProgress;
              if (data.readHistoryList !== undefined) newAllHistory[uid] = data.readHistoryList;
              if (data.savedStories !== undefined) newAllSaved[uid] = data.savedStories;
@@ -480,10 +500,35 @@ export const useStore = create<UserState>()(
                computedChapters = Object.values(prog).reduce((a: any, b: any) => a + (Array.isArray(b) ? b.length : (typeof b === 'number' ? b : 0)), 0);
             }
             
-            let computedCheckIns = data.totalCheckIns;
-            if ((computedCheckIns === undefined || computedCheckIns === 0) && data.checkInStreak) {
-               computedCheckIns = data.checkInStreak;
-            }
+            let computedCheckIns = data.totalCheckIns || 0;
+            const rawStreak = data.checkInStreak !== undefined ? data.checkInStreak : state.checkInStreak || 0;
+            computedCheckIns = Math.max(computedCheckIns, rawStreak);
+
+            let rawMissions = data.missions !== undefined ? data.missions : state.missions;
+            let resolvedMissions = reconcileMissions(rawMissions);
+
+            resolvedMissions = resolvedMissions.map(m => {
+               if (m.type === 'permanent' && m.description.includes('Điểm danh')) {
+                  const progress = Math.max(m.progress || 0, computedCheckIns);
+                  const completed = progress >= m.target;
+                  return { ...m, progress, completed };
+               }
+               if (m.id === 'w1') {
+                  const isStreakActive = data.lastCheckInDate || state.lastCheckInDate ? true : false;
+                  if (isStreakActive && rawStreak > 0) {
+                     const d = getGMT7Date();
+                     const day = d.getDay();
+                     const dayOfWeek = day === 0 ? 7 : day;
+                     const estimatedWeeklyCheckins = Math.min(dayOfWeek, rawStreak);
+                     const progress = Math.max(m.progress || 0, estimatedWeeklyCheckins);
+                     const completed = progress >= m.target;
+                     return { ...m, progress, completed };
+                  }
+               }
+               return m;
+            });
+
+            newAllMissions[uid] = resolvedMissions;
 
             return {
             allUsersUnlockedAchievements: newAllUsersUnlocked,
@@ -528,7 +573,7 @@ export const useStore = create<UserState>()(
             savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
             unlockedPassChapters: data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters,
             unlockedEarlyAccessChapters: data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters,
-            missions: data.missions !== undefined ? data.missions : state.missions,
+            missions: resolvedMissions,
             storyProgress: data.storyProgress !== undefined ? data.storyProgress : state.storyProgress,
             readHistoryList: data.readHistoryList !== undefined ? data.readHistoryList : state.readHistoryList,
             chucuLevel: data.chucuLevel !== undefined ? data.chucuLevel : state.chucuLevel,
@@ -809,14 +854,15 @@ export const useStore = create<UserState>()(
         else if (newStreak >= 46) dailyChoco = 10;
 
         // Update missions
-        const ms = [...state.missions];
+        const ms = reconcileMissions([...state.missions]);
         const dCheck = ms.find(m => m.id === 'd1');
         if (dCheck) { dCheck.progress = 1; dCheck.completed = true; }
         
         const wCheck = ms.find(m => m.id === 'w1');
         if (wCheck) { wCheck.progress += 1; if (wCheck.progress >= wCheck.target) wCheck.completed = true; }
-        
-        const newTotalCheckins = (state.totalCheckIns || 0) + 1;
+         
+        const actualTotalCheckIns = Math.max(state.totalCheckIns || 0, state.checkInStreak || 0);
+        const newTotalCheckins = actualTotalCheckIns + 1;
         
         ms.filter(m => m.type === 'permanent' && m.description.includes('Điểm danh')).forEach(pCheck => {
            pCheck.progress = newTotalCheckins;
@@ -1061,20 +1107,42 @@ export const useStore = create<UserState>()(
       },
       
       syncCommentsCountFromDB: async () => {
+         await get().syncUserDataStatsFromDB();
+      },
+      
+      syncUserDataStatsFromDB: async () => {
          const state = get();
          const uid = state.uid;
          if (!uid) return;
          try {
             const commenterQuery = query(collection(db, 'comments'), where('uid', '==', uid));
-            const snap = await getDocs(commenterQuery);
-            const count = snap.size;
-            if (count !== state.totalCommentsCount) {
-               set({ totalCommentsCount: count });
-               await state.updateUserDoc({ totalCommentsCount: count });
+            const commentsSnap = await getDocs(commenterQuery);
+            const commentsCount = commentsSnap.size;
+
+            const chatQuery = query(collection(db, 'chatMessages'), where('uid', '==', uid));
+            const chatSnap = await getDocs(chatQuery);
+            const chatCount = chatSnap.size;
+
+            const updates: any = {};
+            if (commentsCount !== state.totalCommentsCount) {
+               updates.totalCommentsCount = commentsCount;
             }
+            if (chatCount !== state.sentMessagesCount) {
+               updates.sentMessagesCount = chatCount;
+            }
+
+            set({
+               totalCommentsCount: commentsCount,
+               sentMessagesCount: chatCount
+            });
+
+            if (Object.keys(updates).length > 0) {
+               await state.updateUserDoc(updates);
+            }
+
             get()._triggerCountAchievementsCheck();
          } catch (e) {
-            console.error("Lỗi đồng bộ số bình luận:", e);
+            console.error("Lỗi đồng bộ dữ liệu người dùng từ máy chủ:", e);
          }
       },
       
