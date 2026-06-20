@@ -498,7 +498,8 @@ export function ChocoMascot() {
 
         <motion.svg
           viewBox="0 0 100 100"
-          className="w-full h-full drop-shadow-[2px_2px_0_rgba(62,39,35,0.7)]"
+          className="w-full h-full drop-shadow-[2px_2px_0_rgba(62,39,35,0.7)] overflow-visible"
+          style={{ overflow: "visible" }}
           animate={
             mood === "happy"
               ? { y: [0, -15, 0, -10, 0], rotate: [0, 8, -8, 8, 0] }
