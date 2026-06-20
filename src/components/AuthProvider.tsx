@@ -298,6 +298,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         login(user.displayName || 'Reader'); // Keep fallback for existing components
         useStore.getState()._ensureActiveWeekCalculations();
+        useStore.getState().syncUserDataStatsFromDB();
       } else {
         setFirebaseUser(null);
         // Bao ve du lieu: Khong tu dong reset / logout de tranh loi mat sach du lieu khi reload (F5) trong moi truong iframe/Vercel
