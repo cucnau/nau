@@ -451,7 +451,37 @@ export const useStore = create<UserState>()(
       },
       syncFromFirebase: (data) => {
          set((state) => {
+             const uid = state.uid;
+             if (!uid) return {};
+             
+             // Update caches
+             const newAllUsersUnlocked = { ...state.allUsersUnlockedAchievements };
+             const newAllUsersClaimed = { ...state.allUsersClaimedAchievements };
+             const newAllMissions = { ...state.allUsersMissions };
+             const newAllProgress = { ...state.allUsersStoryProgress };
+             const newAllHistory = { ...state.allUsersReadHistoryList };
+             const newAllSaved = { ...state.allUsersSavedStories };
+             const newAllStickers = { ...state.allUsersOwnedStickers };
+             const newAllAccessories = { ...state.allUsersOwnedAccessories };
+             
+             if (data.unlockedAchievements !== undefined) newAllUsersUnlocked[uid] = data.unlockedAchievements;
+             if (data.claimedAchievements !== undefined) newAllUsersClaimed[uid] = data.claimedAchievements;
+             if (data.missions !== undefined) newAllMissions[uid] = data.missions;
+             if (data.storyProgress !== undefined) newAllProgress[uid] = data.storyProgress;
+             if (data.readHistoryList !== undefined) newAllHistory[uid] = data.readHistoryList;
+             if (data.savedStories !== undefined) newAllSaved[uid] = data.savedStories;
+             if (data.ownedStickers !== undefined) newAllStickers[uid] = data.ownedStickers;
+             if (data.ownedAccessories !== undefined) newAllAccessories[uid] = data.ownedAccessories;
+
             return {
+            allUsersUnlockedAchievements: newAllUsersUnlocked,
+            allUsersClaimedAchievements: newAllUsersClaimed,
+            allUsersMissions: newAllMissions,
+            allUsersStoryProgress: newAllProgress,
+            allUsersReadHistoryList: newAllHistory,
+            allUsersSavedStories: newAllSaved,
+            allUsersOwnedStickers: newAllStickers,
+            allUsersOwnedAccessories: newAllAccessories,
             isFirebaseSynced: true,
             choco: data.choco !== undefined ? data.choco : state.choco,
             goldenChoco: data.goldenChoco !== undefined ? data.goldenChoco : state.goldenChoco,
