@@ -1,9 +1,16 @@
+import { useEffect } from 'react';
 import { useStore } from '../store';
 import { Target, CheckCircle, Gift } from 'lucide-react';
 import { cn } from '../components/Layout';
 
 export function Missions() {
-  const { missions, claimMission, isLoggedIn, checkInStreak } = useStore();
+  const { missions, claimMission, isLoggedIn, checkInStreak, syncUserDataStatsFromDB } = useStore();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      syncUserDataStatsFromDB();
+    }
+  }, [isLoggedIn, syncUserDataStatsFromDB]);
 
   const renderMissionGroup = (title: string, type: string) => {
      const items = missions.filter(m => m.type === type);
