@@ -473,6 +473,17 @@ export const useStore = create<UserState>()(
              if (data.ownedStickers !== undefined) newAllStickers[uid] = data.ownedStickers;
              if (data.ownedAccessories !== undefined) newAllAccessories[uid] = data.ownedAccessories;
 
+            let computedChapters = data.totalChaptersRead;
+            if (computedChapters === undefined || computedChapters === 0) {
+               const prog = data.storyProgress || state.storyProgress || {};
+               computedChapters = Object.values(prog).reduce((a: any, b: any) => a + (typeof b === 'number' ? b : 0), 0);
+            }
+            
+            let computedCheckIns = data.totalCheckIns;
+            if ((computedCheckIns === undefined || computedCheckIns === 0) && data.checkInStreak) {
+               computedCheckIns = data.checkInStreak;
+            }
+
             return {
             allUsersUnlockedAchievements: newAllUsersUnlocked,
             allUsersClaimedAchievements: newAllUsersClaimed,
@@ -533,10 +544,10 @@ export const useStore = create<UserState>()(
             totalEarnedChoco: data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco,
             totalEarnedGChoco: data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco,
             totalSpentChoco: data.totalSpentChoco !== undefined ? data.totalSpentChoco : state.totalSpentChoco,
-            totalCheckIns: data.totalCheckIns !== undefined ? data.totalCheckIns : state.totalCheckIns,
+            totalCheckIns: computedCheckIns !== undefined ? computedCheckIns : state.totalCheckIns,
             perfectDailyDates: data.perfectDailyDates !== undefined ? data.perfectDailyDates : state.perfectDailyDates,
             sentMessagesCount: data.sentMessagesCount !== undefined ? data.sentMessagesCount : state.sentMessagesCount,
-            totalChaptersRead: data.totalChaptersRead !== undefined ? data.totalChaptersRead : state.totalChaptersRead,
+            totalChaptersRead: computedChapters,
             totalCommentsCount: data.totalCommentsCount !== undefined ? data.totalCommentsCount : state.totalCommentsCount,
             genresRead: data.genresRead !== undefined ? data.genresRead : state.genresRead,
             activePoints: data.activePoints !== undefined ? data.activePoints : state.activePoints,
@@ -632,9 +643,18 @@ export const useStore = create<UserState>()(
          }
 
          try {
-            const docUpdates = { ...updates };
+            const docUpdates: any = { ...updates };
             delete docUpdates.$chocoDiff;
             delete docUpdates.$gchocoDiff;
+            
+            // Hard delete obsolete fields permanently if they were accidentally requested in update
+            const obsolete = ['allUsersUnlockedAchievements', 'allUsersClaimedAchievements', 'allUsersMissions', 'allUsersStoryProgress', 'allUsersReadHistoryList', 'allUsersSavedStories', 'allUsersOwnedStickers', 'allUsersOwnedAccessories'];
+            obsolete.forEach(k => {
+                if (k in docUpdates) {
+                   const { deleteField } = require('firebase/firestore');
+                   docUpdates[k] = deleteField();
+                }
+            });
 
             // Tự động kiểm tra và phục hồi: nếu avatarUrl hiện tại quá lớn (>80KB Base64),
             // ta sẽ đè lên bằng một phiên bản nén siêu nhỏ để cứu document khỏi giới hạn 1MB của Firestore.
@@ -695,11 +715,23 @@ export const useStore = create<UserState>()(
             const newBoxes = (currentState.ownedMysteryBoxes || 0) - 1;
             const newStickers = [...(currentState.ownedStickers || []), chosenSticker.url];
             
-            // Cập nhật thông qua updateUserDoc để lưu đồng nhất
+            // Cập nhật thông qua updateUserDoc để lưu đồng nhất (trừ ownedStickers vì lưu vào subcollection)
             await currentState.updateUserDoc({
-               ownedMysteryBoxes: newBoxes,
-               ownedStickers: newStickers
+               ownedMysteryBoxes: newBoxes
             });
+
+            // Ghi sticker mới vào subcollection
+            try {
+               await addDoc(collection(db, 'users', currentState.uid, 'owned_stickers'), {
+                  url: chosenSticker.url,
+                  acquiredAt: Date.now()
+               });
+            } catch(subErr) {
+               console.error('Lỗi khi lưu sticker vào subcollection:', subErr);
+            }
+            
+            // Cập nhật state cục bộ manually vì listener onSnapshot có thể chậm 1 chút
+            set({ ownedStickers: newStickers });
             
             return chosenSticker;
          } catch (err: any) {
@@ -925,7 +957,7 @@ export const useStore = create<UserState>()(
            get().unlockAchievement('early_morning_read');
         }
 
-        // 3. Multi Genre: 5 unique genres read AND at least 5 stories read
+        // 3. Multi Genre: 5 unique genres read and 5 stories read
         let uniqueGenres = state.genresRead || [];
         if (genres && genres.length > 0) {
            uniqueGenres = Array.from(new Set([...uniqueGenres, ...genres]));
@@ -1490,6 +1522,11 @@ export const useStore = create<UserState>()(
          
          const currentUnlocked = state.unlockedAchievements || [];
          
+         // 3. Multi Genre fallback trigger
+         if (!currentUnlocked.includes('multi_genre') && (state.genresRead || []).length >= 5 && (state.readHistoryList || []).length >= 5) {
+             get().unlockAchievement('multi_genre');
+         }
+
          // 4. Collector: Library has >= 10 stories
          if (!currentUnlocked.includes('collector') && (state.savedStories || []).length >= 10) {
             get().unlockAchievement('collector');
@@ -1512,6 +1549,10 @@ export const useStore = create<UserState>()(
          // 7. Tiêu Nhiều Choco: total spent choco in store >= 10000
          if (!currentUnlocked.includes('big_spender') && (state.totalSpentChoco || 0) >= 10000) {
             get().unlockAchievement('big_spender');
+         }
+
+         if (!currentUnlocked.includes('generous_donor') && (state.totalSpentChoco || 0) > 0) {
+            get().unlockAchievement('generous_donor');
          }
 
          // 8. Streak 7: checkInStreak >= 7
