@@ -688,12 +688,15 @@ export const useStore = create<UserState>()(
             const randomIndex = Math.floor(Math.random() * unowned.length);
             const chosenSticker = unowned[randomIndex];
             
+            // Lấy lại state mới nhất để tránh lỗi click nhiều lần liên tiếp do lag tải data
+            const currentState = get();
+            
             // Cập nhật state cục bộ và Firestore
-            const newBoxes = (state.ownedMysteryBoxes || 0) - 1;
-            const newStickers = [...(state.ownedStickers || []), chosenSticker.url];
+            const newBoxes = (currentState.ownedMysteryBoxes || 0) - 1;
+            const newStickers = [...(currentState.ownedStickers || []), chosenSticker.url];
             
             // Cập nhật thông qua updateUserDoc để lưu đồng nhất
-            await get().updateUserDoc({
+            await currentState.updateUserDoc({
                ownedMysteryBoxes: newBoxes,
                ownedStickers: newStickers
             });
@@ -1305,7 +1308,7 @@ export const useStore = create<UserState>()(
       // Achievements Actions
       unlockAchievement: (id: string) => {
         const state = get();
-        if (!state.isLoggedIn || !state.uid) return;
+        if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
         const currentUnlocked = state.unlockedAchievements || [];
         if (currentUnlocked.includes(id)) return;
 
@@ -1324,7 +1327,7 @@ export const useStore = create<UserState>()(
 
       claimAchievement: (id: string) => {
          const state = get();
-         if (!state.isLoggedIn || !state.uid || !id) return;
+         if (!state.isLoggedIn || !state.uid || !id || !state.isFirebaseSynced) return;
          const unlocked = state.unlockedAchievements || [];
          const claimed = state.claimedAchievements || [];
          
