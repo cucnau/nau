@@ -168,6 +168,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if ('frameUrl' in data) fieldsToDelete.frameUrl = deleteField();
             if ('equippedSticker' in data) fieldsToDelete.equippedSticker = deleteField();
             if ('stickerPosition' in data) fieldsToDelete.stickerPosition = deleteField();
+            
+            // Dọn dẹp rác bộ nhớ cục bộ vô tình lưu lên Firestore
+            const localObsoleteKeys = ['allUsersUnlockedAchievements', 'allUsersClaimedAchievements', 'allUsersMissions', 'allUsersStoryProgress', 'allUsersReadHistoryList', 'allUsersSavedStories', 'allUsersOwnedStickers', 'allUsersOwnedAccessories'];
+            localObsoleteKeys.forEach(k => {
+              if (k in data) fieldsToDelete[k] = deleteField();
+            });
+
+            if (data.avatarUrl && data.avatarUrl.startsWith('data:image/') && data.avatarUrl.length > 80000) {
+              try {
+                const { compressBase64Image } = await import('../store');
+                const compressed = await compressBase64Image(data.avatarUrl);
+                if (compressed && compressed.length < data.avatarUrl.length) {
+                   fieldsToDelete.avatarUrl = compressed;
+                }
+              } catch(e) {}
+            }
 
             // Tiến hành di chuyển dữ liệu ownedStickers từ trường sang subcollection
             if (Array.isArray(data.ownedStickers) && data.ownedStickers.length > 0) {
