@@ -288,7 +288,7 @@ function AchievementsModal() {
     totalEarnedChoco, totalEarnedGChoco, totalSpentChoco, totalCheckIns,
     perfectDailyDates, sentMessagesCount, genresRead, checkInStreak,
     claimAchievement, savedStories, totalChaptersRead, totalCommentsCount, ownedStickers,
-    chucuInteractions, chucuPremiumFeeds, chucuLevel, ownedChucuAccessories
+    chucuInteractions, chucuPremiumFeeds, chucuLevel, ownedChucuAccessories, readHistoryList
   } = useStore();
 
   const [activeCategory, setActiveCategory] = useState('all');
@@ -311,7 +311,7 @@ function AchievementsModal() {
       case 'read_100_chapters':
         return totalChaptersRead || 0;
       case 'multi_genre':
-        return (genresRead || []).length;
+        return Math.min((genresRead || []).length, (readHistoryList || []).length);
       case 'collector':
         return (savedStories || []).length;
       case 'sticker_collector':
