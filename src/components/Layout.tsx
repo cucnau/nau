@@ -382,22 +382,6 @@ function AchievementsModal() {
           <p className="text-xs text-[#6D4C41] dark:text-[#A1887F] mt-1 font-bold">
             Đạt các cột mốc danh giá để nhận quà tặng ({unlockedAchievements.length}/{ACHIEVEMENTS_LIST.length})
           </p>
-          <button
-             onClick={() => {
-                if (isSyncing) return;
-                setIsSyncing(true);
-                syncCommentsCountFromDB().finally(() => {
-                   setIsSyncing(false);
-                });
-             }}
-             title="Cập nhật lại số liệu từ máy chủ"
-             className={cn(
-                "absolute right-2 top-2 p-1.5 rounded-lg border-[2px] border-[#3E2723] bg-white text-[#3E2723] dark:bg-[#1E1815] dark:text-[#ECE5DC] hover:bg-[#EFEBE9]/40 hover:border-[#3E2723]/80 transition-all cursor-pointer shadow-[0_2px_0_0_#3E2723]/30",
-                isSyncing && "opacity-50 pointer-events-none"
-             )}
-          >
-             <RefreshCw className={cn("w-3.5 h-3.5", isSyncing && "animate-spin")} />
-          </button>
       </div>
 
       {/* Category Carousel / Tabs */}
@@ -528,6 +512,8 @@ export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [showQuotaWarning, setShowQuotaWarning] = useState(true);
+  const [isSyncingAchievements, setIsSyncingAchievements] = useState(false);
+  const syncCommentsCountFromDB = useStore(state => state.syncCommentsCountFromDB);
   const { 
     isLoggedIn, uid, displayName, avatarUrl, 
     equippedAccessory, accessoryPosition,
@@ -915,6 +901,23 @@ export function AppLayout() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setAchievementsOpen(false)} />
           <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-2xl max-h-[85vh] rounded-3xl overflow-y-auto border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] dark:border-[#5D4037] shadow-2xl flex flex-col z-10 p-6 sm:p-8 transition-all">
+            <button 
+              onClick={() => {
+                if (isSyncingAchievements) return;
+                setIsSyncingAchievements(true);
+                syncCommentsCountFromDB().finally(() => {
+                   setIsSyncingAchievements(false);
+                });
+              }} 
+              title="Cập nhật lại số liệu từ máy chủ"
+              className={cn(
+                "absolute top-4 left-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all active:translate-y-1 active:shadow-none z-20 cursor-pointer",
+                isSyncingAchievements && "opacity-50 pointer-events-none"
+              )}
+            >
+              <RefreshCw className={cn("w-4 h-4 text-[#3E2723] dark:text-[#ECE5DC]", isSyncingAchievements && "animate-spin")} />
+            </button>
+
             <button 
               onClick={() => setAchievementsOpen(false)} 
               className="absolute top-4 right-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all active:translate-y-1 active:shadow-none z-20"
