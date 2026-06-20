@@ -45,6 +45,10 @@ export function StoryList() {
     const matchesGenre = selectedGenre === 'all' || 
                          (Array.isArray(story.genres) && story.genres.includes(selectedGenre));
     return matchesSearch && matchesGenre;
+  }).sort((a, b) => {
+    const timeA = a.updatedAt || (a.createdAt?.toMillis ? a.createdAt.toMillis() : (typeof a.createdAt === 'number' ? a.createdAt : 0)) || 0;
+    const timeB = b.updatedAt || (b.createdAt?.toMillis ? b.createdAt.toMillis() : (typeof b.createdAt === 'number' ? b.createdAt : 0)) || 0;
+    return timeB - timeA;
   });
 
   return (
