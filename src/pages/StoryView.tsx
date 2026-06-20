@@ -448,6 +448,8 @@ export function StoryView() {
                type: 'comment_reply',
            });
         }
+        
+        useStore.getState().addCommentProgress();
 
         setReplyText('');
         setReplyingToId(null);
@@ -498,6 +500,7 @@ export function StoryView() {
            storyId: story.id,
            content: commentText.trim()
         });
+        useStore.getState().addCommentProgress();
         setCommentText('');
      } catch (err) {
         console.error(err);
