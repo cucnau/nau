@@ -17,6 +17,162 @@ import { db } from "../lib/firebase";
 import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import { getChucuAccessoryPreview } from "../components/ChucuPresetAccessories";
 
+const PRESET_SHOP_ACCESSORIES = [
+  {
+    id: "preset_crown",
+    name: "Vương Miện Hoàng Gia",
+    description: "Chiếc vương miện lấp lánh bằng vàng dành riêng cho vị vua Chucu tinh nghịch.",
+    price: 50,
+    requiredLevel: 5,
+    type: "choco",
+    url: "chucu_acc_crown"
+  },
+  {
+    id: "preset_sunglasses",
+    name: "Kính Râm Cool Ngầu",
+    description: "Cặp kính đặc vụ đen láy siêu ngầu cho Chucu sành điệu bước đi.",
+    price: 20,
+    requiredLevel: 2,
+    type: "choco",
+    url: "chucu_acc_sunglasses"
+  },
+  {
+    id: "preset_halo",
+    name: "Hào Quang Thiên Thần",
+    description: "Một vòng thánh quang lấp lánh lơ lửng trên đỉnh đầu của em Chucu.",
+    price: 5,
+    requiredLevel: 10,
+    type: "golden",
+    url: "chucu_acc_halo"
+  },
+  {
+    id: "preset_ribbon",
+    name: "Nơ Đỏ Quý Phái",
+    description: "Chiếc nơ lụa thắt đỏ duyên dáng, làm bừng sáng nét dễ thương.",
+    price: 10,
+    requiredLevel: 1,
+    type: "choco",
+    url: "chucu_acc_ribbon"
+  },
+  {
+    id: "preset_santa",
+    name: "Mũ Noel Ấm Áp",
+    description: "Nhỏ bé mà ấm cúng, chiếc mũ Noel rực ánh đỏ sưởi ấm mùa đông.",
+    price: 15,
+    requiredLevel: 1,
+    type: "choco",
+    url: "chucu_acc_santa"
+  },
+  {
+    id: "preset_chef",
+    name: "Mũ Đầu Bếp Nhí",
+    description: "Chiếc mũ trắng tơi phồng, giúp Chucu sẵn sàng nhào nặn sô cô la ngọt ngào.",
+    price: 25,
+    requiredLevel: 3,
+    type: "choco",
+    url: "chucu_acc_chef"
+  },
+  {
+    id: "preset_cat_ears",
+    name: "Tai Mèo Tinh Nghịch",
+    description: "Nhìn vểnh vểnh cực dễ thương với đôi tai mèo nhỏ xíu sô cô la.",
+    price: 30,
+    requiredLevel: 4,
+    type: "choco",
+    url: "chucu_acc_cat_ears"
+  },
+  {
+    id: "preset_straw_hat",
+    name: "Mũ Rơm Đồng Quê",
+    description: "Cùng Chucu đi picnic, dạo mát nhẹ nhàng dưới nắng hạ mộc mạc.",
+    price: 12,
+    requiredLevel: 2,
+    type: "choco",
+    url: "chucu_acc_straw_hat"
+  },
+  {
+    id: "preset_apple",
+    name: "Quả Táo Đỏ Thăng Bằng",
+    description: "Một quả táo nhỏ căng mọng thăng bằng cực kiêu trên đỉnh đầu.",
+    price: 8,
+    requiredLevel: 1,
+    type: "choco",
+    url: "chucu_acc_apple"
+  },
+  {
+    id: "preset_sprout",
+    name: "Băng Đô Mầm Cây Hy Vọng",
+    description: "Một mầm cây xanh nhỏ bé tràn đầy sức sống mọc lên từ đỉnh đầu của Chucu.",
+    price: 10,
+    requiredLevel: 1,
+    type: "choco",
+    url: "chucu_acc_sprout"
+  },
+  {
+    id: "preset_monocle",
+    name: "Kính Đơn & Râu Quý Tộc",
+    description: "Sự kết hợp giữa chiếc kính đơn hoàng gia vàng óng và bộ ria mép uốn cong lịch lãm.",
+    price: 35,
+    requiredLevel: 4,
+    type: "choco",
+    url: "chucu_acc_monocle"
+  },
+  {
+    id: "preset_wizard_hat",
+    name: "Mũ Phù Thuỷ Chiêm Tinh",
+    description: "Mũ chóp cao màu tím huyền hoặc đính kèm trăng khuyết và sao đêm lấp lánh.",
+    price: 45,
+    requiredLevel: 5,
+    type: "choco",
+    url: "chucu_acc_wizard_hat"
+  },
+  {
+    id: "preset_headphones",
+    name: "Tai Nghe Neon Gaming",
+    description: "Bộ tai nghe màu hồng ngọt ngào với đệm mút đen cực chất cho game thủ Chucu.",
+    price: 4,
+    requiredLevel: 8,
+    type: "golden",
+    url: "chucu_acc_headphones"
+  },
+  {
+    id: "preset_round_glasses",
+    name: "Kính Tròn Học Thức",
+    description: "Đôi kính gọng tròn sẫm màu tri thức, cộng ngay 100 điểm IQ cho thú cưng.",
+    price: 18,
+    requiredLevel: 2,
+    type: "choco",
+    url: "chucu_acc_round_glasses"
+  },
+  {
+    id: "preset_bunny_ears",
+    name: "Tai Thỏ Lém Lỉnh",
+    description: "Bộ tai thỏ siêu dài mềm mại thướt tha, biến Chucu thành thỏ ngọc Choco.",
+    price: 22,
+    requiredLevel: 3,
+    type: "choco",
+    url: "chucu_acc_bunny_ears"
+  },
+  {
+    id: "preset_detective",
+    name: "Mũ Thám Tử Tài Ba",
+    description: "Mũ phớt Sherlock Holmes hoạ tiết caro sành điệu chuyên đi phá án của Chucu.",
+    price: 40,
+    requiredLevel: 5,
+    type: "choco",
+    url: "chucu_acc_detective"
+  },
+  {
+    id: "preset_scarf",
+    name: "Khăn Choàng Ấm Áp",
+    description: "Chiếc khăn len đỏ viền sọc trắng giữ ấm vào những ngày đông lạnh giá khi đọc truyện.",
+    price: 15,
+    requiredLevel: 2,
+    type: "choco",
+    url: "chucu_acc_scarf"
+  }
+];
+
 export function Store() {
   const {
     choco,
@@ -104,9 +260,16 @@ export function Store() {
           orderBy("createdAt", "desc"),
         );
         const snap = await getDocs(q);
-        setStoreChucuAccessories(
-          snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
-        );
+        const fbAccessories = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        
+        // Merge with preset ones, filtering out duplicates by url/id
+        const fbUrls = fbAccessories.map((a: any) => a.url);
+        const missingPresets = PRESET_SHOP_ACCESSORIES.filter(p => !fbUrls.includes(p.url));
+        
+        setStoreChucuAccessories([
+          ...fbAccessories,
+          ...missingPresets
+        ]);
       } catch (err) {
         console.error("Lỗi khi tải danh sách phụ kiện chucu:", err);
       }
