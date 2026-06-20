@@ -194,6 +194,198 @@ export const CHUCU_PRESET_ACCESSORIES: ChucuPresetAccessory[] = [
         <path d="M 50 21 Q 65 21, 63 12 Q 54 15, 50 21 Z" fill="#2E7D32" stroke="#3E2723" strokeWidth="3" strokeLinejoin="round" />
       </svg>
     )
+  },
+  {
+    id: "chucu_acc_sprout",
+    name: "Băng Đô Mầm Cây Hy Vọng",
+    description: "Một mầm cây xanh nhỏ bé tràn đầy sức sống mọc lên từ đỉnh đầu của Chucu.",
+    svgContent: () => (
+      <g>
+        <path d="M 50 30 L 50 16" stroke="#3E2723" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M 50 16 Q 42 12 42 17 Q 46 20 50 16" fill="#81C784" stroke="#3E2723" strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M 50 16 Q 58 12 58 17 Q 54 20 50 16" fill="#81C784" stroke="#3E2723" strokeWidth="1.8" strokeLinejoin="round" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <path d="M 50 75 L 50 35" stroke="#3E2723" strokeWidth="5" strokeLinecap="round" />
+        <path d="M 50 35 Q 30 25 30 37 Q 40 45 50 35" fill="#81C784" stroke="#3E2723" strokeWidth="4" strokeLinejoin="round" />
+        <path d="M 50 35 Q 70 25 70 37 Q 60 45 50 35" fill="#81C784" stroke="#3E2723" strokeWidth="4" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_monocle",
+    name: "Kính Đơn & Râu Quý Tộc",
+    description: "Sự kết hợp giữa chiếc kính đơn hoàng gia vàng óng và bộ ria mép uốn cong lịch lãm.",
+    svgContent: () => (
+      <g>
+        {/* Monocle on right eye (cx=58, cy=46, r=7) */}
+        <circle cx="58" cy="46" r="7" fill="none" stroke="#FFD700" strokeWidth="2.2" />
+        <line x1="54" y1="42" x2="58" y2="46" stroke="#FFF" strokeWidth="1.2" opacity="0.7" />
+        {/* Gold Chain to body */}
+        <path d="M 65 46 Q 72 49 70 65" fill="none" stroke="#FFD700" strokeWidth="1.2" strokeLinecap="round" />
+        {/* Mustache below mouth */}
+        <path d="M 41 58 Q 45 53 50 56 Q 55 53 59 58 Q 55 55 50 55 Q 45 55 41 58 Z" fill="#212121" stroke="#3E2723" strokeWidth="1.2" strokeLinejoin="round" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <circle cx="50" cy="35" r="22" fill="none" stroke="#FFD700" strokeWidth="5" />
+        <line x1="38" y1="23" x2="50" y2="35" stroke="#FFF" strokeWidth="3" opacity="0.7" />
+        <path d="M 72 35 Q 85 40 80 75" fill="none" stroke="#FFD700" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M 30 68 Q 40 56 50 63 Q 60 56 70 68 Q 60 61 50 61 Q 40 61 30 68 Z" fill="#212121" stroke="#3E2723" strokeWidth="2.5" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_wizard_hat",
+    name: "Mũ Phù Thuỷ Chiêm Tinh",
+    description: "Mũ chóp cao màu tím huyền hoặc đính kèm trăng khuyết và sao đêm lấp lánh.",
+    svgContent: () => (
+      <g>
+        <ellipse cx="50" cy="25" rx="22" ry="4.5" fill="#5E35B1" stroke="#3E2723" strokeWidth="2.5" />
+        <path d="M 33 24 Q 45 8 40 4 Q 52 8 67 24 Z" fill="#5E35B1" stroke="#3E2723" strokeWidth="2.5" strokeLinejoin="round" />
+        <path d="M 35 22 Q 50 18 65 22 L 65.5 24 Q 50 20 34.5 24 Z" fill="#FFB300" stroke="#3E2723" strokeWidth="1" />
+        <circle cx="48" cy="12" r="1.5" fill="#FFF" />
+        <path d="M 43 9 L 44 11 L 46 11 L 44.5 12 L 45 14 L 43 13 L 41 14 L 41.5 12 L 40 11 L 42 11 Z" fill="#FFEB3B" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <ellipse cx="50" cy="78" rx="42" ry="9" fill="#5E35B1" stroke="#3E2723" strokeWidth="4.5" />
+        <path d="M 18 76 Q 40 14 30 6 Q 52 14 82 76 Z" fill="#5E35B1" stroke="#3E2723" strokeWidth="5" strokeLinejoin="round" />
+        <path d="M 22 71 Q 50 63 78 71 L 79 77 Q 50 69 21 77 Z" fill="#FFB300" stroke="#3E2723" strokeWidth="2" />
+        <path d="M 50 35 L 53 42 L 60 42 L 55 46 L 57 53 L 50 49 L 43 53 L 45 46 L 40 42 L 47 42 Z" fill="#FFEB3B" stroke="#3E2723" strokeWidth="1.5" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_headphones",
+    name: "Tai Nghe Neon Gaming",
+    description: "Bộ tai nghe màu hồng ngọt ngào với đệm mút đen cực chất cho game thủ Chucu.",
+    svgContent: () => (
+      <g>
+        <path d="M 23 53 A 28 28 0 0 1 77 53" fill="none" stroke="#EC407A" strokeWidth="3" />
+        <rect x="18" y="44" width="7" height="17" rx="3.5" fill="#212121" stroke="#EC407A" strokeWidth="2" />
+        <rect x="75" y="44" width="7" height="17" rx="3.5" fill="#212121" stroke="#EC407A" strokeWidth="2" />
+        <circle cx="21.5" cy="52.5" r="2.5" fill="#EC407A" />
+        <circle cx="78.5" cy="52.5" r="2.5" fill="#EC407A" />
+        <path d="M 20 57 Q 22 68 31 68" fill="none" stroke="#212121" strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="31" cy="68" r="1.5" fill="#EC407A" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <path d="M 12 55 A 38 38 0 0 1 88 55" fill="none" stroke="#EC407A" strokeWidth="6" />
+        <rect x="3" y="40" width="15" height="35" rx="7.5" fill="#212121" stroke="#EC407A" strokeWidth="4.5" />
+        <rect x="82" y="40" width="15" height="35" rx="7.5" fill="#212121" stroke="#EC407A" strokeWidth="4.5" />
+        <path d="M 10 65 Q 15 90 35 90" fill="none" stroke="#212121" strokeWidth="4" strokeLinecap="round" />
+        <circle cx="35" cy="90" r="3.5" fill="#EC407A" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_round_glasses",
+    name: "Kính Tròn Học Thức",
+    description: "Đôi kính gọng tròn sẫm màu tri thức, cộng ngay 100 điểm IQ cho thú cưng.",
+    svgContent: () => (
+      <g>
+        <circle cx="41" cy="46" r="7.5" fill="none" stroke="#3E2723" strokeWidth="2.5" />
+        <line x1="37" y1="42" x2="41" y2="46" stroke="#FFF" strokeWidth="1.5" opacity="0.7" />
+        <circle cx="59" cy="46" r="7.5" fill="none" stroke="#3E2723" strokeWidth="2.5" />
+        <line x1="55" y1="42" x2="59" y2="46" stroke="#FFF" strokeWidth="1.5" opacity="0.7" />
+        <path d="M 48.5 46 Q 50 44 51.5 46" fill="none" stroke="#3E2723" strokeWidth="2.2" />
+        <path d="M 33.5 46 Q 28 47 25 49" fill="none" stroke="#3E2723" strokeWidth="1.8" />
+        <path d="M 66.5 46 Q 72 47 75 49" fill="none" stroke="#3E2723" strokeWidth="1.8" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        {/* Left lens */}
+        <circle cx="35.5" cy="50" r="12" fill="none" stroke="#3E2723" strokeWidth="4.5" />
+        <line x1="29.5" y1="44" x2="35.5" y2="50" stroke="#FFF" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
+        {/* Right lens */}
+        <circle cx="64.5" cy="50" r="12" fill="none" stroke="#3E2723" strokeWidth="4.5" />
+        <line x1="58.5" y1="44" x2="64.5" y2="50" stroke="#FFF" strokeWidth="2.5" strokeLinecap="round" opacity="0.8" />
+        {/* Bridge */}
+        <path d="M 47.5 50 Q 50 46 52.5 50" fill="none" stroke="#3E2723" strokeWidth="4" strokeLinecap="round" />
+        {/* Left temple */}
+        <path d="M 23.5 50 Q 15 51.5 10 55" fill="none" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" />
+        {/* Right temple */}
+        <path d="M 76.5 50 Q 85 51.5 90 55" fill="none" stroke="#3E2723" strokeWidth="3" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_bunny_ears",
+    name: "Tai Thỏ Lém Lỉnh",
+    description: "Bộ tai thỏ siêu dài mềm mại thướt tha, biến Chucu thành thỏ ngọc Choco.",
+    svgContent: () => (
+      <g>
+        <path d="M 37 23 Q 29 -2 36 -3 Q 43 -3 43 23 Z" fill="#FFF" stroke="#3E2723" strokeWidth="2.5" strokeLinejoin="round" />
+        <path d="M 37 20 Q 32 1.5 36 1.5 Q 40 1.5 40 20 Z" fill="#FF8A80" />
+        <path d="M 63 23 Q 71 -2 64 -3 Q 57 -3 57 23 Z" fill="#FFF" stroke="#3E2723" strokeWidth="2.5" strokeLinejoin="round" />
+        <path d="M 63 20 Q 68 1.5 64 1.5 Q 60 1.5 60 20 Z" fill="#FF8A80" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <path d="M 35 70 Q 15 5 35 3 Q 55 5 50 70 Z" fill="#FFF" stroke="#3E2723" strokeWidth="5" strokeLinejoin="round" />
+        <path d="M 35 63 Q 23 11 34 10 Q 45 11 44 63 Z" fill="#FF8A80" />
+        <path d="M 65 70 Q 85 5 65 3 Q 45 5 50 70 Z" fill="#FFF" stroke="#3E2723" strokeWidth="5" strokeLinejoin="round" />
+        <path d="M 65 63 Q 77 11 66 10 Q 55 11 56 63 Z" fill="#FF8A80" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_detective",
+    name: "Mũ Thám Tử Tài Ba",
+    description: "Mũ phớt Sherlock Holmes hoạ tiết caro sành điệu chuyên đi phá án của Chucu.",
+    svgContent: () => (
+      <g>
+        <path d="M 28 27 Q 50 20 72 27 Z" fill="#8D6E63" stroke="#3E2723" strokeWidth="2.5" strokeLinejoin="round" />
+        <path d="M 31 25 C 30 11, 70 11, 69 25 Z" fill="#8D6E63" stroke="#3E2723" strokeWidth="2.5" strokeLinejoin="round" />
+        <line x1="50" y1="12" x2="50" y2="25" stroke="#3E2723" strokeWidth="1.2" opacity="0.4" />
+        <line x1="38" y1="18" x2="62" y2="18" stroke="#3E2723" strokeWidth="1.2" opacity="0.4" />
+        <circle cx="50" cy="11.5" r="2.2" fill="#5D4037" stroke="#3E2723" strokeWidth="1.5" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <path d="M 12 60 Q 50 45 88 60 Z" fill="#8D6E63" stroke="#3E2723" strokeWidth="5.5" strokeLinejoin="round" />
+        <path d="M 18 55 C 16 20, 84 20, 82 55 Z" fill="#8D6E63" stroke="#3E2723" strokeWidth="5.5" strokeLinejoin="round" />
+        <line x1="50" y1="23" x2="50" y2="55" stroke="#3E2723" strokeWidth="2.5" opacity="0.4" />
+        <line x1="28" y1="39" x2="72" y2="39" stroke="#3E2723" strokeWidth="2.5" opacity="0.4" />
+        <circle cx="50" cy="21" r="5" fill="#5D4037" stroke="#3E2723" strokeWidth="2.5" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_scarf",
+    name: "Khăn Choàng Ấm Áp",
+    description: "Chiếc khăn len đỏ viền sọc trắng giữ ấm vào những ngày đông lạnh giá khi đọc truyện.",
+    svgContent: () => (
+      <g>
+        <rect x="36" y="66" width="28" height="7.5" rx="3.5" fill="#E53935" stroke="#3E2723" strokeWidth="2.2" />
+        <line x1="43" y1="66" x2="43" y2="73.5" stroke="#FFF" strokeWidth="2" />
+        <line x1="50" y1="66" x2="50" y2="73.5" stroke="#FFF" strokeWidth="2" />
+        <line x1="57" y1="66" x2="57" y2="73.5" stroke="#FFF" strokeWidth="2" />
+        {/* Scarf hanging tail */}
+        <path d="M 58 72 L 63 80 Q 64 84 62 84 Q 59 84 57 73 Z" fill="#E53935" stroke="#3E2723" strokeWidth="1.8" strokeLinejoin="round" />
+        <line x1="59.5" y1="74" x2="62" y2="79" stroke="#FFF" strokeWidth="1.5" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <rect x="15" y="40" width="70" height="20" rx="10" fill="#E53935" stroke="#3E2723" strokeWidth="5.5" />
+        <line x1="30" y1="40" x2="30" y2="60" stroke="#FFF" strokeWidth="5.5" />
+        <line x1="50" y1="40" x2="50" y2="60" stroke="#FFF" strokeWidth="5.5" />
+        <line x1="70" y1="40" x2="70" y2="60" stroke="#FFF" strokeWidth="5.5" />
+        <path d="M 68 55 L 82 85 Q 85 92 80 92 Q 72 92 65 58 Z" fill="#E53935" stroke="#3E2723" strokeWidth="4" strokeLinejoin="round" />
+        <line x1="72" y1="63" x2="79" y2="79" stroke="#FFF" strokeWidth="4" />
+      </svg>
+    )
   }
 ];
 
