@@ -1139,10 +1139,89 @@ export const useStore = create<UserState>()(
                updates.sentMessagesCount = chatCount;
             }
 
-            set({
+            const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
+            const currentWeekId = getWeeklyId();
+
+            let commentsTodayCount = 0;
+            let commentsThisWeekCount = 0;
+
+            const toGMT7Date = (ms: number): Date => {
+               const d = new Date(ms);
+               const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+               return new Date(utc + (3600000 * 7));
+            };
+
+            const getWeeklyIdOfDate = (gmt7: Date): string => {
+               const d = new Date(gmt7.getTime());
+               d.setHours(0, 0, 0, 0);
+               d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+               const yearStart = new Date(d.getFullYear(), 0, 1);
+               const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+               return `${d.getFullYear()}-W${weekNo}`;
+            };
+
+            commentsSnap.forEach((doc) => {
+               const data = doc.data();
+               if (data && data.createdAt) {
+                  const createdAt = data.createdAt;
+                  const createdMs = typeof createdAt === 'number' ? createdAt : (createdAt?.toMillis?.() || 0);
+                  if (createdMs > 0) {
+                     const commentGmt7 = toGMT7Date(createdMs);
+                     
+                     const commentDateStr = format(commentGmt7, 'yyyy-MM-dd');
+                     if (commentDateStr === todayStr) {
+                        commentsTodayCount++;
+                     }
+                     
+                     const commentWeekId = getWeeklyIdOfDate(commentGmt7);
+                     if (commentWeekId === currentWeekId) {
+                        commentsThisWeekCount++;
+                     }
+                  }
+               }
+            });
+
+            const ms = [...state.missions];
+            let missionsUpdated = false;
+
+            const d3 = ms.find(m => m.id === 'd3');
+            if (d3) {
+               const targetProgress = Math.min(d3.target, commentsTodayCount);
+               if (d3.progress < targetProgress) {
+                  d3.progress = targetProgress;
+                  if (d3.progress >= d3.target) {
+                     d3.completed = true;
+                  }
+                  missionsUpdated = true;
+               }
+            }
+
+            const w3 = ms.find(m => m.id === 'w3');
+            if (w3) {
+               const targetProgress = Math.min(w3.target, commentsThisWeekCount);
+               if (w3.progress < targetProgress) {
+                  w3.progress = targetProgress;
+                  if (w3.progress >= w3.target) {
+                     w3.completed = true;
+                  }
+                  missionsUpdated = true;
+               }
+            }
+
+            const nextState: any = {
                totalCommentsCount: commentsCount,
                sentMessagesCount: chatCount
-            });
+            };
+
+            if (missionsUpdated) {
+               nextState.missions = ms;
+               const allMs = { ...(state.allUsersMissions || {}) };
+               allMs[uid] = ms;
+               nextState.allUsersMissions = allMs;
+               updates.missions = ms;
+            }
+
+            set(nextState);
 
             if (Object.keys(updates).length > 0) {
                await state.updateUserDoc(updates);
