@@ -508,6 +508,14 @@ export const useStore = create<UserState>()(
             let resolvedMissions = reconcileMissions(rawMissions);
 
             resolvedMissions = resolvedMissions.map(m => {
+               if (m.id === 'd1') {
+                  const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
+                  const isCheckedInToday = (data.lastCheckInDate || state.lastCheckInDate) === todayStr;
+                  if (isCheckedInToday) {
+                     m.progress = 1;
+                     m.completed = true;
+                  }
+               }
                if (m.type === 'permanent' && m.description.includes('Điểm danh')) {
                   const progress = Math.max(m.progress || 0, computedCheckIns);
                   const completed = progress >= m.target;
@@ -792,7 +800,7 @@ export const useStore = create<UserState>()(
         const state = get();
         if (!state.isLoggedIn) return;
         
-        const todayStr = format(new Date(), 'yyyy-MM-dd');
+        const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
         if (state.lastCheckInDate === todayStr) return; // Already checked in
         
         let newStreak = 1;
@@ -1728,7 +1736,7 @@ export const useStore = create<UserState>()(
          const daily = state.missions.filter(m => m.type === 'daily');
          const allCompleted = daily.every(m => m.completed);
          if (allCompleted) {
-            const todayStr = format(new Date(), 'yyyy-MM-dd');
+            const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
             const pDates = state.perfectDailyDates || [];
             if (!pDates.includes(todayStr)) {
                const newPerfectDates = [...pDates, todayStr];
@@ -1746,7 +1754,7 @@ export const useStore = create<UserState>()(
          const state = get();
          if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
 
-         const todayStr = format(new Date(), 'yyyy-MM-dd');
+         const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
          const currentWeekId = getWeeklyId();
 
          let changed = false;
@@ -1759,6 +1767,9 @@ export const useStore = create<UserState>()(
             console.log('Daily reset triggered, resetting daily missions');
             nextMissions = nextMissions.map(m => {
                if (m.type === 'daily') {
+                  if (m.id === 'd1' && state.lastCheckInDate === todayStr) {
+                     return { ...m, progress: 1, completed: true };
+                  }
                   return { ...m, progress: 0, completed: false, claimed: false };
                }
                return m;
