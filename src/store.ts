@@ -560,6 +560,7 @@ export const useStore = create<UserState>()(
             };
          });
          get()._checkResetMissions();
+         get()._triggerCountAchievementsCheck();
       },
 
       gainExp: (amount: number) => {
@@ -1070,8 +1071,8 @@ export const useStore = create<UserState>()(
             if (count !== state.totalCommentsCount) {
                set({ totalCommentsCount: count });
                await state.updateUserDoc({ totalCommentsCount: count });
-               get()._triggerCountAchievementsCheck();
             }
+            get()._triggerCountAchievementsCheck();
          } catch (e) {
             console.error("Lỗi đồng bộ số bình luận:", e);
          }
