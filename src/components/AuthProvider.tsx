@@ -88,6 +88,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               totalCheckIns: localTotalCheckIns,
               perfectDailyDates: state.perfectDailyDates || [],
               sentMessagesCount: state.sentMessagesCount || 0,
+              totalChaptersRead: state.totalChaptersRead || 0,
+              totalCommentsCount: state.totalCommentsCount || 0,
               genresRead: state.genresRead || [],
               activePoints: state.activePoints || 0,
               lastActiveWeek: state.lastActiveWeek || '',
