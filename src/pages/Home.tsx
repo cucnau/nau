@@ -8,13 +8,13 @@ import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { UserAvatar } from '../components/UserAvatar';
 import { format } from 'date-fns';
-import { getWeeklyId } from '../types/achievements';
+import { getWeeklyId, getGMT7Date } from '../types/achievements';
 
 export function Home() {
   const navigate = useNavigate();
   const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, lastCheckInDate, checkInStreak, getTitleColor, lastFreeStreakRecoveryMonth, activeStreakProtection, ownedStreakTickets, theme } = useStore();
   
-  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
   const isCheckedInToday = lastCheckInDate === todayStr;
   
   const hasUnclaimedMissions = isCheckedInToday && missions.some(m => m.completed && !m.claimed);
@@ -373,7 +373,7 @@ export function Home() {
                  <button onClick={handleCheckInBtnClick} className="flex flex-col items-center justify-center text-center p-3 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-2xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_3px_0_0_#D7CCC8] dark:shadow-[0_3px_0_0_#0D0907] hover:-translate-y-1 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-1 active:shadow-none cursor-pointer">
                     <div className="relative w-12 h-12 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1.5 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
                        <CalendarCheck className="w-5 h-5 text-[#8D6E63]" />
-                       {(!lastCheckInDate || lastCheckInDate !== format(new Date(), 'yyyy-MM-dd')) && isLoggedIn && (
+                       {(!lastCheckInDate || lastCheckInDate !== todayStr) && isLoggedIn && (
                           <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8D6E63] opacity-75"></span>
                              <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#5D4037] border-[2px] border-[#FDF6EC] dark:border-[#2C221D]"></span>
