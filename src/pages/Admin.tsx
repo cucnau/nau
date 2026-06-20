@@ -952,6 +952,7 @@ export function Admin() {
         completed,
         externalUrl: externalUrl.trim(),
         createdAt: serverTimestamp(),
+        updatedAt: Date.now(),
       });
       setTitle("");
       setAuthor("");
@@ -993,6 +994,7 @@ export function Admin() {
         genres: genreArray,
         completed: editingStory.completed || false,
         externalUrl: editingStory.externalUrl || "",
+        updatedAt: Date.now(),
       });
       setEditingStory(null);
       if (editFileInputRef.current) editFileInputRef.current.value = "";
@@ -1144,7 +1146,10 @@ export function Admin() {
         const storySnap = await getDoc(storyRef);
         if (storySnap.exists()) {
           const currentCount = storySnap.data().chapterCount || 0;
-          await updateDoc(storyRef, { chapterCount: currentCount + 1 });
+          await updateDoc(storyRef, { 
+            chapterCount: currentCount + 1,
+            updatedAt: Date.now()
+          });
 
           // Send notifications to users who have saved this story
           const storyData = storySnap.data();
@@ -1189,6 +1194,9 @@ export function Admin() {
             externalUrl: cExternalUrl.trim(),
           },
         );
+        await updateDoc(doc(db, "stories", managingStoryChapters), {
+          updatedAt: Date.now()
+        });
       }
 
       setChapterModalMode(null);
