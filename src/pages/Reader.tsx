@@ -7,7 +7,7 @@ import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquar
 import { db, checkIfQuotaError } from '../lib/firebase';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, doc, getDoc, updateDoc, increment, limit } from 'firebase/firestore';
 import { format } from 'date-fns';
-import { getWeeklyId } from '../types/achievements';
+import { getWeeklyId, getGMT7Date } from '../types/achievements';
 import { useUserProfilesCache } from '../hooks/useUserProfilesCache';
 
 const ParagraphCommentNode = ({
@@ -665,7 +665,7 @@ export function Reader() {
 
   const handleReadingFinished = () => {
     if (storyId && currentChapter) {
-       const todayStr = format(new Date(), 'yyyy-MM-dd');
+       const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
        const weekId = getWeeklyId();
        // Increment firebase view count
        updateDoc(doc(db, 'stories', storyId), { 
