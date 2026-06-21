@@ -266,10 +266,19 @@ export function Store() {
         const fbUrls = fbAccessories.map((a: any) => a.url);
         const missingPresets = PRESET_SHOP_ACCESSORIES.filter(p => !fbUrls.includes(p.url));
         
-        setStoreChucuAccessories([
+        const combined = [
           ...fbAccessories,
           ...missingPresets
-        ]);
+        ];
+
+        // Sort by requiredLevel ascending (lowest level required first)
+        combined.sort((a: any, b: any) => {
+          const lvA = Number(a.requiredLevel !== undefined ? a.requiredLevel : 1);
+          const lvB = Number(b.requiredLevel !== undefined ? b.requiredLevel : 1);
+          return lvA - lvB;
+        });
+
+        setStoreChucuAccessories(combined);
       } catch (err) {
         console.error("Lỗi khi tải danh sách phụ kiện chucu:", err);
       }
