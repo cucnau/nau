@@ -618,11 +618,11 @@ export const useStore = create<UserState>()(
             chucuPremiumFeeds: data.chucuPremiumFeeds !== undefined ? data.chucuPremiumFeeds : state.chucuPremiumFeeds,
             chucuLastTime: data.chucuLastTime !== undefined ? data.chucuLastTime : state.chucuLastTime,
 
-            chucuGameFragments: data.chucuGameFragments !== undefined ? data.chucuGameFragments : 0,
-            chucuGameGFragments: data.chucuGameGFragments !== undefined ? data.chucuGameGFragments : 0,
-            chucuGameBonusPoints: data.chucuGameBonusPoints !== undefined ? data.chucuGameBonusPoints : 0,
-            chucuGamePlaysToday: data.chucuGamePlaysToday !== undefined ? data.chucuGamePlaysToday : 0,
-            chucuGameLastPlayDate: data.chucuGameLastPlayDate !== undefined ? data.chucuGameLastPlayDate : null,
+            chucuGameFragments: data.chucuGameFragments !== undefined ? data.chucuGameFragments : state.chucuGameFragments,
+            chucuGameGFragments: data.chucuGameGFragments !== undefined ? data.chucuGameGFragments : state.chucuGameGFragments,
+            chucuGameBonusPoints: data.chucuGameBonusPoints !== undefined ? data.chucuGameBonusPoints : state.chucuGameBonusPoints,
+            chucuGamePlaysToday: data.chucuGamePlaysToday !== undefined ? data.chucuGamePlaysToday : state.chucuGamePlaysToday,
+            chucuGameLastPlayDate: data.chucuGameLastPlayDate !== undefined ? data.chucuGameLastPlayDate : state.chucuGameLastPlayDate,
 
 
             unlockedAchievements: data.unlockedAchievements !== undefined ? data.unlockedAchievements : state.unlockedAchievements,
