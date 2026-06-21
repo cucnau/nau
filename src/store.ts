@@ -1796,15 +1796,24 @@ export const useStore = create<UserState>()(
          if (lastWeek !== currentWeek) {
             // Week changed! Checking Top 3 to award choco_cute final
             try {
-               const q = query(
-                  collection(db, 'users'),
-                  orderBy('activePoints', 'desc'),
-                  limit(3)
-               );
-               const snap = await getDocs(q);
-               const topUids = snap.docs.map(doc => doc.id);
-               if (topUids.includes(state.uid)) {
-                  get().unlockAchievement('choco_cute');
+               const userEmail = state.email || state.firebaseUser?.email || '';
+               const isAdmin = userEmail.toLowerCase() === 'cucnau01@gmail.com';
+               
+               if (!isAdmin) {
+                  const q = query(
+                     collection(db, 'users'),
+                     orderBy('activePoints', 'desc'),
+                     limit(10)
+                  );
+                  const snap = await getDocs(q);
+                  const activePlayers = snap.docs
+                     .map(doc => ({ id: doc.id, ...doc.data() as any }))
+                     .filter(u => u.email?.toLowerCase() !== 'cucnau01@gmail.com');
+                  
+                  const top3Uids = activePlayers.slice(0, 3).map(u => u.id);
+                  if (top3Uids.includes(state.uid)) {
+                     get().unlockAchievement('choco_cute');
+                  }
                }
             } catch (e) {
                console.error('Error on week transition top 3 checking:', e);
