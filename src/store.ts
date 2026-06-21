@@ -119,6 +119,23 @@ interface UserState {
   showChucu: boolean;
   setShowChucu: (show: boolean) => void;
 
+  // Chucu Game & Radio Popups States
+  isChucuGameOpen: boolean;
+  setChucuGameOpen: (open: boolean) => void;
+  isChocoRadioOpen: boolean;
+  setChocoRadioOpen: (open: boolean) => void;
+
+  chucuGameFragments: number;
+  chucuGameGFragments: number;
+  chucuGameBonusPoints: number;
+  chucuGamePlaysToday: number;
+  chucuGameLastPlayDate: string | null;
+
+  addChucuGameFragments: (amt: number) => void;
+  addChucuGameGFragments: (amt: number) => void;
+  addChucuGameBonusPoints: (amt: number) => void;
+  incrementChucuGamePlayCount: () => void;
+
   // Per-uid historical record dictionaries
   allUsersMissions: Record<string, Mission[]>;
   allUsersStoryProgress: Record<string, Record<string, number | number[]>>;
@@ -274,6 +291,15 @@ export const useStore = create<UserState>()(
       ownedChucuAccessories: [],
       equippedChucuAccessory: null,
       showChucu: true,
+
+      // Chucu Game & Radio default states
+      isChucuGameOpen: false,
+      isChocoRadioOpen: false,
+      chucuGameFragments: 0,
+      chucuGameGFragments: 0,
+      chucuGameBonusPoints: 0,
+      chucuGamePlaysToday: 0,
+      chucuGameLastPlayDate: null,
       ownedPassTickets: 0,
       ownedPriorityTickets: 0,
       ownedMysteryBoxes: 0,
@@ -591,6 +617,12 @@ export const useStore = create<UserState>()(
             chucuInteractions: data.chucuInteractions !== undefined ? data.chucuInteractions : state.chucuInteractions,
             chucuPremiumFeeds: data.chucuPremiumFeeds !== undefined ? data.chucuPremiumFeeds : state.chucuPremiumFeeds,
             chucuLastTime: data.chucuLastTime !== undefined ? data.chucuLastTime : state.chucuLastTime,
+
+            chucuGameFragments: data.chucuGameFragments !== undefined ? data.chucuGameFragments : 0,
+            chucuGameGFragments: data.chucuGameGFragments !== undefined ? data.chucuGameGFragments : 0,
+            chucuGameBonusPoints: data.chucuGameBonusPoints !== undefined ? data.chucuGameBonusPoints : 0,
+            chucuGamePlaysToday: data.chucuGamePlaysToday !== undefined ? data.chucuGamePlaysToday : 0,
+            chucuGameLastPlayDate: data.chucuGameLastPlayDate !== undefined ? data.chucuGameLastPlayDate : null,
 
 
             unlockedAchievements: data.unlockedAchievements !== undefined ? data.unlockedAchievements : state.unlockedAchievements,
@@ -1481,6 +1513,45 @@ export const useStore = create<UserState>()(
          if (state.isLoggedIn) {
             get().updateUserDoc({ showChucu: show });
          }
+       },
+
+      setChucuGameOpen: (open: boolean) => {
+         set({ isChucuGameOpen: open });
+      },
+
+      setChocoRadioOpen: (open: boolean) => {
+         set({ isChocoRadioOpen: open });
+      },
+
+      addChucuGameFragments: (amt: number) => {
+         const current = get().chucuGameFragments || 0;
+         set({ chucuGameFragments: current + amt });
+         get().updateUserDoc({ chucuGameFragments: current + amt });
+      },
+
+      addChucuGameGFragments: (amt: number) => {
+         const current = get().chucuGameGFragments || 0;
+         set({ chucuGameGFragments: current + amt });
+         get().updateUserDoc({ chucuGameGFragments: current + amt });
+      },
+
+      addChucuGameBonusPoints: (amt: number) => {
+         const current = get().chucuGameBonusPoints || 0;
+         set({ chucuGameBonusPoints: current + amt });
+         get().updateUserDoc({ chucuGameBonusPoints: current + amt });
+      },
+
+      incrementChucuGamePlayCount: () => {
+         const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
+         const lastDate = get().chucuGameLastPlayDate;
+         let count = get().chucuGamePlaysToday || 0;
+         if (lastDate !== todayStr) {
+           count = 1;
+         } else {
+           count += 1;
+         }
+         set({ chucuGamePlaysToday: count, chucuGameLastPlayDate: todayStr });
+         get().updateUserDoc({ chucuGamePlaysToday: count, chucuGameLastPlayDate: todayStr });
       },
 
       setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => {
