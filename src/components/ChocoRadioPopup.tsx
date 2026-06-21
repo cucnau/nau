@@ -370,11 +370,6 @@ export function ChocoRadioPopup() {
                                 File
                               </span>
                             )}
-                            {t.isExternal && !t.isSpotify && !t.isLocalFile && (
-                              <span className="text-[8px] font-bold bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300 px-1.5 py-0.2 rounded-full border border-orange-200 dark:border-orange-900 leading-tight">
-                                Live Stream
-                              </span>
-                            )}
                           </div>
                           <p className="text-[10px] text-stone-500 truncate mt-0.5">
                             {t.desc}
