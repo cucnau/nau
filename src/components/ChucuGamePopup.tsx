@@ -95,7 +95,7 @@ interface FallingItem {
   x: number;
   y: number;
   speed: number;
-  type: 'white' | 'brown' | 'gold' | 'milk' | 'bomb' | 'rotten_apple';
+  type: 'white' | 'brown' | 'gold' | 'milk' | 'bomb' | 'rotten_apple' | 'magnet';
   radius: number;
 }
 
@@ -149,6 +149,8 @@ export function ChucuGamePopup() {
   const items = useRef<FallingItem[]>([]);
   const floatingTexts = useRef<FloatingText[]>([]);
   const screenFlash = useRef(0);
+  const magnetActive = useRef(false);
+  const magnetTimer = useRef<any>(null);
   const animationFrameId = useRef<number | null>(null);
   const timerIntervalId = useRef<number | null>(null);
   const lastSpawnTime = useRef(0);
@@ -560,8 +562,9 @@ export function ChucuGamePopup() {
       if (r < 0.60) randType = 'white'; // White Be chocolate is point (60%)
       else if (r < 0.75) randType = 'bomb'; // Bomb trap (-20 points) (15%)
       else if (r < 0.85) randType = 'rotten_apple'; // Rotten Apple (-1 life) (10%)
-      else if (r < 0.93) randType = 'milk'; // Sữa ngọt ngào power-up (8%)
-      else if (r < 0.985) randType = 'brown'; // Brown Choco fragment (Hiếm - 5.5%)
+      else if (r < 0.90) randType = 'milk'; // Sữa ngọt ngào power-up (5%)
+      else if (r < 0.95) randType = 'magnet'; // Nam châm hút (5%)
+      else if (r < 0.985) randType = 'brown'; // Brown Choco fragment (Hiếm - 3.5%)
       else randType = 'gold'; // Gold fragment (Siêu hiếm - 1.5%)
 
       items.current.push({
@@ -576,6 +579,17 @@ export function ChucuGamePopup() {
 
     // Physics update falling items
     items.current.forEach((item, idx) => {
+      // magnet pull logic
+      if (magnetActive.current && ['white', 'brown', 'gold'].includes(item.type)) {
+        const dx = basketX.current - item.x;
+        const dy = (H - 45) - item.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist > 0 && dist < 250) {
+           item.x += (dx / dist) * 10;
+           item.y += (dy / dist) * 10;
+        }
+      }
+
       item.y += item.speed;
 
       // Draw item
@@ -910,6 +924,27 @@ export function ChucuGamePopup() {
         ctx.arc(flyX - 1, flyY - 1, 1, 0, Math.PI * 2);
         ctx.arc(flyX + 1, flyY - 1, 1, 0, Math.PI * 2);
         ctx.fill();
+      } else if (item.type === 'magnet') {
+        const rad = item.radius;
+        // U shape magnet centered at x,y
+        ctx.fillStyle = '#E53935'; // Red
+        ctx.beginPath();
+        ctx.arc(item.x, item.y - 4, rad, Math.PI, 0, false);
+        ctx.lineTo(item.x + rad, item.y + rad - 4);
+        ctx.lineTo(item.x + rad/2.5, item.y + rad - 4);
+        ctx.lineTo(item.x + rad/2.5, item.y - 4);
+        ctx.arc(item.x, item.y - 4, rad/2.5, 0, Math.PI, true);
+        ctx.lineTo(item.x - rad/2.5, item.y + rad - 4);
+        ctx.lineTo(item.x - rad, item.y + rad - 4);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#CFD8DC'; // Silver tips
+        ctx.fillRect(item.x - rad, item.y + rad - 4, rad - rad/2.5, 6);
+        ctx.fillRect(item.x + rad/2.5, item.y + rad - 4, rad - rad/2.5, 6);
+        ctx.strokeRect(item.x - rad, item.y + rad - 4, rad - rad/2.5, 6);
+        ctx.strokeRect(item.x + rad/2.5, item.y + rad - 4, rad - rad/2.5, 6);
       }
 
       // Colllision catcher check
@@ -943,6 +978,15 @@ export function ChucuGamePopup() {
           if (powerupTimer.current) clearTimeout(powerupTimer.current);
           powerupTimer.current = setTimeout(() => {
             basketWidth.current = 65;
+          }, 7000) as any;
+        } else if (item.type === 'magnet') {
+          // Magnet: attracts everything for 7 seconds
+          gameSounds.playPowerUp();
+          floatingTexts.current.push({ x: item.x, y: item.y, text: 'HÚT!', color: '#E53935', alpha: 1.0 });
+          magnetActive.current = true;
+          if (magnetTimer.current) clearTimeout(magnetTimer.current);
+          magnetTimer.current = setTimeout(() => {
+            magnetActive.current = false;
           }, 7000) as any;
         } else if (item.type === 'bomb') {
           // Mischief bomb: Deducts 20 points score
@@ -1400,6 +1444,7 @@ export function ChucuGamePopup() {
                       <li><b>Choco Trắng (Sữa):</b> Điểm cộng thưởng ngọt ngào (+5 điểm).</li>
                       <li><b>Choco Nâu (Mảnh nhỏ):</b> Rơi hiếm, đổi Choco thực tế (+15 điểm).</li>
                       <li><b>Choco Vàng (Mảnh vàng):</b> Siêu hiếm, đổi GChoco thực tế (+35 điểm).</li>
+                      <li><b>Nam châm hút (Power-up):</b> Hút toàn bộ Choco tích cực về phía Chucu trong 7 giây.</li>
                       <li><b>Hộp sữa ngọt ngào (Power-up):</b> Phóng to kích thước Chucu to gấp đôi trong 7 giây để hứng trọn kẹo dễ dàng hơn.</li>
                       <li><b>Bom nghịch ngợm (Quả bom):</b> Gây nổ phụ, trừ mạnh -20 điểm. Hãy né tránh quả bom này nhé!</li>
                       <li><b>Táo thối bốc mùi (Vật cản):</b> Vật cản bốc khói hôi rình, khiến Chucu **bị trừ đi 1 mạng** (tối đa 3 mạng). Hứng nhầm 3 quả táo thối sẽ bị Game Over ngay lập tức!</li>
