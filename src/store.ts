@@ -135,6 +135,7 @@ interface UserState {
   addChucuGameGFragments: (amt: number) => void;
   addChucuGameBonusPoints: (amt: number) => void;
   incrementChucuGamePlayCount: () => void;
+  finishChucuGame: (fragments: number, gFragments: number, bonusPoints: number, isNoRewardPlay: boolean, satietyDeduct: number) => void;
 
   // Per-uid historical record dictionaries
   allUsersMissions: Record<string, Mission[]>;
@@ -1555,6 +1556,56 @@ export const useStore = create<UserState>()(
          }
          set({ chucuGamePlaysToday: count, chucuGameLastPlayDate: todayStr });
          get().updateUserDoc({ chucuGamePlaysToday: count, chucuGameLastPlayDate: todayStr });
+      },
+
+      finishChucuGame: (fragments: number, gFragments: number, bonusPoints: number, isNoRewardPlay: boolean, satietyDeduct: number) => {
+         const state = get();
+         const updates: any = {};
+         const nextState: any = {};
+         
+         // 1. Play count
+         const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
+         const lastDate = state.chucuGameLastPlayDate;
+         let count = state.chucuGamePlaysToday || 0;
+         if (lastDate !== todayStr) {
+           count = 1;
+         } else {
+           count += 1;
+         }
+         nextState.chucuGamePlaysToday = count;
+         nextState.chucuGameLastPlayDate = todayStr;
+         updates.chucuGamePlaysToday = count;
+         updates.chucuGameLastPlayDate = todayStr;
+
+         // 2. Rewards (only if not no reward play)
+         if (!isNoRewardPlay) {
+            if (fragments > 0) {
+               let curF = state.chucuGameFragments || 0;
+               if (curF < 0) curF = 0;
+               nextState.chucuGameFragments = curF + fragments;
+               updates.chucuGameFragments = curF + fragments;
+            }
+            if (gFragments > 0) {
+               let curG = state.chucuGameGFragments || 0;
+               if (curG < 0) curG = 0;
+               nextState.chucuGameGFragments = curG + gFragments;
+               updates.chucuGameGFragments = curG + gFragments;
+            }
+            if (bonusPoints > 0) {
+               let curP = state.chucuGameBonusPoints || 0;
+               if (curP < 0) curP = 0;
+               nextState.chucuGameBonusPoints = curP + bonusPoints;
+               updates.chucuGameBonusPoints = curP + bonusPoints;
+            }
+         } else {
+            // Deduct satiety
+            const newSatiety = Math.max(0, (state.chucuSatiety || 70) - satietyDeduct);
+            nextState.chucuSatiety = newSatiety;
+            updates.chucuSatiety = newSatiety;
+         }
+
+         set(nextState);
+         get().updateUserDoc(updates);
       },
 
       setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => {
