@@ -199,7 +199,7 @@ export function ChucuGamePopup() {
     }
     if (type === 'choco') {
       if (chucuGameFragments < 10) {
-        alert("Bạn cần tích lũy tối thiểu 10 mảnh Choco nâu để quy đổi!");
+        alert("Bạn cần tích lũy tối thiểu 10 mảnh Choco để quy đổi!");
         return;
       }
       const newFragments = chucuGameFragments - 10;
@@ -208,11 +208,10 @@ export function ChucuGamePopup() {
         chucuGameFragments: newFragments,
         choco: newChoco
       });
-      addChucuGameFragments(-10); // sync with state
       alert("Đổi thành công 10 mảnh lấy 1 Choco thực!");
     } else {
       if (chucuGameGFragments < 10) {
-        alert("Bạn cần tích lũy tối thiểu 10 mảnh Gchoco vàng để quy đổi!");
+        alert("Bạn cần tích lũy tối thiểu 10 mảnh Gchoco để quy đổi!");
         return;
       }
       const newFragments = chucuGameGFragments - 10;
@@ -221,8 +220,7 @@ export function ChucuGamePopup() {
         chucuGameGFragments: newFragments,
         goldenChoco: newGChoco
       });
-      addChucuGameGFragments(-10); // sync with state
-      alert("Đổi thành công 10 mảnh vàng lấy 1 Gchoco thực!");
+      alert("Đổi thành công 10 mảnh lấy 1 Gchoco thực!");
     }
   };
 
@@ -242,7 +240,6 @@ export function ChucuGamePopup() {
         chucuGameBonusPoints: newPoints,
         ownedMysteryBoxes: newBoxes
       });
-      addChucuGameBonusPoints(-1200); // sync with state
       alert("Đổi thành công 1200 điểm lấy 1 Hộp quà Sticker Bí Ẩn!");
     } else if (reward === 'streak_ticket') {
       if (chucuGameBonusPoints < 800) {
@@ -255,7 +252,6 @@ export function ChucuGamePopup() {
         chucuGameBonusPoints: newPoints,
         ownedStreakTickets: newTickets
       });
-      addChucuGameBonusPoints(-800); // sync with state
       alert("Đổi thành công 800 điểm lấy 1 Vé bảo vệ Streak!");
     } else if (reward === 'feed_mlem') {
       if (chucuGameBonusPoints < 600) {
@@ -267,10 +263,8 @@ export function ChucuGamePopup() {
       const newSatiety = Math.min(100, chucuSatiety + 25);
       updateUserDoc({
         chucuGameBonusPoints: newPoints,
-        chucuSatiety: newSatiety
       });
       updateChucuStats({ chucuSatiety: newSatiety });
-      addChucuGameBonusPoints(-600); // sync with state
       alert("Đổi thành công 600 điểm lấy 1 Thức ăn mlem mlem hảo hạng Chucu (Nạp đầy Satiety thêm +25%)!");
     }
   };
@@ -1196,11 +1190,11 @@ export function ChucuGamePopup() {
               {gameState === 'playing' && (
                 <div className="w-full flex-1 flex flex-col items-center">
                   {/* Playing score HUD */}
-                  <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-1.5 px-2 font-mono pb-2 text-sm font-black text-[#5D4037] dark:text-stone-300">
-                    <div className="flex flex-wrap justify-center items-center gap-2 md:gap-4">
+                  <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-1.5 px-1 font-mono pb-2 text-sm font-black text-[#5D4037] dark:text-stone-300">
+                    <div className="flex items-center justify-center gap-2 md:gap-4 text-xs sm:text-sm whitespace-nowrap">
                       <span>🎯 Điểm: <b className="text-base text-red-500">{score}</b></span>
-                      <span>🟤 Mảnh nâu: <b>{chucuFragmentsEarned}</b></span>
-                      <span>🟡 Mảnh vàng: <b>{chucuGFragmentsEarned}</b></span>
+                      <span>🟤 Mảnh Choco: <b>{chucuFragmentsEarned}</b></span>
+                      <span>🟡 Mảnh Gchoco: <b>{chucuGFragmentsEarned}</b></span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="flex items-center bg-red-50 dark:bg-red-950/40 px-2 py-1 rounded-lg border border-red-200 dark:border-red-900 text-red-500 font-extrabold shrink-0 gap-0.5">
@@ -1259,7 +1253,7 @@ export function ChucuGamePopup() {
                       <strong className="text-lg text-rose-500">{scoreRef.current}</strong>
                     </div>
                     <div className="flex flex-col gap-1 border-r border-[#3E2723]/10 dark:border-white/10">
-                      <span className="text-[10px] uppercase font-black text-stone-500 font-mono">Mảnh Choco Nâu</span>
+                      <span className="text-[10px] uppercase font-black text-stone-500 font-mono">Mảnh Choco</span>
                       <strong className="text-lg text-amber-800">+{isNoRewardPlay ? 0 : chucuFragmentsEarned}</strong>
                     </div>
                     <div className="flex flex-col gap-1">
@@ -1295,11 +1289,11 @@ export function ChucuGamePopup() {
                 </span>
                 <div className="grid grid-cols-3 gap-3 text-center mt-2">
                   <div className="p-2 bg-white dark:bg-[#1E1815] rounded-xl border border-[#3E2723]/10 dark:border-stone-800">
-                    <div className="text-[10px] font-bold text-stone-500">Mảnh Choco Nâu</div>
+                    <div className="text-[10px] font-bold text-stone-500">Mảnh Choco</div>
                     <div className="text-base font-black text-amber-800 mt-1">{chucuGameFragments}</div>
                   </div>
                   <div className="p-2 bg-white dark:bg-[#1E1815] rounded-xl border border-[#3E2723]/10 dark:border-stone-800">
-                    <div className="text-[10px] font-bold text-stone-500">Mảnh GChoco Vàng</div>
+                    <div className="text-[10px] font-bold text-stone-500">Mảnh GChoco</div>
                     <div className="text-base font-black text-yellow-600 mt-1">{chucuGameGFragments}</div>
                   </div>
                   <div className="p-2 bg-white dark:bg-[#1E1815] rounded-xl border border-[#3E2723]/10 dark:border-stone-800">
