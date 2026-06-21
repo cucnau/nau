@@ -169,10 +169,10 @@ export function ChocoRadioPopup() {
             {/* Now Playing Title */}
             <div className="text-center mt-4 px-4 w-full">
               <h3 className="font-extrabold text-sm text-[#3E2723] dark:text-[#ECE5DC] truncate max-w-xs mx-auto">
-                {activeTrack ? activeTrack.title : "Chucu Cozy Rhodes"}
+                {activeTrack ? activeTrack.title : "Chưa có bài hát nào"}
               </h3>
               <p className="text-[11px] text-[#8D6E63] dark:text-stone-400 mt-1 line-clamp-1 max-w-xs mx-auto leading-relaxed h-5">
-                {activeTrack ? activeTrack.desc : ""}
+                {activeTrack ? activeTrack.desc : "Thêm bài hát để phát!"}
               </p>
             </div>
 
