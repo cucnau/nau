@@ -1524,19 +1524,22 @@ export const useStore = create<UserState>()(
       },
 
       addChucuGameFragments: (amt: number) => {
-         const current = get().chucuGameFragments || 0;
+         let current = get().chucuGameFragments || 0;
+         if (current < 0) current = 0;
          set({ chucuGameFragments: current + amt });
          get().updateUserDoc({ chucuGameFragments: current + amt });
       },
 
       addChucuGameGFragments: (amt: number) => {
-         const current = get().chucuGameGFragments || 0;
+         let current = get().chucuGameGFragments || 0;
+         if (current < 0) current = 0;
          set({ chucuGameGFragments: current + amt });
          get().updateUserDoc({ chucuGameGFragments: current + amt });
       },
 
       addChucuGameBonusPoints: (amt: number) => {
-         const current = get().chucuGameBonusPoints || 0;
+         let current = get().chucuGameBonusPoints || 0;
+         if (current < 0) current = 0; // Auto-repair negative points
          set({ chucuGameBonusPoints: current + amt });
          get().updateUserDoc({ chucuGameBonusPoints: current + amt });
       },
