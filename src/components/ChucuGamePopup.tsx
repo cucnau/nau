@@ -113,7 +113,7 @@ export function ChucuGamePopup() {
     chucuGameFragments, addChucuGameFragments,
     chucuGameGFragments, addChucuGameGFragments,
     chucuGameBonusPoints, addChucuGameBonusPoints,
-    chucuGamePlaysToday, chucuGameLastPlayDate, incrementChucuGamePlayCount,
+    chucuGamePlaysToday, chucuGameLastPlayDate, finishChucuGame,
     chucuSatiety, updateChucuStats,
     choco, goldenChoco, ownedMysteryBoxes, ownedStreakTickets,
     isLoggedIn, uid, updateUserDoc, theme
@@ -188,6 +188,19 @@ export function ChucuGamePopup() {
       if (powerupTimer.current) clearTimeout(powerupTimer.current);
     };
   }, []);
+
+  // Prevent vibration/scrolling on mobile devices while dragging on canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const preventScroll = (e: TouchEvent) => {
+      e.preventDefault();
+    };
+    canvas.addEventListener('touchmove', preventScroll, { passive: false });
+    return () => {
+      canvas.removeEventListener('touchmove', preventScroll);
+    }
+  }, [panelTab, gameState]);
 
   if (!isChucuGameOpen) return null;
 
@@ -330,21 +343,13 @@ export function ChucuGamePopup() {
     }
 
     // Satiety and transaction deduction logic
-    if (isNoRewardPlay) {
-      // Deduct satiety because played more than 10 times today without receiving rewards
-      const newSatiety = Math.max(0, chucuSatiety - satietyRequiredPerNoRewardPlay);
-      updateUserDoc({ 
-        chucuSatiety: newSatiety
-      });
-      updateChucuStats({ chucuSatiety: newSatiety });
-      incrementChucuGamePlayCount();
-    } else {
-      // Award fragments and bonus points inside daily rewarded limits!
-      addChucuGameFragments(fragRef.current);
-      addChucuGameGFragments(gFragRef.current);
-      addChucuGameBonusPoints(scoreRef.current);
-      incrementChucuGamePlayCount();
-    }
+    finishChucuGame(
+      fragRef.current,
+      gFragRef.current,
+      scoreRef.current,
+      isNoRewardPlay,
+      satietyRequiredPerNoRewardPlay
+    );
   };
 
   // Main canvas looping
@@ -1094,10 +1099,10 @@ export function ChucuGamePopup() {
         className="relative bg-[#FFFDF9] dark:bg-[#1A1412] w-full max-w-xl rounded-[2.5rem] overflow-hidden border-4 border-[#3E2723] dark:border-[#5D4037] shadow-[0_4px_0_0_#3E2723] dark:shadow-[0_4px_0_0_#0D0907] flex flex-col max-h-[92vh] z-10"
       >
         {/* Header tabs row */}
-        <div className="flex border-b-4 border-[#3E2723] dark:border-[#4E342E] bg-[#F1E4D6]/50 dark:bg-[#251E1B] p-2 pr-12 gap-1.5 shrink-0 select-none">
+        <div className="flex overflow-x-auto scrollbar-hide border-b-4 border-[#3E2723] dark:border-[#4E342E] bg-[#F1E4D6]/50 dark:bg-[#251E1B] p-2 pr-12 gap-1.5 shrink-0 select-none">
           <button
             onClick={() => setPanelTab('play')}
-            className={`px-4 py-2 rounded-xl text-xs font-black uppercase flex items-center gap-1 cursor-pointer transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase flex items-center shrink-0 whitespace-nowrap gap-1 cursor-pointer transition-all ${
               panelTab === 'play' 
                 ? 'bg-[#8D6E63] text-white shadow-inner' 
                 : 'bg-white hover:bg-stone-50 text-[#3E2723] dark:bg-stone-900 dark:text-stone-300'
@@ -1108,7 +1113,7 @@ export function ChucuGamePopup() {
           
           <button
             onClick={() => setPanelTab('exchange')}
-            className={`px-4 py-2 rounded-xl text-xs font-black uppercase flex items-center gap-1 cursor-pointer transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase flex items-center shrink-0 whitespace-nowrap gap-1 cursor-pointer transition-all ${
               panelTab === 'exchange' 
                 ? 'bg-[#8D6E63] text-white shadow-inner' 
                 : 'bg-white hover:bg-stone-50 text-[#3E2723] dark:bg-stone-900 dark:text-stone-300'
@@ -1119,7 +1124,7 @@ export function ChucuGamePopup() {
 
           <button
             onClick={() => setPanelTab('guide')}
-            className={`px-4 py-2 rounded-xl text-xs font-black uppercase flex items-center gap-1 cursor-pointer transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase flex items-center shrink-0 whitespace-nowrap gap-1 cursor-pointer transition-all ${
               panelTab === 'guide' 
                 ? 'bg-[#8D6E63] text-white shadow-inner' 
                 : 'bg-white hover:bg-stone-50 text-[#3E2723] dark:bg-stone-900 dark:text-stone-300'
