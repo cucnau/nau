@@ -37,6 +37,8 @@ import {
   MessageCircle,
   ShoppingBag,
   Wrench,
+  Radio,
+  Music,
 } from "lucide-react";
 import { ACHIEVEMENTS_LIST } from "../types/achievements";
 
@@ -126,6 +128,7 @@ export function Admin() {
     | "titles"
     | "accessories"
     | "chucu_accessories"
+    | "radio"
   >("stories");
 
   // Custom Confirmation Dialog
@@ -321,6 +324,17 @@ export function Admin() {
   >(null);
   const chucuAccessoryFileInputRef = useRef<HTMLInputElement>(null);
   const editChucuAccessoryFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Radio Tracks Management state
+  const [customTracks, setCustomTracks] = useState<any[]>([]);
+  const [radioTitle, setRadioTitle] = useState("");
+  const [radioDesc, setRadioDesc] = useState("");
+  const [radioStreamUrl, setRadioStreamUrl] = useState("");
+  const [radioTrackType, setRadioTrackType] = useState<"url" | "spotify" | "file">("file");
+  const [radioSpotifyUrl, setRadioSpotifyUrl] = useState("");
+  const [radioAudioBase64, setRadioAudioBase64] = useState("");
+  const [radioFileSizeKB, setRadioFileSizeKB] = useState<number | null>(null);
+  const adminRadioFileInputRef = useRef<HTMLInputElement>(null);
 
   // Posts Management
   const [posts, setPosts] = useState<any[]>([]);
@@ -787,10 +801,28 @@ export function Admin() {
       },
     );
 
+    const unsubRadioTracks = onSnapshot(
+      query(
+        collection(db, "radioTracks"),
+        orderBy("createdAt", "desc"),
+      ),
+      (snap) => {
+        const list: any[] = [];
+        snap.forEach((docSnap) => {
+          list.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        setCustomTracks(list);
+      },
+      (err) => {
+        console.error("Error fetching radio tracks realtime:", err);
+      },
+    );
+
     return () => {
       unsubStickers();
       unsubAccessories();
       unsubChucuAccessories();
+      unsubRadioTracks();
     };
   }, []);
 
@@ -1704,6 +1736,69 @@ export function Admin() {
     });
   };
 
+  const handleAddRadioTrack = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!radioTitle.trim()) {
+      alert("Vui lòng điền tên bài hát!");
+      return;
+    }
+
+    if (!radioAudioBase64) {
+      alert("Vui lòng chọn hoặc tải file âm thanh lên!");
+      return;
+    }
+
+    // Double check size in Base64 characters (should be safely under 1,000,000 characters)
+    if (radioAudioBase64.length > 1030000) {
+      alert(
+        "Tệp âm thanh của bạn quá lớn sau khi mã hóa (vượt quá 1MB giới hạn của Firestore).\n\n" +
+        "Mách bạn cách sửa:\n" +
+        "• Chọn file .mp3 có dung lượng nhỏ hơn 700KB.\n" +
+        "• Sử dụng công cụ nén âm thanh trực tuyến (nén thành bitrate 64kbps hoặc 96kbps mono).\n" +
+        "• Hoặc cắt ngắn nhạc thành 20-30 giây để Chucu vừa phát lặp lại vừa tối ưu hóa tốc độ tải trang!"
+      );
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "radioTracks"), {
+        title: radioTitle.trim(),
+        desc: radioDesc.trim(),
+        streamUrl: radioAudioBase64,
+        isSpotify: false,
+        spotifyEmbedUrl: "",
+        isLocalFile: true,
+        createdAt: new Date().toISOString()
+      });
+
+      // Clear states
+      setRadioTitle("");
+      setRadioDesc("");
+      setRadioStreamUrl("");
+      setRadioSpotifyUrl("");
+      setRadioAudioBase64("");
+      setRadioFileSizeKB(null);
+      if (adminRadioFileInputRef.current) adminRadioFileInputRef.current.value = "";
+      alert("Đã lưu và xuất bản bài hát Choco Radio thành công!");
+    } catch (err: any) {
+      alert("Lỗi khi thêm bài hát: " + err.message);
+    }
+  };
+
+  const handleDeleteRadioTrack = (id: string) => {
+    setConfirmDialog({
+      text: "Bạn có chắc chắn muốn xóa bài hát radio này?",
+      action: async () => {
+        try {
+          await deleteDoc(doc(db, "radioTracks", id));
+          alert("Đã xóa bài hát Radio thành công!");
+        } catch (err: any) {
+          alert("Lỗi: " + err.message);
+        }
+      }
+    });
+  };
+
   const isAdmin =
     email?.toLowerCase() === "cucnau01@gmail.com" ||
     firebaseUser?.email?.toLowerCase() === "cucnau01@gmail.com";
@@ -1812,6 +1907,13 @@ export function Admin() {
           >
             <ShoppingBag className="w-5 h-5" />
           </button>
+          <button
+            onClick={() => setActiveTab("radio")}
+            title="Quản lý Radio"
+            className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === "radio" ? "bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm" : "border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]"}`}
+          >
+            <Radio className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Thanh dọc phân cách */}
@@ -1845,6 +1947,7 @@ export function Admin() {
           {activeTab === "stickers" && "✨ Quản lý Stickers"}
           {activeTab === "accessories" && "👑 Quản lý Phụ kiện"}
           {activeTab === "chucu_accessories" && "🧸 Quản lý Phụ kiện Chucu"}
+          {activeTab === "radio" && "📻 Quản lý Choco Radio"}
           {activeTab === "system" && "🛠️ Quản lý Hệ thống"}
         </span>
       </div>
@@ -2738,6 +2841,153 @@ export function Admin() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {activeTab === "radio" && (
+        <>
+          <form
+            onSubmit={handleAddRadioTrack}
+            className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 transition-all duration-300 ${isDark ? "bg-[#211B18] border-[#4E342E] text-[#ECE5DC]" : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]"}`}
+          >
+            <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-2">
+              <Plus className="w-5 h-5 text-amber-500" /> Thêm luồng âm nhạc Choco Radio
+            </h2>
+
+            <div className="flex flex-col gap-3 font-sans">
+              <input
+                type="text"
+                placeholder="Tên bài hát / Giai điệu (Ví dụ: Chill Lofi Day)"
+                value={radioTitle}
+                onChange={(e) => setRadioTitle(e.target.value)}
+                className={`px-4 py-2.5 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl font-bold`}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Mô tả phụ (Ví dụ: Thư giãn thanh bình cùng bé Chucu...)"
+                value={radioDesc}
+                onChange={(e) => setRadioDesc(e.target.value)}
+                className={`px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl`}
+              />
+
+              <div className="flex flex-col gap-2">
+                <input
+                  type="file"
+                  accept="audio/*"
+                  ref={adminRadioFileInputRef}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      // Guard check before reader
+                      if (file.size > 720000) {
+                        alert(
+                          `Tệp âm thanh của bạn nặng ${(file.size / 1024).toFixed(1)} KB (vượt quá giới hạn 700KB!).\n\n` +
+                          "Để có chất lượng truyền và load mượt nhất trên đám mây Firestore, vui lòng dùng công cụ nén mp3 trực tuyến về chất lượng 64 - 96kbps mono hoặc cắt dưới 20 giây!"
+                        );
+                        if (adminRadioFileInputRef.current) adminRadioFileInputRef.current.value = "";
+                        return;
+                      }
+
+                      if (!radioTitle) {
+                        setRadioTitle(file.name.replace(/\.[^/.]+$/, ""));
+                      }
+                      setRadioFileSizeKB(Math.round(file.size / 1024));
+
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        setRadioAudioBase64(reader.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => adminRadioFileInputRef.current?.click()}
+                  className="w-full py-4 border-2 border-dashed border-[#8D6E63]/40 hover:border-[#8D6E63] rounded-xl flex flex-col items-center justify-center gap-1.5 bg-white dark:bg-[#1E1815] cursor-pointer"
+                >
+                  <Music className="w-5 h-5 text-[#8D6E63]/70" />
+                  <span className="text-xs font-black text-[#8D6E63]">
+                    {radioAudioBase64 
+                      ? `✓ Đã nạp tệp thành công (${radioFileSizeKB || '?'} KB)` 
+                      : "Nhấp vào đây và chọn tệp .mp3 (< 700KB)"}
+                  </span>
+                  <span className="text-[10px] text-stone-400 max-w-md text-center px-4 leading-normal">
+                    Giới hạn tối đa của một bản nhạc là 700KB. Khuyên dùng các video loop lofi ngắn hoặc nhạc chuông nén dưới 500KB để có độ phản hồi âm thanh nhanh nhất!
+                  </span>
+                </button>
+              </div>
+            </div>
+            <button
+              type="submit"
+              className="mt-2 bg-[#8D6E63] text-white py-2.5 rounded-xl font-black hover:bg-[#5D4037] transition-all duration-200 active:translate-y-0.5 cursor-pointer text-xs uppercase tracking-wider"
+            >
+              Lưu vào Album Radio Choco
+            </button>
+          </form>
+
+          <div className="space-y-4 pb-20 mt-8 font-sans">
+            <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-2">
+              <Radio className="w-5 h-5 text-rose-500 animate-pulse" /> Thư viện Luồng Phát Trực Tuyến ({customTracks.length})
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {customTracks.map((track) => (
+                <div
+                  key={track.id}
+                  className={`p-5 rounded-3xl border-2 shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex items-start justify-between gap-4 transition-all duration-300 ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-8 h-8 rounded-full bg-[#F5E6D3] dark:bg-[#3C2E27] flex items-center justify-center border-2 border-[#D7CCC8] dark:border-[#4E342E] shrink-0 animate-spin-slow">
+                        <Music className="w-4 h-4 text-[#8D6E63]" />
+                      </div>
+                      <h3 className="font-extrabold text-base text-[#3E2723] dark:text-[#ECE5DC] truncate flex items-center gap-2">
+                        {track.title}
+                        {track.isSpotify && (
+                          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300 border border-green-200 dark:border-green-800">
+                            Spotify
+                          </span>
+                        )}
+                        {track.isLocalFile && (
+                          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                            Local File
+                          </span>
+                        )}
+                        {!track.isSpotify && !track.isLocalFile && (
+                          <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                            Direct Link
+                          </span>
+                        )}
+                      </h3>
+                    </div>
+                    <p className="text-xs text-[#8D6E63] dark:text-stone-300 mb-2 pl-10">
+                      {track.desc || "Không có mô tả phụ."}
+                    </p>
+                    <div className="pl-10 text-[10px] font-mono text-stone-500 truncate select-all dark:text-stone-400 bg-black/5 dark:bg-black/20 p-1.5 rounded-lg border border-[#3E2723]/5 dark:border-white/5 max-w-full">
+                      {track.streamUrl && track.streamUrl.startsWith('data:') 
+                        ? `[Dữ liệu Tệp Âm Thanh MP3 Mã Hóa - ${Math.round(track.streamUrl.length / 1024)} KB]` 
+                        : (track.streamUrl || "")}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteRadioTrack(track.id)}
+                    className="p-2.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl border border-red-200 dark:border-red-900 transition-colors shrink-0 active:translate-y-0.5 cursor-pointer"
+                    title="Xóa bài hát"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              {customTracks.length === 0 && (
+                <div className={`col-span-full p-8 text-center rounded-3xl border-2 border-dashed ${isDark ? "bg-[#211B18] border-[#4E342E] text-stone-400" : "bg-[#FFFDF9] border-[#3E2723]/30 text-stone-500"}`}>
+                  <p className="text-sm font-bold">Chưa có luồng phát sóng tự quản lý nào.</p>
+                  <p className="text-xs mt-1 text-stone-400">Hãy thêm một luồng ghi phát trực tiếp ở trên để cùng người đọc lắc lư theo điệu nhạc nhé!</p>
+                </div>
+              )}
             </div>
           </div>
         </>
