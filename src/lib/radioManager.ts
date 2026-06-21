@@ -389,7 +389,7 @@ export interface TrackDef {
 export class RadioManagerClass {
   public isPlaying: boolean = false;
   public muted: boolean = false;
-  public activeTrackId: string = 'procedural_lofi';
+  public activeTrackId: string = '';
   public rainVol: number = 0;
   public fireVol: number = 0;
   public wavesVol: number = 0;
@@ -398,18 +398,7 @@ export class RadioManagerClass {
 
   public playMode: 'loop_all' | 'loop_one' | 'shuffle' = 'loop_all';
 
-  public defaultTracks: TrackDef[] = [
-    { 
-      id: 'procedural_lofi', 
-      title: "Chucu Cozy Rhodes", 
-      desc: "Giai điệu lofi ấm áp từ bộ tổng hợp nhạc Chucu. Càng nghe càng thư giãn." 
-    },
-    { 
-      id: 'rainy_chill', 
-      title: "Mưa Thu Trên Phím Đàn", 
-      desc: "Học tập, đọc truyện tập trung cao độ cùng tiếng mưa đàn lofi rả rích." 
-    }
-  ];
+  public defaultTracks: TrackDef[] = [];
 
   public adminTracks: TrackDef[] = [];
   public customTracks: TrackDef[] = [];
@@ -527,6 +516,11 @@ export class RadioManagerClass {
   public play() {
     this.isPlaying = true;
     this.synth.init();
+
+    if (!this.activeTrackId && this.tracks.length > 0) {
+      this.activeTrackId = this.tracks[0].id;
+    }
+
     this.triggerTrackPlay(this.activeTrackId);
     
     // Start tempo cycle for sway animations
@@ -642,7 +636,12 @@ export class RadioManagerClass {
     }
 
     const currentTrack = this.tracks.find(t => t.id === trackId);
-    if (currentTrack && currentTrack.isExternal && currentTrack.streamUrl) {
+    if (!currentTrack) {
+      this.notify();
+      return;
+    }
+
+    if (currentTrack.isExternal && currentTrack.streamUrl) {
       if (currentTrack.isSpotify) {
         // Spotify is managed in iframe so we do not stream via standard Audio element.
       } else {
