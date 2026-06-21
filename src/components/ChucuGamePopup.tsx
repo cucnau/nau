@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  X, Gamepad2, ShoppingBag, Info, Sparkles, 
-  Flame, HelpCircle, Trophy, Ticket, Heart, Utensils
+  Gamepad2, ShoppingBag, Info, Sparkles, 
+  Flame, HelpCircle, Trophy, Ticket, Heart, Utensils, Cookie, Star
 } from 'lucide-react';
 
 // Highly performance-optimized 8-bit synth sound generator using Web Audio API
@@ -99,6 +99,14 @@ interface FallingItem {
   radius: number;
 }
 
+interface FloatingText {
+  x: number;
+  y: number;
+  text: string;
+  color: string;
+  alpha: number;
+}
+
 export function ChucuGamePopup() {
   const { 
     isChucuGameOpen, setChucuGameOpen, 
@@ -139,6 +147,8 @@ export function ChucuGamePopup() {
   const basketX = useRef(150);
   const basketWidth = useRef(60);
   const items = useRef<FallingItem[]>([]);
+  const floatingTexts = useRef<FloatingText[]>([]);
+  const screenFlash = useRef(0);
   const animationFrameId = useRef<number | null>(null);
   const timerIntervalId = useRef<number | null>(null);
   const lastSpawnTime = useRef(0);
@@ -294,6 +304,8 @@ export function ChucuGamePopup() {
 
     basketWidth.current = 65;
     items.current = [];
+    floatingTexts.current = [];
+    screenFlash.current = 0;
     lastSpawnTime.current = Date.now();
     pointerInputRef.current = 150;
 
@@ -539,23 +551,23 @@ export function ChucuGamePopup() {
 
     // Spawning falling items
     const nowTime = Date.now();
-    const spawnInterval = Math.max(450, 750 - Math.floor(scoreRef.current / 4)); // Spawns faster as score increases (down to 450ms)
+    const spawnInterval = Math.max(300, 600 - Math.floor(scoreRef.current / 2)); // Spawns faster as score increases
     if (nowTime - lastSpawnTime.current > spawnInterval) {
       const spawnX = Math.random() * (W - 30) + 15;
       let randType: FallingItem['type'] = 'white';
       const r = Math.random();
       
-      if (r < 0.40) randType = 'white'; // White Be chocolate is point
-      else if (r < 0.52) randType = 'bomb'; // Bomb trap (-45 points)
-      else if (r < 0.65) randType = 'rotten_apple'; // Rotten Apple (-1 life)
-      else if (r < 0.82) randType = 'brown'; // Brown Choco fragment
-      else if (r < 0.92) randType = 'milk'; // Sữa ngọt ngào power-up
-      else randType = 'gold'; // Gold fragment (most rare!)
+      if (r < 0.60) randType = 'white'; // White Be chocolate is point (60%)
+      else if (r < 0.75) randType = 'bomb'; // Bomb trap (-20 points) (15%)
+      else if (r < 0.85) randType = 'rotten_apple'; // Rotten Apple (-1 life) (10%)
+      else if (r < 0.93) randType = 'milk'; // Sữa ngọt ngào power-up (8%)
+      else if (r < 0.985) randType = 'brown'; // Brown Choco fragment (Hiếm - 5.5%)
+      else randType = 'gold'; // Gold fragment (Siêu hiếm - 1.5%)
 
       items.current.push({
         x: spawnX,
         y: -15,
-        speed: 3.0 + Math.random() * 2.5 + (scoreRef.current / 220), // Higher base speed (3.0-5.5) and faster acceleration
+        speed: 3.8 + Math.random() * 3.5 + (scoreRef.current / 150), // Higher base speed
         type: randType,
         radius: 12
       });
@@ -910,31 +922,39 @@ export function ChucuGamePopup() {
         items.current.splice(idx, 1);
         
         if (item.type === 'white') {
-          setScore(prev => prev + 15);
+          setScore(prev => prev + 5);
+          floatingTexts.current.push({ x: item.x, y: item.y, text: '+5', color: '#10B981', alpha: 1.0 });
           gameSounds.playCatch();
         } else if (item.type === 'brown') {
           setChucuFragmentsEarned(prev => prev + 1);
-          setScore(prev => prev + 50);
+          setScore(prev => prev + 15);
+          floatingTexts.current.push({ x: item.x, y: item.y, text: '+15', color: '#8B5A2B', alpha: 1.0 });
           gameSounds.playCatch();
         } else if (item.type === 'gold') {
           setChucuGFragmentsEarned(prev => prev + 1);
-          setScore(prev => prev + 100);
+          setScore(prev => prev + 35);
+          floatingTexts.current.push({ x: item.x, y: item.y, text: '+35 Vàng', color: '#F59E0B', alpha: 1.0 });
           gameSounds.playCatch();
         } else if (item.type === 'milk') {
           // Sweet Milk Carton: Double scale size catcher for 7 seconds
           gameSounds.playPowerUp();
+          floatingTexts.current.push({ x: item.x, y: item.y, text: 'TO LÊN!', color: '#3B82F6', alpha: 1.0 });
           basketWidth.current = 115;
           if (powerupTimer.current) clearTimeout(powerupTimer.current);
           powerupTimer.current = setTimeout(() => {
             basketWidth.current = 65;
           }, 7000) as any;
         } else if (item.type === 'bomb') {
-          // Mischief bomb: Deducts 45 points score
+          // Mischief bomb: Deducts 20 points score
           gameSounds.playBomb();
-          setScore(prev => Math.max(0, prev - 45));
+          screenFlash.current = 0.5;
+          floatingTexts.current.push({ x: item.x, y: item.y, text: '-20', color: '#EF4444', alpha: 1.0 });
+          setScore(prev => Math.max(0, prev - 20));
         } else if (item.type === 'rotten_apple') {
           // Táo thối bốc mùi decreases lives by 1, if 0 it triggers gameOver
           gameSounds.playBomb();
+          screenFlash.current = 0.7;
+          floatingTexts.current.push({ x: item.x, y: item.y, text: '-1 ♥', color: '#EF4444', alpha: 1.0 });
           const nextLives = livesRef.current - 1;
           setLives(nextLives);
           livesRef.current = nextLives;
@@ -949,6 +969,40 @@ export function ChucuGamePopup() {
         items.current.splice(idx, 1);
       }
     });
+
+    // Draw Floating Texts
+    for (let i = floatingTexts.current.length - 1; i >= 0; i--) {
+      const ft = floatingTexts.current[i];
+      ft.y -= 1.2; // Float upwards
+      ft.alpha -= 0.02; // Fade out
+      
+      if (ft.alpha <= 0) {
+        floatingTexts.current.splice(i, 1);
+        continue;
+      }
+      
+      ctx.save();
+      ctx.globalAlpha = ft.alpha;
+      ctx.fillStyle = ft.color;
+      ctx.font = 'bold 16px sans-serif';
+      ctx.textAlign = 'center';
+      
+      // text outline
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 2.5;
+      ctx.strokeText(ft.text, ft.x, ft.y);
+      ctx.fillText(ft.text, ft.x, ft.y);
+      ctx.restore();
+    }
+
+    // Draw Screen Flash
+    if (screenFlash.current > 0) {
+      ctx.save();
+      ctx.fillStyle = `rgba(239, 68, 68, ${screenFlash.current})`; // Red flash
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+      screenFlash.current = Math.max(0, screenFlash.current - 0.05);
+    }
 
     // Request next animation frame if playing
     if (gameStateRef.current === 'playing') {
@@ -1049,9 +1103,9 @@ export function ChucuGamePopup() {
               setChucuGameOpen(false);
             }
           }}
-          className="absolute top-3.5 right-4 w-8 h-8 rounded-xl bg-white dark:bg-[#2C221D] border-[3px] border-[#3E2723] dark:border-[#4E342E] flex items-center justify-center hover:bg-stone-100 dark:hover:bg-[#3E2F28] cursor-pointer z-10 text-[#3E2723] dark:text-[#ECE5DC]"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-[#FDF6EC] hover:bg-[#E6D8C9] dark:bg-[#1E1815] dark:hover:bg-[#2C221D] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl active:translate-y-0.5 active:shadow-none transition-all z-10 text-xl font-bold font-sans pb-0.5"
         >
-          <X className="w-4 h-4" />
+          ×
         </button>
 
         {/* Content Tabs render */}
@@ -1193,7 +1247,7 @@ export function ChucuGamePopup() {
             <div className="flex-grow space-y-5 font-sans">
               <div className="bg-[#F5E6D3]/30 dark:bg-black/25 p-4 rounded-3xl border-2 border-[#D7CCC8] dark:border-stone-800">
                 <span className="text-[10px] font-black uppercase text-stone-500 tracking-wider">
-                  💼 Túi đồ mảnh Chucu của bạn hiện tại:
+                  💼 Túi đồ đổi thưởng của bạn hiện tại:
                 </span>
                 <div className="grid grid-cols-3 gap-3 text-center mt-2">
                   <div className="p-2 bg-white dark:bg-[#1E1815] rounded-xl border border-[#3E2723]/10 dark:border-stone-800">
@@ -1214,7 +1268,7 @@ export function ChucuGamePopup() {
               {/* Fragment Converter Items list */}
               <div className="space-y-3">
                 <span className="text-xs font-black uppercase text-stone-500 tracking-wider">
-                  🍬 Quy Đổi Mảnh sang Choco thực
+                  🍬 Quy đổi mảnh Choco và Gchoco
                 </span>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1222,11 +1276,11 @@ export function ChucuGamePopup() {
                   <div className="bg-white dark:bg-[#1E1815] p-3.5 rounded-2xl border-2 border-[#3E2723]/10 dark:border-stone-800 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center border border-orange-200 shrink-0">
-                        <Flame className="w-5 h-5 text-orange-600" />
+                        <Cookie className="w-5 h-5 text-orange-600" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Choco thực tế</h4>
-                        <p className="text-[10px] text-stone-500">Phí: 10 mảnh Choco nâu</p>
+                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Choco</h4>
+                        <p className="text-[10px] text-stone-500">Phí: 10 mảnh Choco</p>
                       </div>
                     </div>
                     <button
@@ -1241,10 +1295,10 @@ export function ChucuGamePopup() {
                   <div className="bg-white dark:bg-[#1E1815] p-3.5 rounded-2xl border-2 border-[#3E2723]/10 dark:border-stone-800 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center border border-amber-200 shrink-0">
-                        <Sparkles className="w-5 h-5 text-amber-600" />
+                        <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 GChoco thực tế</h4>
+                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 GChoco</h4>
                         <p className="text-[10px] text-stone-500">Phí: 10 mảnh GChoco</p>
                       </div>
                     </div>
@@ -1343,11 +1397,11 @@ export function ChucuGamePopup() {
                   <div>
                     <h5 className="font-extrabold uppercase text-[10px] mb-1">🍭 Phân Loại Vật Phẩm:</h5>
                     <ul className="space-y-1 text-[11px] list-disc pl-3">
-                      <li><b>Choco Trắng (Sữa):</b> Điểm cộng thưởng ngọt ngào (+15 điểm).</li>
-                      <li><b>Choco Nâu (Mảnh nhỏ):</b> Rơi hiếm, đổi Choco thực tế (+50 điểm).</li>
-                      <li><b>Choco Vàng (Mảnh vàng):</b> Siêu hiếm, đổi GChoco thực tế (+100 điểm).</li>
+                      <li><b>Choco Trắng (Sữa):</b> Điểm cộng thưởng ngọt ngào (+5 điểm).</li>
+                      <li><b>Choco Nâu (Mảnh nhỏ):</b> Rơi hiếm, đổi Choco thực tế (+15 điểm).</li>
+                      <li><b>Choco Vàng (Mảnh vàng):</b> Siêu hiếm, đổi GChoco thực tế (+35 điểm).</li>
                       <li><b>Hộp sữa ngọt ngào (Power-up):</b> Phóng to kích thước Chucu to gấp đôi trong 7 giây để hứng trọn kẹo dễ dàng hơn.</li>
-                      <li><b>Bom nghịch ngợm (Quả bom):</b> Gây nổ phụ, trừ mạnh -45 điểm. Hãy né tránh quả bom này nhé!</li>
+                      <li><b>Bom nghịch ngợm (Quả bom):</b> Gây nổ phụ, trừ mạnh -20 điểm. Hãy né tránh quả bom này nhé!</li>
                       <li><b>Táo thối bốc mùi (Vật cản):</b> Vật cản bốc khói hôi rình, khiến Chucu **bị trừ đi 1 mạng** (tối đa 3 mạng). Hứng nhầm 3 quả táo thối sẽ bị Game Over ngay lập tức!</li>
                     </ul>
                   </div>
