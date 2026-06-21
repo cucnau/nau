@@ -69,5 +69,18 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.auth != null && request.auth.token.email.matches('(?i)^cucnau01@gmail\\.com$');
     }
+
+    match /arcadeLeaderboard/{scoreId} {
+      allow read: if true;
+      allow write: if true; // allow guest uploads to secure and gamify highscores
+    }
+
+    match /radioTracks/{trackId} {
+      allow read: if true;
+      allow write: if request.auth != null && (
+        (request.auth.token.email != null && request.auth.token.email.matches('(?i)^cucnau01@gmail\\.com$')) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.email.matches('(?i)^cucnau01@gmail\\.com$'))
+      );
+    }
   }
 }
