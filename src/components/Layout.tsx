@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, Search, User, Key, LogOut, X, Trophy, BookOpen, Zap, Flame, ShieldCheck, 
   Camera, Calendar, Mail, Clock, Settings, Copy, Home, ClipboardList, ShoppingBag, List, Edit2, Library,
   Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck, Sun, Moon, Eye, EyeOff,
-  RefreshCw
+  RefreshCw, Gamepad2, Radio, ShoppingBasket, Cookie
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
@@ -18,6 +19,8 @@ import { Missions } from '../pages/Missions';
 import { Inventory } from '../pages/Inventory';
 import { UserAvatar } from './UserAvatar';
 import { ChocoMascot } from './ChocoMascot';
+import { ChucuGamePopup } from './ChucuGamePopup';
+import { ChocoRadioPopup } from './ChocoRadioPopup';
 
 export function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -71,6 +74,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   const { 
     isLoggedIn, email, missions, level, lastClaimedRewardLevel,
     setStoreOpen, setMissionsOpen, setAchievementsOpen,
+    setChucuGameOpen, setChocoRadioOpen,
     firebaseUser, showChucu, setShowChucu, logout
   } = useStore();
 
@@ -210,6 +214,28 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                 </div>
                 <span className="text-xs font-black leading-normal uppercase tracking-tight">Thành Tựu</span>
               </button>
+
+             {/* Hứng Choco */}
+             <button 
+                onClick={() => { onClose(); setChucuGameOpen(true); }}
+                className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 group cursor-pointer"
+             >
+                <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
+                   <ShoppingBasket className="w-5 h-5 text-[#8D6E63]" />
+                </div>
+                <span className="text-xs font-black leading-normal uppercase tracking-tight">Hứng Choco</span>
+             </button>
+
+             {/* Choco Radio */}
+             <button 
+                onClick={() => { onClose(); setChocoRadioOpen(true); }}
+                className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 group cursor-pointer"
+             >
+                <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
+                   <Radio className="w-5 h-5 text-[#8D6E63]" />
+                </div>
+                <span className="text-xs font-black leading-normal uppercase tracking-tight">Choco Radio</span>
+             </button>
 
               {/* Tài Khoản */}
               <button 
@@ -519,7 +545,9 @@ export function AppLayout() {
     equippedAccessory, accessoryPosition,
     choco, goldenChoco, email, level, lastClaimedRewardLevel, missions,
     isStoreOpen, isMissionsOpen, isAchievementsOpen, isInventoryOpen,
+    isChucuGameOpen, isChocoRadioOpen,
     setStoreOpen, setMissionsOpen, setAchievementsOpen, setInventoryOpen,
+    setChucuGameOpen, setChocoRadioOpen,
     isQuotaExceeded, firebaseUser, activeTitle, getTitleColor,
     theme, setTheme, logout
   } = useStore();
@@ -859,6 +887,14 @@ export function AppLayout() {
       </header>
 
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      {/* Global Modals for Chucu Games & Radio */}
+      <AnimatePresence>
+        {isChucuGameOpen && <ChucuGamePopup />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isChocoRadioOpen && <ChocoRadioPopup />}
+      </AnimatePresence>
 
       {/* Modal Cửa hàng */}
       {isStoreOpen && (
