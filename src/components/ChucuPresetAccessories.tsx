@@ -386,6 +386,188 @@ export const CHUCU_PRESET_ACCESSORIES: ChucuPresetAccessory[] = [
         <line x1="72" y1="63" x2="79" y2="79" stroke="#FFF" strokeWidth="4" />
       </svg>
     )
+  },
+  {
+    id: "chucu_acc_flower",
+    name: "Bông Hoa Mùa Xuân",
+    description: "Một bông hoa cúc trắng nhỏ cài trên đầu cực kỳ dễ thương và đầy sức sống.",
+    svgContent: () => (
+      <g>
+        <path d="M 68 30 Q 70 35 65 40" fill="none" stroke="#4CAF50" strokeWidth="2.5" />
+        <circle cx="68" cy="30" r="3.5" fill="#FFEB3B" stroke="#3E2723" strokeWidth="1.5" />
+        <circle cx="64" cy="28" r="3" fill="#FFF" stroke="#3E2723" strokeWidth="1" />
+        <circle cx="72" cy="28" r="3" fill="#FFF" stroke="#3E2723" strokeWidth="1" />
+        <circle cx="64" cy="32" r="3" fill="#FFF" stroke="#3E2723" strokeWidth="1" />
+        <circle cx="72" cy="32" r="3" fill="#FFF" stroke="#3E2723" strokeWidth="1" />
+        <circle cx="68" cy="26" r="3" fill="#FFF" stroke="#3E2723" strokeWidth="1" />
+        <circle cx="68" cy="34" r="3" fill="#FFF" stroke="#3E2723" strokeWidth="1" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <path d="M 50 50 Q 55 65 45 75" fill="none" stroke="#4CAF50" strokeWidth="5" />
+        <circle cx="50" cy="50" r="10" fill="#FFEB3B" stroke="#3E2723" strokeWidth="3" />
+        <circle cx="40" cy="43" r="8" fill="#FFF" stroke="#3E2723" strokeWidth="2" />
+        <circle cx="60" cy="43" r="8" fill="#FFF" stroke="#3E2723" strokeWidth="2" />
+        <circle cx="40" cy="57" r="8" fill="#FFF" stroke="#3E2723" strokeWidth="2" />
+        <circle cx="60" cy="57" r="8" fill="#FFF" stroke="#3E2723" strokeWidth="2" />
+        <circle cx="50" cy="38" r="8" fill="#FFF" stroke="#3E2723" strokeWidth="2" />
+        <circle cx="50" cy="62" r="8" fill="#FFF" stroke="#3E2723" strokeWidth="2" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_magic_hat",
+    name: "Mũ Ảo Thuật Gia",
+    description: "Chiếc mũ chóp cao màu đen huyền bí lấp lánh phép màu của ảo thuật gia.",
+    svgContent: () => (
+      <g>
+        <rect x="36" y="8" width="28" height="18" fill="#212121" stroke="#3E2723" strokeWidth="2.5" />
+        <rect x="36" y="22" width="28" height="4" fill="#E53935" stroke="#3E2723" strokeWidth="1.5" />
+        <ellipse cx="50" cy="26" rx="22" ry="3.5" fill="#212121" stroke="#3E2723" strokeWidth="2.5" />
+        <circle cx="50" cy="15" r="1" fill="#FFF" opacity="0.6" />
+        <circle cx="42" cy="18" r="0.8" fill="#FFF" opacity="0.8" />
+        <circle cx="57" cy="12" r="1.2" fill="#FFF" opacity="0.5" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <rect x="25" y="15" width="50" height="40" fill="#212121" stroke="#3E2723" strokeWidth="5" />
+        <rect x="25" y="45" width="50" height="10" fill="#E53935" stroke="#3E2723" strokeWidth="4" />
+        <ellipse cx="50" cy="55" rx="40" ry="8" fill="#212121" stroke="#3E2723" strokeWidth="5" />
+        <circle cx="50" cy="30" r="2.5" fill="#FFF" opacity="0.6" />
+        <circle cx="35" cy="38" r="2" fill="#FFF" opacity="0.8" />
+        <circle cx="65" cy="22" r="3" fill="#FFF" opacity="0.5" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_3d_glasses",
+    name: "Kính 3D Sinh Động",
+    description: "Cặp kính 3D xanh đỏ siêu độc đáo dành cho những buổi xem phim thâu đêm.",
+    svgContent: () => (
+      <g>
+        <rect x="30" y="41" width="16" height="10" rx="2" fill="#E53935" stroke="#3E2723" strokeWidth="2.5" />
+        <rect x="54" y="41" width="16" height="10" rx="2" fill="#1E88E5" stroke="#3E2723" strokeWidth="2.5" />
+        <line x1="46" y1="44" x2="54" y2="44" stroke="#3E2723" strokeWidth="2.5" />
+        <line x1="28" y1="44" x2="30" y2="44" stroke="#3E2723" strokeWidth="2.5" />
+        <line x1="70" y1="44" x2="72" y2="44" stroke="#3E2723" strokeWidth="2.5" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <rect x="10" y="35" width="35" height="25" rx="5" fill="#E53935" stroke="#3E2723" strokeWidth="5" />
+        <rect x="55" y="35" width="35" height="25" rx="5" fill="#1E88E5" stroke="#3E2723" strokeWidth="5" />
+        <line x1="45" y1="45" x2="55" y2="45" stroke="#3E2723" strokeWidth="6" />
+        <line x1="0" y1="45" x2="10" y2="45" stroke="#3E2723" strokeWidth="6" />
+        <line x1="90" y1="45" x2="100" y2="45" stroke="#3E2723" strokeWidth="6" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_tie",
+    name: "Cà Vạt Doanh Nhân",
+    description: "Cà vạt kẻ sọc lịch sự chuyên nghiệp cho những ngày Chucu làm nhân viên văn phòng.",
+    svgContent: () => (
+      <g>
+        <polygon points="46,65 54,65 58,80 50,85 42,80" fill="#1E88E5" stroke="#3E2723" strokeWidth="2.2" />
+        <polygon points="47,62 53,62 51,66 49,66" fill="#1565C0" stroke="#3E2723" strokeWidth="1.5" />
+        <line x1="44" y1="70" x2="56" y2="67" stroke="#FFF" strokeWidth="1.5" />
+        <line x1="43" y1="76" x2="57" y2="72" stroke="#FFF" strokeWidth="1.5" />
+        <line x1="47" y1="81" x2="54" y2="78" stroke="#FFF" strokeWidth="1.5" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <polygon points="40,25 60,25 70,75 50,90 30,75" fill="#1E88E5" stroke="#3E2723" strokeWidth="5" />
+        <polygon points="43,15 57,15 53,28 47,28" fill="#1565C0" stroke="#3E2723" strokeWidth="4" />
+        <line x1="35" y1="45" x2="65" y2="35" stroke="#FFF" strokeWidth="4" />
+        <line x1="32" y1="65" x2="68" y2="52" stroke="#FFF" strokeWidth="4" />
+        <line x1="40" y1="82" x2="65" y2="72" stroke="#FFF" strokeWidth="4" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_pirate_patch",
+    name: "Miếng Đắp Hải Tặc",
+    description: "Che một mắt cực kỳ dũng mãnh, sẵn sàng ra khơi tìm kho báu đánh cướp ngọc Choco.",
+    svgContent: () => (
+      <g>
+        <line x1="28" y1="36" x2="50" y2="44" stroke="#212121" strokeWidth="2" />
+        <circle cx="41" cy="46" r="7" fill="#212121" stroke="#3E2723" strokeWidth="2" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <line x1="10" y1="20" x2="60" y2="45" stroke="#212121" strokeWidth="6" />
+        <circle cx="45" cy="50" r="20" fill="#212121" stroke="#3E2723" strokeWidth="5" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_sleep_mask",
+    name: "Bịt Mắt Ngủ Nướng",
+    description: "Bịt mắt gấu bông êm ái màu tím nhạt, luôn trong tình trạng buồn ngủ mọi lúc mọi nơi.",
+    svgContent: () => (
+      <g>
+        <path d="M 30 46 C 30 52, 45 52, 50 46 C 55 52, 70 52, 70 46 C 70 40, 55 40, 50 46 C 45 40, 30 40, 30 46 Z" fill="#E1BEE7" stroke="#3E2723" strokeWidth="2.5" strokeLinejoin="round" />
+        <line x1="35" y1="46" x2="40" y2="46" stroke="#3E2723" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="60" y1="46" x2="65" y2="46" stroke="#3E2723" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="26" y1="46" x2="30" y2="46" stroke="#3E2723" strokeWidth="1.5" />
+        <line x1="70" y1="46" x2="74" y2="46" stroke="#3E2723" strokeWidth="1.5" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <path d="M 10 50 C 10 70, 45 70, 50 50 C 55 70, 90 70, 90 50 C 90 30, 55 30, 50 50 C 45 30, 10 30, 10 50 Z" fill="#E1BEE7" stroke="#3E2723" strokeWidth="5" strokeLinejoin="round" />
+        <line x1="25" y1="50" x2="40" y2="50" stroke="#3E2723" strokeWidth="4" strokeLinecap="round" />
+        <line x1="60" y1="50" x2="75" y2="50" stroke="#3E2723" strokeWidth="4" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_mustache",
+    name: "Ria Mép Quý Ông",
+    description: "Bộ râu kẽm uốn lượn đậm chất quý ông cổ điển phương Tây, vô cùng thức giả.",
+    svgContent: () => (
+      <g>
+        <path d="M 38 60 Q 42 55 50 58 Q 58 55 62 60 Q 56 62 50 59 Q 44 62 38 60 Z" fill="#4E342E" stroke="#3E2723" strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M 38 60 Q 35 59 36 57" fill="none" stroke="#4E342E" strokeWidth="2" strokeLinecap="round" />
+        <path d="M 62 60 Q 65 59 64 57" fill="none" stroke="#4E342E" strokeWidth="2" strokeLinecap="round" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <path d="M 20 55 Q 35 35 50 48 Q 65 35 80 55 Q 65 65 50 53 Q 35 65 20 55 Z" fill="#4E342E" stroke="#3E2723" strokeWidth="5" strokeLinejoin="round" />
+        <path d="M 20 55 Q 10 50 15 40" fill="none" stroke="#4E342E" strokeWidth="5" strokeLinecap="round" />
+        <path d="M 80 55 Q 90 50 85 40" fill="none" stroke="#4E342E" strokeWidth="5" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    id: "chucu_acc_propeller_hat",
+    name: "Mũ Chong Chóng",
+    description: "Mũ chong chóng tre đa sắc màu, tuổi thơ quay về rực rỡ và bay nhảy trên đỉnh đầu.",
+    svgContent: () => (
+      <g>
+        <path d="M 35 25 Q 50 15 65 25 Z" fill="#4CAF50" stroke="#3E2723" strokeWidth="2.5" strokeLinejoin="round" />
+        <rect x="32" y="24" width="36" height="4" fill="#FFEB3B" stroke="#3E2723" strokeWidth="2" />
+        <rect x="49" y="10" width="2" height="10" fill="#3E2723" />
+        <ellipse cx="50" cy="10" rx="8" ry="2" fill="#2196F3" stroke="#3E2723" strokeWidth="1.5" />
+        <ellipse cx="50" cy="10" rx="3" ry="8" fill="#F44336" stroke="#3E2723" strokeWidth="1.5" />
+        <circle cx="50" cy="10" r="1.5" fill="#FFEB3B" />
+      </g>
+    ),
+    previewSvg: (
+      <svg viewBox="0 0 100 100" className="w-12 h-12">
+        <path d="M 20 65 Q 50 40 80 65 Z" fill="#4CAF50" stroke="#3E2723" strokeWidth="5" strokeLinejoin="round" />
+        <rect x="15" y="60" width="70" height="10" fill="#FFEB3B" stroke="#3E2723" strokeWidth="4" />
+        <rect x="47" y="25" width="6" height="30" fill="#3E2723" />
+        <ellipse cx="50" cy="25" rx="25" ry="6" fill="#2196F3" stroke="#3E2723" strokeWidth="4" />
+        <ellipse cx="50" cy="25" rx="8" ry="20" fill="#F44336" stroke="#3E2723" strokeWidth="4" />
+        <circle cx="50" cy="25" r="4" fill="#FFEB3B" />
+      </svg>
+    )
   }
 ];
 
