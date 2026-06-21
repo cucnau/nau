@@ -9,6 +9,8 @@ import { Account } from './pages/Account';
 import { Admin } from './pages/Admin';
 import { Library } from './pages/Library';
 import { StoryList } from './pages/StoryList';
+import { ChucuGame } from './pages/ChucuGame';
+import { ChocoRadio } from './pages/ChocoRadio';
 import { useStore } from './store';
 import { Wrench } from 'lucide-react';
 import { signInWithPopup, signInWithRedirect, GoogleAuthProvider } from 'firebase/auth';
@@ -95,6 +97,8 @@ export default function App() {
               
               <Route path="danh-sach" element={<StoryList />} />
               <Route path="thu-vien" element={<Library />} />
+              <Route path="tro-choi" element={<ChucuGame />} />
+              <Route path="choco-radio" element={<ChocoRadio />} />
             </Route>
           </Routes>
         </MaintenanceGuard>
