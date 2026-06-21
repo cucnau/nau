@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useStore } from "../store";
 import { FortuneWidget } from "./FortuneWidget";
+import { RadioManager } from "../lib/radioManager";
 import {
   renderChucuAccessorySvg,
   getChucuAccessoryPreview,
@@ -53,9 +54,20 @@ export function ChocoMascot() {
     equipChucuAccessory,
     showChucu,
     setShowChucu,
+    setChucuGameOpen,
+    setChocoRadioOpen,
   } = useStore();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [radioPlaying, setRadioPlaying] = useState<boolean>(false);
+
+  useEffect(() => {
+    setRadioPlaying(RadioManager.isPlaying);
+    const unsub = RadioManager.subscribe(() => {
+      setRadioPlaying(RadioManager.isPlaying);
+    });
+    return unsub;
+  }, []);
   const [isMute, setIsMute] = useState<boolean>(false);
   const [mood, setMood] = useState<
     "idle" | "happy" | "eating" | "dizzy" | "sleeping" | "angry"
@@ -599,9 +611,58 @@ export function ChocoMascot() {
           }}
           onDragEnd={handleDragEnd}
           whileDrag={{ scale: 1.1, rotate: Math.random() > 0.5 ? 5 : -5 }}
-          className="fixed bottom-6 right-6 z-40 flex flex-col items-center justify-center pointer-events-auto w-16 h-16 sm:w-20 sm:h-20"
+          className="fixed bottom-6 right-6 z-40 flex flex-col items-center justify-center pointer-events-auto w-16 h-16 sm:w-20 sm:h-20 cursor-pointer"
         >
-          {renderMascotVisual(false)}
+          {radioPlaying && (
+            <div className="absolute -top-5 -left-5 w-11 h-11 bg-[#F5F2EB] dark:bg-[#2C221D] border-2 border-[#3E2723] rounded-xl flex items-center justify-center shadow-lg pointer-events-none z-10 overflow-hidden">
+              {/* Spinning Vinyl */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+                className="w-8 h-8 relative flex items-center justify-center"
+              >
+                <svg className="w-full h-full" viewBox="0 0 100 100">
+                  {/* Vinyl base */}
+                  <circle cx="50" cy="50" r="45" fill="#1C1917" stroke="#3E2723" strokeWidth="3" />
+                  {/* concentric grooves */}
+                  <circle cx="50" cy="50" r="35" fill="none" stroke="#2D2825" strokeWidth="3.5" strokeDasharray="12 6" />
+                  <circle cx="50" cy="50" r="25" fill="none" stroke="#2D2825" strokeWidth="2.5" strokeDasharray="18 4" />
+                  {/* shiny radial reflection wedges */}
+                  <path d="M 50 50 L 80 25 A 45 45 0 0 1 85 41 Z" fill="rgba(255,255,255,0.22)" />
+                  <path d="M 50 50 L 20 75 A 45 45 0 0 1 15 59 Z" fill="rgba(255,255,255,0.22)" />
+                  {/* center yellow/orange label */}
+                  <circle cx="50" cy="50" r="13" fill="#E65100" />
+                  <circle cx="50" cy="50" r="4.5" fill="#FFFBF7" />
+                </svg>
+              </motion.div>
+              {/* Static Tonearm on the record player */}
+              <div className="absolute top-1 right-1 w-5 h-5 pointer-events-none">
+                <svg className="w-full h-full" viewBox="0 0 50 50">
+                  {/* Tonearm base pivot */}
+                  <circle cx="36" cy="14" r="3.5" fill="#78716C" stroke="#3E2723" strokeWidth="1.5" />
+                  {/* metal arm line */}
+                  <path d="M 36 14 L 25 32 L 18 32" fill="none" stroke="#A8A29E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  {/* needle cartridge head shell */}
+                  <rect x="14" y="30" width="5" height="3" fill="#44403C" stroke="#3E2723" strokeWidth="1" />
+                </svg>
+              </div>
+            </div>
+          )}
+          <motion.div
+            animate={radioPlaying ? {
+              y: [0, -7, 0, -7, 0],
+              rotate: [-5, 5, -5, 5, -5],
+              scaleX: [1, 1.05, 0.95, 1.05, 1],
+            } : {}}
+            transition={radioPlaying ? {
+              repeat: Infinity,
+              duration: 1.25,
+              ease: "easeInOut"
+            } : {}}
+            className="w-full h-full flex items-center justify-center"
+          >
+            {renderMascotVisual(false)}
+          </motion.div>
         </motion.div>
       </div>
 
