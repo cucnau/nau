@@ -103,6 +103,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               chucuInteractions: state.chucuInteractions || 0,
               chucuPremiumFeeds: state.chucuPremiumFeeds || 0,
               chucuLastTime: state.chucuLastTime || Date.now(),
+              chucuGameFragments: state.chucuGameFragments || 0,
+              chucuGameGFragments: state.chucuGameGFragments || 0,
+              chucuGameBonusPoints: state.chucuGameBonusPoints || 0,
+              chucuGamePlaysToday: state.chucuGamePlaysToday || 0,
+              chucuGameLastPlayDate: state.chucuGameLastPlayDate || null,
               
               missions: state.missions || [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()],
               storyProgress: state.storyProgress || {},
