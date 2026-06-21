@@ -160,11 +160,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 } catch(e) {}
               }
             }
-            if (user.email?.toLowerCase() === 'cucnau01@gmail.com' && (data.choco < 999999 || data.goldenChoco < 999999)) {
-              try {
-                await setDoc(userRef, { choco: 9999999, goldenChoco: 9999999 }, { merge: true });
-              } catch (e) {
-                console.error('Error updating admin doc', e);
+            if (user.email?.toLowerCase() === 'cucnau01@gmail.com') {
+              const updates: any = {};
+              if (data.choco < 999999 || data.goldenChoco < 999999) {
+                updates.choco = 9999999;
+                updates.goldenChoco = 9999999;
+              }
+              
+              // Evict choco_cute achievement from admin account
+              let unlocked = Array.isArray(data.unlockedAchievements) ? [...data.unlockedAchievements] : [];
+              let claimed = Array.isArray(data.claimedAchievements) ? [...data.claimedAchievements] : [];
+              let needsEvict = false;
+              if (unlocked.includes('choco_cute')) {
+                unlocked = unlocked.filter((id: string) => id !== 'choco_cute');
+                needsEvict = true;
+              }
+              if (claimed.includes('choco_cute')) {
+                claimed = claimed.filter((id: string) => id !== 'choco_cute');
+                needsEvict = true;
+              }
+              if (needsEvict) {
+                updates.unlockedAchievements = unlocked;
+                updates.claimedAchievements = claimed;
+                data.unlockedAchievements = unlocked;
+                data.claimedAchievements = claimed;
+              }
+
+              if (Object.keys(updates).length > 0) {
+                try {
+                  await setDoc(userRef, updates, { merge: true });
+                } catch (e) {
+                  console.error('Error updating admin doc', e);
+                }
               }
             }
 
