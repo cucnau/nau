@@ -163,6 +163,20 @@
         "createdAt": { "type": "number" }
       },
       "required": ["uid", "displayName", "content", "createdAt"]
+    },
+    "RadioTrack": {
+      "title": "Choco Radio Track",
+      "description": "Tracks and audio stream links for Choco Radio",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "desc": { "type": "string" },
+        "streamUrl": { "type": "string" },
+        "isSpotify": { "type": "boolean" },
+        "spotifyEmbedUrl": { "type": "string" },
+        "isLocalFile": { "type": "boolean" }
+      },
+      "required": ["title", "streamUrl"]
     }
   },
   "firestore": {
@@ -209,6 +223,10 @@
     "newsFeed/{postId}": {
       "schema": { "$ref": "#/entities/NewsFeedPost" },
       "description": "Global news feed posts uploaded by users"
+    },
+    "radioTracks/{trackId}": {
+      "schema": { "$ref": "#/entities/RadioTrack" },
+      "description": "Radio streams list"
     }
   }
 }
