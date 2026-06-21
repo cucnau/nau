@@ -1436,8 +1436,8 @@ export function ChucuGamePopup() {
                     <h5 className="font-extrabold uppercase text-[10px] mb-1">🍭 Phân Loại Vật Phẩm:</h5>
                     <ul className="space-y-1 text-[11px] list-disc pl-3">
                       <li><b>Choco Trắng (Sữa):</b> Điểm cộng thưởng ngọt ngào (+5 điểm).</li>
-                      <li><b>Choco Nâu (Mảnh nhỏ):</b> Rơi hiếm, đổi Choco thực tế (+15 điểm).</li>
-                      <li><b>Choco Vàng (Mảnh vàng):</b> Siêu hiếm, đổi GChoco thực tế (+35 điểm).</li>
+                      <li><b>Choco Nâu (Mảnh Choco):</b> Rơi hiếm, đổi Choco thực tế (+15 điểm).</li>
+                      <li><b>Choco Vàng (Mảnh Gchoco):</b> Siêu hiếm, đổi GChoco thực tế (+35 điểm).</li>
                       <li><b>Nam châm hút (Power-up):</b> Hút toàn bộ Choco tích cực về phía Chucu trong 7 giây.</li>
                       <li><b>Hộp sữa ngọt ngào (Power-up):</b> Phóng to kích thước Chucu to gấp đôi trong 7 giây để hứng trọn kẹo dễ dàng hơn.</li>
                       <li><b>Bom nghịch ngợm (Quả bom):</b> Gây nổ phụ, trừ mạnh -20 điểm. Hãy né tránh quả bom này nhé!</li>
