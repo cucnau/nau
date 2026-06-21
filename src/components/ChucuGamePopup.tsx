@@ -1200,10 +1200,14 @@ export function ChucuGamePopup() {
                 <div className="w-full flex-1 flex flex-col items-center">
                   {/* Playing score HUD */}
                   <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-1.5 px-1 font-mono pb-2 text-sm font-black text-[#5D4037] dark:text-stone-300">
-                    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[10px] sm:text-xs">
-                      <span className="whitespace-nowrap">🎯 Điểm: <b className="text-sm sm:text-base text-red-500">{score}</b></span>
-                      <span className="whitespace-nowrap">🟤 Mảnh Choco: <b>{chucuFragmentsEarned}</b></span>
-                      <span className="whitespace-nowrap">🟡 Mảnh Gchoco: <b>{chucuGFragmentsEarned}</b></span>
+                    <div className="flex flex-col items-center sm:items-start gap-1 text-[10px] sm:text-xs">
+                      <div className="whitespace-nowrap">
+                        🎯 Điểm: <b className="text-sm sm:text-base text-red-500">{score}</b>
+                      </div>
+                      <div className="flex items-center gap-x-3">
+                        <span className="whitespace-nowrap">🟤 Mảnh Choco: <b>{chucuFragmentsEarned}</b></span>
+                        <span className="whitespace-nowrap">🟡 Mảnh Gchoco: <b>{chucuGFragmentsEarned}</b></span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-1.5 mt-2 sm:mt-0">
                       <span className="flex items-center bg-red-50 dark:bg-red-950/40 px-2 py-1 rounded-lg border border-red-200 dark:border-red-900 text-red-500 font-extrabold shrink-0 gap-0.5">
