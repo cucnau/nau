@@ -1184,9 +1184,6 @@ export function ChucuGamePopup() {
                   <h3 className="text-xl font-black text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide">
                     Chucu Hứng Choco
                   </h3>
-                  <p className="text-stone-500 text-xs mt-2 line-height-relaxed leading-relaxed">
-                    Giúp bé Chucu mèo đáng yêu di chuyển và hứng vật phẩm rơi xuống từ bầu trời ngọt ngào!
-                  </p>
 
                   <div className="my-5 p-3.5 rounded-2xl bg-orange-50 dark:bg-[#2A1D1A] border-2 border-dashed border-[#8D6E63] text-left text-[11px] text-[#5D4037] dark:text-stone-300 space-y-1.5 leading-relaxed">
                     <div className="font-extrabold flex items-center gap-1 text-orange-600">⚠️ Cơ chế chống lạm phát:</div>
