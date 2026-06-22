@@ -3,7 +3,8 @@ import { useStore } from '../store';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Gamepad2, ShoppingBag, Info, Sparkles, 
-  Flame, HelpCircle, Trophy, Ticket, Heart, Utensils, Cookie, Star
+  Flame, HelpCircle, Trophy, Ticket, Heart, Utensils, Cookie, Star,
+  Zap, BookOpen
 } from 'lucide-react';
 
 // Highly performance-optimized 8-bit synth sound generator using Web Audio API
@@ -248,14 +249,14 @@ export function ChucuGamePopup() {
     }
   };
 
-  const handleExchangePoints = (reward: 'mystery' | 'streak_ticket' | 'feed_mlem') => {
+  const handleExchangePoints = (reward: 'mystery' | 'streak_ticket' | 'gacha_ticket') => {
     if (!isLoggedIn) {
       alert("Bạn cần đăng nhập để đổi quà!");
       return;
     }
     if (reward === 'mystery') {
       if (chucuGameBonusPoints < 1200) {
-        alert("Bạn chưa đủ 1200 điểm thưởng để đổi Hộp Quà Sticker Bí Ẩn!");
+        alert("Bạn chưa đủ 1200 điểm thưởng để đổi Hộp Sticker Bí Ẩn!");
         return;
       }
       const newPoints = chucuGameBonusPoints - 1200;
@@ -264,10 +265,10 @@ export function ChucuGamePopup() {
         chucuGameBonusPoints: newPoints,
         ownedMysteryBoxes: newBoxes
       });
-      alert("Đổi thành công 1200 điểm lấy 1 Hộp quà Sticker Bí Ẩn!");
+      alert("Đổi thành công 1200 điểm lấy 1 Hộp Sticker Bí Ẩn!");
     } else if (reward === 'streak_ticket') {
       if (chucuGameBonusPoints < 800) {
-        alert("Bạn chưa đủ 800 điểm thưởng để đổi Vé bảo vệ Streak!");
+        alert("Bạn chưa đủ 800 điểm thưởng để đổi Vé Giữ Chuỗi!");
         return;
       }
       const newPoints = chucuGameBonusPoints - 800;
@@ -276,20 +277,19 @@ export function ChucuGamePopup() {
         chucuGameBonusPoints: newPoints,
         ownedStreakTickets: newTickets
       });
-      alert("Đổi thành công 800 điểm lấy 1 Vé bảo vệ Streak!");
-    } else if (reward === 'feed_mlem') {
-      if (chucuGameBonusPoints < 600) {
-        alert("Bạn chưa đủ 600 điểm thưởng để đổi Thức ăn mlem!");
+      alert("Đổi thành công 800 điểm lấy 1 Vé Giữ Chuỗi!");
+    } else if (reward === 'gacha_ticket') {
+      if (chucuGameBonusPoints < 1500) {
+        alert("Bạn chưa đủ 1500 điểm thưởng để đổi Vé Gacha!");
         return;
       }
-      const newPoints = chucuGameBonusPoints - 600;
-      // Adds a free Premium feed instantly inside Mascot stats
-      const newSatiety = Math.min(100, chucuSatiety + 25);
+      const newPoints = chucuGameBonusPoints - 1500;
+      const newTickets = (useStore.getState().ownedGachaTickets || 0) + 1;
       updateUserDoc({
         chucuGameBonusPoints: newPoints,
+        ownedGachaTickets: newTickets
       });
-      updateChucuStats({ chucuSatiety: newSatiety });
-      alert("Đổi thành công 600 điểm lấy 1 Thức ăn mlem mlem hảo hạng Chucu (Nạp đầy Satiety thêm +25%)!");
+      alert("Đổi thành công 1500 điểm lấy 1 Vé Gacha!");
     }
   };
 
@@ -1374,25 +1374,6 @@ export function ChucuGamePopup() {
                 </span>
 
                 <div className="space-y-2">
-                  {/* Exchange Box */}
-                  <div className="bg-white dark:bg-[#1E1815] p-3 rounded-2xl border-2 border-[#3E2723]/10 dark:border-stone-800 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
-                        <Trophy className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Hộp quà Sticker Bí Ẩn</h4>
-                        <p className="text-[10px] text-stone-500">Để mở sticker chưa có trong cửa hàng • <b>1200 điểm</b></p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleExchangePoints('mystery')}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase rounded-lg transition-colors cursor-pointer"
-                    >
-                      Đổi
-                    </button>
-                  </div>
-
                   {/* Exchange Ticket */}
                   <div className="bg-white dark:bg-[#1E1815] p-3 rounded-2xl border-2 border-[#3E2723]/10 dark:border-stone-800 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
@@ -1400,7 +1381,7 @@ export function ChucuGamePopup() {
                         <Ticket className="w-5 h-5 text-amber-600" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Vé bảo vệ điểm điểm danh</h4>
+                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Vé Giữ Chuỗi</h4>
                         <p className="text-[10px] text-stone-500">Giữ streak checkin vĩnh viễn khi vắng mặt • <b>800 điểm</b></p>
                       </div>
                     </div>
@@ -1412,19 +1393,38 @@ export function ChucuGamePopup() {
                     </button>
                   </div>
 
-                  {/* Exchange instant mlem feed */}
+                  {/* Exchange Box */}
                   <div className="bg-white dark:bg-[#1E1815] p-3 rounded-2xl border-2 border-[#3E2723]/10 dark:border-stone-800 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-[#E0F7FA] flex items-center justify-center shrink-0">
-                        <Flame className="w-5 h-5 text-teal-600" />
+                      <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+                        <Trophy className="w-5 h-5 text-purple-600" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">Thức ăn hảo hạng mlem mlem Chucu</h4>
-                        <p className="text-[10px] text-stone-500">Nạp đầy ngay lập tức cho Chucu thêm +25% Độ No bụng • <b>600 điểm</b></p>
+                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Hộp Sticker Bí Ẩn</h4>
+                        <p className="text-[10px] text-stone-500">Để mở sticker chưa có trong cửa hàng • <b>1200 điểm</b></p>
                       </div>
                     </div>
                     <button
-                      onClick={() => handleExchangePoints('feed_mlem')}
+                      onClick={() => handleExchangePoints('mystery')}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase rounded-lg transition-colors cursor-pointer"
+                    >
+                      Đổi
+                    </button>
+                  </div>
+
+                  {/* Exchange Gacha Ticket */}
+                  <div className="bg-white dark:bg-[#1E1815] p-3 rounded-2xl border-2 border-[#3E2723]/10 dark:border-stone-800 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-pink-100 flex items-center justify-center shrink-0">
+                        <Sparkles className="w-5 h-5 text-pink-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Vé Gacha</h4>
+                        <p className="text-[10px] text-stone-500">Dùng để quay Banner Gacha nhận quà khủng • <b>1500 điểm</b></p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleExchangePoints('gacha_ticket')}
                       className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase rounded-lg transition-colors cursor-pointer"
                     >
                       Đổi
