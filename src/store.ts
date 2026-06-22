@@ -83,6 +83,7 @@ interface UserState {
   ownedPriorityTickets: number;
   ownedMysteryBoxes: number;
   ownedStreakTickets?: number;
+  ownedGachaTickets?: number;
   activeStreakProtection?: boolean;
   lastFreeStreakRecoveryMonth?: string | null;
   lastClaimedRewardLevel: number;
@@ -305,6 +306,7 @@ export const useStore = create<UserState>()(
       ownedPriorityTickets: 0,
       ownedMysteryBoxes: 0,
       ownedStreakTickets: 0,
+      ownedGachaTickets: 0,
       activeStreakProtection: false,
       lastFreeStreakRecoveryMonth: null,
       lastClaimedRewardLevel: 1,
@@ -410,6 +412,7 @@ export const useStore = create<UserState>()(
         ownedPriorityTickets: 0,
         ownedMysteryBoxes: 0,
         ownedStreakTickets: 0,
+        ownedGachaTickets: 0,
         activeStreakProtection: false,
         lastFreeStreakRecoveryMonth: null,
         lastClaimedRewardLevel: 1,
@@ -602,6 +605,7 @@ export const useStore = create<UserState>()(
             ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
             ownedMysteryBoxes: data.ownedMysteryBoxes !== undefined ? data.ownedMysteryBoxes : state.ownedMysteryBoxes,
             ownedStreakTickets: data.ownedStreakTickets !== undefined ? data.ownedStreakTickets : state.ownedStreakTickets,
+            ownedGachaTickets: data.ownedGachaTickets !== undefined ? data.ownedGachaTickets : state.ownedGachaTickets,
             activeStreakProtection: data.activeStreakProtection !== undefined ? data.activeStreakProtection : state.activeStreakProtection,
             lastFreeStreakRecoveryMonth: data.lastFreeStreakRecoveryMonth !== undefined ? data.lastFreeStreakRecoveryMonth : state.lastFreeStreakRecoveryMonth,
             lastClaimedRewardLevel: data.lastClaimedRewardLevel !== undefined ? data.lastClaimedRewardLevel : state.lastClaimedRewardLevel,
