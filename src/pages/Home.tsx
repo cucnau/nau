@@ -369,10 +369,10 @@ export function Home() {
               <h2 className="font-black text-lg border-l-[6px] border-[#3E2723] pl-3 mb-4 mt-2 text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-widest drop-shadow-[1px_1px_0_#D7CCC8] dark:drop-shadow-[1px_1px_0_#1A1412]">
                  Hộp Công Cụ
               </h2>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                 <button onClick={handleCheckInBtnClick} className="flex flex-col items-center justify-center text-center p-3 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-2xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_3px_0_0_#D7CCC8] dark:shadow-[0_3px_0_0_#0D0907] hover:-translate-y-1 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-1 active:shadow-none cursor-pointer">
-                    <div className="relative w-12 h-12 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1.5 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
-                       <CalendarCheck className="w-5 h-5 text-[#8D6E63]" />
+              <div className="grid grid-cols-3 gap-2">
+                 <button onClick={handleCheckInBtnClick} className="flex flex-col items-center justify-center text-center p-2 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_2px_0_0_#D7CCC8] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-0.5 active:shadow-none cursor-pointer">
+                    <div className="relative w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
+                       <CalendarCheck className="w-4 h-4 text-[#8D6E63]" />
                        {(!lastCheckInDate || lastCheckInDate !== todayStr) && isLoggedIn && (
                           <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8D6E63] opacity-75"></span>
@@ -380,58 +380,58 @@ export function Home() {
                           </span>
                        )}
                     </div>
-                    <span className="font-bold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors">Điểm danh</span>
+                    <span className="font-bold text-[9px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors leading-[1.1]">Điểm danh</span>
                  </button>
  
-                 <button onClick={() => setMissionsOpen(true)} className="flex flex-col items-center justify-center text-center p-3 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-2xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_3px_0_0_#D7CCC8] dark:shadow-[0_3px_0_0_#0D0907] hover:-translate-y-1 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-1 active:shadow-none cursor-pointer">
-                    <div className="relative w-12 h-12 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1.5 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
-                       <ClipboardList className="w-5 h-5 text-[#8D6E63]" />
+                 <button onClick={() => setMissionsOpen(true)} className="flex flex-col items-center justify-center text-center p-2 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_2px_0_0_#D7CCC8] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-0.5 active:shadow-none cursor-pointer">
+                    <div className="relative w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
+                       <ClipboardList className="w-4 h-4 text-[#8D6E63]" />
                        {hasUnclaimedMissions && <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#5D4037] rounded-full border-[2px] border-[#FDF6EC] dark:border-[#2C221D]" />}
                     </div>
-                    <span className="font-bold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors">Nhiệm vụ</span>
+                    <span className="font-bold text-[9px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors leading-[1.1]">Nhiệm vụ</span>
                  </button>
  
-                 <button onClick={() => setStoreOpen(true)} className="flex flex-col items-center justify-center text-center p-3 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-2xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_3px_0_0_#D7CCC8] dark:shadow-[0_3px_0_0_#0D0907] hover:-translate-y-1 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-1 active:shadow-none cursor-pointer">
-                    <div className="w-12 h-12 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1.5 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
-                       <ShoppingBag className="w-5 h-5 text-[#8D6E63]" />
+                 <button onClick={() => setStoreOpen(true)} className="flex flex-col items-center justify-center text-center p-2 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_2px_0_0_#D7CCC8] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-0.5 active:shadow-none cursor-pointer">
+                    <div className="w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
+                       <ShoppingBag className="w-4 h-4 text-[#8D6E63]" />
                     </div>
-                    <span className="font-bold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors">Cửa hàng</span>
+                    <span className="font-bold text-[9px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors leading-[1.1]">Cửa hàng</span>
                  </button>
  
-                 <button onClick={() => setAchievementsOpen(true)} className="flex flex-col items-center justify-center text-center p-3 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-2xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_3px_0_0_#D7CCC8] dark:shadow-[0_3px_0_0_#0D0907] hover:-translate-y-1 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-1 active:shadow-none cursor-pointer">
-                    <div className="relative w-12 h-12 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1.5 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
-                       <Trophy className="w-5 h-5 text-[#8D6E63]" />
+                 <button onClick={() => setAchievementsOpen(true)} className="flex flex-col items-center justify-center text-center p-2 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_2px_0_0_#D7CCC8] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-0.5 active:shadow-none cursor-pointer">
+                    <div className="relative w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
+                       <Trophy className="w-4 h-4 text-[#8D6E63]" />
                        {hasUnclaimedAchievements && <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#5D4037] rounded-full border-[2px] border-[#FDF6EC] dark:border-[#2C221D]" />}
                     </div>
-                    <span className="font-bold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors">Thành tựu</span>
+                    <span className="font-bold text-[9px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors leading-[1.1]">Thành tựu</span>
                  </button>
 
-                 <button onClick={() => navigate('/thu-vien')} className="flex flex-col items-center justify-center text-center p-3 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-2xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_3px_0_0_#D7CCC8] dark:shadow-[0_3px_0_0_#0D0907] hover:-translate-y-1 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-1 active:shadow-none cursor-pointer">
-                    <div className="w-12 h-12 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1.5 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
-                       <Library className="w-5 h-5 text-[#8D6E63]" />
+                 <button onClick={() => navigate('/thu-vien')} className="flex flex-col items-center justify-center text-center p-2 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_2px_0_0_#D7CCC8] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-0.5 active:shadow-none cursor-pointer">
+                    <div className="w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
+                       <Library className="w-4 h-4 text-[#8D6E63]" />
                     </div>
-                    <span className="font-bold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors">Thư viện</span>
+                    <span className="font-bold text-[9px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors leading-[1.1]">Thư viện</span>
                  </button>
 
-                 <button onClick={() => setInventoryOpen(true)} className="flex flex-col items-center justify-center text-center p-3 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-2xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_3px_0_0_#D7CCC8] dark:shadow-[0_3px_0_0_#0D0907] hover:-translate-y-1 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-1 active:shadow-none cursor-pointer">
-                    <div className="w-12 h-12 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1.5 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
-                       <PackageOpen className="w-5 h-5 text-[#8D6E63]" />
+                 <button onClick={() => setInventoryOpen(true)} className="flex flex-col items-center justify-center text-center p-2 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_2px_0_0_#D7CCC8] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-0.5 active:shadow-none cursor-pointer">
+                    <div className="w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
+                       <PackageOpen className="w-4 h-4 text-[#8D6E63]" />
                     </div>
-                    <span className="font-bold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors">Túi đồ</span>
+                    <span className="font-bold text-[9px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors leading-[1.1]">Túi đồ</span>
                  </button>
 
-                 <button onClick={() => setChucuGameOpen(true)} className="flex flex-col items-center justify-center text-center p-3 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-2xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_3px_0_0_#D7CCC8] dark:shadow-[0_3px_0_0_#0D0907] hover:-translate-y-1 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-1 active:shadow-none cursor-pointer">
-                    <div className="w-12 h-12 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1.5 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
-                       <ShoppingBasket className="w-5 h-5 text-[#8D6E63]" />
+                 <button onClick={() => setChucuGameOpen(true)} className="flex flex-col items-center justify-center text-center p-2 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_2px_0_0_#D7CCC8] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-0.5 active:shadow-none cursor-pointer">
+                    <div className="w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
+                       <ShoppingBasket className="w-4 h-4 text-[#8D6E63]" />
                     </div>
-                    <span className="font-bold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors">Hứng Choco</span>
+                    <span className="font-bold text-[9px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors leading-[1.1] truncate max-w-full">Hứng Choco</span>
                  </button>
 
-                 <button onClick={() => setChocoRadioOpen(true)} className="flex flex-col items-center justify-center text-center p-3 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-2xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_3px_0_0_#D7CCC8] dark:shadow-[0_3px_0_0_#0D0907] hover:-translate-y-1 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-1 active:shadow-none cursor-pointer">
-                    <div className="w-12 h-12 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1.5 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
-                       <Radio className="w-5 h-5 text-[#8D6E63]" />
+                 <button onClick={() => setChocoRadioOpen(true)} className="flex flex-col items-center justify-center text-center p-2 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_2px_0_0_#D7CCC8] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-0.5 active:shadow-none cursor-pointer">
+                    <div className="w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
+                       <Radio className="w-4 h-4 text-[#8D6E63]" />
                     </div>
-                    <span className="font-bold text-[11px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors">Choco Radio</span>
+                    <span className="font-bold text-[9px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors leading-[1.1] truncate max-w-full">Radio</span>
                  </button>
               </div>
            </div>
