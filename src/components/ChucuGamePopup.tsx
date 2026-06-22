@@ -116,11 +116,18 @@ export function ChucuGamePopup() {
     chucuGamePlaysToday, chucuGameLastPlayDate, finishChucuGame,
     chucuSatiety, updateChucuStats,
     choco, goldenChoco, ownedMysteryBoxes, ownedStreakTickets,
-    isLoggedIn, uid, updateUserDoc, theme
+    isLoggedIn, uid, updateUserDoc, theme,
+    _checkResetMissions
   } = useStore();
 
   const isDark = theme === 'dark';
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    if (isChucuGameOpen) {
+      _checkResetMissions();
+    }
+  }, [isChucuGameOpen, _checkResetMissions]);
 
   // Modal Screen Tab State
   const [panelTab, setPanelTab] = useState<'play' | 'exchange' | 'guide'>('play');
