@@ -1991,6 +1991,15 @@ export const useStore = create<UserState>()(
             changed = true;
          }
 
+         let nextChucuGamePlaysToday = state.chucuGamePlaysToday;
+         let nextChucuGameLastPlayDate = state.chucuGameLastPlayDate;
+         if (state.chucuGameLastPlayDate && state.chucuGameLastPlayDate !== todayStr) {
+            if (nextChucuGamePlaysToday !== 0) {
+               nextChucuGamePlaysToday = 0;
+               changed = true;
+            }
+         }
+
          // 2. Check Weekly Reset (00:00 Sunday -> Monday)
          if (!state.lastWeeklyResetId || state.lastWeeklyResetId !== currentWeekId) {
             console.log('Weekly reset triggered, resetting weekly missions');
@@ -2015,13 +2024,15 @@ export const useStore = create<UserState>()(
                missions: nextMissions,
                lastDailyResetDate: nextDailyResetDate,
                lastWeeklyResetId: nextWeeklyResetId,
-               allUsersMissions: allMs
+               allUsersMissions: allMs,
+               chucuGamePlaysToday: nextChucuGamePlaysToday
             });
 
             get().updateUserDoc({
                lastDailyResetDate: nextDailyResetDate,
                lastWeeklyResetId: nextWeeklyResetId,
-               missions: nextMissions
+               missions: nextMissions,
+               chucuGamePlaysToday: nextChucuGamePlaysToday
             });
          }
       }
