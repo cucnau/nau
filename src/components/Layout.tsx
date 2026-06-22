@@ -5,7 +5,7 @@ import {
   Menu, Search, User, Key, LogOut, X, Trophy, BookOpen, Zap, Flame, ShieldCheck, 
   Camera, Calendar, Mail, Clock, Settings, Copy, Home, ClipboardList, ShoppingBag, List, Edit2, Library,
   Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck, Sun, Moon, Eye, EyeOff,
-  RefreshCw, Gamepad2, Radio, ShoppingBasket, Cookie
+  RefreshCw, Gamepad2, Radio, ShoppingBasket, Cookie, Target, Crown, ChevronLeft, LayoutGrid, Star
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
@@ -319,7 +319,7 @@ function AchievementsModal() {
     syncCommentsCountFromDB
   } = useStore();
 
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const listContainerRef = useRef<HTMLDivElement>(null);
 
@@ -395,12 +395,24 @@ function AchievementsModal() {
     }
   };
 
-  const filteredAchievements = ACHIEVEMENTS_LIST.filter(
+  const filteredAchievements = activeCategory ? ACHIEVEMENTS_LIST.filter(
     (ach) => activeCategory === 'all' || ach.category === activeCategory
-  );
+  ) : [];
+
+  const getCategoryIcon = (id: string, className: string) => {
+    switch (id) {
+      case 'all': return <LayoutGrid className={className} />;
+      case 'reading': return <BookOpen className={className} />;
+      case 'community': return <Users className={className} />;
+      case 'collection': return <ShoppingBag className={className} />;
+      case 'challenge': return <Target className={className} />;
+      case 'legend': return <Crown className={className} />;
+      default: return <Star className={className} />;
+    }
+  };
 
   return (
-    <div className="text-[#3E2723] dark:text-[#ECE5DC] flex-1 flex flex-col h-full">
+    <div className="text-[#3E2723] dark:text-[#ECE5DC] flex-1 flex flex-col relative">
       {/* Title Header */}
       <div className="mb-4 text-center border-b-[3px] border-[#3E2723] dark:border-[#5D4037] pb-4 w-full shrink-0 relative">
           <Trophy className="w-10 h-10 text-[#8D6E63] mx-auto mb-1 drop-shadow" />
@@ -410,34 +422,46 @@ function AchievementsModal() {
           </p>
       </div>
 
-      {/* Category Carousel / Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-4 mb-4 border-b-[3px] border-[#3E2723]/20 dark:border-[#5D4037]/40 max-w-full scrollbar-none shrink-0 scroll-smooth">
-        {ACHIEVEMENT_CATEGORIES.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
-            className={cn(
-              "px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 border-[3px] shrink-0",
-              activeCategory === cat.id
-                ? "bg-[#E6D8C9] border-[#3E2723] text-[#3E2723] dark:bg-[#C29D70] dark:border-[#4E342E] dark:text-[#181311] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] scale-105"
-                : "bg-white text-[#8D6E63] border-[#3E2723]/30 dark:bg-[#1C1613] dark:border-[#5D4037]/50 dark:text-[#A1887F] hover:bg-[#EFEBE9]/40 hover:border-[#3E2723]/80"
-            )}
-          >
-            {cat.name}
-          </button>
-        ))}
-      </div>
-
-      {/* Achievements List */}
-      <div ref={listContainerRef} className="flex-1 overflow-y-auto pr-1 space-y-4 max-h-[50vh]">
-        {filteredAchievements.length === 0 ? (
-          <div className="text-center py-10 text-stone-400 text-xs font-bold font-mono">
-            Chưa có thành tựu nào thuộc mục này.
+      {!activeCategory ? (
+        <div className="flex-1 px-1 pb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {ACHIEVEMENT_CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className="flex flex-col items-center justify-center gap-3 p-4 bg-[#EBE0D3] dark:bg-[#2A211D] border-[3px] border-[#3E2723]/30 dark:border-[#5D4037]/50 rounded-2xl hover:bg-[#D7CCC8] dark:hover:bg-[#3E2723] hover:border-[#3E2723]/80 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_6px_0_0_rgba(62,39,35,0.3)] dark:hover:shadow-[0_6px_0_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none shadow-[0_3px_0_0_rgba(62,39,35,0.2)] dark:shadow-[0_3px_0_0_rgba(0,0,0,0.3)] group"
+            >
+              <div className="p-3 bg-[#FFFDF9] dark:bg-[#3C2E27] rounded-xl group-hover:bg-white dark:group-hover:bg-[#4E342E] group-hover:scale-110 transition-all duration-300 border-[2px] border-[#3E2723]/10 dark:border-transparent">
+                {getCategoryIcon(cat.id, "w-8 h-8 text-[#8D6E63] dark:text-[#D7CCC8]")}
+              </div>
+              <span className="text-xs font-black uppercase tracking-wider text-center text-[#5D4037] dark:text-[#A1887F] group-hover:text-[#3E2723] dark:group-hover:text-[#ECE5DC]">
+                {cat.name}
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center gap-3 mb-4">
+            <button 
+              onClick={() => setActiveCategory(null)}
+              className="p-2 bg-stone-100 dark:bg-stone-800 rounded-xl hover:bg-stone-200 dark:hover:bg-stone-700 transition"
+            >
+              <ChevronLeft className="w-5 h-5 text-stone-600 dark:text-stone-300" />
+            </button>
+            <h3 className="text-sm font-black uppercase tracking-wider">
+              {ACHIEVEMENT_CATEGORIES.find(c => c.id === activeCategory)?.name || 'Thành Tựu'}
+            </h3>
           </div>
-        ) : (
-          filteredAchievements.map((ach) => {
-            const isUnlocked = unlockedAchievements.includes(ach.id);
-            const isClaimed = claimedAchievements.includes(ach.id);
+
+          <div ref={listContainerRef} className="flex-1 overflow-y-auto pr-1 space-y-4 max-h-[50vh] scrollbar-thin">
+            {filteredAchievements.length === 0 ? (
+              <div className="text-center py-10 text-stone-400 text-xs font-bold font-mono">
+                Chưa có thành tựu nào thuộc mục này.
+              </div>
+            ) : (
+              filteredAchievements.map((ach) => {
+                const isUnlocked = unlockedAchievements.includes(ach.id);
+                const isClaimed = claimedAchievements.includes(ach.id);
             const progress = getProgress(ach.id);
             const percent = Math.min(100, Math.floor((progress / ach.progressTarget) * 100));
 
@@ -530,6 +554,8 @@ function AchievementsModal() {
           })
         )}
       </div>
+        </>
+      )}
     </div>
   );
 }
@@ -936,7 +962,7 @@ export function AppLayout() {
       {isAchievementsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setAchievementsOpen(false)} />
-          <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-2xl max-h-[85vh] rounded-3xl overflow-y-auto border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] dark:border-[#5D4037] shadow-2xl flex flex-col z-10 p-6 sm:p-8 transition-all">
+          <div className="relative bg-[#FDF6EC] dark:bg-[#1A1412] w-full max-w-2xl max-h-[85vh] rounded-[2rem] overflow-hidden border-[3px] border-[#3E2723] shadow-[0_4px_0_0_#3E2723] dark:border-[#5D4037] shadow-xl flex flex-col z-10 p-6 sm:p-8 transition-all">
             <button 
               onClick={() => {
                 if (isSyncingAchievements) return;
