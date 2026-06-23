@@ -304,7 +304,7 @@ export const getPermanentMissions = (): Mission[] => {
    }
    // Hứng rơi (1000, 2000...)
    for (let i = 1; i <= 20; i++) {
-       res.push({ id: `p_catch_${i}`, type: 'permanent', description: `Hứng rơi được tổng cộng ${i * 1000} điểm thưởng từ game Hứng Choco`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 1000, completed: false, claimed: false });
+       res.push({ id: `p_catch_${i}`, type: 'permanent', description: `Hứng chính xác ${i * 1000} viên Choco trong game Hứng Choco`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 1000, completed: false, claimed: false });
    }
    // Radio (60, 120... mins)
    for (let i = 1; i <= 20; i++) {
@@ -666,6 +666,40 @@ export const useStore = create<UserState>()(
 
             newAllMissions[uid] = resolvedMissions;
 
+            // Bù đắp dữ liệu gacha/radio từ trước cho những feature mới thêm
+            const totalGachaPullsFallback = Math.max(
+                data.totalGachaPulls !== undefined ? data.totalGachaPulls : (state.totalGachaPulls || 0),
+                data.gachaSinglePullCount !== undefined ? data.gachaSinglePullCount : (state.gachaSinglePullCount || 0)
+            );
+            // Bù đắp radio
+            let totalRadioSecondsFallback = data.totalRadioSeconds !== undefined ? data.totalRadioSeconds : (state.totalRadioSeconds || 0);
+            if (totalRadioSecondsFallback <= 0) {
+                const prevNightChill = data.radioNightChillSeconds !== undefined ? data.radioNightChillSeconds : (state.radioNightChillSeconds || 0);
+                const prevMaxTrack = data.maxRadioTrackSeconds !== undefined ? data.maxRadioTrackSeconds : (state.maxRadioTrackSeconds || 0);
+                totalRadioSecondsFallback = Math.max(totalRadioSecondsFallback, prevNightChill + prevMaxTrack);
+            }
+
+            // Bù đắp tiêu Choco = số Choco đã tiêu + (số GChoco đã tiêu * 3)
+            const getEarnedTotalC = data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : (state.totalEarnedChoco || 0);
+            const getCurrentC = data.choco !== undefined ? data.choco : (state.choco || 0);
+            const getEarnedTotalG = data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : (state.totalEarnedGChoco || 0);
+            const getCurrentG = data.goldenChoco !== undefined ? data.goldenChoco : (state.goldenChoco || 0);
+            let totalSpentChocoFallback = data.totalSpentChoco !== undefined ? data.totalSpentChoco : (state.totalSpentChoco || 0);
+            const spentGChocoApprox = Math.max(0, getEarnedTotalG - getCurrentG);
+            const spentChocoApprox = Math.max(0, getEarnedTotalC - getCurrentC);
+            if (totalSpentChocoFallback < spentChocoApprox + (spentGChocoApprox * 3)) {
+                totalSpentChocoFallback = Math.max(totalSpentChocoFallback, spentChocoApprox + (spentGChocoApprox * 3));
+            }
+
+            // Bù đắp Hứng Choco (nếu trước kia chưa lưu totalChocoCaught)
+            let totalChocoCaughtFallback = data.totalChocoCaught !== undefined ? data.totalChocoCaught : (state.totalChocoCaught || 0);
+            if (totalChocoCaughtFallback <= 0) {
+               // Ước tính số viên đã hứng dựa trên điểm thưởng hiện có và exp của Chucu
+               const approxFromExp = data.chucuExp ? Math.floor(data.chucuExp / 2) : 0;
+               const approxFromPoints = data.chucuGameBonusPoints ? Math.floor(data.chucuGameBonusPoints / 8) : 0;
+               totalChocoCaughtFallback = Math.max(approxFromExp, approxFromPoints, data.chucuGameFragments || 0);
+            }
+
             return {
             allUsersUnlockedAchievements: newAllUsersUnlocked,
             allUsersClaimedAchievements: newAllUsersClaimed,
@@ -735,18 +769,18 @@ export const useStore = create<UserState>()(
             claimedAchievements: data.claimedAchievements !== undefined ? data.claimedAchievements : state.claimedAchievements,
             totalEarnedChoco: data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco,
             totalEarnedGChoco: data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco,
-            totalSpentChoco: data.totalSpentChoco !== undefined ? data.totalSpentChoco : state.totalSpentChoco,
+            totalSpentChoco: totalSpentChocoFallback,
             totalCheckIns: computedCheckIns !== undefined ? computedCheckIns : state.totalCheckIns,
             perfectDailyDates: data.perfectDailyDates !== undefined ? data.perfectDailyDates : state.perfectDailyDates,
             sentMessagesCount: data.sentMessagesCount !== undefined ? data.sentMessagesCount : state.sentMessagesCount,
             totalChaptersRead: computedChapters,
             totalCommentsCount: data.totalCommentsCount !== undefined ? data.totalCommentsCount : state.totalCommentsCount,
-            totalGachaPulls: data.totalGachaPulls !== undefined ? data.totalGachaPulls : (state.totalGachaPulls || 0),
-            totalRadioSeconds: data.totalRadioSeconds !== undefined ? data.totalRadioSeconds : (state.totalRadioSeconds || 0),
+            totalGachaPulls: totalGachaPullsFallback,
+            totalRadioSeconds: totalRadioSecondsFallback,
             genresRead: data.genresRead !== undefined ? data.genresRead : state.genresRead,
             activePoints: data.activePoints !== undefined ? data.activePoints : state.activePoints,
             maxConsecutiveChocoCount: data.maxConsecutiveChocoCount !== undefined ? data.maxConsecutiveChocoCount : (state.maxConsecutiveChocoCount || 0),
-            totalChocoCaught: data.totalChocoCaught !== undefined ? data.totalChocoCaught : (state.totalChocoCaught || 0),
+            totalChocoCaught: totalChocoCaughtFallback,
             consecutiveGoldClears: data.consecutiveGoldClears !== undefined ? data.consecutiveGoldClears : (state.consecutiveGoldClears || 0),
             consecutiveDodgeClears: data.consecutiveDodgeClears !== undefined ? data.consecutiveDodgeClears : (state.consecutiveDodgeClears || 0),
             radioNightChillSeconds: data.radioNightChillSeconds !== undefined ? data.radioNightChillSeconds : (state.radioNightChillSeconds || 0),
@@ -1108,8 +1142,14 @@ export const useStore = create<UserState>()(
       spendGoldenChoco: (amount, reason = "Dùng GChoco") => {
           const state = get();
           if (state.goldenChoco >= amount) {
-              set({ goldenChoco: state.goldenChoco - amount });
-              get().updateUserDoc({ goldenChoco: state.goldenChoco - amount, $gchocoDiff: -amount }, reason);
+              const newTotalSpent = (state.totalSpentChoco || 0) + (amount * 3);
+              set({ goldenChoco: state.goldenChoco - amount, totalSpentChoco: newTotalSpent });
+              get().updateUserDoc({ goldenChoco: state.goldenChoco - amount, totalSpentChoco: newTotalSpent, $gchocoDiff: -amount }, reason);
+              
+              setTimeout(() => {
+                 get()._triggerCountAchievementsCheck();
+              }, 50);
+
               return true;
           }
           return false;
@@ -1793,15 +1833,18 @@ export const useStore = create<UserState>()(
           if (state.choco < amount || amount <= 0) return false;
           
           const newChoco = state.choco - amount;
+          const newTotalSpent = (state.totalSpentChoco || 0) + amount;
           const finalActivePoints = (state.activePoints || 0) + 1;
 
           set({ 
             choco: newChoco,
+            totalSpentChoco: newTotalSpent,
             activePoints: finalActivePoints,
           });
 
           get().updateUserDoc({ 
             choco: newChoco,
+            totalSpentChoco: newTotalSpent,
             $chocoDiff: -amount,
             activePoints: finalActivePoints,
           }, "Tặng Choco cho truyện");
