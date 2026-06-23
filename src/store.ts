@@ -145,7 +145,19 @@ interface UserState {
   addChucuGameBonusPoints: (amt: number) => void;
   addGachaFragments: (amt: number) => void;
   incrementChucuGamePlayCount: () => void;
-  finishChucuGame: (fragments: number, gFragments: number, bonusPoints: number, isNoRewardPlay: boolean, satietyDeduct: number) => void;
+  finishChucuGame: (
+     fragments: number,
+     gFragments: number,
+     bonusPoints: number,
+     isNoRewardPlay: boolean,
+     satietyDeduct: number,
+     stats?: {
+        maxConsecutiveCatches: number;
+        totalCaught: number;
+        goldMissed: boolean;
+        hitBombOrApple: boolean;
+     }
+  ) => void;
 
   // Per-uid historical record dictionaries
   allUsersMissions: Record<string, Mission[]>;
@@ -174,6 +186,17 @@ interface UserState {
   prevActivePoints: number;
   prevActiveWeek: string;
   activeTitle: string | null;
+  maxConsecutiveChocoCount?: number;
+  totalChocoCaught?: number;
+  consecutiveGoldClears?: number;
+  consecutiveDodgeClears?: number;
+  radioNightChillSeconds?: number;
+  radioTrackSeconds?: number;
+  maxRadioTrackSeconds?: number;
+  heardRadioTracks?: string[];
+  radioTrackSwitches?: number;
+  gachaSinglePullCount?: number;
+  maxBannerCompletionPct?: number;
   setActiveTitle: (title: string | null) => void;
   isMaintenance: boolean;
   setMaintenance: (val: boolean) => void;
@@ -372,6 +395,17 @@ export const useStore = create<UserState>()(
       totalCommentsCount: 0,
       genresRead: [],
       activePoints: 0,
+      maxConsecutiveChocoCount: 0,
+      totalChocoCaught: 0,
+      consecutiveGoldClears: 0,
+      consecutiveDodgeClears: 0,
+      radioNightChillSeconds: 0,
+      radioTrackSeconds: 0,
+      maxRadioTrackSeconds: 0,
+      heardRadioTracks: [],
+      radioTrackSwitches: 0,
+      gachaSinglePullCount: 0,
+      maxBannerCompletionPct: 0,
       lastActiveWeek: '',
       prevActivePoints: 0,
       prevActiveWeek: '',
@@ -459,6 +493,17 @@ export const useStore = create<UserState>()(
         totalCommentsCount: 0,
         genresRead: [],
         activePoints: 0,
+        maxConsecutiveChocoCount: 0,
+        totalChocoCaught: 0,
+        consecutiveGoldClears: 0,
+        consecutiveDodgeClears: 0,
+        radioNightChillSeconds: 0,
+        radioTrackSeconds: 0,
+        maxRadioTrackSeconds: 0,
+        heardRadioTracks: [],
+        radioTrackSwitches: 0,
+        gachaSinglePullCount: 0,
+        maxBannerCompletionPct: 0,
         lastActiveWeek: '',
         prevActivePoints: 0,
         prevActiveWeek: '',
@@ -661,6 +706,17 @@ export const useStore = create<UserState>()(
             totalCommentsCount: data.totalCommentsCount !== undefined ? data.totalCommentsCount : state.totalCommentsCount,
             genresRead: data.genresRead !== undefined ? data.genresRead : state.genresRead,
             activePoints: data.activePoints !== undefined ? data.activePoints : state.activePoints,
+            maxConsecutiveChocoCount: data.maxConsecutiveChocoCount !== undefined ? data.maxConsecutiveChocoCount : (state.maxConsecutiveChocoCount || 0),
+            totalChocoCaught: data.totalChocoCaught !== undefined ? data.totalChocoCaught : (state.totalChocoCaught || 0),
+            consecutiveGoldClears: data.consecutiveGoldClears !== undefined ? data.consecutiveGoldClears : (state.consecutiveGoldClears || 0),
+            consecutiveDodgeClears: data.consecutiveDodgeClears !== undefined ? data.consecutiveDodgeClears : (state.consecutiveDodgeClears || 0),
+            radioNightChillSeconds: data.radioNightChillSeconds !== undefined ? data.radioNightChillSeconds : (state.radioNightChillSeconds || 0),
+            radioTrackSeconds: data.radioTrackSeconds !== undefined ? data.radioTrackSeconds : (state.radioTrackSeconds || 0),
+            maxRadioTrackSeconds: data.maxRadioTrackSeconds !== undefined ? data.maxRadioTrackSeconds : (state.maxRadioTrackSeconds || 0),
+            heardRadioTracks: data.heardRadioTracks !== undefined ? data.heardRadioTracks : (state.heardRadioTracks || []),
+            radioTrackSwitches: data.radioTrackSwitches !== undefined ? data.radioTrackSwitches : (state.radioTrackSwitches || 0),
+            gachaSinglePullCount: data.gachaSinglePullCount !== undefined ? data.gachaSinglePullCount : (state.gachaSinglePullCount || 0),
+            maxBannerCompletionPct: data.maxBannerCompletionPct !== undefined ? data.maxBannerCompletionPct : (state.maxBannerCompletionPct || 0),
             lastActiveWeek: data.lastActiveWeek !== undefined ? data.lastActiveWeek : state.lastActiveWeek,
             prevActivePoints: data.prevActivePoints !== undefined ? data.prevActivePoints : state.prevActivePoints,
             prevActiveWeek: data.prevActiveWeek !== undefined ? data.prevActiveWeek : state.prevActiveWeek,
@@ -1596,7 +1652,19 @@ export const useStore = create<UserState>()(
          get().updateUserDoc({ chucuGamePlaysToday: count, chucuGameLastPlayDate: todayStr });
       },
 
-      finishChucuGame: (fragments: number, gFragments: number, bonusPoints: number, isNoRewardPlay: boolean, satietyDeduct: number) => {
+      finishChucuGame: (
+         fragments: number,
+         gFragments: number,
+         bonusPoints: number,
+         isNoRewardPlay: boolean,
+         satietyDeduct: number,
+         stats?: {
+            maxConsecutiveCatches: number;
+            totalCaught: number;
+            goldMissed: boolean;
+            hitBombOrApple: boolean;
+         }
+      ) => {
          const state = get();
          const updates: any = {};
          const nextState: any = {};
@@ -1615,7 +1683,30 @@ export const useStore = create<UserState>()(
          updates.chucuGamePlaysToday = count;
          updates.chucuGameLastPlayDate = todayStr;
 
-         // 2. Rewards (only if not no reward play)
+         // 2. Achievements stats
+         if (stats) {
+            const currentTotalChoco = state.totalChocoCaught || 0;
+            const newTotalChoco = currentTotalChoco + stats.totalCaught;
+            nextState.totalChocoCaught = newTotalChoco;
+            updates.totalChocoCaught = newTotalChoco;
+
+            const currentMaxConsecutive = state.maxConsecutiveChocoCount || 0;
+            const newMaxConsecutive = Math.max(currentMaxConsecutive, stats.maxConsecutiveCatches);
+            nextState.maxConsecutiveChocoCount = newMaxConsecutive;
+            updates.maxConsecutiveChocoCount = newMaxConsecutive;
+
+            const currentDodgeClears = state.consecutiveDodgeClears || 0;
+            const newDodgeClears = stats.hitBombOrApple ? 0 : (currentDodgeClears + 1);
+            nextState.consecutiveDodgeClears = newDodgeClears;
+            updates.consecutiveDodgeClears = newDodgeClears;
+
+            const currentGoldClears = state.consecutiveGoldClears || 0;
+            const newGoldClears = stats.goldMissed ? 0 : (currentGoldClears + 1);
+            nextState.consecutiveGoldClears = newGoldClears;
+            updates.consecutiveGoldClears = newGoldClears;
+         }
+
+         // 3. Rewards (only if not no reward play)
          if (!isNoRewardPlay) {
             if (fragments > 0) {
                let curF = state.chucuGameFragments || 0;
@@ -1644,6 +1735,7 @@ export const useStore = create<UserState>()(
 
          set(nextState);
          get().updateUserDoc(updates);
+         get()._triggerCountAchievementsCheck();
       },
 
       setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => {
@@ -1721,6 +1813,11 @@ export const useStore = create<UserState>()(
          const newTotalEarnedChoco = (state.totalEarnedChoco || 0) + ach.chocoReward;
          const newTotalEarnedGChoco = (state.totalEarnedGChoco || 0) + ach.goldenReward;
          
+         let addedTickets = 0;
+         if (id === 'choco_kientri' || id === 'choco_suutam') {
+            addedTickets = 10;
+         }
+         
          const allClaimed = { ...(state.allUsersClaimedAchievements || {}) };
          allClaimed[state.uid] = newClaimed;
 
@@ -1730,7 +1827,8 @@ export const useStore = create<UserState>()(
             choco: newChoco,
             goldenChoco: newGolden,
             totalEarnedChoco: newTotalEarnedChoco,
-            totalEarnedGChoco: newTotalEarnedGChoco
+            totalEarnedGChoco: newTotalEarnedGChoco,
+            ownedGachaTickets: (state.ownedGachaTickets || 0) + addedTickets
          });
          
          get().updateUserDoc({
@@ -1740,7 +1838,8 @@ export const useStore = create<UserState>()(
             goldenChoco: newGolden,
             $gchocoDiff: ach.goldenReward,
             totalEarnedChoco: newTotalEarnedChoco,
-            totalEarnedGChoco: newTotalEarnedGChoco
+            totalEarnedGChoco: newTotalEarnedGChoco,
+            ownedGachaTickets: (state.ownedGachaTickets || 0) + addedTickets
          }, `Nhận thưởng thành tựu: ${ach.name}`);
          
          get().gainExp(30);
@@ -1978,6 +2077,62 @@ export const useStore = create<UserState>()(
          // 21. Fashionista Chucu: ownedChucuAccessories.length >= 5
          if (!currentUnlocked.includes('chucu_fashion_5') && (state.ownedChucuAccessories || []).length >= 5) {
             get().unlockAchievement('chucu_fashion_5');
+         }
+
+         // 22. Hứng Choco Không Trượt Phát Nào: maxConsecutiveChocoCount >= 20
+         if (!currentUnlocked.includes('choco_catch_no_miss') && (state.maxConsecutiveChocoCount || 0) >= 20) {
+            get().unlockAchievement('choco_catch_no_miss');
+         }
+
+         // 23. Mưa Choco Ngột Ngào (Đồng/Bạc/Vàng)
+         if (!currentUnlocked.includes('choco_rain_1000') && (state.totalChocoCaught || 0) >= 1000) {
+            get().unlockAchievement('choco_rain_1000');
+         }
+         if (!currentUnlocked.includes('choco_rain_5000') && (state.totalChocoCaught || 0) >= 5000) {
+            get().unlockAchievement('choco_rain_5000');
+         }
+         if (!currentUnlocked.includes('choco_rain_10000') && (state.totalChocoCaught || 0) >= 10000) {
+            get().unlockAchievement('choco_rain_10000');
+         }
+
+         // 24. Săn Choco Hoàng Kim: consecutiveGoldClears >= 5
+         if (!currentUnlocked.includes('gold_choco_perfect') && (state.consecutiveGoldClears || 0) >= 5) {
+            get().unlockAchievement('gold_choco_perfect');
+         }
+
+         // 25. Choco Né Số Một: consecutiveDodgeClears >= 5
+         if (!currentUnlocked.includes('dodge_negative_perfect') && (state.consecutiveDodgeClears || 0) >= 5) {
+            get().unlockAchievement('dodge_negative_perfect');
+         }
+
+         // 26. Choco Chill Đêm: radioNightChillSeconds >= 1800 (30 mins)
+         if (!currentUnlocked.includes('radio_night_chill') && (state.radioNightChillSeconds || 0) >= 1800) {
+            get().unlockAchievement('radio_night_chill');
+         }
+
+         // 27. Giai Điệu Choco Yêu: maxRadioTrackSeconds >= 3600 (1 hour)
+         if (!currentUnlocked.includes('radio_one_track_love') && (state.maxRadioTrackSeconds || 0) >= 3600) {
+            get().unlockAchievement('radio_one_track_love');
+         }
+
+         // 28. Vũ Trụ Âm Thanh Của Choco: heardRadioTracks.length >= 10
+         if (!currentUnlocked.includes('radio_universe_explorer') && (state.heardRadioTracks || []).length >= 10) {
+            get().unlockAchievement('radio_universe_explorer');
+         }
+
+         // 29. Choco Tìm Kiếm: radioTrackSwitches >= 15
+         if (!currentUnlocked.includes('radio_track_switches') && (state.radioTrackSwitches || 0) >= 15) {
+            get().unlockAchievement('radio_track_switches');
+         }
+
+         // 30. Choco Kiên Trì: gachaPity5Star >= 90
+         if (!currentUnlocked.includes('choco_kientri') && (state.gachaPity5Star || 0) >= 90) {
+            get().unlockAchievement('choco_kientri');
+         }
+
+         // 31. Choco Sưu Tầm: maxBannerCompletionPct >= 100
+         if (!currentUnlocked.includes('choco_suutam') && (state.maxBannerCompletionPct || 0) >= 100) {
+            get().unlockAchievement('choco_suutam');
          }
       },
 
