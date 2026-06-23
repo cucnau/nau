@@ -11,6 +11,8 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  Ticket,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "../components/Layout";
 import { db } from "../lib/firebase";
@@ -195,6 +197,8 @@ export function Store() {
     addOwnedChucuAccessory,
     equipChucuAccessory,
     chucuLevel,
+    chucuGameFragments,
+    ownedGachaTickets,
   } = useStore();
   const [storeStickers, setStoreStickers] = useState<any[]>([]);
   const [storeAccessories, setStoreAccessories] = useState<any[]>([]);
@@ -312,11 +316,70 @@ export function Store() {
     }
   };
 
+  const handleExchangeFragmentsToGachaTicket = () => {
+    if (!isLoggedIn) {
+      alert("Vui lòng đăng nhập!");
+      return;
+    }
+    const currentFragments = chucuGameFragments || 0;
+    if (currentFragments < 100) {
+      alert(`Bạn không đủ Mảnh Choco (Bạn có: ${currentFragments}, cần ít nhất 100 mảnh)!`);
+      return;
+    }
+    const maxTickets = Math.floor(currentFragments / 100);
+    const input = prompt(`Nhập số Vé Gacha muốn đổi (100 Mảnh Choco = 1 Vé Gacha). Tối đa bạn đổi được ${maxTickets} vé:`, "1");
+    if (input === null) return;
+    const qty = parseInt(input, 10);
+    if (isNaN(qty) || qty <= 0) {
+      alert("Số lượng đổi không hợp lệ!");
+      return;
+    }
+    const cost = qty * 100;
+    if (currentFragments >= cost) {
+      updateUserDoc({
+        chucuGameFragments: currentFragments - cost,
+        ownedGachaTickets: (ownedGachaTickets || 0) + qty
+      });
+      alert(`Đổi thành công ${qty} Vé Gacha từ ${cost} Mảnh Choco!`);
+    } else {
+      alert(`Bạn không đủ Mảnh Choco (Cần ${cost} Mảnh)!`);
+    }
+  };
+
+  const handleExchangeGChocoToGachaTicket = () => {
+    if (!isLoggedIn) {
+      alert("Vui lòng đăng nhập!");
+      return;
+    }
+    const currentGChoco = goldenChoco || 0;
+    if (currentGChoco < 2) {
+      alert(`Bạn không đủ Gchoco (Bạn có: ${currentGChoco}, cần ít nhất 2 Gchoco)!`);
+      return;
+    }
+    const maxTickets = Math.floor(currentGChoco / 2);
+    const input = prompt(`Nhập số Vé Gacha muốn đổi từ Gchoco (2 Gchoco = 1 Vé Gacha). Tối đa bạn đổi được ${maxTickets} vé:`, "1");
+    if (input === null) return;
+    const qty = parseInt(input, 10);
+    if (isNaN(qty) || qty <= 0) {
+      alert("Số lượng đổi không hợp lệ!");
+      return;
+    }
+    const cost = qty * 2;
+    if (spendGoldenChoco(cost, `Đổi sang ${qty} Vé Gacha`)) {
+      updateUserDoc({
+        ownedGachaTickets: (ownedGachaTickets || 0) + qty
+      });
+      alert(`Đổi thành công ${qty} Vé Gacha từ ${cost} Gchoco!`);
+    } else {
+      alert(`Bạn không đủ Gchoco (Cần ${cost} Gchoco)!`);
+    }
+  };
+
   const buyTicketWithQuantity = (
     name: string,
     pricePerUnit: number,
     currencyType: "choco" | "golden",
-    ticketType: "pass" | "priority" | "streak",
+    ticketType: "pass" | "priority" | "streak" | "gacha",
   ) => {
     if (!isLoggedIn) {
       alert("Vui lòng đăng nhập!");
@@ -332,14 +395,26 @@ export function Store() {
     const totalPrice = pricePerUnit * qty;
     if (currencyType === "choco") {
       if (spendChoco(totalPrice, `Mua ${qty} ${name}`)) {
-        buyTicket(ticketType, qty);
+        if (ticketType === "gacha") {
+          updateUserDoc({
+            ownedGachaTickets: (ownedGachaTickets || 0) + qty,
+          });
+        } else {
+          buyTicket(ticketType, qty);
+        }
         alert(`Đã mua thành công ${qty} ${name}!`);
       } else {
         alert(`Không đủ Choco (Cần ${totalPrice} Choco để mua ${qty} vé)`);
       }
     } else {
       if (spendGoldenChoco(totalPrice, `Mua ${qty} ${name}`)) {
-        buyTicket(ticketType, qty);
+        if (ticketType === "gacha") {
+          updateUserDoc({
+            ownedGachaTickets: (ownedGachaTickets || 0) + qty,
+          });
+        } else {
+          buyTicket(ticketType, qty);
+        }
         alert(`Đã mua thành công ${qty} ${name}!`);
       } else {
         alert(`Không đủ Gchoco (Cần ${totalPrice} Gchoco để mua ${qty} vé)`);
@@ -643,6 +718,47 @@ export function Store() {
               </span>
             </button>
           </div>
+
+          {/* Vé Gacha đổi từ Mảnh Choco */}
+          <div className="bg-[#FFFDF9] dark:bg-[#1A1412] border-[3px] border-[#3E2723] rounded-3xl p-5 flex flex-col items-center text-center shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden group hover:-translate-y-1 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all">
+            <div className="absolute top-0 right-0 bg-amber-700 text-[#FDF6EC] text-[8px] sm:text-[10px] uppercase font-bold tracking-widest px-2 sm:px-3 py-1 rounded-bl-xl shadow-sm">
+              Đổi Mảnh
+            </div>
+            <RefreshCw className="w-8 h-8 sm:w-10 sm:h-10 text-amber-600 mt-2 mb-2 sm:mb-4 group-hover:rotate-180 transition-transform duration-500" />
+            <h3 className="text-sm sm:text-base font-black mb-1 sm:mb-2 uppercase text-[#3E2723] dark:text-[#ECE5DC]">
+              Đổi Vé Gacha
+            </h3>
+            <p className="text-stone-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">
+              100 Mảnh Choco = 1 Vé Gacha. Bạn có: {chucuGameFragments || 0} mảnh.
+            </p>
+            <button
+              onClick={handleExchangeFragmentsToGachaTicket}
+              className="bg-amber-600 text-[#FDF6EC] border border-amber-700 p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-amber-700 transition-colors w-full mt-auto uppercase text-[10px] sm:text-xs tracking-widest cursor-pointer"
+            >
+              Đổi vé
+            </button>
+          </div>
+
+          {/* Vé Gacha đổi từ Gchoco */}
+          <div className="bg-[#FFFDF9] dark:bg-[#1A1412] border-[3px] border-[#3E2723] rounded-3xl p-5 flex flex-col items-center text-center shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden group hover:-translate-y-1 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all">
+            <div className="absolute top-0 right-0 bg-[#D4AF37] text-black text-[8px] sm:text-[10px] uppercase font-bold tracking-widest px-2 sm:px-3 py-1 rounded-bl-xl shadow-sm">
+              Đổi Gchoco
+            </div>
+            <Ticket className="w-8 h-8 sm:w-10 sm:h-10 text-[#D4AF37] mt-2 mb-2 sm:mb-4 group-hover:scale-110 transition-transform duration-300" />
+            <h3 className="text-sm sm:text-base font-black mb-1 sm:mb-2 uppercase text-[#3E2723] dark:text-[#ECE5DC]">
+              Gchoco lấy Vé
+            </h3>
+            <p className="text-stone-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">
+              2 Gchoco = 1 Vé Gacha. Bạn có: {goldenChoco || 0} Gchoco.
+            </p>
+            <button
+              onClick={handleExchangeGChocoToGachaTicket}
+              className="bg-[#D4AF37] text-slate-950 p-2 sm:px-4 sm:py-2.5 rounded-xl font-black border-2 border-[#3E2723] shadow-[1px_1px_0_0_#3E2723] hover:bg-[#B5952F] transition-all w-full mt-auto uppercase text-[10px] sm:text-xs tracking-widest cursor-pointer"
+            >
+              Đổi vé
+            </button>
+          </div>
+
         </div>
       )}
 
