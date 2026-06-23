@@ -9,11 +9,54 @@ export function Missions() {
   useEffect(() => {
     if (isLoggedIn) {
       syncUserDataStatsFromDB();
+    } else {
+      useStore.getState()._triggerCountAchievementsCheck();
     }
   }, [isLoggedIn, syncUserDataStatsFromDB]);
 
   const renderMissionGroup = (title: string, type: string) => {
-     const items = missions.filter(m => m.type === type);
+     let items = missions.filter(m => m.type === type);
+     
+     // Dynamic progressive permanent mission reduction
+     if (type === 'permanent') {
+         // Create logical groups based on id prefixes
+         const groups: Record<string, typeof items> = {};
+         for (const m of items) {
+             const prefixMatch = m.id.match(/^(p_[a-z]+)_\d+$/);
+             if (prefixMatch) {
+                 const prefix = prefixMatch[1];
+                 if (!groups[prefix]) groups[prefix] = [];
+                 groups[prefix].push(m);
+             } else {
+                 if (!groups['other']) groups['other'] = [];
+                 groups['other'].push(m);
+             }
+         }
+         
+         const filteredItems: typeof items = [];
+         
+         for (const prefix in groups) {
+             const groupMissions = groups[prefix];
+             // Sort by numeric id suffix ascending
+             groupMissions.sort((a, b) => {
+                 const numA = parseInt(a.id.split('_').pop() || '0');
+                 const numB = parseInt(b.id.split('_').pop() || '0');
+                 return numA - numB;
+             });
+             
+             // Find the first mission that is NOT claimed
+             const firstUnclaimed = groupMissions.find(m => !m.claimed);
+             
+             if (firstUnclaimed) {
+                 filteredItems.push(firstUnclaimed);
+             } else {
+                 // If all claimed, show the last completed one so the list doesn't disappear
+                 filteredItems.push(groupMissions[groupMissions.length - 1]);
+             }
+         }
+         items = filteredItems;
+     }
+
      return (
        <div className="bg-[#FFFDF9] dark:bg-[#211B18] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-3xl p-6 shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] mb-8">
           <h2 className="text-lg font-bold text-[#3E2723] mb-6 border-l-[4px] border-[#3E2723] pl-3 flex items-center gap-2 uppercase tracking-tighter">
