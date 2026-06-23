@@ -209,7 +209,8 @@ export default function GachaPopup() {
        
        // Grant item to user
        if (res.item.type === 'sticker') {
-         addOwnedSticker(res.item.id);
+         const stickerUrl = res.item.image || 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?q=80&w=120&auto=format&fit=crop';
+         addOwnedSticker(stickerUrl);
        } else if (res.item.type === 'fragment') {
          // rough parse of number from name: "10 Mảnh..."
          const amtMatch = res.item.name.match(/\d+/);
