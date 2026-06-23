@@ -105,6 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               chucuLastTime: state.chucuLastTime || Date.now(),
               chucuGameFragments: state.chucuGameFragments || 0,
               chucuGameGFragments: state.chucuGameGFragments || 0,
+              gachaFragments: state.gachaFragments || 0,
               chucuGameBonusPoints: state.chucuGameBonusPoints || 0,
               chucuGamePlaysToday: state.chucuGamePlaysToday || 0,
               chucuGameLastPlayDate: state.chucuGameLastPlayDate || null,
