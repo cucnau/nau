@@ -434,10 +434,12 @@ export default function GachaPopup() {
     
     // Save state
     const singlePullCount = useStore.getState().gachaSinglePullCount || 0;
+    const totalPulls = useStore.getState().totalGachaPulls || 0;
     const updates: any = {
        ownedGachaTickets: currentTickets - times,
        gachaPity5Star: currentPity5,
-       gachaPity4Star: currentPity4
+       gachaPity4Star: currentPity4,
+       totalGachaPulls: totalPulls + times
     };
     
     if (times === 1) {
