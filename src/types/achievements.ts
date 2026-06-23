@@ -278,6 +278,146 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     goldenReward: 0,
     progressTarget: 5,
     category: 'collection'
+  },
+  {
+    id: 'choco_catch_no_miss',
+    name: 'Hứng Choco Không Trượt Phát Nào',
+    description: 'Hứng liên tiếp 20 viên Choco mà không làm rơi bất kỳ viên nào trong một màn chơi.',
+    rewardText: '+20 Choco',
+    chocoReward: 20,
+    goldenReward: 0,
+    progressTarget: 20,
+    category: 'challenge'
+  },
+  {
+    id: 'choco_rain_1000',
+    name: 'Mưa Choco Ngọt Ngào (Đồng)',
+    description: 'Hứng được tổng cộng 1,000 viên Choco (tích lũy qua các màn chơi).',
+    rewardText: '+100 Choco',
+    chocoReward: 100,
+    goldenReward: 0,
+    progressTarget: 1000,
+    category: 'challenge'
+  },
+  {
+    id: 'choco_rain_5000',
+    name: 'Mưa Choco Ngọt Ngào (Bạc)',
+    description: 'Hứng được tổng cộng 5,000 viên Choco (tích lũy qua các màn chơi).',
+    rewardText: '+500 Choco',
+    chocoReward: 500,
+    goldenReward: 0,
+    progressTarget: 5000,
+    category: 'challenge'
+  },
+  {
+    id: 'choco_rain_10000',
+    name: 'Mưa Choco Ngọt Ngào (Vàng)',
+    description: 'Hứng được tổng cộng 10,000 viên Choco (tích lũy qua các màn chơi).',
+    rewardText: '+1,000 Choco',
+    chocoReward: 1000,
+    goldenReward: 0,
+    progressTarget: 10000,
+    category: 'challenge'
+  },
+  {
+    id: 'gold_choco_perfect',
+    name: 'Săn Choco Hoàng Kim',
+    description: 'Thu thập trọn vẹn toàn bộ số Choco Vàng xuất hiện trong 5 lượt chơi liên tiếp.',
+    rewardText: '+5 Gchoco',
+    chocoReward: 0,
+    goldenReward: 5,
+    progressTarget: 5,
+    category: 'challenge'
+  },
+  {
+    id: 'dodge_negative_perfect',
+    name: 'Choco Né Số Một',
+    description: 'Né được hết những vật phẩm tiêu cực trong 5 lượt chơi liên tiếp.',
+    rewardText: '+5 Gchoco',
+    chocoReward: 0,
+    goldenReward: 5,
+    progressTarget: 5,
+    category: 'challenge'
+  },
+  {
+    id: 'radio_night_chill',
+    name: 'Choco Chill Đêm',
+    description: 'Nghe Radio trong 30 phút liên tục trong khung giờ từ 11:00 tối đến 5:00 sáng hôm sau.',
+    rewardText: '+10 Choco',
+    chocoReward: 10,
+    goldenReward: 0,
+    progressTarget: 30,
+    category: 'challenge'
+  },
+  {
+    id: 'radio_one_track_love',
+    name: 'Giai Điệu Choco Yêu',
+    description: 'Nghe 1 giai điệu liên tục trong 1 tiếng đồng hồ.',
+    rewardText: '+10 Choco',
+    chocoReward: 10,
+    goldenReward: 0,
+    progressTarget: 60,
+    category: 'challenge'
+  },
+  {
+    id: 'radio_universe_explorer',
+    name: 'Vũ Trụ Âm Thanh Của Choco',
+    description: 'Khám phá và nghe qua tất cả các bài hát / bản nhạc có sẵn trong danh sách phát của Radio ít nhất một lần.',
+    rewardText: '+1 Gchoco',
+    chocoReward: 0,
+    goldenReward: 1,
+    progressTarget: 10,
+    category: 'challenge'
+  },
+  {
+    id: 'radio_track_switches',
+    name: 'Choco Tìm Kiếm',
+    description: 'Đổi danh giai điệu qua lại 15 lần (Tìm kiếm giai điệu phù hợp nhất cho tâm trạng).',
+    rewardText: '+15 Choco',
+    chocoReward: 15,
+    goldenReward: 0,
+    progressTarget: 15,
+    category: 'challenge'
+  },
+  {
+    id: 'gacha_first_pull_5star',
+    name: 'Choco Siêu May Mắn',
+    description: 'Trúng Sticker 5 Sao ngay trong lượt Gacha Đơn (Gacha 1 Lần) đầu tiên.',
+    rewardText: '+5 Gchoco',
+    chocoReward: 0,
+    goldenReward: 5,
+    progressTarget: 1,
+    category: 'challenge'
+  },
+  {
+    id: 'choco_kientri',
+    name: 'Choco Kiên Trì',
+    description: 'Chạm mốc bảo hiểm 90 lượt (Pity) để nhận Sticker 5 Sao đầu tiên.',
+    rewardText: '+10 Vé Gacha',
+    chocoReward: 0,
+    goldenReward: 0,
+    progressTarget: 90,
+    category: 'challenge'
+  },
+  {
+    id: 'choco_suutam',
+    name: 'Choco Sưu Tầm',
+    description: 'Sở hữu toàn bộ sticker có trong 1 banner.',
+    rewardText: '+10 Vé Gacha',
+    chocoReward: 0,
+    goldenReward: 0,
+    progressTarget: 100,
+    category: 'challenge'
+  },
+  {
+    id: 'gacha_double_4star',
+    name: 'Choco Nhân Phẩm',
+    description: 'Thực hiện cú quay x10 (Gacha 10 Lần) và nhận được đồng thời từ 2 Sticker 4 Sao trở lên trong một lượt.',
+    rewardText: '+20 Choco',
+    chocoReward: 20,
+    goldenReward: 0,
+    progressTarget: 1,
+    category: 'challenge'
   }
 ];
 
