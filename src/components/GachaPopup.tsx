@@ -15,7 +15,7 @@ export default function GachaPopup() {
      choco, goldenChoco, ownedGachaTickets = 0, 
      spendChoco, spendGoldenChoco,
      updateUserDoc, gachaPity5Star = 0, gachaPity4Star = 0, 
-     addOwnedSticker, addChucuGameFragments,
+     addOwnedSticker, addGachaFragments, gachaFragments = 0,
      theme, email, firebaseUser
   } = useStore();
   const isDark = theme === "dark";
@@ -33,18 +33,67 @@ export default function GachaPopup() {
   const [historyList, setHistoryList] = useState<{ name: string; rarity: number; time: string; bannerName: string }[]>([]);
 
   useEffect(() => {
+    if (!isGachaOpen) return;
     const userId = firebaseUser?.uid || 'guest';
-    const storedHistory = localStorage.getItem(`gacha_pull_history_${userId}`);
+    const storedHistoryKey = `gacha_pull_history_${userId}`;
+    const storedHistory = localStorage.getItem(storedHistoryKey);
+    
+    let currentHistory: any[] = [];
     if (storedHistory) {
       try {
-        setHistoryList(JSON.parse(storedHistory));
+        currentHistory = JSON.parse(storedHistory);
       } catch (e) {
         console.error("Error parsing gacha history:", e);
       }
-    } else {
-      setHistoryList([]);
     }
-  }, [firebaseUser?.uid, isGachaOpen]);
+    
+    // Auto-reconstruct history matching the user's gacha pity
+    if (currentHistory.length === 0 && gachaPity5Star > 0) {
+      const generatedList: any[] = [];
+      const pityCount = gachaPity5Star;
+      
+      const pool4 = activeBanner?.pool4Star || [];
+      const default4StarNames = ['Sticker Bánh Gấu', 'Sticker Ly Choco Kem', 'Sticker Kem Dâu Cute', 'Sticker Chucu Trái Tim'];
+      
+      for (let i = 1; i <= pityCount; i++) {
+        const is4 = (i % 10 === 0);
+        const rarity = is4 ? 4 : 3;
+        
+        let name = '10 Mảnh Choco Gacha';
+        if (is4) {
+          if (pool4.length > 0) {
+            name = pool4[Math.floor(Math.random() * pool4.length)].name;
+          } else {
+            name = default4StarNames[i % default4StarNames.length];
+          }
+        }
+        
+        // Stagger previous pull times by 45s intervals
+        const timeOffset = (pityCount - i) * 45 * 1000 + 5000;
+        const simulatedDate = new Date(Date.now() - timeOffset);
+        const VietnamTime = simulatedDate.toLocaleString('vi-VN', { 
+          hour: '2-digit', 
+          minute: '2-digit', 
+          second: '2-digit',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        });
+        
+        generatedList.unshift({
+          name,
+          rarity,
+          time: VietnamTime,
+          bannerName: activeBanner?.name || 'Cốc Choco Nóng'
+        });
+      }
+      
+      localStorage.setItem(storedHistoryKey, JSON.stringify(generatedList));
+      setHistoryList(generatedList);
+    } else {
+      setHistoryList(currentHistory);
+    }
+  }, [firebaseUser?.uid, isGachaOpen, gachaPity5Star, activeBanner, banners]);
 
   useEffect(() => {
     if (!isGachaOpen) return;
@@ -201,7 +250,7 @@ export default function GachaPopup() {
         }
       }
     } else {
-      pulledItem = { id: 's3-1', name: '10 Mảnh Choco', rarity: 3, type: 'fragment' };
+      pulledItem = { id: 's3-1', name: '10 Mảnh Choco Gacha', rarity: 3, type: 'fragment' };
     }
     
     return { item: pulledItem, newPity5: nextPity5, newPity4: nextPity4 };
@@ -263,9 +312,9 @@ export default function GachaPopup() {
          // rough parse of number from name: "10 Mảnh..."
          const amtMatch = res.item.name.match(/\d+/);
          if (amtMatch) {
-            addChucuGameFragments(parseInt(amtMatch[0]));
+            addGachaFragments(parseInt(amtMatch[0]));
          } else {
-            addChucuGameFragments(5); // default
+            addGachaFragments(5); // default
          }
        }
     }
@@ -393,7 +442,7 @@ export default function GachaPopup() {
           </div>
 
           {/* Banner Info Content */}
-          <div className="relative z-10 pt-2 px-8 pb-8 flex-grow flex flex-col justify-between text-shadow-sm select-text text-left">
+          <div className="relative z-10 pt-4 px-8 pb-4 flex-grow flex flex-col justify-between text-shadow-sm select-text text-left">
             <h1 className={cn(
               "text-3xl sm:text-4xl md:text-5xl font-black font-sans uppercase tracking-tight transition-all duration-300 mt-0",
               isDark 
@@ -403,7 +452,7 @@ export default function GachaPopup() {
               {activeBanner.name}
             </h1>
             
-            <div className="mb-2 sm:mb-4 flex gap-3">
+            <div className="flex gap-3 mt-auto">
                <button 
                  onClick={() => setHistoryOpen(true)}
                  className={cn(
@@ -806,7 +855,7 @@ export default function GachaPopup() {
                   {activeBanner.name}
                 </p>
                 <p className={cn("text-[11px] leading-relaxed", isDark ? "text-stone-300" : "text-[#5D4037]")}>
-                  {activeBanner.description || "Bể Gacha đặc biệt chứa các sticker độc quyền."}
+                  {activeBanner.description || "Banner Gacha đặc biệt chứa các sticker độc quyền."}
                 </p>
               </div>
 
@@ -831,7 +880,7 @@ export default function GachaPopup() {
 
               {/* Pool items list */}
               <div className="space-y-2">
-                <p className="font-extrabold text-stone-900 dark:text-stone-100 uppercase tracking-tight text-[11px]">Danh sách các Sticker có trong Bể:</p>
+                <p className="font-extrabold text-stone-900 dark:text-stone-100 uppercase tracking-tight text-[11px]">Danh sách các Sticker có trong Banner:</p>
 
                 {/* 5 Star list */}
                 {activeBanner.pool5Star && activeBanner.pool5Star.length > 0 && (
@@ -865,7 +914,7 @@ export default function GachaPopup() {
                 <div className="space-y-1 pt-1">
                   <p className="font-black text-stone-500 text-[10px] uppercase tracking-wider">📦 PHẦN THƯỞNG 3 SAO:</p>
                   <p className={cn("text-[10px]", isDark ? "text-stone-400" : "text-stone-600")}>
-                    Món quà 10 Mảnh Choco dùng để tăng tiến trình, dùng nâng cấp Chucu hoặc đổi các bộ phụ kiện giới hạn khác.
+                    Món quà 10 Mảnh Choco Gacha dùng để tích lũy quy đổi Vé Gacha tại Cửa hàng.
                   </p>
                 </div>
               </div>
