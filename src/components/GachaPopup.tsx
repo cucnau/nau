@@ -396,6 +396,11 @@ export default function GachaPopup() {
     
     for (let i = 0; i < times; i++) {
        const res = performSinglePull(currentPity5, currentPity4);
+       
+       if (currentPity5 + 1 >= 90 && res.item.rarity === 5) {
+          useStore.getState().unlockAchievement('choco_kientri');
+       }
+       
        const pullResultItem = { ...res.item };
        currentPity5 = res.newPity5;
        currentPity4 = res.newPity4;
@@ -428,11 +433,51 @@ export default function GachaPopup() {
     }
     
     // Save state
-    await updateUserDoc({
+    const singlePullCount = useStore.getState().gachaSinglePullCount || 0;
+    const updates: any = {
        ownedGachaTickets: currentTickets - times,
        gachaPity5Star: currentPity5,
        gachaPity4Star: currentPity4
-    });
+    };
+    
+    if (times === 1) {
+       updates.gachaSinglePullCount = singlePullCount + 1;
+       if (singlePullCount === 0 && results[0].rarity === 5) {
+           useStore.getState().unlockAchievement('gacha_first_pull_5star');
+       }
+    } else if (times === 10) {
+       const highRarityCount = results.filter(i => i.rarity >= 4).length;
+       if (highRarityCount >= 2) {
+           useStore.getState().unlockAchievement('gacha_double_4star');
+       }
+    }
+
+    // Banner completion check
+    const allStickersInBanner = [
+       ...(activeBanner.pool5Star || []), 
+       ...(activeBanner.pool4Star || []), 
+       ...(activeBanner.pool3Star || [])
+    ];
+    
+    // Some banners might have a featured5Star property if they are limited
+    if ((activeBanner as any).featured5Star) {
+       allStickersInBanner.push((activeBanner as any).featured5Star);
+    }
+    
+    const bannerStickers = allStickersInBanner.filter(i => i.type === 'sticker' && i.image).map(i => i.image as string);
+    const bannerStickersSet = new Set(bannerStickers);
+    if (bannerStickersSet.size > 0) {
+       let ownedInBanner = 0;
+       currentOwnedSet.forEach(url => {
+          if (bannerStickersSet.has(url)) ownedInBanner++;
+       });
+       const pct = (ownedInBanner / bannerStickersSet.size) * 100;
+       const maxPct = Math.max(useStore.getState().maxBannerCompletionPct || 0, pct);
+       updates.maxBannerCompletionPct = maxPct;
+    }
+
+    await updateUserDoc(updates);
+    useStore.getState()._triggerCountAchievementsCheck();
     
     // update local history
     const newHistoryItems = results.map(item => ({
