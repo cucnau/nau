@@ -330,8 +330,8 @@ export default function GachaPopup() {
           
           {/* Background Grid of Stickers */}
           <div className={cn(
-            "absolute inset-0 z-0 overflow-hidden p-6 flex flex-wrap gap-4 items-center justify-center content-center select-none pointer-events-none transition-all duration-300",
-            isDark ? "opacity-35" : "opacity-80"
+            "absolute inset-0 z-0 overflow-hidden p-6 flex flex-wrap gap-4 items-center justify-end content-center select-none pointer-events-none transition-all duration-300",
+            isDark ? "opacity-60" : "opacity-100"
           )}>
             {[
               ...(activeBanner.pool5Star || []).filter((item: any) => item.type === 'sticker' || item.image),
@@ -343,11 +343,11 @@ export default function GachaPopup() {
                   "w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center relative p-1.5 border-2 transition-all shadow-md shrink-0",
                   isDark
                     ? (item.rarity === 5 
-                        ? "border-amber-400 bg-gradient-to-br from-amber-500/10 to-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.3)]" 
-                        : "border-purple-400 bg-gradient-to-br from-purple-500/10 to-purple-500/20 shadow-[0_0_12px_rgba(168,85,247,0.3)]")
+                        ? "border-amber-400 bg-[#2C211E] shadow-[0_0_12px_rgba(245,158,11,0.3)]" 
+                        : "border-purple-400 bg-[#251A24] shadow-[0_0_12px_rgba(168,85,247,0.3)]")
                     : (item.rarity === 5 
-                        ? "border-amber-400/80 bg-gradient-to-br from-amber-50/60 to-amber-100/60 shadow-[0_4px_10px_rgba(245,158,11,0.08)]" 
-                        : "border-purple-400/80 bg-gradient-to-br from-purple-50/60 to-purple-100/60 shadow-[0_4px_10px_rgba(168,85,247,0.08)]")
+                        ? "border-amber-400 bg-[#FFFBEB] shadow-[0_4px_10px_rgba(245,158,11,0.15)]" 
+                        : "border-purple-300 bg-[#FAF5FF] shadow-[0_4px_10px_rgba(168,85,247,0.12)]")
                 )}
               >
                 {item.image ? (
@@ -363,14 +363,14 @@ export default function GachaPopup() {
           <div className={cn(
             "absolute inset-0 z-[1] pointer-events-none transition-all duration-300",
             isDark 
-              ? "bg-gradient-to-r from-[#1A1412]/95 via-[#1A1412]/85 to-[#1A1412]/20" 
-              : "bg-gradient-to-r from-[#FFFDF9]/95 via-[#FFFDF9]/85 to-[#FFFDF9]/20"
+              ? "bg-gradient-to-r from-[#1A1412]/80 via-[#1A1412]/40 to-transparent" 
+              : "bg-gradient-to-r from-[#FFFDF9]/85 via-[#FFFDF9]/40 to-transparent"
           )} />
           <div className={cn(
             "absolute inset-0 z-[1] pointer-events-none transition-all duration-300",
             isDark 
-              ? "bg-gradient-to-t from-[#1A1412]/90 via-transparent to-transparent" 
-              : "bg-gradient-to-t from-[#FFFDF9]/90 via-transparent to-transparent"
+              ? "bg-gradient-to-t from-[#1A1412]/50 via-transparent to-transparent" 
+              : "bg-gradient-to-t from-[#FFFDF9]/50 via-transparent to-transparent"
           )} />
 
           {/* Banner Info Content */}
@@ -420,8 +420,8 @@ export default function GachaPopup() {
                     <div 
                       className="bg-gradient-to-r from-amber-300 to-amber-500 h-full rounded-full transition-all" 
                       style={{ width: `${Math.min((gachaPity5Star / PITY_5_STAR) * 100, 100)}%` }} 
-                    />
-                 </div>
+                     />
+                  </div>
               </div>
 
               <div className="flex gap-3 mt-4">
@@ -431,12 +431,12 @@ export default function GachaPopup() {
                   className={cn(
                     "flex-1 rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-95 transition-all disabled:opacity-50 cursor-pointer border",
                     isDark 
-                      ? "bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] border-transparent" 
-                      : "bg-[#3E2723] hover:bg-[#5D4037] text-white border-transparent"
+                      ? "bg-[#251C1A] hover:bg-[#322320] text-[#E6D4BF] border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]" 
+                      : "bg-[#FFF9E6] hover:bg-[#FCE5B2] text-[#3E2723] border-[#E8C07D] shadow-[0_4px_12px_rgba(232,192,125,0.15)]"
                   )}
                 >
-                  <span className="text-sm font-black uppercase tracking-wider">Gacha 1 Lần</span>
-                  <div className={cn("flex items-center gap-1.5 mt-1 text-xs font-bold", isDark ? "text-[#5D4037]" : "text-white/80")}>
+                  <span className={cn("text-sm font-black uppercase tracking-wider", isDark ? "text-[#E6D4BF]" : "text-[#3E2723]")}>Gacha 1 Lần</span>
+                  <div className={cn("flex items-center gap-1.5 mt-1 text-xs font-bold", isDark ? "text-stone-400" : "text-[#5D4037]")}>
                      <Sparkles className="w-3.5 h-3.5 text-pink-500 animate-pulse" />
                      <span>x1</span>
                   </div>
@@ -445,16 +445,16 @@ export default function GachaPopup() {
                   onClick={pullTen}
                   disabled={isPulling}
                   className={cn(
-                    "flex-1 bg-gradient-to-b from-[#FFF9C4] to-[#FFD54F] hover:from-[#FFF176] hover:to-[#FFC107] text-[#3E2723] rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-95 transition-all disabled:opacity-50 border cursor-pointer",
+                    "flex-1 rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-95 transition-all disabled:opacity-50 border cursor-pointer",
                     isDark 
-                      ? "border-[#FFE082] shadow-[0_0_15px_rgba(255,193,7,0.3)]" 
-                      : "border-amber-400 shadow-[0_4px_12px_rgba(245,158,11,0.2)]"
+                      ? "bg-gradient-to-b from-[#3E2E1D] to-[#25180F] hover:from-[#4E3C29] hover:to-[#322217] text-[#FFD54F] border-[#FFD54F]/20 shadow-[0_0_15px_rgba(255,193,7,0.15)]" 
+                      : "bg-gradient-to-b from-[#FFF9C4] to-[#FFD54F] hover:from-[#FFF176] hover:to-[#FFC107] text-[#3E2723] border-amber-400 shadow-[0_4px_12px_rgba(245,158,11,0.2)]"
                   )}
                 >
-                  <span className="text-sm font-black uppercase tracking-wider">Gacha 10 Lần</span>
-                  <div className="flex items-center gap-1.5 mt-1 text-xs text-[#5D4037] font-bold">
-                     <Sparkles className="w-3.5 h-3.5 text-pink-600 animate-pulse" />
-                     <span>x10</span>
+                  <span className={cn("text-sm font-black uppercase tracking-wider", isDark ? "text-[#FFD54F]" : "text-[#3E2723]")}>Gacha 10 Lần</span>
+                  <div className="flex items-center gap-1.5 mt-1 text-xs font-bold">
+                     <Sparkles className={cn("w-3.5 h-3.5 animate-pulse", isDark ? "text-amber-400" : "text-pink-600")} />
+                     <span className={isDark ? "text-amber-300" : "text-[#5D4037]"}>x10</span>
                   </div>
                 </button>
               </div>
