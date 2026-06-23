@@ -138,10 +138,12 @@ interface UserState {
   chucuGameBonusPoints: number;
   chucuGamePlaysToday: number;
   chucuGameLastPlayDate: string | null;
+  gachaFragments: number;
 
   addChucuGameFragments: (amt: number) => void;
   addChucuGameGFragments: (amt: number) => void;
   addChucuGameBonusPoints: (amt: number) => void;
+  addGachaFragments: (amt: number) => void;
   incrementChucuGamePlayCount: () => void;
   finishChucuGame: (fragments: number, gFragments: number, bonusPoints: number, isNoRewardPlay: boolean, satietyDeduct: number) => void;
 
@@ -308,6 +310,7 @@ export const useStore = create<UserState>()(
       isGachaAdminOpen: false,
       chucuGameFragments: 0,
       chucuGameGFragments: 0,
+      gachaFragments: 0,
       chucuGameBonusPoints: 0,
       chucuGamePlaysToday: 0,
       chucuGameLastPlayDate: null,
@@ -640,6 +643,7 @@ export const useStore = create<UserState>()(
 
             chucuGameFragments: data.chucuGameFragments !== undefined ? data.chucuGameFragments : state.chucuGameFragments,
             chucuGameGFragments: data.chucuGameGFragments !== undefined ? data.chucuGameGFragments : state.chucuGameGFragments,
+            gachaFragments: data.gachaFragments !== undefined ? data.gachaFragments : state.gachaFragments,
             chucuGameBonusPoints: data.chucuGameBonusPoints !== undefined ? data.chucuGameBonusPoints : state.chucuGameBonusPoints,
             chucuGamePlaysToday: data.chucuGamePlaysToday !== undefined ? data.chucuGamePlaysToday : state.chucuGamePlaysToday,
             chucuGameLastPlayDate: data.chucuGameLastPlayDate !== undefined ? data.chucuGameLastPlayDate : state.chucuGameLastPlayDate,
@@ -1570,6 +1574,13 @@ export const useStore = create<UserState>()(
          if (current < 0) current = 0; // Auto-repair negative points
          set({ chucuGameBonusPoints: current + amt });
          get().updateUserDoc({ chucuGameBonusPoints: current + amt });
+      },
+
+      addGachaFragments: (amt: number) => {
+         let current = get().gachaFragments || 0;
+         if (current < 0) current = 0;
+         set({ gachaFragments: current + amt });
+         get().updateUserDoc({ gachaFragments: current + amt });
       },
 
       incrementChucuGamePlayCount: () => {
