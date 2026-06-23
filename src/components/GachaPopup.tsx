@@ -16,6 +16,7 @@ export default function GachaPopup() {
      spendChoco, spendGoldenChoco,
      updateUserDoc, gachaPity5Star = 0, gachaPity4Star = 0, 
      addOwnedSticker, addGachaFragments, gachaFragments = 0,
+     ownedStickers = [],
      theme, email, firebaseUser
   } = useStore();
   const isDark = theme === "dark";
@@ -47,29 +48,99 @@ export default function GachaPopup() {
       }
     }
     
-    // Auto-reconstruct history matching the user's gacha pity
-    if (currentHistory.length === 0 && gachaPity5Star > 0) {
+    // Check if the history is empty or contains placeholders that don't match actual items
+    const hasOnlyPlaceholders = currentHistory.length > 0 && currentHistory.every(item => 
+      ['10 Mảnh Choco', '10 Mảnh Choco Gacha', 'Sticker Bánh Gấu', 'Sticker Ly Choco Kem', 'Sticker Kem Dâu Cute', 'Sticker Chucu Trái Tim'].includes(item.name)
+    );
+
+    // Only attempt reconstruction when banners have loaded
+    if ((currentHistory.length === 0 || hasOnlyPlaceholders) && banners.length > 0) {
+      const allGachaStickers: { id: string; name: string; rarity: number; image: string; bannerName: string }[] = [];
+      
+      banners.forEach(banner => {
+        if (banner.pool5Star) {
+          banner.pool5Star.forEach((item: any) => {
+            if (item.image) {
+              allGachaStickers.push({
+                id: item.id,
+                name: item.name,
+                rarity: 5,
+                image: item.image,
+                bannerName: banner.name
+              });
+            }
+          });
+        }
+        if (banner.pool4Star) {
+          banner.pool4Star.forEach((item: any) => {
+            if (item.image) {
+              allGachaStickers.push({
+                id: item.id,
+                name: item.name,
+                rarity: 4,
+                image: item.image,
+                bannerName: banner.name
+              });
+            }
+          });
+        }
+      });
+
+      // See which of ownedStickers match our gacha stickers
+      const userGachaStickers = allGachaStickers.filter(gs => ownedStickers.includes(gs.image));
+
+      const pityCount = gachaPity5Star > 0 ? gachaPity5Star : 22;
       const generatedList: any[] = [];
-      const pityCount = gachaPity5Star;
-      
-      const pool4 = activeBanner?.pool4Star || [];
-      const default4StarNames = ['Sticker Bánh Gấu', 'Sticker Ly Choco Kem', 'Sticker Kem Dâu Cute', 'Sticker Chucu Trái Tim'];
-      
+
+      const user4Stars = userGachaStickers.filter(s => s.rarity === 4);
+      const user5Stars = userGachaStickers.filter(s => s.rarity === 5);
+
       for (let i = 1; i <= pityCount; i++) {
-        const is4 = (i % 10 === 0);
-        const rarity = is4 ? 4 : 3;
-        
-        let name = '10 Mảnh Choco Gacha';
-        if (is4) {
-          if (pool4.length > 0) {
-            name = pool4[Math.floor(Math.random() * pool4.length)].name;
-          } else {
-            name = default4StarNames[i % default4StarNames.length];
+        let chosenItem: { name: string; rarity: number; bannerName: string } | null = null;
+
+        // Slot user's 4-star stickers
+        if (i % 10 === 0 && user4Stars.length > 0) {
+          const stickerIndex = Math.floor((i / 10 - 1)) % user4Stars.length;
+          const matchedSticker = user4Stars[stickerIndex];
+          chosenItem = {
+            name: matchedSticker.name,
+            rarity: 4,
+            bannerName: matchedSticker.bannerName
+          };
+        } 
+        // Slot user's 5-star sticker if available
+        else if (i === 15 && user5Stars.length > 0) {
+          const matchedSticker = user5Stars[0];
+          chosenItem = {
+            name: matchedSticker.name,
+            rarity: 5,
+            bannerName: matchedSticker.bannerName
+          };
+        }
+
+        if (!chosenItem) {
+          const alreadySlottedNames = generatedList.map(g => g.name);
+          const unslottedSticker = userGachaStickers.find(s => !alreadySlottedNames.includes(s.name));
+          if (unslottedSticker && Math.random() < 0.3) {
+            chosenItem = {
+              name: unslottedSticker.name,
+              rarity: unslottedSticker.rarity,
+              bannerName: unslottedSticker.bannerName
+            };
           }
         }
-        
-        // Stagger previous pull times by 45s intervals
-        const timeOffset = (pityCount - i) * 45 * 1000 + 5000;
+
+        // Fallback to 10 Mảnh Choco Gacha
+        if (!chosenItem) {
+          chosenItem = {
+            name: '10 Mảnh Choco Gacha',
+            rarity: 3,
+            bannerName: activeBanner?.name || 'Cốc Choco Nóng'
+          };
+        }
+
+        // Stagger previous pull times
+        const timeOffset = (pityCount - i) * 60 * 1000 + 10000;
         const simulatedDate = new Date(Date.now() - timeOffset);
         const VietnamTime = simulatedDate.toLocaleString('vi-VN', { 
           hour: '2-digit', 
@@ -79,21 +150,43 @@ export default function GachaPopup() {
           month: '2-digit',
           year: 'numeric'
         });
-        
+
         generatedList.unshift({
-          name,
-          rarity,
+          name: chosenItem.name,
+          rarity: chosenItem.rarity,
           time: VietnamTime,
-          bannerName: activeBanner?.name || 'Cốc Choco Nóng'
+          bannerName: chosenItem.bannerName
         });
       }
-      
+
+      // Ensure all of user's active gacha stickers are prepended if we missed any
+      userGachaStickers.forEach(sticker => {
+        const alreadyIn = generatedList.some(g => g.name === sticker.name);
+        if (!alreadyIn) {
+          const simulatedDate = new Date(Date.now() - (pityCount + 5) * 60 * 1000);
+          const VietnamTime = simulatedDate.toLocaleString('vi-VN', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          });
+          generatedList.unshift({
+            name: sticker.name,
+            rarity: sticker.rarity,
+            time: VietnamTime,
+            bannerName: sticker.bannerName
+          });
+        }
+      });
+
       localStorage.setItem(storedHistoryKey, JSON.stringify(generatedList));
       setHistoryList(generatedList);
-    } else {
+    } else if (currentHistory.length > 0 && !hasOnlyPlaceholders) {
       setHistoryList(currentHistory);
     }
-  }, [firebaseUser?.uid, isGachaOpen, gachaPity5Star, activeBanner, banners]);
+  }, [firebaseUser?.uid, isGachaOpen, gachaPity5Star, activeBanner, banners, ownedStickers]);
 
   useEffect(() => {
     if (!isGachaOpen) return;
