@@ -21,6 +21,7 @@ import { UserAvatar } from './UserAvatar';
 import { ChocoMascot } from './ChocoMascot';
 import { ChucuGamePopup } from './ChucuGamePopup';
 import { ChocoRadioPopup } from './ChocoRadioPopup';
+import GachaPopup from './GachaPopup';
 
 export function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -571,9 +572,9 @@ export function AppLayout() {
     equippedAccessory, accessoryPosition,
     choco, goldenChoco, email, level, lastClaimedRewardLevel, missions,
     isStoreOpen, isMissionsOpen, isAchievementsOpen, isInventoryOpen,
-    isChucuGameOpen, isChocoRadioOpen,
+    isChucuGameOpen, isChocoRadioOpen, isGachaOpen, isGachaAdminOpen,
     setStoreOpen, setMissionsOpen, setAchievementsOpen, setInventoryOpen,
-    setChucuGameOpen, setChocoRadioOpen,
+    setChucuGameOpen, setChocoRadioOpen, setGachaOpen, setGachaAdminOpen,
     isQuotaExceeded, firebaseUser, activeTitle, getTitleColor,
     theme, setTheme, logout
   } = useStore();
@@ -920,6 +921,9 @@ export function AppLayout() {
       </AnimatePresence>
       <AnimatePresence>
         {isChocoRadioOpen && <ChocoRadioPopup />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isGachaOpen && <GachaPopup />}
       </AnimatePresence>
 
       {/* Modal Cửa hàng */}
