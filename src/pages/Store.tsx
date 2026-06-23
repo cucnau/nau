@@ -198,6 +198,7 @@ export function Store() {
     equipChucuAccessory,
     chucuLevel,
     chucuGameFragments,
+    gachaFragments = 0,
     ownedGachaTickets,
   } = useStore();
   const [storeStickers, setStoreStickers] = useState<any[]>([]);
@@ -316,18 +317,18 @@ export function Store() {
     }
   };
 
-  const handleExchangeFragmentsToGachaTicket = () => {
+  const handleExchangeGachaFragmentsToGachaTicket = () => {
     if (!isLoggedIn) {
       alert("Vui lòng đăng nhập!");
       return;
     }
-    const currentFragments = chucuGameFragments || 0;
-    if (currentFragments < 100) {
-      alert(`Bạn không đủ Mảnh Choco (Bạn có: ${currentFragments}, cần ít nhất 100 mảnh)!`);
+    const currentGachaFragments = gachaFragments || 0;
+    if (currentGachaFragments < 100) {
+      alert(`Bạn không đủ Mảnh Choco Gacha (Bạn có: ${currentGachaFragments}, cần ít nhất 100 mảnh)!`);
       return;
     }
-    const maxTickets = Math.floor(currentFragments / 100);
-    const input = prompt(`Nhập số Vé Gacha muốn đổi (100 Mảnh Choco = 1 Vé Gacha). Tối đa bạn đổi được ${maxTickets} vé:`, "1");
+    const maxTickets = Math.floor(currentGachaFragments / 100);
+    const input = prompt(`Nhập số Vé Gacha muốn đổi (100 Mảnh Choco Gacha = 1 Vé Gacha). Tối đa bạn đổi được ${maxTickets} vé:`, "1");
     if (input === null) return;
     const qty = parseInt(input, 10);
     if (isNaN(qty) || qty <= 0) {
@@ -335,14 +336,14 @@ export function Store() {
       return;
     }
     const cost = qty * 100;
-    if (currentFragments >= cost) {
+    if (currentGachaFragments >= cost) {
       updateUserDoc({
-        chucuGameFragments: currentFragments - cost,
+        gachaFragments: currentGachaFragments - cost,
         ownedGachaTickets: (ownedGachaTickets || 0) + qty
       });
-      alert(`Đổi thành công ${qty} Vé Gacha từ ${cost} Mảnh Choco!`);
+      alert(`Đổi thành công ${qty} Vé Gacha từ ${cost} Mảnh Choco Gacha!`);
     } else {
-      alert(`Bạn không đủ Mảnh Choco (Cần ${cost} Mảnh)!`);
+      alert(`Bạn không đủ Mảnh Choco Gacha (Cần ${cost} Mảnh)!`);
     }
   };
 
@@ -719,7 +720,7 @@ export function Store() {
             </button>
           </div>
 
-          {/* Vé Gacha đổi từ Mảnh Choco */}
+          {/* Vé Gacha đổi từ Mảnh Choco Gacha */}
           <div className="bg-[#FFFDF9] dark:bg-[#1A1412] border-[3px] border-[#3E2723] rounded-3xl p-5 flex flex-col items-center text-center shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden group hover:-translate-y-1 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all">
             <div className="absolute top-0 right-0 bg-amber-700 text-[#FDF6EC] text-[8px] sm:text-[10px] uppercase font-bold tracking-widest px-2 sm:px-3 py-1 rounded-bl-xl shadow-sm">
               Đổi Mảnh
@@ -729,10 +730,10 @@ export function Store() {
               Đổi Vé Gacha
             </h3>
             <p className="text-stone-500 text-[10px] sm:text-xs mb-3 sm:mb-6 italic">
-              100 Mảnh Choco = 1 Vé Gacha. Bạn có: {chucuGameFragments || 0} mảnh.
+              100 Mảnh Choco Gacha = 1 Vé Gacha. Bạn có: {gachaFragments || 0} mảnh.
             </p>
             <button
-              onClick={handleExchangeFragmentsToGachaTicket}
+              onClick={handleExchangeGachaFragmentsToGachaTicket}
               className="bg-amber-600 text-[#FDF6EC] border border-amber-700 p-2 sm:px-4 sm:py-2.5 rounded-xl font-bold hover:bg-amber-700 transition-colors w-full mt-auto uppercase text-[10px] sm:text-xs tracking-widest cursor-pointer"
             >
               Đổi vé
