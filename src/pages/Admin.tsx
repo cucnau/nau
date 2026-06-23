@@ -384,6 +384,70 @@ export function Admin() {
   const [poolItemImage, setPoolItemImage] = useState("");
   const [poolItemDesc, setPoolItemDesc] = useState("");
 
+  const [isMigratingPool, setIsMigratingPool] = useState(false);
+
+  const handleMigrateLegacyPool = async () => {
+    setIsMigratingPool(true);
+    try {
+      let migratedCount = 0;
+      for (const banner of rawGachaBanners) {
+        const p5 = banner.pool5Star || [];
+        const p4 = banner.pool4Star || [];
+        
+        if (p5.length === 0 && p4.length === 0) continue;
+
+        // Copy pool5Star
+        for (const item of p5) {
+          const alreadyExists = dbGachaItems.some(gi => gi.id === item.id);
+          if (!alreadyExists) {
+            await addDoc(collection(db, "gacha_items"), {
+              id: item.id || "item-" + Date.now() + Math.random().toString(36).substr(2, 5),
+              bannerId: banner.id,
+              name: item.name || "Sticker Không Tên",
+              rarity: 5,
+              type: item.type || "sticker",
+              image: item.image || "",
+              description: item.description || "",
+              createdAt: item.createdAt || new Date().toISOString()
+            });
+            migratedCount++;
+          }
+        }
+
+        // Copy pool4Star
+        for (const item of p4) {
+          const alreadyExists = dbGachaItems.some(gi => gi.id === item.id);
+          if (!alreadyExists) {
+            await addDoc(collection(db, "gacha_items"), {
+              id: item.id || "item-" + Date.now() + Math.random().toString(36).substr(2, 5),
+              bannerId: banner.id,
+              name: item.name || "Sticker Không Tên",
+              rarity: 4,
+              type: item.type || "sticker",
+              image: item.image || "",
+              description: item.description || "",
+              createdAt: item.createdAt || new Date().toISOString()
+            });
+            migratedCount++;
+          }
+        }
+
+        // Now clear the fields in the banner document
+        await updateDoc(doc(db, "gacha_banners", banner.id), {
+          pool5Star: [],
+          pool4Star: []
+        });
+      }
+
+      alert(`Tối ưu dữ liệu hoàn tất! Đã di cư thành công ${migratedCount} Sticker sang hệ thống lưu trữ phân rã mới. Dung lượng bản ghi chính đã giảm từ 1MB+ về dưới 1KB!`);
+    } catch (err: any) {
+      console.error(err);
+      alert("Lỗi tối ưu hóa dữ liệu: " + err.message);
+    } finally {
+      setIsMigratingPool(false);
+    }
+  };
+
   const [gachaSubTab, setGachaSubTab] = useState<"standard" | "limited">("standard");
   const [editingStdBannerName, setEditingStdBannerName] = useState("");
   const [isEditingStdBannerName, setIsEditingStdBannerName] = useState(false);
@@ -2231,30 +2295,43 @@ export function Admin() {
     setConfirmDialog({
       text: "Bạn có chắc muốn xóa vật phẩm này ra khỏi bể tỉ lệ Gacha?",
       action: async () => {
-        const currentBanner = gachaBanners.find(b => b.id === bannerId);
-        if (!currentBanner) return;
+        const rawBanner = rawGachaBanners.find(b => b.id === bannerId);
+        if (!rawBanner) return;
 
         try {
-          // 1. Delete from legacy arrays if present
+          // 1. Delete from legacy arrays in raw doc if present
+          let hasLegacy = false;
           if (itemRarity === 5) {
-            const updated = (currentBanner.pool5Star || []).filter((i: any) => i.id !== itemId);
-            await updateDoc(doc(db, "gacha_banners", bannerId), { pool5Star: updated });
+            const legacyPool = rawBanner.pool5Star || [];
+            if (legacyPool.some((i: any) => i.id === itemId)) {
+              const updated = legacyPool.filter((i: any) => i.id !== itemId);
+              await updateDoc(doc(db, "gacha_banners", bannerId), { pool5Star: updated });
+              hasLegacy = true;
+            }
           } else {
-            const updated = (currentBanner.pool4Star || []).filter((i: any) => i.id !== itemId);
-            await updateDoc(doc(db, "gacha_banners", bannerId), { pool4Star: updated });
+            const legacyPool = rawBanner.pool4Star || [];
+            if (legacyPool.some((i: any) => i.id === itemId)) {
+              const updated = legacyPool.filter((i: any) => i.id !== itemId);
+              await updateDoc(doc(db, "gacha_banners", bannerId), { pool4Star: updated });
+              hasLegacy = true;
+            }
           }
 
           // 2. Delete from flat gacha_items collection
           const q = query(collection(db, "gacha_items"), where("id", "==", itemId));
           const querySnap = await getDocs(q);
-          querySnap.forEach(async (docSnap) => {
+          for (const docSnap of querySnap.docs) {
             await deleteDoc(docSnap.ref);
-          });
+          }
 
           alert("Đã xoá vật phẩm!");
         } catch (err: any) {
           console.error(err);
-          alert("Lỗi khi xoá vật phẩm: " + err.message);
+          if (err.message?.includes("exceeds the maximum allowed size") || err.message?.includes("1048576 bytes")) {
+            alert("Lỗi: Dữ liệu cấu trúc cũ (Legacy) trong tài liệu này quá lớn (>1MB). Bạn hãy kéo xuống nhấn nút 'Tối ưu hóa và Di cư dữ liệu bể Gacha' để hệ thống tự động giải phóng dung lượng, sau đó bạn sẽ xóa vật phẩm thành công!");
+          } else {
+            alert("Lỗi khi xoá vật phẩm: " + err.message);
+          }
         }
       }
     });
@@ -3464,6 +3541,32 @@ export function Admin() {
 
       {activeTab === "gacha" && (
         <>
+          {rawGachaBanners.some(b => (b.pool5Star && b.pool5Star.length > 0) || (b.pool4Star && b.pool4Star.length > 0)) && (
+            <div className={`p-5 mb-6 rounded-3xl border-2 flex flex-col gap-3 ${isDark ? "bg-amber-950/20 border-amber-500/30 text-amber-300" : "bg-amber-50 border-amber-500/30 text-amber-900"}`}>
+              <div className="flex gap-2.5 items-start">
+                <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
+                <div>
+                  <h4 className="text-sm font-black uppercase tracking-wider">Phát Hiện Dữ Liệu Bể Gacha Cũ (Legacy Pool Array)</h4>
+                  <p className="text-xs mt-1 leading-relaxed">
+                    Hệ thống phát hiện bể tỷ lệ gacha của bạn đang chứa các sticker được lưu gộp trực tiếp trong một tài liệu duy nhất (dung lượng lớn dễ gây lỗi giới hạn 1MB của Firestore khi xoá hoặc cập nhật). Hãy nhấn nút tối ưu hóa bên dưới để di chuyển toàn bộ sticker thành các bản ghi phụ độc lập, an toàn 100%!
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleMigrateLegacyPool}
+                disabled={isMigratingPool}
+                className={`px-5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-[2px_2px_0_0_#1A1412] dark:shadow-none self-start active:translate-y-0.5 cursor-pointer transition-all ${
+                  isMigratingPool 
+                    ? "bg-stone-400 text-stone-700 cursor-not-allowed" 
+                    : "bg-amber-500 hover:bg-amber-600 text-stone-950"
+                }`}
+              >
+                {isMigratingPool ? "Đang xử lý di cư dữ liệu..." : "Bắt đầu Di cư & Tối ưu hóa hệ thống Gacha 🛠️"}
+              </button>
+            </div>
+          )}
+
           {/* Sub Tab selection */}
           <div className="flex gap-3 mb-6 border-b-2 border-stone-200/50 dark:border-stone-800/50 pb-4">
             <button
