@@ -14,8 +14,10 @@ export default function GachaPopup() {
      isGachaOpen, setGachaOpen, 
      choco, ownedGachaTickets = 0, 
      updateUserDoc, gachaPity5Star = 0, gachaPity4Star = 0, 
-     addOwnedSticker, addChucuGameFragments
+     addOwnedSticker, addChucuGameFragments,
+     theme
   } = useStore();
+  const isDark = theme === "dark";
   
   // Custom limited banner loaded from DB
   const [banners, setBanners] = useState<GachaBanner[]>([]);
@@ -244,28 +246,51 @@ export default function GachaPopup() {
       <div className="relative w-full max-w-5xl h-[85vh] sm:h-[80vh] flex flex-col items-center justify-center animate-in zoom-in-95 duration-300">
         <button 
           onClick={() => setGachaOpen(false)}
-          className="absolute top-4 right-4 z-20 w-10 h-10 bg-black/50 hover:bg-black/80 backdrop-blur border border-white/20 rounded-full flex items-center justify-center text-white transition-all"
+          className={cn(
+            "absolute top-4 right-4 z-20 w-10 h-10 backdrop-blur rounded-full flex items-center justify-center transition-all border",
+            isDark 
+              ? "bg-black/50 hover:bg-black/80 text-white border-white/20" 
+              : "bg-white/80 hover:bg-white text-[#3E2723] border-[#3E2723]/10 shadow-sm"
+          )}
         >
           <X className="w-6 h-6" />
         </button>
 
         {/* Header Currency */}
         <div className="absolute top-4 right-20 z-20 flex gap-3">
-          <div className="flex items-center gap-2 bg-black/40 backdrop-blur px-4 py-2 rounded-full border border-white/10 text-white shadow-lg">
+          <div className={cn(
+            "flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full border shadow-lg",
+            isDark 
+              ? "bg-black/40 border-white/10 text-white" 
+              : "bg-white/80 border-[#3E2723]/10 text-[#3E2723]"
+          )}>
             <span className="font-bold text-sm">{choco}</span>
-            <span className="text-xs text-[#E6D8C9]">Choco</span>
+            <span className={cn("text-xs", isDark ? "text-[#E6D8C9]" : "text-[#8D6E63]")}>Choco</span>
           </div>
-          <div className="flex items-center gap-2 bg-pink-500/20 backdrop-blur px-4 py-2 rounded-full border border-pink-500/30 text-white shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-            <Sparkles className="w-4 h-4 text-pink-300" />
+          <div className={cn(
+            "flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full border shadow-lg lg:shadow-[0_0_15px_rgba(236,72,153,0.15)]",
+            isDark 
+              ? "bg-pink-500/20 border-pink-500/30 text-white" 
+              : "bg-pink-500/10 border-pink-500/20 text-[#C2185B]"
+          )}>
+            <Sparkles className="w-4 h-4 text-pink-500" />
             <span className="font-bold text-sm tracking-wide">{ownedGachaTickets || 0}</span>
           </div>
         </div>
 
         {/* Banner Area */}
-        <div className="relative w-full h-[70vh] sm:h-[65vh] rounded-3xl overflow-hidden shadow-2xl border-[4px] border-[#FFFDF9]/20 flex flex-col md:flex-row bg-[#1A1412]">
+        <div className={cn(
+          "relative w-full h-[70vh] sm:h-[65vh] rounded-3xl overflow-hidden shadow-2xl border-[4px] flex flex-col md:flex-row transition-all duration-300",
+          isDark 
+            ? "border-[#FFFDF9]/20 bg-[#1A1412] text-white" 
+            : "border-[#3E2723]/15 bg-[#FFFDF9] text-[#3E2723]"
+        )}>
           
           {/* Background Grid of Stickers */}
-          <div className="absolute inset-0 z-0 overflow-hidden opacity-40 p-6 flex flex-wrap gap-4 items-center justify-center content-center select-none pointer-events-none">
+          <div className={cn(
+            "absolute inset-0 z-0 overflow-hidden p-6 flex flex-wrap gap-4 items-center justify-center content-center select-none pointer-events-none transition-all duration-300",
+            isDark ? "opacity-35" : "opacity-80"
+          )}>
             {[
               ...(activeBanner.pool5Star || []).filter((item: any) => item.type === 'sticker' || item.image),
               ...(activeBanner.pool4Star || []).filter((item: any) => item.type === 'sticker' || item.image)
@@ -273,38 +298,65 @@ export default function GachaPopup() {
               <div 
                 key={item.id || idx} 
                 className={cn(
-                  "w-16 h-16 sm:w-20 sm:h-20 bg-[#2B1B17] rounded-2xl flex items-center justify-center relative p-1.5 border-2 transition-all shadow-md shrink-0",
-                  item.rarity === 5 
-                    ? "border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.3)] bg-gradient-to-br from-amber-500/10 to-amber-500/20" 
-                    : "border-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.3)] bg-gradient-to-br from-purple-500/10 to-purple-500/20"
+                  "w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center relative p-1.5 border-2 transition-all shadow-md shrink-0",
+                  isDark
+                    ? (item.rarity === 5 
+                        ? "border-amber-400 bg-gradient-to-br from-amber-500/10 to-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.3)]" 
+                        : "border-purple-400 bg-gradient-to-br from-purple-500/10 to-purple-500/20 shadow-[0_0_12px_rgba(168,85,247,0.3)]")
+                    : (item.rarity === 5 
+                        ? "border-amber-400/80 bg-gradient-to-br from-amber-50/60 to-amber-100/60 shadow-[0_4px_10px_rgba(245,158,11,0.08)]" 
+                        : "border-purple-400/80 bg-gradient-to-br from-purple-50/60 to-purple-100/60 shadow-[0_4px_10px_rgba(168,85,247,0.08)]")
                 )}
               >
                 {item.image ? (
-                  <img src={item.image} alt={item.name} referrerPolicy="no-referrer" className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+                  <img src={item.image} alt={item.name} referrerPolicy="no-referrer" className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" />
                 ) : (
                   <span className="text-xl">🏷️</span>
                 )}
               </div>
             ))}
           </div>
+
           {/* Gradient overlays to ensure text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1A1412] via-[#1A1412]/80 to-[#1A1412]/40 z-[1] pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1A1412] via-transparent to-transparent z-[1] pointer-events-none" />
+          <div className={cn(
+            "absolute inset-0 z-[1] pointer-events-none transition-all duration-300",
+            isDark 
+              ? "bg-gradient-to-r from-[#1A1412]/95 via-[#1A1412]/85 to-[#1A1412]/20" 
+              : "bg-gradient-to-r from-[#FFFDF9]/95 via-[#FFFDF9]/85 to-[#FFFDF9]/20"
+          )} />
+          <div className={cn(
+            "absolute inset-0 z-[1] pointer-events-none transition-all duration-300",
+            isDark 
+              ? "bg-gradient-to-t from-[#1A1412]/90 via-transparent to-transparent" 
+              : "bg-gradient-to-t from-[#FFFDF9]/90 via-transparent to-transparent"
+          )} />
 
           {/* Banner Info Content */}
-          <div className="relative z-10 p-8 flex-1 flex flex-col justify-center text-white text-shadow-sm">
-            <h1 className="text-4xl md:text-6xl font-black font-sans uppercase italic tracking-tighter mb-2 text-[#FFFDF9] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+          <div className="relative z-10 p-8 flex-grow flex flex-col justify-center text-shadow-sm select-text">
+            <h1 className={cn(
+              "text-4xl md:text-6xl font-black font-sans uppercase italic tracking-tighter mb-2 transition-all duration-300",
+              isDark 
+                ? "text-[#FFFDF9] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" 
+                : "text-[#3E2723] drop-shadow-[0_1px_2px_rgba(0,0,0,0.1)]"
+            )}>
               {activeBanner.name}
             </h1>
-            <p className="text-[#D7CCC8] text-lg font-medium max-w-md drop-shadow-md">
-              {activeBanner.description}
-            </p>
             
             <div className="mt-8 flex gap-3">
-               <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl backdrop-blur transition-all text-sm font-bold border border-white/20">
+               <button className={cn(
+                 "flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur transition-all text-sm font-bold border",
+                 isDark 
+                   ? "bg-white/10 hover:bg-white/20 text-white border-white/20" 
+                   : "bg-[#3E2723]/10 hover:bg-[#3E2723]/20 text-[#3E2723] border-[#3E2723]/20"
+               )}>
                  <History className="w-4 h-4" /> Lịch sử
                </button>
-               <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl backdrop-blur transition-all text-sm font-bold border border-white/20">
+               <button className={cn(
+                 "flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur transition-all text-sm font-bold border",
+                 isDark 
+                   ? "bg-white/10 hover:bg-white/20 text-white border-white/20" 
+                   : "bg-[#3E2723]/10 hover:bg-[#3E2723]/20 text-[#3E2723] border-[#3E2723]/20"
+               )}>
                  <Info className="w-4 h-4" /> Chi tiết
                </button>
             </div>
@@ -312,43 +364,58 @@ export default function GachaPopup() {
 
           {/* Actions Column */}
           <div className="relative z-10 p-8 flex flex-col justify-end md:w-96 gap-4">
-             <div className="bg-black/50 backdrop-blur-md p-4 rounded-2xl border border-white/10 text-white">
-                <p className="text-xs text-[#D7CCC8] uppercase tracking-wider font-bold mb-1">Tiến trình bảo hiểm</p>
-                <div className="flex justify-between text-sm">
-                  <span>5 Sao: <span className="font-bold text-amber-400">{gachaPity5Star}/{PITY_5_STAR}</span></span>
-                </div>
-                <div className="w-full bg-white/10 h-2 rounded-full mt-2 overflow-hidden">
-                   <div 
-                     className="bg-gradient-to-r from-amber-200 to-amber-500 h-full rounded-full transition-all" 
-                     style={{ width: `${Math.min((gachaPity5Star / PITY_5_STAR) * 100, 100)}%` }} 
-                   />
-                </div>
-             </div>
+              <div className={cn(
+                 "backdrop-blur-md p-4 rounded-2xl border transition-all duration-300",
+                 isDark 
+                   ? "bg-black/55 border-white/10 text-white" 
+                   : "bg-white/80 border-[#3E2723]/15 text-[#3E2723]"
+              )}>
+                 <p className={cn("text-xs uppercase tracking-wider font-extrabold mb-1", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63]")}>Tiến trình bảo hiểm</p>
+                 <div className="flex justify-between text-sm font-bold">
+                   <span>5 Sao: <span className="text-amber-500">{gachaPity5Star}/{PITY_5_STAR}</span></span>
+                 </div>
+                 <div className={cn("w-full h-2 rounded-full mt-2 overflow-hidden", isDark ? "bg-white/15" : "bg-[#3E2723]/10")}>
+                    <div 
+                      className="bg-gradient-to-r from-amber-300 to-amber-500 h-full rounded-full transition-all" 
+                      style={{ width: `${Math.min((gachaPity5Star / PITY_5_STAR) * 100, 100)}%` }} 
+                    />
+                 </div>
+              </div>
 
-             <div className="flex gap-3 mt-4">
-               <button 
-                 onClick={pullOnce}
-                 disabled={isPulling}
-                 className="flex-1 bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-95 transition-all disabled:opacity-50"
-               >
-                 <span>Gacha 1 Lần</span>
-                 <div className="flex items-center gap-1.5 mt-1 text-xs text-[#5D4037]">
-                    <Sparkles className="w-3.5 h-3.5 text-pink-500" />
-                    <span>x1</span>
-                 </div>
-               </button>
-               <button 
-                 onClick={pullTen}
-                 disabled={isPulling}
-                 className="flex-1 bg-gradient-to-b from-[#FFF9C4] to-[#FFD54F] hover:from-[#FFF176] hover:to-[#FFC107] text-[#3E2723] rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide shadow-[0_0_15px_rgba(255,193,7,0.4)] active:scale-95 transition-all disabled:opacity-50 border border-[#FFE082]"
-               >
-                 <span>Gacha 10 Lần</span>
-                 <div className="flex items-center gap-1.5 mt-1 text-xs text-[#5D4037]">
-                    <Sparkles className="w-3.5 h-3.5 text-pink-600" />
-                    <span>x10</span>
-                 </div>
-               </button>
-             </div>
+              <div className="flex gap-3 mt-4">
+                <button 
+                  onClick={pullOnce}
+                  disabled={isPulling}
+                  className={cn(
+                    "flex-1 rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-95 transition-all disabled:opacity-50 cursor-pointer border",
+                    isDark 
+                      ? "bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] border-transparent" 
+                      : "bg-[#3E2723] hover:bg-[#5D4037] text-white border-transparent"
+                  )}
+                >
+                  <span className="text-sm font-black uppercase tracking-wider">Gacha 1 Lần</span>
+                  <div className={cn("flex items-center gap-1.5 mt-1 text-xs font-bold", isDark ? "text-[#5D4037]" : "text-white/80")}>
+                     <Sparkles className="w-3.5 h-3.5 text-pink-500 animate-pulse" />
+                     <span>x1</span>
+                  </div>
+                </button>
+                <button 
+                  onClick={pullTen}
+                  disabled={isPulling}
+                  className={cn(
+                    "flex-1 bg-gradient-to-b from-[#FFF9C4] to-[#FFD54F] hover:from-[#FFF176] hover:to-[#FFC107] text-[#3E2723] rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-95 transition-all disabled:opacity-50 border cursor-pointer",
+                    isDark 
+                      ? "border-[#FFE082] shadow-[0_0_15px_rgba(255,193,7,0.3)]" 
+                      : "border-amber-400 shadow-[0_4px_12px_rgba(245,158,11,0.2)]"
+                  )}
+                >
+                  <span className="text-sm font-black uppercase tracking-wider">Gacha 10 Lần</span>
+                  <div className="flex items-center gap-1.5 mt-1 text-xs text-[#5D4037] font-bold">
+                     <Sparkles className="w-3.5 h-3.5 text-pink-600 animate-pulse" />
+                     <span>x10</span>
+                  </div>
+                </button>
+              </div>
           </div>
         </div>
 
@@ -359,17 +426,26 @@ export default function GachaPopup() {
               key={b.id}
               onClick={() => setActiveBanner(b)}
               className={cn(
-                "px-6 py-2 rounded-full font-bold text-sm shadow-lg whitespace-nowrap transition-all duration-300",
+                "px-6 py-2.5 rounded-full font-extrabold text-[#3E2723] text-xs uppercase tracking-wider shadow-md whitespace-nowrap transition-all duration-300 cursor-pointer border",
                 activeBanner.id === b.id 
-                  ? "bg-white text-[#3E2723] scale-105" 
-                  : "bg-black/40 text-stone-300 hover:bg-black/60 hover:text-white"
+                  ? (isDark 
+                      ? "bg-[#FFFDF9] text-[#3E2723] border-transparent scale-105 shadow-[0_0_15px_rgba(255,255,255,0.1)]" 
+                      : "bg-[#3E2723] text-white border-transparent scale-105")
+                  : (isDark 
+                      ? "bg-black/40 text-stone-300 border-white/5 hover:bg-black/60 hover:text-white" 
+                      : "bg-white/80 text-[#5D4037] border-[#3E2723]/10 hover:bg-[#FDF9F3] hover:text-[#3E2723]")
               )}
             >
               {b.name}
             </button>
           ))}
           {banners.length === 0 && (
-            <button className="px-6 py-2 rounded-full bg-white text-[#3E2723] font-bold text-sm shadow-lg whitespace-nowrap">
+            <button className={cn(
+              "px-6 py-2.5 rounded-full font-extrabold text-xs uppercase tracking-wider shadow-md whitespace-nowrap border",
+              isDark 
+                ? "bg-[#FFFDF9] text-[#3E2723] border-transparent" 
+                : "bg-[#3E2723] text-white border-transparent"
+            )}>
               {activeBanner.name}
             </button>
           )}
@@ -378,22 +454,35 @@ export default function GachaPopup() {
       
       {/* Pull Animation/Result Overlay Area - to be implemented in details */}
       {showResults && (
-        <div className="absolute inset-0 z-50 bg-[#1A1412] flex flex-col items-center justify-center animate-in fade-in duration-500 p-4">
-            <h2 className="text-3xl font-black text-white italic tracking-widest mb-12">KẾT QUẢ</h2>
+        <div className={cn(
+          "absolute inset-0 z-50 flex flex-col items-center justify-center animate-in fade-in duration-500 p-4 transition-all duration-300",
+          isDark ? "bg-[#1A1412]" : "bg-[#FFFDF9]"
+        )}>
+            <h2 className={cn(
+              "text-3xl font-black italic tracking-widest mb-12 transition-all duration-300",
+              isDark ? "text-white" : "text-[#3E2723]"
+            )}>KẾT QUẢ</h2>
             
             <div className="flex flex-wrap items-center justify-center gap-4 max-w-5xl">
               {showResults.map((item, idx) => (
                 <div key={idx} className={cn(
-                  "relative w-28 h-28 sm:w-36 sm:h-36 rounded-2xl flex flex-col items-center justify-center animate-in zoom-in duration-300 shadow-2xl",
-                  item.rarity === 5 ? "bg-gradient-to-br from-amber-200 to-amber-600 border-[3px] border-amber-100" :
-                  item.rarity === 4 ? "bg-gradient-to-br from-purple-300 to-purple-600 border-[3px] border-purple-200" :
-                  "bg-gradient-to-br from-stone-200 to-stone-400 border-[3px] border-stone-100"
+                  "relative w-28 h-28 sm:w-36 sm:h-36 rounded-2xl flex flex-col items-center justify-center animate-in zoom-in duration-300 shadow-2xl transition-all duration-300 border-[3px]",
+                  item.rarity === 5 
+                    ? "bg-gradient-to-br from-amber-100 to-amber-500 border-amber-300 text-[#3E2723]" 
+                    : (item.rarity === 4 
+                        ? "bg-gradient-to-br from-purple-200 to-purple-500 border-purple-300 text-white" 
+                        : (isDark 
+                             ? "bg-gradient-to-br from-[#2D221D] to-stone-800 border-stone-800 text-white" 
+                             : "bg-gradient-to-br from-stone-100 to-stone-200 border-stone-200 text-[#3E2723]"))
                 )} style={{ animationDelay: `${idx * 100}ms` }}>
                   
                   {/* Item Icon */}
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/10 backdrop-blur rounded-xl flex items-center justify-center shadow-inner overflow-hidden mb-2 relative">
+                  <div className={cn(
+                    "w-16 h-16 sm:w-20 sm:h-20 backdrop-blur rounded-xl flex items-center justify-center shadow-inner overflow-hidden mb-2 relative",
+                    isDark ? "bg-black/20" : "bg-white/50"
+                  )}>
                      {item.image ? (
-                       <img src={item.image} alt={item.name} referrerPolicy="no-referrer" className="w-full h-full object-contain p-1" />
+                       <img src={item.image} alt={item.name} referrerPolicy="no-referrer" className="w-full h-full object-contain p-1 filter drop-shadow-md" />
                      ) : (
                        <span className="text-3xl">{item.type === 'sticker' ? '🏷️' : '🧩'}</span>
                      )}
@@ -406,7 +495,14 @@ export default function GachaPopup() {
                      ))}
                   </div>
 
-                  <span className="text-[9px] sm:text-[10px] font-bold text-white text-center leading-tight px-1 drop-shadow-md line-clamp-2">
+                  <span className={cn(
+                    "text-[9px] sm:text-[10px] font-extrabold text-center leading-tight px-1 drop-shadow-sm line-clamp-2 uppercase tracking-wide",
+                    item.rarity === 5 
+                      ? "text-[#3E2723]"
+                      : (item.rarity === 4 
+                          ? "text-white"
+                          : (isDark ? "text-stone-300" : "text-[#3E2723]"))
+                  )}>
                     {item.name}
                   </span>
                 </div>
@@ -415,7 +511,12 @@ export default function GachaPopup() {
 
             <button 
               onClick={() => setShowResults(null)}
-              className="mt-16 px-10 py-3 bg-white hover:bg-stone-200 text-[#1A1412] font-bold rounded-full transition-all uppercase tracking-widest"
+              className={cn(
+                "mt-16 px-10 py-3 font-extrabold rounded-full transition-all uppercase tracking-widest cursor-pointer shadow-lg",
+                isDark 
+                  ? "bg-[#FFFDF9] hover:bg-stone-200 text-[#1A1412]" 
+                  : "bg-[#3E2723] hover:bg-[#5D4037] text-white"
+              )}
             >
               Xác Nhận
             </button>
