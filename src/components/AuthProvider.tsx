@@ -298,6 +298,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 delete latestData.ownedStickers;
                 delete latestData.ownedAccessories;
               }
+              
+              // Validate and heal equipped legacy stickers starting with "item-"
+              const stickerKeys = ['equippedStickerComment', 'equippedStickerChat', 'equippedStickerPost'] as const;
+              (async () => {
+                const healerUpdates: any = {};
+                let hasHealed = false;
+                for (const key of stickerKeys) {
+                  const val = latestData[key];
+                  if (val && val.startsWith('item-')) {
+                    try {
+                      const itemQ = query(collection(db, 'gacha_items'), where('id', '==', val));
+                      const itemSnap = await getDocs(itemQ);
+                      if (!itemSnap.empty) {
+                        const actualItem = itemSnap.docs[0].data();
+                        const actualUrl = actualItem.image;
+                        if (actualUrl) {
+                          healerUpdates[key] = actualUrl;
+                          hasHealed = true;
+                          useStore.setState({ [key]: actualUrl });
+                        }
+                      }
+                    } catch (e) {
+                      console.error(`Error healing equipped sticker ${key}:`, e);
+                    }
+                  }
+                }
+                if (hasHealed) {
+                  await updateDoc(userRef, healerUpdates);
+                  console.log("Healed equipped stickers:", healerUpdates);
+                }
+              })();
+
               syncFromFirebase(latestData);
             }
           }, (err) => {
@@ -306,9 +338,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           // Mount subcollection snapshot listeners to load owned items in real-time
           unsubSubStickers = onSnapshot(collection(db, 'users', user.uid, 'owned_stickers'), (snap) => {
-             const urls = snap.docs.map(d => d.data().url).filter(Boolean);
-             const uniqueUrls = Array.from(new Set(urls));
-              useStore.setState({ ownedStickers: uniqueUrls });
+             const docsData = snap.docs.map(d => ({ docId: d.id, url: d.data().url })).filter(d => Boolean(d.url));
+             const initialUrls = docsData.map(d => d.url);
+             useStore.setState({ ownedStickers: Array.from(new Set(initialUrls)) });
+
+             (async () => {
+                let changed = false;
+                const finalUrls: string[] = [];
+                for (const docObj of docsData) {
+                  let currentUrl = docObj.url;
+                  if (currentUrl && currentUrl.startsWith('item-')) {
+                    try {
+                      const itemQ = query(collection(db, 'gacha_items'), where('id', '==', currentUrl));
+                      const itemSnap = await getDocs(itemQ);
+                      if (!itemSnap.empty) {
+                        const actualItem = itemSnap.docs[0].data();
+                        const actualUrl = actualItem.image;
+                        if (actualUrl) {
+                          currentUrl = actualUrl;
+                          changed = true;
+                          await updateDoc(doc(db, 'users', user.uid, 'owned_stickers', docObj.docId), {
+                            url: actualUrl
+                          });
+                        }
+                      }
+                    } catch (err) {
+                      console.error("Heal sticker error:", err);
+                    }
+                  }
+                  if (currentUrl) {
+                    finalUrls.push(currentUrl);
+                  }
+                }
+                if (changed) {
+                  useStore.setState({ ownedStickers: Array.from(new Set(finalUrls)) });
+                }
+             })();
           }, (err) => {
              console.error('Error listening to user owned_stickers updates:', err);
           });
