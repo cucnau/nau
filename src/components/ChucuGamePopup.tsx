@@ -1115,8 +1115,10 @@ export function ChucuGamePopup() {
             onClick={() => setPanelTab('play')}
             className={`px-4 py-2 rounded-xl text-xs font-black uppercase flex items-center shrink-0 whitespace-nowrap gap-1 cursor-pointer transition-all ${
               panelTab === 'play' 
-                ? 'bg-[#8D6E63] text-white shadow-inner' 
-                : 'bg-white hover:bg-stone-50 text-[#3E2723] dark:bg-stone-900 dark:text-stone-300'
+                ? 'bg-[#8D6E63] text-white shadow-inner shadow-black/30' 
+                : isDark 
+                  ? 'bg-[#1E1715] hover:bg-[#2D211D] text-[#E6D4BF] border border-stone-800' 
+                  : 'bg-white hover:bg-stone-50 text-[#3E2723] border border-stone-200'
             }`}
           >
             <Gamepad2 className="w-4 h-4" /> Chơi game
@@ -1126,8 +1128,10 @@ export function ChucuGamePopup() {
             onClick={() => setPanelTab('exchange')}
             className={`px-4 py-2 rounded-xl text-xs font-black uppercase flex items-center shrink-0 whitespace-nowrap gap-1 cursor-pointer transition-all ${
               panelTab === 'exchange' 
-                ? 'bg-[#8D6E63] text-white shadow-inner' 
-                : 'bg-white hover:bg-stone-50 text-[#3E2723] dark:bg-stone-900 dark:text-stone-300'
+                ? 'bg-[#8D6E63] text-white shadow-inner shadow-black/30' 
+                : isDark 
+                  ? 'bg-[#1E1715] hover:bg-[#2D211D] text-[#E6D4BF] border border-stone-800' 
+                  : 'bg-white hover:bg-stone-50 text-[#3E2723] border border-stone-200'
             }`}
           >
             <ShoppingBag className="w-4 h-4" /> Tiệm Đổi Thưởng
@@ -1137,8 +1141,10 @@ export function ChucuGamePopup() {
             onClick={() => setPanelTab('guide')}
             className={`px-4 py-2 rounded-xl text-xs font-black uppercase flex items-center shrink-0 whitespace-nowrap gap-1 cursor-pointer transition-all ${
               panelTab === 'guide' 
-                ? 'bg-[#8D6E63] text-white shadow-inner' 
-                : 'bg-white hover:bg-stone-50 text-[#3E2723] dark:bg-stone-900 dark:text-stone-300'
+                ? 'bg-[#8D6E63] text-white shadow-inner shadow-black/30' 
+                : isDark 
+                  ? 'bg-[#1E1715] hover:bg-[#2D211D] text-[#E6D4BF] border border-stone-800' 
+                  : 'bg-white hover:bg-stone-50 text-[#3E2723] border border-stone-200'
             }`}
           >
             <Info className="w-4 h-4" /> Hướng dẫn
