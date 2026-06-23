@@ -476,61 +476,66 @@ export default function GachaPopup() {
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setGachaOpen(false)} />
       
       {/* Banner UI */}
-      <div className="relative w-full max-w-5xl h-[85vh] sm:h-[80vh] flex flex-col items-center justify-center animate-in zoom-in-95 duration-300">
-        <button 
-          onClick={() => setGachaOpen(false)}
-          className="absolute top-4 right-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all hover:scale-110 active:translate-y-1 active:shadow-none z-20 pointer-events-auto cursor-pointer"
-        >
-          <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#3E2723] dark:text-[#ECE5DC]" />
-        </button>
-
-        {/* Header Currency */}
-        <div className="absolute top-4 right-20 z-20 flex gap-2 sm:gap-3">
-          <div className={cn(
-            "flex items-center gap-1.5 sm:gap-2 backdrop-blur px-3 sm:px-4 py-2 rounded-full border shadow-lg",
-            isDark 
-              ? "bg-black/40 border-white/10 text-white" 
-              : "bg-white/80 border-[#3E2723]/10 text-[#3E2723]"
-          )}>
-            <span className="font-bold text-xs sm:text-sm">
-              {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}
-            </span>
-            <span className={cn("text-[10px] sm:text-xs", isDark ? "text-[#E6D8C9]" : "text-[#8D6E63]")}>Choco</span>
-          </div>
-          <div className={cn(
-            "flex items-center gap-1.5 sm:gap-2 backdrop-blur px-3 sm:px-4 py-2 rounded-full border shadow-lg",
-            isDark 
-              ? "bg-[#3E2723]/60 border-white/10 text-white" 
-              : "bg-[#FFF9C4]/80 border-[#3E2723]/15 text-[#5D4037]"
-          )}>
-            <span className="font-bold text-xs sm:text-sm">
-              {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : (goldenChoco || 0)}
-            </span>
-            <span className={cn("text-[10px] sm:text-xs font-bold text-amber-500", isDark ? "text-amber-400" : "text-amber-700")}>Gchoco</span>
-          </div>
-          <div className={cn(
-            "flex items-center gap-1.5 sm:gap-2 backdrop-blur px-3 sm:px-4 py-2 rounded-full border shadow-lg lg:shadow-[0_0_15px_rgba(236,72,153,0.15)]",
-            isDark 
-              ? "bg-pink-500/20 border-pink-500/30 text-white" 
-              : "bg-pink-500/10 border-pink-500/20 text-[#C2185B]"
-          )}>
-            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-500 animate-pulse" />
-            <span className="font-bold text-xs sm:text-sm tracking-wide">{ownedGachaTickets || 0}</span>
-          </div>
-        </div>
+      <div className="relative w-full max-w-5xl h-[90vh] md:h-[80vh] flex flex-col items-center justify-center animate-in zoom-in-95 duration-300">
 
         {/* Banner Area */}
         <div className={cn(
-          "relative w-full h-[70vh] sm:h-[65vh] rounded-3xl overflow-hidden shadow-2xl border-[4px] flex flex-col md:flex-row transition-all duration-300",
+          "relative w-full h-[68vh] md:h-[65vh] rounded-3xl overflow-y-auto md:overflow-hidden shadow-2xl border-[4px] flex flex-col md:flex-row transition-all duration-300",
           isDark 
             ? "border-[#FFFDF9]/20 bg-[#1A1412] text-white" 
             : "border-[#3E2723]/15 bg-[#FFFDF9] text-[#3E2723]"
         )}>
           
+          {/* Header Controls (Absolute positioned inside the bordered Banner Area) */}
+          <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-3.5 sm:p-4 pointer-events-none">
+            {/* Header Currency */}
+            <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-3 max-w-[70%] sm:max-w-[75%] md:max-w-none pointer-events-auto">
+              <div className={cn(
+                "flex items-center gap-1 sm:gap-2 backdrop-blur px-2.5 sm:px-3.5 py-1.5 rounded-full border shadow-md",
+                isDark 
+                  ? "bg-black/50 border-white/10 text-white" 
+                  : "bg-white/90 border-[#3E2723]/10 text-[#3E2723]"
+              )}>
+                <span className="font-bold text-[10px] sm:text-xs">
+                  {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}
+                </span>
+                <span className={cn("text-[8px] sm:text-[10px]", isDark ? "text-[#E6D8C9]" : "text-[#8D6E63]")}>Choco</span>
+              </div>
+              <div className={cn(
+                "flex items-center gap-1 sm:gap-2 backdrop-blur px-2.5 sm:px-3.5 py-1.5 rounded-full border shadow-md",
+                isDark 
+                  ? "bg-[#3E2723]/70 border-white/10 text-white" 
+                  : "bg-[#FFF9C4]/90 border-[#3E2723]/15 text-[#5D4037]"
+              )}>
+                <span className="font-bold text-[10px] sm:text-xs">
+                  {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : (goldenChoco || 0)}
+                </span>
+                <span className={cn("text-[8px] sm:text-[10px] font-bold text-amber-500", isDark ? "text-amber-400" : "text-amber-700")}>Gchoco</span>
+              </div>
+              <div className={cn(
+                "flex items-center gap-1 sm:gap-2 backdrop-blur px-2.5 sm:px-3.5 py-1.5 rounded-full border shadow-md lg:shadow-[0_0_15px_rgba(236,72,153,0.15)]",
+                isDark 
+                  ? "bg-pink-500/20 border-pink-500/30 text-white" 
+                  : "bg-pink-500/10 border-pink-500/20 text-[#C2185B]"
+              )}>
+                <Sparkles className="w-3 h-3 text-pink-500 animate-pulse" />
+                <span className="font-bold text-[10px] sm:text-xs tracking-wide">{ownedGachaTickets || 0}</span>
+              </div>
+            </div>
+
+            {/* Close Button */}
+            <button 
+              onClick={() => setGachaOpen(false)}
+              className="w-8 h-8 sm:w-9 sm:h-9 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] transition-all hover:scale-110 active:translate-y-0.5 active:shadow-none pointer-events-auto cursor-pointer"
+            >
+              <X className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#3E2723] dark:text-[#ECE5DC]" />
+            </button>
+          </div>
+          
           {/* Background Grid of Stickers */}
           <div className={cn(
-            "absolute inset-0 z-0 overflow-hidden p-6 flex flex-wrap gap-4 items-center justify-start content-center select-none pointer-events-none transition-all duration-300",
-            isDark ? "opacity-85" : "opacity-100"
+            "absolute inset-0 z-0 overflow-hidden p-6 flex flex-wrap gap-3 sm:gap-4 items-center justify-start content-center select-none pointer-events-none transition-all duration-300",
+            isDark ? "opacity-15 md:opacity-25" : "opacity-25 md:opacity-35"
           )}>
             {[
               ...(activeBanner.pool5Star || []).filter((item: any) => item.type === 'sticker' || item.image),
@@ -539,7 +544,7 @@ export default function GachaPopup() {
               <div 
                 key={item.id || idx} 
                 className={cn(
-                  "w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center relative p-1.5 border-2 transition-all shadow-md shrink-0",
+                  "w-12 h-12 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center relative p-1 border-2 transition-all shadow-md shrink-0",
                   isDark
                     ? (item.rarity === 5 
                         ? "border-amber-400 bg-[#2C211E] shadow-[0_0_12px_rgba(245,158,11,0.3)]" 
@@ -552,16 +557,16 @@ export default function GachaPopup() {
                 {item.image ? (
                   <img src={item.image} alt={item.name} referrerPolicy="no-referrer" className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" />
                 ) : (
-                  <span className="text-xl">🏷️</span>
+                  <span className="text-sm sm:text-xl">🏷️</span>
                 )}
               </div>
             ))}
           </div>
 
           {/* Banner Info Content */}
-          <div className="relative z-10 pt-4 px-8 pb-4 flex-grow flex flex-col justify-between text-shadow-sm select-text text-left">
+          <div className="relative z-10 pt-16 sm:pt-20 md:pt-8 px-5 md:px-8 pb-4 flex-grow flex flex-col justify-between text-shadow-sm select-text text-center md:text-left">
             <h1 className={cn(
-              "text-3xl sm:text-4xl md:text-5xl font-black font-sans uppercase tracking-tight transition-all duration-300 mt-0",
+              "text-xl sm:text-3xl md:text-5xl font-black font-sans uppercase tracking-tight transition-all duration-300 mt-2 md:mt-0",
               isDark 
                 ? "text-[#FFFDF9] drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]" 
                 : "text-[#3E2723] drop-shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
@@ -569,11 +574,11 @@ export default function GachaPopup() {
               {activeBanner.name}
             </h1>
             
-            <div className="flex gap-3 mt-auto">
+            <div className="flex gap-2.5 mt-4 md:mt-auto justify-center md:justify-start">
                <button 
                  onClick={() => setHistoryOpen(true)}
                  className={cn(
-                   "flex items-center gap-2 px-4.5 py-2.5 rounded-xl backdrop-blur transition-all text-xs font-black uppercase tracking-wider border-2 hover:scale-105 active:scale-95 duration-200 cursor-pointer shadow-sm hover:shadow-md",
+                   "flex items-center gap-1.5 px-3.5 py-2 rounded-xl backdrop-blur transition-all text-xs font-black uppercase tracking-wider border-2 hover:scale-105 active:scale-95 duration-200 cursor-pointer shadow-sm hover:shadow-md",
                    isDark 
                      ? "bg-black/40 hover:bg-[#FFFDF9] text-stone-200 hover:text-[#3E2723] border-white/20 hover:border-[#FFFDF9]" 
                      : "bg-[#FFFDF9]/80 hover:bg-[#3E2723] text-[#3E2723] hover:text-white border-[#3E2723]/25"
@@ -584,7 +589,7 @@ export default function GachaPopup() {
                <button 
                  onClick={() => setDetailsOpen(true)}
                  className={cn(
-                   "flex items-center gap-2 px-4.5 py-2.5 rounded-xl backdrop-blur transition-all text-xs font-black uppercase tracking-wider border-2 hover:scale-105 active:scale-95 duration-200 cursor-pointer shadow-sm hover:shadow-md",
+                   "flex items-center gap-1.5 px-3.5 py-2 rounded-xl backdrop-blur transition-all text-xs font-black uppercase tracking-wider border-2 hover:scale-105 active:scale-95 duration-200 cursor-pointer shadow-sm hover:shadow-md",
                    isDark 
                      ? "bg-black/40 hover:bg-[#FFFDF9] text-stone-200 hover:text-[#3E2723] border-white/20 hover:border-[#FFFDF9]" 
                      : "bg-[#FFFDF9]/80 hover:bg-[#3E2723] text-[#3E2723] hover:text-white border-[#3E2723]/25"
@@ -596,18 +601,18 @@ export default function GachaPopup() {
           </div>
 
           {/* Actions Column */}
-          <div className="relative z-10 p-8 flex flex-col justify-end md:w-96 gap-4">
+          <div className="relative z-10 p-5 sm:p-6 md:p-8 flex flex-col justify-end w-full md:w-96 gap-3 sm:gap-4">
               <div className={cn(
-                 "backdrop-blur-md p-4 rounded-2xl border transition-all duration-300",
+                 "backdrop-blur-md p-3.5 sm:p-4 rounded-2xl border transition-all duration-300",
                  isDark 
                    ? "bg-black/55 border-white/10 text-white" 
                    : "bg-white/80 border-[#3E2723]/15 text-[#3E2723]"
               )}>
-                 <p className={cn("text-xs uppercase tracking-wider font-extrabold mb-1", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63]")}>Tiến trình bảo hiểm</p>
-                 <div className="flex justify-between text-sm font-bold">
+                 <p className={cn("text-[10px] sm:text-xs uppercase tracking-wider font-extrabold mb-1", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63]")}>Tiến trình bảo hiểm</p>
+                 <div className="flex justify-between text-xs sm:text-sm font-bold">
                    <span>5 Sao: <span className="text-amber-500">{gachaPity5Star}/{PITY_5_STAR}</span></span>
                  </div>
-                 <div className={cn("w-full h-2 rounded-full mt-2 overflow-hidden", isDark ? "bg-white/15" : "bg-[#3E2723]/10")}>
+                 <div className={cn("w-full h-1.5 sm:h-2 rounded-full mt-1.5 sm:mt-2 overflow-hidden", isDark ? "bg-white/15" : "bg-[#3E2723]/10")}>
                     <div 
                       className="bg-gradient-to-r from-amber-300 to-amber-500 h-full rounded-full transition-all" 
                       style={{ width: `${Math.min((gachaPity5Star / PITY_5_STAR) * 100, 100)}%` }} 
@@ -615,19 +620,19 @@ export default function GachaPopup() {
                   </div>
               </div>
 
-              <div className="flex gap-3 mt-4">
+              <div className="flex gap-2 sm:gap-3 mt-1 sm:mt-2">
                 <button 
                   onClick={pullOnce}
                   disabled={isPulling}
                   className={cn(
-                    "flex-1 rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-[0.97] hover:scale-[1.03] transition-all duration-200 disabled:opacity-50 cursor-pointer border-2",
+                    "flex-1 rounded-2xl py-3 sm:py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-[0.97] hover:scale-[1.03] transition-all duration-200 disabled:opacity-50 cursor-pointer border-2",
                     isDark 
                       ? "bg-[#251C1A] hover:bg-[#322320] text-[#E6D4BF] border-white/10 hover:border-white/20 shadow-[0_4px_12px_rgba(0,0,0,0.3)] hover:shadow-[0_0_15px_rgba(230,212,191,0.1)]" 
                       : "bg-[#FFF9E6] hover:bg-[#FDF1D5] text-[#3E2723] border-[#E8C07D] hover:border-[#dfab52] shadow-[0_4px_12px_rgba(232,192,125,0.15)] hover:shadow-[0_0_18px_rgba(232,192,125,0.5)]"
                   )}
                 >
-                  <span className={cn("text-sm font-black uppercase tracking-wider", isDark ? "text-[#E6D4BF]" : "text-[#3E2723]")}>Gacha 1 Lần</span>
-                  <div className={cn("flex items-center gap-1.5 mt-1 text-xs font-bold", isDark ? "text-stone-400" : "text-[#5D4037]")}>
+                  <span className={cn("text-xs sm:text-sm font-black uppercase tracking-wider", isDark ? "text-[#E6D4BF]" : "text-[#3E2723]")}>Gacha 1 Lần</span>
+                  <div className={cn("flex items-center gap-1 mt-0.5 text-[10px] sm:text-xs font-bold", isDark ? "text-stone-400" : "text-[#5D4037]")}>
                      <Sparkles className="w-3.5 h-3.5 text-pink-500 animate-pulse" />
                      <span>x1</span>
                   </div>
@@ -636,14 +641,14 @@ export default function GachaPopup() {
                   onClick={pullTen}
                   disabled={isPulling}
                   className={cn(
-                    "flex-1 rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-[0.97] hover:scale-[1.03] transition-all duration-200 disabled:opacity-50 border-2 cursor-pointer",
+                    "flex-1 rounded-2xl py-3 sm:py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-[0.97] hover:scale-[1.03] transition-all duration-200 disabled:opacity-50 border-2 cursor-pointer",
                     isDark 
                       ? "bg-gradient-to-b from-[#3E2E1D] to-[#25180F] hover:from-[#4E3C29] hover:to-[#322217] text-[#FFD54F] border-[#FFD54F]/30 hover:border-[#FFD54F]/50 shadow-[0_0_15px_rgba(255,193,7,0.15)] hover:shadow-[0_0_20px_rgba(255,193,7,0.3)]" 
                       : "bg-gradient-to-b from-[#FFF9C4] to-[#FFD54F] hover:from-[#FFF176] hover:to-[#FFD54F] text-[#3E2723] border-amber-400 hover:border-[#FFB300] shadow-[0_4px_12px_rgba(245,158,11,0.2)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)]"
                   )}
                 >
-                  <span className={cn("text-sm font-black uppercase tracking-wider", isDark ? "text-[#FFD54F]" : "text-[#3E2723]")}>Gacha 10 Lần</span>
-                  <div className="flex items-center gap-1.5 mt-1 text-xs font-bold">
+                  <span className={cn("text-xs sm:text-sm font-black uppercase tracking-wider", isDark ? "text-[#FFD54F]" : "text-[#3E2723]")}>Gacha 10 Lần</span>
+                  <div className="flex items-center gap-1.5 mt-0.5 text-[10px] sm:text-xs font-bold">
                      <Sparkles className={cn("w-3.5 h-3.5 animate-pulse", isDark ? "text-amber-400" : "text-pink-600")} />
                      <span className={isDark ? "text-amber-300" : "text-[#5D4037]"}>x10</span>
                   </div>
