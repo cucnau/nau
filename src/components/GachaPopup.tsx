@@ -609,9 +609,10 @@ export default function GachaPopup() {
           </div>
 
           {/* Banner Info Content */}
-          <div className="relative z-10 pt-16 sm:pt-20 md:pt-16 px-5 md:px-8 pb-4 flex-grow flex flex-col justify-between text-shadow-sm select-text text-center md:text-left">
+          <div className="relative z-10 pt-16 sm:pt-20 md:pt-6 px-5 md:px-8 pb-4 flex-grow flex flex-col justify-between text-shadow-sm select-text text-center md:text-left">
             <h1 className={cn(
               "text-xl sm:text-3xl md:text-5xl font-black font-sans uppercase tracking-tight transition-all duration-300 mt-2 md:mt-0",
+
               isDark 
                 ? "text-[#FFFDF9] drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]" 
                 : "text-[#3E2723] drop-shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
