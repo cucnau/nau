@@ -561,11 +561,16 @@ function AchievementsModal() {
   );
 }
 
+import { useRadioTracking } from '../hooks/useRadioTracking';
+
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [showQuotaWarning, setShowQuotaWarning] = useState(true);
   const [isSyncingAchievements, setIsSyncingAchievements] = useState(false);
+  
+  useRadioTracking();
+
   const syncCommentsCountFromDB = useStore(state => state.syncCommentsCountFromDB);
   const { 
     isLoggedIn, uid, displayName, avatarUrl, 
