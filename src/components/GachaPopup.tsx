@@ -28,6 +28,23 @@ export default function GachaPopup() {
   const [activeBanner, setActiveBanner] = useState<GachaBanner>(GACHA_STANDARD_BANNER);
   const [isPulling, setIsPulling] = useState(false);
   const [showResults, setShowResults] = useState<GachaItem[] | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [historyList, setHistoryList] = useState<{ name: string; rarity: number; time: string; bannerName: string }[]>([]);
+
+  useEffect(() => {
+    const userId = firebaseUser?.uid || 'guest';
+    const storedHistory = localStorage.getItem(`gacha_pull_history_${userId}`);
+    if (storedHistory) {
+      try {
+        setHistoryList(JSON.parse(storedHistory));
+      } catch (e) {
+        console.error("Error parsing gacha history:", e);
+      }
+    } else {
+      setHistoryList([]);
+    }
+  }, [firebaseUser?.uid, isGachaOpen]);
 
   useEffect(() => {
     if (!isGachaOpen) return;
@@ -260,6 +277,27 @@ export default function GachaPopup() {
        gachaPity4Star: currentPity4
     });
     
+    // update local history
+    const newHistoryItems = results.map(item => ({
+      name: item.name,
+      rarity: item.rarity,
+      time: new Date().toLocaleString('vi-VN', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }),
+      bannerName: activeBanner.name
+    }));
+    
+    setHistoryList(prev => {
+      const updated = [...newHistoryItems, ...prev].slice(0, 200);
+      localStorage.setItem(`gacha_pull_history_${firebaseUser?.uid || 'guest'}`, JSON.stringify(updated));
+      return updated;
+    });
+
     setIsPulling(false);
     setShowResults(results);
   };
@@ -275,14 +313,9 @@ export default function GachaPopup() {
       <div className="relative w-full max-w-5xl h-[85vh] sm:h-[80vh] flex flex-col items-center justify-center animate-in zoom-in-95 duration-300">
         <button 
           onClick={() => setGachaOpen(false)}
-          className={cn(
-            "absolute top-4 right-4 z-20 w-10 h-10 backdrop-blur rounded-full flex items-center justify-center transition-all border",
-            isDark 
-              ? "bg-black/50 hover:bg-black/80 text-white border-white/20" 
-              : "bg-white/80 hover:bg-white text-[#3E2723] border-[#3E2723]/10 shadow-sm"
-          )}
+          className="absolute top-4 right-4 w-8 h-8 sm:w-10 sm:h-10 bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-[#3E2723] dark:border-[#4E342E] rounded-xl flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] transition-all hover:scale-110 active:translate-y-1 active:shadow-none z-20 pointer-events-auto cursor-pointer"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#3E2723] dark:text-[#ECE5DC]" />
         </button>
 
         {/* Header Currency */}
@@ -360,32 +393,38 @@ export default function GachaPopup() {
           </div>
 
           {/* Banner Info Content */}
-          <div className="relative z-10 pt-2 px-8 pb-8 flex-grow flex flex-col justify-between text-shadow-sm select-text">
+          <div className="relative z-10 pt-2 px-8 pb-8 flex-grow flex flex-col justify-between text-shadow-sm select-text text-left">
             <h1 className={cn(
-              "text-4xl md:text-6xl font-black font-sans uppercase italic tracking-tighter transition-all duration-300 mt-0",
+              "text-3xl sm:text-4xl md:text-5xl font-black font-sans uppercase tracking-tight transition-all duration-300 mt-0",
               isDark 
-                ? "text-[#FFFDF9] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" 
-                : "text-[#3E2723] drop-shadow-[0_1px_2px_rgba(0,0,0,0.1)]"
+                ? "text-[#FFFDF9] drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]" 
+                : "text-[#3E2723] drop-shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
             )}>
               {activeBanner.name}
             </h1>
             
             <div className="mb-2 sm:mb-4 flex gap-3">
-               <button className={cn(
-                 "flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur transition-all text-sm font-bold border cursor-pointer",
-                 isDark 
-                   ? "bg-white/10 hover:bg-white/20 text-white border-white/20" 
-                   : "bg-[#3E2723]/10 hover:bg-[#3E2723]/20 text-[#3E2723] border-[#3E2723]/20"
-               )}>
-                 <History className="w-4 h-4" /> Lịch sử
+               <button 
+                 onClick={() => setHistoryOpen(true)}
+                 className={cn(
+                   "flex items-center gap-2 px-4.5 py-2.5 rounded-xl backdrop-blur transition-all text-xs font-black uppercase tracking-wider border-2 hover:scale-105 active:scale-95 duration-200 cursor-pointer shadow-sm hover:shadow-md",
+                   isDark 
+                     ? "bg-black/40 hover:bg-[#FFFDF9] text-stone-200 hover:text-[#3E2723] border-white/20 hover:border-[#FFFDF9]" 
+                     : "bg-[#FFFDF9]/80 hover:bg-[#3E2723] text-[#3E2723] hover:text-white border-[#3E2723]/25"
+                 )}
+               >
+                 <History className="w-3.5 h-3.5" /> Lịch sử
                </button>
-               <button className={cn(
-                 "flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur transition-all text-sm font-bold border cursor-pointer",
-                 isDark 
-                   ? "bg-white/10 hover:bg-white/20 text-white border-white/20" 
-                   : "bg-[#3E2723]/10 hover:bg-[#3E2723]/20 text-[#3E2723] border-[#3E2723]/20"
-               )}>
-                 <Info className="w-4 h-4" /> Chi tiết
+               <button 
+                 onClick={() => setDetailsOpen(true)}
+                 className={cn(
+                   "flex items-center gap-2 px-4.5 py-2.5 rounded-xl backdrop-blur transition-all text-xs font-black uppercase tracking-wider border-2 hover:scale-105 active:scale-95 duration-200 cursor-pointer shadow-sm hover:shadow-md",
+                   isDark 
+                     ? "bg-black/40 hover:bg-[#FFFDF9] text-stone-200 hover:text-[#3E2723] border-white/20 hover:border-[#FFFDF9]" 
+                     : "bg-[#FFFDF9]/80 hover:bg-[#3E2723] text-[#3E2723] hover:text-white border-[#3E2723]/25"
+                 )}
+               >
+                 <Info className="w-3.5 h-3.5" /> Chi tiết
                </button>
             </div>
           </div>
@@ -415,10 +454,10 @@ export default function GachaPopup() {
                   onClick={pullOnce}
                   disabled={isPulling}
                   className={cn(
-                    "flex-1 rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-95 transition-all disabled:opacity-50 cursor-pointer border",
+                    "flex-1 rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-[0.97] hover:scale-[1.03] transition-all duration-200 disabled:opacity-50 cursor-pointer border-2",
                     isDark 
-                      ? "bg-[#251C1A] hover:bg-[#322320] text-[#E6D4BF] border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.2)]" 
-                      : "bg-[#FFF9E6] hover:bg-[#FCE5B2] text-[#3E2723] border-[#E8C07D] shadow-[0_4px_12px_rgba(232,192,125,0.15)]"
+                      ? "bg-[#251C1A] hover:bg-[#322320] text-[#E6D4BF] border-white/10 hover:border-white/20 shadow-[0_4px_12px_rgba(0,0,0,0.3)] hover:shadow-[0_0_15px_rgba(230,212,191,0.1)]" 
+                      : "bg-[#FFF9E6] hover:bg-[#FDF1D5] text-[#3E2723] border-[#E8C07D] hover:border-[#dfab52] shadow-[0_4px_12px_rgba(232,192,125,0.15)] hover:shadow-[0_0_18px_rgba(232,192,125,0.5)]"
                   )}
                 >
                   <span className={cn("text-sm font-black uppercase tracking-wider", isDark ? "text-[#E6D4BF]" : "text-[#3E2723]")}>Gacha 1 Lần</span>
@@ -431,10 +470,10 @@ export default function GachaPopup() {
                   onClick={pullTen}
                   disabled={isPulling}
                   className={cn(
-                    "flex-1 rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-95 transition-all disabled:opacity-50 border cursor-pointer",
+                    "flex-1 rounded-2xl py-4 flex flex-col items-center justify-center font-bold tracking-wide active:scale-[0.97] hover:scale-[1.03] transition-all duration-200 disabled:opacity-50 border-2 cursor-pointer",
                     isDark 
-                      ? "bg-gradient-to-b from-[#3E2E1D] to-[#25180F] hover:from-[#4E3C29] hover:to-[#322217] text-[#FFD54F] border-[#FFD54F]/20 shadow-[0_0_15px_rgba(255,193,7,0.15)]" 
-                      : "bg-gradient-to-b from-[#FFF9C4] to-[#FFD54F] hover:from-[#FFF176] hover:to-[#FFC107] text-[#3E2723] border-amber-400 shadow-[0_4px_12px_rgba(245,158,11,0.2)]"
+                      ? "bg-gradient-to-b from-[#3E2E1D] to-[#25180F] hover:from-[#4E3C29] hover:to-[#322217] text-[#FFD54F] border-[#FFD54F]/30 hover:border-[#FFD54F]/50 shadow-[0_0_15px_rgba(255,193,7,0.15)] hover:shadow-[0_0_20px_rgba(255,193,7,0.3)]" 
+                      : "bg-gradient-to-b from-[#FFF9C4] to-[#FFD54F] hover:from-[#FFF176] hover:to-[#FFD54F] text-[#3E2723] border-amber-400 hover:border-[#FFB300] shadow-[0_4px_12px_rgba(245,158,11,0.2)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)]"
                   )}
                 >
                   <span className={cn("text-sm font-black uppercase tracking-wider", isDark ? "text-[#FFD54F]" : "text-[#3E2723]")}>Gacha 10 Lần</span>
@@ -571,7 +610,7 @@ export default function GachaPopup() {
               {pendingExchange.currency !== 'none' ? (
                 <>
                   {" "}Hệ thống đề xuất quy đổi bằng{' '}
-                  <strong className={pendingExchange.currency === 'golden' ? "text-amber-500 font-extrabold" : "text-amber-600 font-extrabold"}>
+                  <strong className={pendingExchange.currency === 'golden' ? "text-amber-500 font-extrabold" : "text-[#795548] font-extrabold"}>
                     {pendingExchange.cost} {pendingExchange.currency === 'golden' ? 'Gchoco' : 'Choco'}
                   </strong>{' '}
                   để tiếp tục.
@@ -653,6 +692,196 @@ export default function GachaPopup() {
                 </button>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* History Popup Modal */}
+      {historyOpen && (
+        <div className="absolute inset-0 z-55 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 rounded-3xl animate-in fade-in duration-200">
+          <div className={cn(
+            "w-full max-w-lg h-[65vh] sm:h-[60vh] rounded-2xl p-6 shadow-2xl border flex flex-col justify-between transition-all duration-300 scale-100 relative",
+            isDark 
+              ? "bg-[#1E1715] text-white border-white/10" 
+              : "bg-[#FDF6EC] text-[#3E2723] border-[#3E2723]/10"
+          )}>
+            <button 
+              onClick={() => setHistoryOpen(false)}
+              className="absolute top-4 right-4 w-8 h-8 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] rounded-lg flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] transition-all active:translate-y-0.5 active:shadow-none cursor-pointer"
+            >
+              <X className="w-4 h-4 text-[#3E2723] dark:text-[#ECE5DC]" />
+            </button>
+
+            <div className="flex items-center gap-2 mb-4 border-b pb-2 border-stone-300 dark:border-stone-700">
+              <History className="w-5 h-5 text-amber-500" />
+              <h3 className="font-extrabold text-sm sm:text-base uppercase tracking-wide">
+                Lịch sử vật phẩm đã quay
+              </h3>
+            </div>
+
+            <div className="flex-grow overflow-y-auto pr-1">
+              {historyList.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center py-10">
+                  <span className="text-4xl mb-2">📜</span>
+                  <p className={cn("text-xs font-semibold", isDark ? "text-stone-400" : "text-stone-500")}>
+                    Bạn chưa có lịch sử quay Gacha. Hãy thử vận may nhé!
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {historyList.map((item, idx) => (
+                    <div 
+                      key={idx} 
+                      className={cn(
+                        "flex items-center justify-between p-2.5 rounded-xl border text-[11px] sm:text-xs text-left",
+                        item.rarity === 5 
+                          ? "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400" 
+                          : item.rarity === 4 
+                            ? "bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400"
+                            : isDark ? "bg-black/20 border-white/5 text-stone-300" : "bg-white/50 border-[#3E2723]/5 text-[#5D4037]"
+                      )}
+                    >
+                      <div className="flex-1 flex flex-col min-w-0 pr-2">
+                        <span className="font-black truncate uppercase tracking-tight">{item.name}</span>
+                        <span className="text-[9px] text-stone-500 dark:text-stone-400 mt-0.5 truncate">{item.bannerName}</span>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="flex text-amber-400 text-[10px]">
+                          {Array.from({ length: item.rarity }).map((_, i) => (
+                            <Star key={i} className="w-2.5 h-2.5 fill-amber-400 stroke-amber-400" />
+                          ))}
+                        </span>
+                        <span className="text-[9px] font-mono text-stone-500 dark:text-stone-400 whitespace-nowrap">
+                          {item.time}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => setHistoryOpen(false)}
+              className={cn(
+                "mt-4 w-full py-2.5 rounded-xl font-black transition-all uppercase tracking-wider text-xs border-2 cursor-pointer text-center",
+                isDark 
+                  ? "bg-black/40 hover:bg-[#FFFDF9] text-stone-200 hover:text-[#3E2723] border-white/20 hover:border-[#FFFDF9]" 
+                  : "bg-[#FFFDF9] hover:bg-[#3E2723] text-[#3E2723] hover:text-white border-[#3E2723]/30"
+              )}
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Details Popup Modal */}
+      {detailsOpen && (
+        <div className="absolute inset-0 z-55 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 rounded-3xl animate-in fade-in duration-200">
+          <div className={cn(
+            "w-full max-w-lg h-[65vh] sm:h-[60vh] rounded-2xl p-6 shadow-2xl border flex flex-col justify-between transition-all duration-300 scale-100 relative",
+            isDark 
+              ? "bg-[#1E1715] text-white border-white/10" 
+              : "bg-[#FDF6EC] text-[#3E2723] border-[#3E2723]/10"
+          )}>
+            <button 
+              onClick={() => setDetailsOpen(false)}
+              className="absolute top-4 right-4 w-8 h-8 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] rounded-lg flex items-center justify-center hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] transition-all active:translate-y-0.5 active:shadow-none cursor-pointer"
+            >
+              <X className="w-4 h-4 text-[#3E2723] dark:text-[#ECE5DC]" />
+            </button>
+
+            <div className="flex items-center gap-2 mb-4 border-b pb-2 border-stone-300 dark:border-stone-700">
+              <Info className="w-5 h-5 text-[#8D6E63] dark:text-amber-500" />
+              <h3 className="font-extrabold text-sm sm:text-base uppercase tracking-wide truncate">
+                Chi tiết Banner Gacha
+              </h3>
+            </div>
+
+            <div className="flex-grow overflow-y-auto pr-1 text-[11px] sm:text-xs space-y-4 text-left">
+              {/* Introduction */}
+              <div>
+                <p className="font-black text-[12px] uppercase tracking-wide text-amber-500 mb-1">
+                  {activeBanner.name}
+                </p>
+                <p className={cn("text-[11px] leading-relaxed", isDark ? "text-stone-300" : "text-[#5D4037]")}>
+                  {activeBanner.description || "Bể Gacha đặc biệt chứa các sticker độc quyền."}
+                </p>
+              </div>
+
+              {/* Rates */}
+              <div className={cn("p-3 rounded-xl border border-dashed", isDark ? "bg-black/35 border-white/10" : "bg-white border-[#3E2723]/15")}>
+                <p className="font-extrabold text-[#3E2723] dark:text-white mb-2 uppercase tracking-tight text-[11px]">Tỷ lệ rơi (Drop rates):</p>
+                <div className="space-y-1">
+                  <div className="flex justify-between font-bold text-amber-500">
+                    <span>⭐⭐⭐⭐⭐ 5 SAO</span>
+                    <span>0.6% <span className="text-[9px] font-normal text-stone-500 dark:text-stone-400">(Tăng mạnh sau lần 75, bảo hiểm lần 90)</span></span>
+                  </div>
+                  <div className="flex justify-between font-bold text-purple-500">
+                    <span>⭐⭐⭐⭐ 4 SAO</span>
+                    <span>5.1% <span className="text-[9px] font-normal text-stone-500 dark:text-stone-400">(Mỗi 10 lần chắc chắn có ít nhất 1 lần 4 sao trở lên)</span></span>
+                  </div>
+                  <div className="flex justify-between font-bold text-stone-500">
+                    <span>⭐⭐⭐ 3 SAO</span>
+                    <span>94.3%</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pool items list */}
+              <div className="space-y-2">
+                <p className="font-extrabold text-stone-900 dark:text-stone-100 uppercase tracking-tight text-[11px]">Danh sách các Sticker có trong Bể:</p>
+
+                {/* 5 Star list */}
+                {activeBanner.pool5Star && activeBanner.pool5Star.length > 0 && (
+                  <div className="space-y-1">
+                    <p className="font-black text-amber-500 text-[10px] uppercase tracking-wider">🌟 STICKER 5 SAO HOÀNG KIM:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {activeBanner.pool5Star.map((item) => (
+                        <span key={item.id} className={cn("px-2 py-1 rounded-md text-[10px] sm:text-[11px] font-extrabold border uppercase", isDark ? "bg-[#2C211E] text-amber-400 border-amber-500/20" : "bg-[#FFFBEB] text-amber-600 border-amber-300")}>
+                          {item.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 4 Star list */}
+                {activeBanner.pool4Star && activeBanner.pool4Star.length > 0 && (
+                  <div className="space-y-1 pt-1">
+                    <p className="font-black text-purple-500 text-[10px] uppercase tracking-wider">✨ STICKER 4 SAO:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {activeBanner.pool4Star.map((item) => (
+                        <span key={item.id} className={cn("px-2 py-1 rounded-md text-[10px] sm:text-[11px] font-extrabold border uppercase", isDark ? "bg-[#251A24] text-purple-400 border-purple-500/20" : "bg-[#FAF5FF] text-purple-600 border-purple-300")}>
+                          {item.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3 Star list */}
+                <div className="space-y-1 pt-1">
+                  <p className="font-black text-stone-500 text-[10px] uppercase tracking-wider">📦 PHẦN THƯỞNG 3 SAO:</p>
+                  <p className={cn("text-[10px]", isDark ? "text-stone-400" : "text-stone-600")}>
+                    Món quà 10 Mảnh Choco dùng để tăng tiến trình, dùng nâng cấp Chucu hoặc đổi các bộ phụ kiện giới hạn khác.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setDetailsOpen(false)}
+              className={cn(
+                "mt-4 w-full py-2.5 rounded-xl font-black transition-all uppercase tracking-wider text-xs border-2 cursor-pointer text-center",
+                isDark 
+                  ? "bg-black/40 hover:bg-[#FFFDF9] text-stone-200 hover:text-[#3E2723] border-white/20 hover:border-[#FFFDF9]" 
+                  : "bg-[#FFFDF9] hover:bg-[#3E2723] text-[#3E2723] hover:text-white border-[#3E2723]/30"
+              )}
+            >
+              Đóng
+            </button>
           </div>
         </div>
       )}
