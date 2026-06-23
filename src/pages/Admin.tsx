@@ -344,6 +344,31 @@ export function Admin() {
 
   // Gacha Banner Management states
   const [gachaBanners, setGachaBanners] = useState<any[]>([]);
+  const [rawGachaBanners, setRawGachaBanners] = useState<any[]>([]);
+  const [dbGachaItems, setDbGachaItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    const merged = rawGachaBanners.map(banner => {
+      const bannerItems = dbGachaItems.filter(item => item.bannerId === banner.id);
+      
+      const pool5Star = [
+        ...(banner.pool5Star || []).filter((item: any) => !dbGachaItems.some(gi => gi.id === item.id)),
+        ...bannerItems.filter(item => item.rarity === 5)
+      ];
+      
+      const pool4Star = [
+        ...(banner.pool4Star || []).filter((item: any) => !dbGachaItems.some(gi => gi.id === item.id)),
+        ...bannerItems.filter(item => item.rarity === 4)
+      ];
+
+      return {
+        ...banner,
+        pool5Star,
+        pool4Star
+      };
+    });
+    setGachaBanners(merged);
+  }, [rawGachaBanners, dbGachaItems]);
   const [selectedBannerId, setSelectedBannerId] = useState<string>("");
   const [gbType, setGbType] = useState<"standard" | "limited">("standard");
   const [gbName, setGbName] = useState("");
@@ -864,7 +889,7 @@ export function Admin() {
         snap.forEach((docSnap) => {
           list.push({ id: docSnap.id, ...docSnap.data() });
         });
-        setGachaBanners(list);
+        setRawGachaBanners(list);
         if (list.length === 0) {
           const initialBanner = {
             type: "standard",
@@ -886,12 +911,27 @@ export function Admin() {
       }
     );
 
+    const unsubGachaItems = onSnapshot(
+      collection(db, "gacha_items"),
+      (snap) => {
+        const list: any[] = [];
+        snap.forEach((docSnap) => {
+          list.push({ id_db: docSnap.id, ...docSnap.data() });
+        });
+        setDbGachaItems(list);
+      },
+      (err) => {
+        console.error("Error fetching gacha items realtime:", err);
+      }
+    );
+
     return () => {
       unsubStickers();
       unsubAccessories();
       unsubChucuAccessories();
       unsubRadioTracks();
       unsubGacha();
+      unsubGachaItems();
     };
   }, []);
 
@@ -1036,34 +1076,76 @@ export function Admin() {
     }
   };
 
+  const handleStickerPoolResize = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 400; // Crisp and clean 400px maximum dimension
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.clearRect(0, 0, width, height); // Keep transparency
+            ctx.drawImage(img, 0, 0, width, height);
+          }
+          resolve(canvas.toDataURL("image/png"));
+        };
+        img.onerror = () => {
+          reject(new Error("Không thể đọc ảnh"));
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = () => {
+        reject(new Error("Không thể đọc file"));
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handlePoolStickerImageChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    let base64Data: string;
-    if (file.type === "image/gif") {
-      base64Data = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          resolve(event.target?.result as string);
-        };
-        reader.readAsDataURL(file);
-      });
-    } else {
-      base64Data = await handleImageResize(file);
-    }
-
-    if (base64Data.length > 500000) {
-      alert(
-        "Ảnh sticker quá lớn! Vui lòng chọn ảnh dung lượng nhỏ hơn (dưới ~350KB).",
-      );
+    if (file.size > 950 * 1024) {
+      alert("Ảnh sticker quá lớn! Vui lòng chọn ảnh dưới 950KB để đảm bảo hệ thống lưu trữ hoạt động ổn định.");
       if (poolStickerFileInputRef.current) poolStickerFileInputRef.current.value = "";
       return;
     }
 
-    setPoolItemImage(base64Data);
+    try {
+      if (file.type === "image/gif") {
+        // Safe to read base64 directly as individual documents can up to 1MB
+        const base64Data = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            resolve(event.target?.result as string);
+          };
+          reader.readAsDataURL(file);
+        });
+        setPoolItemImage(base64Data);
+      } else {
+        const base64Data = await handleStickerPoolResize(file);
+        setPoolItemImage(base64Data);
+      }
+    } catch (err: any) {
+      alert("Lỗi tải ảnh sticker gacha: " + err.message);
+    }
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -2121,27 +2203,19 @@ export function Admin() {
     if (!currentBanner) return;
 
     try {
+      const newItemId = "item-" + Date.now();
       const newItem = {
-        id: "item-" + Date.now(),
+        id: newItemId,
+        bannerId: selectedBannerId,
         name: poolItemName.trim(),
         rarity: poolItemRarity,
         type: poolItemType,
         image: poolItemImage.trim() || "",
-        description: poolItemDesc.trim() || ""
+        description: poolItemDesc.trim() || "",
+        createdAt: new Date().toISOString()
       };
 
-      const p5 = currentBanner.pool5Star || [];
-      const p4 = currentBanner.pool4Star || [];
-
-      if (poolItemRarity === 5) {
-        await updateDoc(doc(db, "gacha_banners", selectedBannerId), {
-          pool5Star: [...p5, newItem]
-        });
-      } else {
-        await updateDoc(doc(db, "gacha_banners", selectedBannerId), {
-          pool4Star: [...p4, newItem]
-        });
-      }
+      await addDoc(collection(db, "gacha_items"), newItem);
 
       alert("Đã thêm vật phẩm vào bể gacha!");
       setPoolItemName("");
@@ -2161,6 +2235,7 @@ export function Admin() {
         if (!currentBanner) return;
 
         try {
+          // 1. Delete from legacy arrays if present
           if (itemRarity === 5) {
             const updated = (currentBanner.pool5Star || []).filter((i: any) => i.id !== itemId);
             await updateDoc(doc(db, "gacha_banners", bannerId), { pool5Star: updated });
@@ -2168,6 +2243,14 @@ export function Admin() {
             const updated = (currentBanner.pool4Star || []).filter((i: any) => i.id !== itemId);
             await updateDoc(doc(db, "gacha_banners", bannerId), { pool4Star: updated });
           }
+
+          // 2. Delete from flat gacha_items collection
+          const q = query(collection(db, "gacha_items"), where("id", "==", itemId));
+          const querySnap = await getDocs(q);
+          querySnap.forEach(async (docSnap) => {
+            await deleteDoc(docSnap.ref);
+          });
+
           alert("Đã xoá vật phẩm!");
         } catch (err: any) {
           console.error(err);
@@ -3531,26 +3614,20 @@ export function Admin() {
                           return;
                         }
                         try {
+                          const newItemId = "item-" + Date.now();
                           const newItem = {
-                            id: "item-" + Date.now(),
+                            id: newItemId,
+                            bannerId: stdBanner.id,
                             name: poolItemName.trim(),
                             rarity: poolItemRarity,
                             type: "sticker",
                             image: poolItemImage.trim(),
-                            description: poolItemDesc.trim() || ""
+                            description: poolItemDesc.trim() || "",
+                            createdAt: new Date().toISOString()
                           };
 
-                          if (poolItemRarity === 5) {
-                            const p5 = stdBanner.pool5Star || [];
-                            await updateDoc(doc(db, "gacha_banners", stdBanner.id), {
-                              pool5Star: [...p5, newItem]
-                            });
-                          } else {
-                            const p4 = stdBanner.pool4Star || [];
-                            await updateDoc(doc(db, "gacha_banners", stdBanner.id), {
-                              pool4Star: [...p4, newItem]
-                            });
-                          }
+                          await addDoc(collection(db, "gacha_items"), newItem);
+
                           alert(`Đã tải & thêm "${poolItemName}" lên Pool thường thành công!`);
                           setPoolItemName("");
                           setPoolItemImage("");
