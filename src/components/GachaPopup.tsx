@@ -487,9 +487,9 @@ export default function GachaPopup() {
         )}>
           
           {/* Header Controls (Absolute positioned inside the bordered Banner Area) */}
-          <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-3.5 sm:p-4 pointer-events-none">
+          <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-3.5 sm:p-4 md:p-6 pointer-events-none">
             {/* Header Currency */}
-            <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-3 max-w-[70%] sm:max-w-[75%] md:max-w-none pointer-events-auto">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-3 max-w-[70%] sm:max-w-[75%] md:max-w-none md:ml-auto md:mr-4 pointer-events-auto">
               <div className={cn(
                 "flex items-center gap-1 sm:gap-2 backdrop-blur px-2.5 sm:px-3.5 py-1.5 rounded-full border shadow-md",
                 isDark 
@@ -564,7 +564,7 @@ export default function GachaPopup() {
           </div>
 
           {/* Banner Info Content */}
-          <div className="relative z-10 pt-16 sm:pt-20 md:pt-8 px-5 md:px-8 pb-4 flex-grow flex flex-col justify-between text-shadow-sm select-text text-center md:text-left">
+          <div className="relative z-10 pt-16 sm:pt-20 md:pt-16 px-5 md:px-8 pb-4 flex-grow flex flex-col justify-between text-shadow-sm select-text text-center md:text-left">
             <h1 className={cn(
               "text-xl sm:text-3xl md:text-5xl font-black font-sans uppercase tracking-tight transition-all duration-300 mt-2 md:mt-0",
               isDark 
