@@ -1121,10 +1121,10 @@ export default function GachaPopup() {
             <button 
               onClick={() => setShowResults(null)}
               className={cn(
-                "mt-16 px-12 py-3.5 font-extrabold rounded-full transition-all uppercase tracking-widest cursor-pointer shadow-lg hover:scale-105 active:scale-95 text-xs sm:text-sm border-2",
+                "mt-16 px-12 py-3.5 font-extrabold rounded-full transition-all uppercase tracking-widest cursor-pointer shadow-lg hover:scale-105 active:scale-95 text-xs sm:text-sm border-2 shadow-[4px_4px_0px_#1A1412]",
                 isDark 
-                  ? "bg-amber-400 hover:bg-amber-500 border-amber-300 text-stone-950 dark:bg-amber-400 dark:text-stone-950" 
-                  : "bg-[#3E2723] hover:bg-[#5D4037] border-[#3E2723] text-white"
+                  ? "bg-[#3C2E27] hover:bg-[#5D4037] border-[#5D4037] text-[#ECE5DC] dark:bg-[#3C2E27] dark:text-[#ECE5DC] dark:border-[#5D4037] dark:hover:bg-[#5D4037]" 
+                  : "bg-[#3E2723] hover:bg-[#5D4037] border-[#3E2723] text-[#FFFDF9]"
               )}
             >
               Xác Nhận
