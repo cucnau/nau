@@ -180,6 +180,8 @@ interface UserState {
   sentMessagesCount: number;
   totalChaptersRead: number;
   totalCommentsCount: number;
+  totalGachaPulls?: number;
+  totalRadioSeconds?: number;
   genresRead: string[];
   activePoints: number;
   lastActiveWeek: string;
@@ -278,11 +280,42 @@ export const getWeeklyMissions = (): Mission[] => [
   { id: 'w3', type: 'weekly', description: 'Bình luận 10 lần', chocoReward: 20, goldenReward: 1, progress: 0, target: 10, completed: false, claimed: false },
 ];
 
-export const getPermanentMissions = (): Mission[] => [
-  { id: 'p1', type: 'permanent', description: 'Điểm danh 30 ngày', chocoReward: 30, goldenReward: 3, progress: 0, target: 30, completed: false, claimed: false },
-  { id: 'p2', type: 'permanent', description: 'Điểm danh 60 ngày', chocoReward: 60, goldenReward: 6, progress: 0, target: 60, completed: false, claimed: false },
-  { id: 'p3', type: 'permanent', description: 'Điểm danh 90 ngày', chocoReward: 90, goldenReward: 9, progress: 0, target: 90, completed: false, claimed: false },
-];
+export const getPermanentMissions = (): Mission[] => {
+   const res: Mission[] = [];
+   // Điểm danh (30, 60, 90...)
+   for (let i = 1; i <= 20; i++) {
+       res.push({ id: `p_checkin_${i}`, type: 'permanent', description: `Điểm danh ${i * 30} ngày`, chocoReward: i * 30, goldenReward: i * 3, progress: 0, target: i * 30, completed: false, claimed: false });
+   }
+   // Đọc (50, 100...)
+   for (let i = 1; i <= 20; i++) {
+       res.push({ id: `p_read_${i}`, type: 'permanent', description: `Đọc ${i * 50} chương truyện`, chocoReward: i * 50, goldenReward: i * 5, progress: 0, target: i * 50, completed: false, claimed: false });
+   }
+   // Level (10, 20...)
+   for (let i = 1; i <= 10; i++) {
+       res.push({ id: `p_level_${i}`, type: 'permanent', description: `Đạt độc giả cấp độ ${i * 10}`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 10, completed: false, claimed: false });
+   }
+   // Bình luận (50, 100...)
+   for (let i = 1; i <= 20; i++) {
+       res.push({ id: `p_comm_${i}`, type: 'permanent', description: `Bình luận truyện ${i * 50} lần`, chocoReward: i * 50, goldenReward: i * 5, progress: 0, target: i * 50, completed: false, claimed: false });
+   }
+   // Gacha (50, 100...)
+   for (let i = 1; i <= 20; i++) {
+       res.push({ id: `p_gacha_${i}`, type: 'permanent', description: `Gacha tổng cộng ${i * 50} lần`, chocoReward: i * 50, goldenReward: i * 5, progress: 0, target: i * 50, completed: false, claimed: false });
+   }
+   // Hứng rơi (1000, 2000...)
+   for (let i = 1; i <= 20; i++) {
+       res.push({ id: `p_catch_${i}`, type: 'permanent', description: `Hứng rơi được tổng cộng ${i * 1000} điểm thưởng từ game Hứng Choco`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 1000, completed: false, claimed: false });
+   }
+   // Radio (60, 120... mins)
+   for (let i = 1; i <= 20; i++) {
+       res.push({ id: `p_radio_${i}`, type: 'permanent', description: `Nghe choco radio tổng cộng ${i * 60} phút`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 60, completed: false, claimed: false });
+   }
+   // Tiêu Choco (100, 200...)
+   for (let i = 1; i <= 20; i++) {
+       res.push({ id: `p_spend_${i}`, type: 'permanent', description: `Tiêu tổng cộng ${i * 100} Choco`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 100, completed: false, claimed: false });
+   }
+   return res;
+};
 
 export const reconcileMissions = (loadedMissions: Mission[]): Mission[] => {
   const defaults = [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()];
@@ -393,6 +426,8 @@ export const useStore = create<UserState>()(
       sentMessagesCount: 0,
       totalChaptersRead: 0,
       totalCommentsCount: 0,
+      totalGachaPulls: 0,
+      totalRadioSeconds: 0,
       genresRead: [],
       activePoints: 0,
       maxConsecutiveChocoCount: 0,
@@ -491,6 +526,8 @@ export const useStore = create<UserState>()(
         sentMessagesCount: 0,
         totalChaptersRead: 0,
         totalCommentsCount: 0,
+        totalGachaPulls: 0,
+        totalRadioSeconds: 0,
         genresRead: [],
         activePoints: 0,
         maxConsecutiveChocoCount: 0,
@@ -704,6 +741,8 @@ export const useStore = create<UserState>()(
             sentMessagesCount: data.sentMessagesCount !== undefined ? data.sentMessagesCount : state.sentMessagesCount,
             totalChaptersRead: computedChapters,
             totalCommentsCount: data.totalCommentsCount !== undefined ? data.totalCommentsCount : state.totalCommentsCount,
+            totalGachaPulls: data.totalGachaPulls !== undefined ? data.totalGachaPulls : (state.totalGachaPulls || 0),
+            totalRadioSeconds: data.totalRadioSeconds !== undefined ? data.totalRadioSeconds : (state.totalRadioSeconds || 0),
             genresRead: data.genresRead !== undefined ? data.genresRead : state.genresRead,
             activePoints: data.activePoints !== undefined ? data.activePoints : state.activePoints,
             maxConsecutiveChocoCount: data.maxConsecutiveChocoCount !== undefined ? data.maxConsecutiveChocoCount : (state.maxConsecutiveChocoCount || 0),
@@ -1972,9 +2011,49 @@ export const useStore = create<UserState>()(
 
       _triggerCountAchievementsCheck: () => {
          const state = get();
-         if (!state.isLoggedIn) return;
          
          const currentUnlocked = state.unlockedAchievements || [];
+         
+         // Evaluate permanent missions progress dynamically
+         const ms = reconcileMissions([...state.missions]);
+         let msChanged = false;
+         
+         ms.filter(m => m.type === 'permanent').forEach(p => {
+             let newProg = p.progress;
+             if (p.id.startsWith('p_checkin_')) {
+                 newProg = Math.max(state.totalCheckIns || 0, state.checkInStreak || 0);
+             } else if (p.id.startsWith('p_read_')) {
+                 newProg = state.totalChaptersRead || 0;
+             } else if (p.id.startsWith('p_comm_')) {
+                 newProg = state.totalCommentsCount || 0;
+             } else if (p.id.startsWith('p_level_')) {
+                 newProg = state.level || 1;
+             } else if (p.id.startsWith('p_gacha_')) {
+                 newProg = state.totalGachaPulls || 0;
+             } else if (p.id.startsWith('p_catch_')) {
+                 newProg = state.totalChocoCaught || 0;
+             } else if (p.id.startsWith('p_radio_')) {
+                 newProg = Math.floor((state.totalRadioSeconds || 0) / 60);
+             } else if (p.id.startsWith('p_spend_')) {
+                 newProg = state.totalSpentChoco || 0;
+             }
+             
+             if (newProg !== p.progress) {
+                 p.progress = newProg;
+                 if (p.progress >= p.target) p.completed = true;
+                 msChanged = true;
+             }
+         });
+         
+         if (msChanged) {
+            set({ missions: ms });
+            get().updateUserDoc({ missions: ms });
+            if (state.uid) {
+               const allMs = { ...(state.allUsersMissions || {}) };
+               allMs[state.uid] = ms;
+               set({ allUsersMissions: allMs });
+            }
+         }
          
          // 3. Multi Genre fallback trigger
          if (!currentUnlocked.includes('multi_genre') && (state.genresRead || []).length >= 5 && (state.readHistoryList || []).length >= 5) {
@@ -2232,6 +2311,13 @@ export const useStore = create<UserState>()(
     }),
     {
       name: 'truyen-storage',
+      merge: (persistedState: any, currentState: UserState) => {
+         const merged = { ...currentState, ...persistedState };
+         if (persistedState.missions) {
+             merged.missions = reconcileMissions(persistedState.missions);
+         }
+         return merged as UserState;
+      }
     }
   )
 );
