@@ -19,13 +19,16 @@ export default function GachaPopup() {
   
   // Custom limited banner loaded from DB
   const [banners, setBanners] = useState<GachaBanner[]>([]);
+  const [rawBanners, setRawBanners] = useState<GachaBanner[]>([]);
+  const [gachaItems, setGachaItems] = useState<any[]>([]);
   const [activeBanner, setActiveBanner] = useState<GachaBanner>(GACHA_STANDARD_BANNER);
   const [isPulling, setIsPulling] = useState(false);
   const [showResults, setShowResults] = useState<GachaItem[] | null>(null);
 
   useEffect(() => {
     if (!isGachaOpen) return;
-    const unsub = onSnapshot(collection(db, "gacha_banners"), (snap) => {
+    
+    const unsubBanners = onSnapshot(collection(db, "gacha_banners"), (snap) => {
       const list: GachaBanner[] = [];
       snap.forEach((docSnap) => {
         const data = docSnap.data();
@@ -33,23 +36,61 @@ export default function GachaPopup() {
           list.push({ id: docSnap.id, ...data } as GachaBanner);
         }
       });
-      setBanners(list);
-      if (list.length > 0) {
-        setActiveBanner(prev => {
-          if (prev) {
-            const found = list.find(b => b.id === prev.id);
-            if (found) return found;
-          }
-          const std = list.find(b => b.type === 'standard');
-          return std || list[0];
-        });
-      }
+      setRawBanners(list);
     }, (err) => {
       console.error("Error reading banners:", err);
     });
 
-    return () => unsub();
+    const unsubItems = onSnapshot(collection(db, "gacha_items"), (snap) => {
+      const list: any[] = [];
+      snap.forEach((docSnap) => {
+        list.push({ id_db: docSnap.id, ...docSnap.data() });
+      });
+      setGachaItems(list);
+    }, (err) => {
+      console.error("Error reading gacha items:", err);
+    });
+
+    return () => {
+      unsubBanners();
+      unsubItems();
+    };
   }, [isGachaOpen]);
+
+  useEffect(() => {
+    const merged = rawBanners.map(banner => {
+      const bannerItems = gachaItems.filter(item => item.bannerId === banner.id);
+      
+      const pool5Star = [
+        ...(banner.pool5Star || []).filter((item: any) => !gachaItems.some((gi: any) => gi.id === item.id)),
+        ...bannerItems.filter(item => item.rarity === 5)
+      ];
+      
+      const pool4Star = [
+        ...(banner.pool4Star || []).filter((item: any) => !gachaItems.some((gi: any) => gi.id === item.id)),
+        ...bannerItems.filter(item => item.rarity === 4)
+      ];
+
+      return {
+        ...banner,
+        pool5Star,
+        pool4Star
+      };
+    });
+
+    setBanners(merged);
+
+    if (merged.length > 0) {
+      setActiveBanner(prev => {
+        if (prev) {
+          const found = merged.find(b => b.id === prev.id);
+          if (found) return found;
+        }
+        const std = merged.find(b => b.type === 'standard');
+        return std || merged[0];
+      });
+    }
+  }, [rawBanners, gachaItems]);
 
   if (!isGachaOpen) return null;
 
