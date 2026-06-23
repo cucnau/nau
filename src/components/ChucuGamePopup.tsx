@@ -223,29 +223,55 @@ export function ChucuGamePopup() {
       return;
     }
     if (type === 'choco') {
-      if (chucuGameFragments < 10) {
+      const maxQty = Math.floor(chucuGameFragments / 10);
+      if (maxQty <= 0) {
         alert("Bạn cần tích lũy tối thiểu 10 mảnh Choco để quy đổi!");
         return;
       }
-      const newFragments = chucuGameFragments - 10;
-      const newChoco = choco + 1;
+      const input = prompt(`Nhập số lượng Choco muốn đổi (10 mảnh Choco = 1 Choco). Tối đa bạn đổi được ${maxQty} Choco:`, "1");
+      if (input === null) return;
+      const qty = parseInt(input, 10);
+      if (isNaN(qty) || qty <= 0) {
+        alert("Số lượng đổi không hợp lệ!");
+        return;
+      }
+      const cost = qty * 10;
+      if (chucuGameFragments < cost) {
+        alert(`Bạn không có đủ mảnh Choco (Cần ${cost} mảnh, hiện có ${chucuGameFragments} mảnh)!`);
+        return;
+      }
+      const newFragments = chucuGameFragments - cost;
+      const newChoco = choco + qty;
       updateUserDoc({
         chucuGameFragments: newFragments,
         choco: newChoco
       });
-      alert("Đổi thành công 10 mảnh lấy 1 Choco thực!");
+      alert(`Đổi thành công ${cost} mảnh lấy ${qty} Choco thực!`);
     } else {
-      if (chucuGameGFragments < 10) {
+      const maxQty = Math.floor(chucuGameGFragments / 10);
+      if (maxQty <= 0) {
         alert("Bạn cần tích lũy tối thiểu 10 mảnh Gchoco để quy đổi!");
         return;
       }
-      const newFragments = chucuGameGFragments - 10;
-      const newGChoco = goldenChoco + 1;
+      const input = prompt(`Nhập số lượng GChoco muốn đổi (10 mảnh Gchoco = 1 GChoco). Tối đa bạn đổi được ${maxQty} GChoco:`, "1");
+      if (input === null) return;
+      const qty = parseInt(input, 10);
+      if (isNaN(qty) || qty <= 0) {
+        alert("Số lượng đổi không hợp lệ!");
+        return;
+      }
+      const cost = qty * 10;
+      if (chucuGameGFragments < cost) {
+        alert(`Bạn không có đủ mảnh Gchoco (Cần ${cost} mảnh, hiện có ${chucuGameGFragments} mảnh)!`);
+        return;
+      }
+      const newFragments = chucuGameGFragments - cost;
+      const newGChoco = goldenChoco + qty;
       updateUserDoc({
         chucuGameGFragments: newFragments,
         goldenChoco: newGChoco
       });
-      alert("Đổi thành công 10 mảnh lấy 1 Gchoco thực!");
+      alert(`Đổi thành công ${cost} mảnh lấy ${qty} Gchoco thực!`);
     }
   };
 
@@ -255,41 +281,80 @@ export function ChucuGamePopup() {
       return;
     }
     if (reward === 'mystery') {
-      if (chucuGameBonusPoints < 1200) {
+      const maxQty = Math.floor(chucuGameBonusPoints / 1200);
+      if (maxQty <= 0) {
         alert("Bạn chưa đủ 1200 điểm thưởng để đổi Hộp Sticker Bí Ẩn!");
         return;
       }
-      const newPoints = chucuGameBonusPoints - 1200;
-      const newBoxes = (ownedMysteryBoxes || 0) + 1;
+      const input = prompt(`Nhập số lượng Hộp Sticker Bí Ẩn muốn đổi (1200 điểm = 1 Hộp). Tối đa bạn đổi được ${maxQty} Hộp:`, "1");
+      if (input === null) return;
+      const qty = parseInt(input, 10);
+      if (isNaN(qty) || qty <= 0) {
+        alert("Số lượng đổi không hợp lệ!");
+        return;
+      }
+      const cost = qty * 1200;
+      if (chucuGameBonusPoints < cost) {
+        alert(`Bạn không có đủ điểm thưởng (Cần ${cost} điểm, hiện có ${chucuGameBonusPoints} điểm)!`);
+        return;
+      }
+      const newPoints = chucuGameBonusPoints - cost;
+      const newBoxes = (ownedMysteryBoxes || 0) + qty;
       updateUserDoc({
         chucuGameBonusPoints: newPoints,
         ownedMysteryBoxes: newBoxes
       });
-      alert("Đổi thành công 1200 điểm lấy 1 Hộp Sticker Bí Ẩn!");
+      alert(`Đổi thành công ${cost} điểm lấy ${qty} Hộp Sticker Bí Ẩn!`);
     } else if (reward === 'streak_ticket') {
-      if (chucuGameBonusPoints < 800) {
+      const maxQty = Math.floor(chucuGameBonusPoints / 800);
+      if (maxQty <= 0) {
         alert("Bạn chưa đủ 800 điểm thưởng để đổi Vé Giữ Chuỗi!");
         return;
       }
-      const newPoints = chucuGameBonusPoints - 800;
-      const newTickets = (ownedStreakTickets || 0) + 1;
+      const input = prompt(`Nhập số lượng Vé Giữ Chuỗi muốn đổi (800 điểm = 1 Vé). Tối đa bạn đổi được ${maxQty} Vé:`, "1");
+      if (input === null) return;
+      const qty = parseInt(input, 10);
+      if (isNaN(qty) || qty <= 0) {
+        alert("Số lượng đổi không hợp lệ!");
+        return;
+      }
+      const cost = qty * 800;
+      if (chucuGameBonusPoints < cost) {
+        alert(`Bạn không có đủ điểm thưởng (Cần ${cost} điểm, hiện có ${chucuGameBonusPoints} điểm)!`);
+        return;
+      }
+      const newPoints = chucuGameBonusPoints - cost;
+      const newTickets = (ownedStreakTickets || 0) + qty;
       updateUserDoc({
         chucuGameBonusPoints: newPoints,
         ownedStreakTickets: newTickets
       });
-      alert("Đổi thành công 800 điểm lấy 1 Vé Giữ Chuỗi!");
+      alert(`Đổi thành công ${cost} điểm lấy ${qty} Vé Giữ Chuỗi!`);
     } else if (reward === 'gacha_ticket') {
-      if (chucuGameBonusPoints < 1500) {
+      const maxQty = Math.floor(chucuGameBonusPoints / 1500);
+      if (maxQty <= 0) {
         alert("Bạn chưa đủ 1500 điểm thưởng để đổi Vé Gacha!");
         return;
       }
-      const newPoints = chucuGameBonusPoints - 1500;
-      const newTickets = (useStore.getState().ownedGachaTickets || 0) + 1;
+      const input = prompt(`Nhập số lượng Vé Gacha muốn đổi (1500 điểm = 1 Vé). Tối đa bạn đổi được ${maxQty} Vé:`, "1");
+      if (input === null) return;
+      const qty = parseInt(input, 10);
+      if (isNaN(qty) || qty <= 0) {
+        alert("Số lượng đổi không hợp lệ!");
+        return;
+      }
+      const cost = qty * 1500;
+      if (chucuGameBonusPoints < cost) {
+        alert(`Bạn không có đủ điểm thưởng (Cần ${cost} điểm, hiện có ${chucuGameBonusPoints} điểm)!`);
+        return;
+      }
+      const newPoints = chucuGameBonusPoints - cost;
+      const newTickets = (useStore.getState().ownedGachaTickets || 0) + qty;
       updateUserDoc({
         chucuGameBonusPoints: newPoints,
         ownedGachaTickets: newTickets
       });
-      alert("Đổi thành công 1500 điểm lấy 1 Vé Gacha!");
+      alert(`Đổi thành công ${cost} điểm lấy ${qty} Vé Gacha!`);
     }
   };
 
