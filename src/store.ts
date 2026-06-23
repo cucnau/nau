@@ -84,6 +84,8 @@ interface UserState {
   ownedMysteryBoxes: number;
   ownedStreakTickets?: number;
   ownedGachaTickets?: number;
+  gachaPity5Star?: number;
+  gachaPity4Star?: number;
   activeStreakProtection?: boolean;
   lastFreeStreakRecoveryMonth?: string | null;
   lastClaimedRewardLevel: number;
@@ -125,6 +127,11 @@ interface UserState {
   setChucuGameOpen: (open: boolean) => void;
   isChocoRadioOpen: boolean;
   setChocoRadioOpen: (open: boolean) => void;
+
+  isGachaOpen: boolean;
+  setGachaOpen: (open: boolean) => void;
+  isGachaAdminOpen: boolean;
+  setGachaAdminOpen: (open: boolean) => void;
 
   chucuGameFragments: number;
   chucuGameGFragments: number;
@@ -297,6 +304,8 @@ export const useStore = create<UserState>()(
       // Chucu Game & Radio default states
       isChucuGameOpen: false,
       isChocoRadioOpen: false,
+      isGachaOpen: false,
+      isGachaAdminOpen: false,
       chucuGameFragments: 0,
       chucuGameGFragments: 0,
       chucuGameBonusPoints: 0,
@@ -307,6 +316,8 @@ export const useStore = create<UserState>()(
       ownedMysteryBoxes: 0,
       ownedStreakTickets: 0,
       ownedGachaTickets: 0,
+      gachaPity5Star: 0,
+      gachaPity4Star: 0,
       activeStreakProtection: false,
       lastFreeStreakRecoveryMonth: null,
       lastClaimedRewardLevel: 1,
@@ -413,6 +424,8 @@ export const useStore = create<UserState>()(
         ownedMysteryBoxes: 0,
         ownedStreakTickets: 0,
         ownedGachaTickets: 0,
+        gachaPity5Star: 0,
+        gachaPity4Star: 0,
         activeStreakProtection: false,
         lastFreeStreakRecoveryMonth: null,
         lastClaimedRewardLevel: 1,
@@ -606,6 +619,8 @@ export const useStore = create<UserState>()(
             ownedMysteryBoxes: data.ownedMysteryBoxes !== undefined ? data.ownedMysteryBoxes : state.ownedMysteryBoxes,
             ownedStreakTickets: data.ownedStreakTickets !== undefined ? data.ownedStreakTickets : state.ownedStreakTickets,
             ownedGachaTickets: data.ownedGachaTickets !== undefined ? data.ownedGachaTickets : state.ownedGachaTickets,
+            gachaPity5Star: data.gachaPity5Star !== undefined ? data.gachaPity5Star : state.gachaPity5Star,
+            gachaPity4Star: data.gachaPity4Star !== undefined ? data.gachaPity4Star : state.gachaPity4Star,
             activeStreakProtection: data.activeStreakProtection !== undefined ? data.activeStreakProtection : state.activeStreakProtection,
             lastFreeStreakRecoveryMonth: data.lastFreeStreakRecoveryMonth !== undefined ? data.lastFreeStreakRecoveryMonth : state.lastFreeStreakRecoveryMonth,
             lastClaimedRewardLevel: data.lastClaimedRewardLevel !== undefined ? data.lastClaimedRewardLevel : state.lastClaimedRewardLevel,
@@ -1526,6 +1541,14 @@ export const useStore = create<UserState>()(
 
       setChocoRadioOpen: (open: boolean) => {
          set({ isChocoRadioOpen: open });
+      },
+
+      setGachaOpen: (open: boolean) => {
+         set({ isGachaOpen: open });
+      },
+
+      setGachaAdminOpen: (open: boolean) => {
+         set({ isGachaAdminOpen: open });
       },
 
       addChucuGameFragments: (amt: number) => {
