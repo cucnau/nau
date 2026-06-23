@@ -412,6 +412,23 @@ function AchievementsModal() {
     }
   };
 
+  const categoryUnclaimedFlags = useMemo(() => {
+    return ACHIEVEMENT_CATEGORIES.reduce((acc, cat) => {
+      acc[cat.id] = false;
+      const catAchs = cat.id === 'all' 
+          ? ACHIEVEMENTS_LIST 
+          : ACHIEVEMENTS_LIST.filter(a => a.category === cat.id);
+      
+      for (const ach of catAchs) {
+          if (unlockedAchievements.includes(ach.id) && !claimedAchievements.includes(ach.id)) {
+              acc[cat.id] = true;
+              break;
+          }
+      }
+      return acc;
+    }, {} as Record<string, boolean>);
+  }, [unlockedAchievements, claimedAchievements]);
+
   return (
     <div className="text-[#3E2723] dark:text-[#ECE5DC] flex-1 flex flex-col relative">
       {/* Title Header */}
@@ -429,8 +446,11 @@ function AchievementsModal() {
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className="flex flex-col items-center justify-center gap-3 p-4 bg-[#EBE0D3] dark:bg-[#2A211D] border-[3px] border-[#3E2723]/30 dark:border-[#5D4037]/50 rounded-2xl hover:bg-[#D7CCC8] dark:hover:bg-[#3E2723] hover:border-[#3E2723]/80 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_6px_0_0_rgba(62,39,35,0.3)] dark:hover:shadow-[0_6px_0_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none shadow-[0_3px_0_0_rgba(62,39,35,0.2)] dark:shadow-[0_3px_0_0_rgba(0,0,0,0.3)] group"
+              className="flex flex-col items-center justify-center gap-3 p-4 bg-[#EBE0D3] dark:bg-[#2A211D] border-[3px] border-[#3E2723]/30 dark:border-[#5D4037]/50 rounded-2xl hover:bg-[#D7CCC8] dark:hover:bg-[#3E2723] hover:border-[#3E2723]/80 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_6px_0_0_rgba(62,39,35,0.3)] dark:hover:shadow-[0_6px_0_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none shadow-[0_3px_0_0_rgba(62,39,35,0.2)] dark:shadow-[0_3px_0_0_rgba(0,0,0,0.3)] group relative"
             >
+              {categoryUnclaimedFlags[cat.id] && (
+                <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-[#8D6E63] dark:bg-[#D7CCC8] rounded-full border-[2px] border-[#3E2723] dark:border-[#1E1815] animate-pulse"></span>
+              )}
               <div className="p-3 bg-[#FFFDF9] dark:bg-[#3C2E27] rounded-xl group-hover:bg-white dark:group-hover:bg-[#4E342E] group-hover:scale-110 transition-all duration-300 border-[2px] border-[#3E2723]/10 dark:border-transparent">
                 {getCategoryIcon(cat.id, "w-8 h-8 text-[#8D6E63] dark:text-[#D7CCC8]")}
               </div>
