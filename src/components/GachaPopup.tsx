@@ -330,8 +330,8 @@ export default function GachaPopup() {
           
           {/* Background Grid of Stickers */}
           <div className={cn(
-            "absolute inset-0 z-0 overflow-hidden p-6 flex flex-wrap gap-4 items-center justify-end content-center select-none pointer-events-none transition-all duration-300",
-            isDark ? "opacity-60" : "opacity-100"
+            "absolute inset-0 z-0 overflow-hidden p-6 flex flex-wrap gap-4 items-center justify-start content-center select-none pointer-events-none transition-all duration-300",
+            isDark ? "opacity-85" : "opacity-100"
           )}>
             {[
               ...(activeBanner.pool5Star || []).filter((item: any) => item.type === 'sticker' || item.image),
@@ -359,24 +359,10 @@ export default function GachaPopup() {
             ))}
           </div>
 
-          {/* Gradient overlays to ensure text readability */}
-          <div className={cn(
-            "absolute inset-0 z-[1] pointer-events-none transition-all duration-300",
-            isDark 
-              ? "bg-gradient-to-r from-[#1A1412]/80 via-[#1A1412]/40 to-transparent" 
-              : "bg-gradient-to-r from-[#FFFDF9]/85 via-[#FFFDF9]/40 to-transparent"
-          )} />
-          <div className={cn(
-            "absolute inset-0 z-[1] pointer-events-none transition-all duration-300",
-            isDark 
-              ? "bg-gradient-to-t from-[#1A1412]/50 via-transparent to-transparent" 
-              : "bg-gradient-to-t from-[#FFFDF9]/50 via-transparent to-transparent"
-          )} />
-
           {/* Banner Info Content */}
-          <div className="relative z-10 p-8 flex-grow flex flex-col justify-between text-shadow-sm select-text">
+          <div className="relative z-10 pt-2 px-8 pb-8 flex-grow flex flex-col justify-between text-shadow-sm select-text">
             <h1 className={cn(
-              "text-4xl md:text-6xl font-black font-sans uppercase italic tracking-tighter transition-all duration-300 mt-2 sm:mt-4",
+              "text-4xl md:text-6xl font-black font-sans uppercase italic tracking-tighter transition-all duration-300 mt-0",
               isDark 
                 ? "text-[#FFFDF9] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" 
                 : "text-[#3E2723] drop-shadow-[0_1px_2px_rgba(0,0,0,0.1)]"
