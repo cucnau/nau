@@ -27,7 +27,7 @@ export const GACHA_STANDARD_BANNER: GachaBanner = {
   id: 'standard-cup',
   type: 'standard',
   name: 'Cốc Choco Nóng',
-  description: 'Gacha Thường Trực - Nơi mang lại những hương vị cổ điển.',
+  description: 'Banner Thường',
   image: 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?q=80&w=600&auto=format&fit=crop', // Hot chocolate cup
   active: true,
   pool5Star: [],
