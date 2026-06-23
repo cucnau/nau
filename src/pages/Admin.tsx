@@ -300,6 +300,7 @@ export function Admin() {
   const [editingSticker, setEditingSticker] = useState<any | null>(null);
   const stickerFileInputRef = useRef<HTMLInputElement>(null);
   const editStickerFileInputRef = useRef<HTMLInputElement>(null);
+  const poolStickerFileInputRef = useRef<HTMLInputElement>(null);
 
   // Avatar Accessories state
   const [accessories, setAccessories] = useState<any[]>([]);
@@ -359,6 +360,8 @@ export function Admin() {
   const [poolItemDesc, setPoolItemDesc] = useState("");
 
   const [gachaSubTab, setGachaSubTab] = useState<"standard" | "limited">("standard");
+  const [editingStdBannerName, setEditingStdBannerName] = useState("");
+  const [isEditingStdBannerName, setIsEditingStdBannerName] = useState(false);
   const [featured5StarId, setFeatured5StarId] = useState("");
   const [customFeatured5StarName, setCustomFeatured5StarName] = useState("");
   const [customFeatured5StarImage, setCustomFeatured5StarImage] = useState("");
@@ -1031,6 +1034,36 @@ export function Admin() {
     } else {
       setStUrl(base64Data);
     }
+  };
+
+  const handlePoolStickerImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    let base64Data: string;
+    if (file.type === "image/gif") {
+      base64Data = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          resolve(event.target?.result as string);
+        };
+        reader.readAsDataURL(file);
+      });
+    } else {
+      base64Data = await handleImageResize(file);
+    }
+
+    if (base64Data.length > 500000) {
+      alert(
+        "Ảnh sticker quá lớn! Vui lòng chọn ảnh dung lượng nhỏ hơn (dưới ~350KB).",
+      );
+      if (poolStickerFileInputRef.current) poolStickerFileInputRef.current.value = "";
+      return;
+    }
+
+    setPoolItemImage(base64Data);
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -3399,9 +3432,61 @@ export function Admin() {
                     {/* Status & Toggle control */}
                     <div className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}>
                       <h3 className="text-sm font-black uppercase text-stone-500 tracking-wider">Trạng thái Bể Thường</h3>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-extrabold text-base text-[#3E2723] dark:text-[#ECE5DC]">{stdBanner.name}</div>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex-1">
+                          {isEditingStdBannerName ? (
+                            <div className="flex items-center gap-2 mt-1">
+                              <input
+                                type="text"
+                                value={editingStdBannerName}
+                                onChange={(e) => setEditingStdBannerName(e.target.value)}
+                                className="px-3 py-1.5 text-sm bg-white dark:bg-[#1A1412] border-2 border-[#8D6E63] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none w-full max-w-[200px]"
+                                placeholder="Nhập tên mới..."
+                                autoFocus
+                              />
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  if (!editingStdBannerName.trim()) {
+                                    alert("Tên banner không được để trống!");
+                                    return;
+                                  }
+                                  try {
+                                    await updateDoc(doc(db, "gacha_banners", stdBanner.id), {
+                                      name: editingStdBannerName.trim()
+                                    });
+                                    setIsEditingStdBannerName(false);
+                                  } catch (err: any) {
+                                    alert("Lỗi đổi tên: " + err.message);
+                                  }
+                                }}
+                                className="px-3 py-1.5 text-xs bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold cursor-pointer"
+                              >
+                                Lưu
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setIsEditingStdBannerName(false)}
+                                className="px-3 py-1.5 text-xs bg-stone-300 hover:bg-stone-400 text-stone-700 rounded-xl font-bold cursor-pointer"
+                              >
+                                Hủy
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <div className="font-extrabold text-base text-[#3E2723] dark:text-[#ECE5DC]">{stdBanner.name}</div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingStdBannerName(stdBanner.name || "");
+                                  setIsEditingStdBannerName(true);
+                                }}
+                                className="px-2 py-0.5 text-[11px] bg-amber-100 hover:bg-amber-200 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-300 rounded-lg font-bold cursor-pointer"
+                              >
+                                Đổi tên
+                              </button>
+                            </div>
+                          )}
                           <div className="text-xs text-stone-400 mt-1 italic">Tự động kích hoạt khi không có banner giới hạn.</div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -3530,12 +3615,33 @@ export function Admin() {
                         </div>
 
                         <div>
-                          <label className="block text-stone-500 font-bold mb-1 uppercase tracking-wide">URL hình ảnh Sticker *</label>
+                          <label className="block text-stone-500 font-bold mb-1 uppercase tracking-wide">Hình ảnh Sticker *</label>
+                          <div className="flex gap-2 items-center mb-2">
+                            <input
+                              type="file"
+                              accept="image/png, image/webp, image/gif"
+                              onChange={handlePoolStickerImageChange}
+                              ref={poolStickerFileInputRef}
+                              className="hidden"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => poolStickerFileInputRef.current?.click()}
+                              className={`px-4 py-2 border text-[11px] font-bold rounded-xl transition-all cursor-pointer ${
+                                isDark 
+                                  ? "bg-[#1D1410] border-[#8D6E63] text-[#ECE5DC] hover:bg-[#251A15]" 
+                                  : "bg-[#FDF6EC] border-[#8D6E63] text-[#8D6E63] hover:bg-white"
+                              }`}
+                            >
+                              Chọn File ảnh sticker (PNG/WebP/GIF)
+                            </button>
+                            <span className="text-[10px] text-stone-400 italic">Hoặc dán URL/Base64 dưới đây:</span>
+                          </div>
                           <input
                             type="text"
                             value={poolItemImage}
                             onChange={(e) => setPoolItemImage(e.target.value)}
-                            placeholder="https://..."
+                            placeholder="Dán URL ảnh hoặc dữ liệu Base64 tại đây..."
                             className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2.5 outline-none font-semibold text-[11px]"
                             required
                           />
