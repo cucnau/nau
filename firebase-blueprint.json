@@ -177,6 +177,26 @@
         "isLocalFile": { "type": "boolean" }
       },
       "required": ["title", "streamUrl"]
+    },
+    "GachaBanner": {
+      "title": "Gacha Banner",
+      "description": "Configuration for permanent and promotional limited banners",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "type": { "type": "string" },
+        "active": { "type": "boolean" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "featured5Star": { "type": "object" },
+        "featured4Stars": { "type": "array" },
+        "pool5Star": { "type": "array" },
+        "pool4Star": { "type": "array" },
+        "pool3Star": { "type": "array" }
+      },
+      "required": ["name", "type", "active"]
     }
   },
   "firestore": {
@@ -227,6 +247,10 @@
     "radioTracks/{trackId}": {
       "schema": { "$ref": "#/entities/RadioTrack" },
       "description": "Radio streams list"
+    },
+    "gacha_banners/{bannerId}": {
+      "schema": { "$ref": "#/entities/GachaBanner" },
+      "description": "Gacha reward configurations"
     }
   }
 }
