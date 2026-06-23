@@ -39,6 +39,7 @@ import {
   Wrench,
   Radio,
   Music,
+  Dices,
 } from "lucide-react";
 import { ACHIEVEMENTS_LIST } from "../types/achievements";
 
@@ -129,6 +130,7 @@ export function Admin() {
     | "accessories"
     | "chucu_accessories"
     | "radio"
+    | "gacha"
   >("stories");
 
   // Custom Confirmation Dialog
@@ -338,6 +340,40 @@ export function Admin() {
 
   // Posts Management
   const [posts, setPosts] = useState<any[]>([]);
+
+  // Gacha Banner Management states
+  const [gachaBanners, setGachaBanners] = useState<any[]>([]);
+  const [selectedBannerId, setSelectedBannerId] = useState<string>("");
+  const [gbType, setGbType] = useState<"standard" | "limited">("standard");
+  const [gbName, setGbName] = useState("");
+  const [gbDescription, setGbDescription] = useState("");
+  const [gbImage, setGbImage] = useState("");
+  const [gbActive, setGbActive] = useState(true);
+  const [gbStartDate, setGbStartDate] = useState("");
+  const [gbEndDate, setGbEndDate] = useState("");
+
+  const [poolItemName, setPoolItemName] = useState("");
+  const [poolItemRarity, setPoolItemRarity] = useState<4 | 5>(5);
+  const [poolItemType, setPoolItemType] = useState<"sticker" | "fragment">("sticker");
+  const [poolItemImage, setPoolItemImage] = useState("");
+  const [poolItemDesc, setPoolItemDesc] = useState("");
+
+  const [gachaSubTab, setGachaSubTab] = useState<"standard" | "limited">("standard");
+  const [featured5StarId, setFeatured5StarId] = useState("");
+  const [customFeatured5StarName, setCustomFeatured5StarName] = useState("");
+  const [customFeatured5StarImage, setCustomFeatured5StarImage] = useState("");
+
+  const [featured4Star1Id, setFeatured4Star1Id] = useState("");
+  const [customFeatured4Star1Name, setCustomFeatured4Star1Name] = useState("");
+  const [customFeatured4Star1Image, setCustomFeatured4Star1Image] = useState("");
+
+  const [featured4Star2Id, setFeatured4Star2Id] = useState("");
+  const [customFeatured4Star2Name, setCustomFeatured4Star2Name] = useState("");
+  const [customFeatured4Star2Image, setCustomFeatured4Star2Image] = useState("");
+
+  const [featured4Star3Id, setFeatured4Star3Id] = useState("");
+  const [customFeatured4Star3Name, setCustomFeatured4Star3Name] = useState("");
+  const [customFeatured4Star3Image, setCustomFeatured4Star3Image] = useState("");
 
   // Titles Management
   const [globalTitles, setGlobalTitles] = useState<CustomTitle[]>([]);
@@ -818,11 +854,41 @@ export function Admin() {
       },
     );
 
+    const unsubGacha = onSnapshot(
+      collection(db, "gacha_banners"),
+      (snap) => {
+        const list: any[] = [];
+        snap.forEach((docSnap) => {
+          list.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        setGachaBanners(list);
+        if (list.length === 0) {
+          const initialBanner = {
+            type: "standard",
+            name: "Cốc Choco Nóng",
+            description: "Gacha Thường Trực - Nơi mang lại những hương vị cổ điển.",
+            image: "https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?q=80&w=600&auto=format&fit=crop",
+            pool5Star: [],
+            pool4Star: [],
+            pool3Star: [
+              { id: "s3-1", name: "10 Mảnh Choco", rarity: 3, type: "fragment" },
+            ],
+            active: true
+          };
+          addDoc(collection(db, "gacha_banners"), initialBanner);
+        }
+      },
+      (err) => {
+        console.error("Error fetching gacha banners:", err);
+      }
+    );
+
     return () => {
       unsubStickers();
       unsubAccessories();
       unsubChucuAccessories();
       unsubRadioTracks();
+      unsubGacha();
     };
   }, []);
 
@@ -1799,6 +1865,285 @@ export function Admin() {
     });
   };
 
+  const handleCreateOrUpdateBanner = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!gbName.trim()) {
+      alert("Vui lòng điền tên banner!");
+      return;
+    }
+    try {
+      let f5Star = null;
+      if (featured5StarId === "custom") {
+        f5Star = {
+          id: "custom-5s-" + Date.now(),
+          name: customFeatured5StarName.trim() || "Sticker 5 Sao Giao Diện",
+          image: customFeatured5StarImage.trim() || "",
+          rarity: 5,
+          type: "sticker"
+        };
+      } else if (featured5StarId) {
+        const found = (stickers || []).find(s => s.id === featured5StarId);
+        if (found) {
+          f5Star = {
+            id: found.id,
+            name: found.name || "Sticker 5 Sao",
+            image: found.url || "",
+            rarity: 5,
+            type: "sticker"
+          };
+        }
+      }
+
+      const f4Stars = [];
+      const keys4 = [
+        { id: featured4Star1Id, customName: customFeatured4Star1Name, customImage: customFeatured4Star1Image },
+        { id: featured4Star2Id, customName: customFeatured4Star2Name, customImage: customFeatured4Star2Image },
+        { id: featured4Star3Id, customName: customFeatured4Star3Name, customImage: customFeatured4Star3Image }
+      ];
+
+      for (let i = 0; i < keys4.length; i++) {
+        const { id, customName, customImage } = keys4[i];
+        if (id === "custom") {
+          f4Stars.push({
+            id: "custom-4s-" + i + "-" + Date.now(),
+            name: customName.trim() || `Sticker 4 Sao ${i+1}`,
+            image: customImage.trim() || "",
+            rarity: 4,
+            type: "sticker"
+          });
+        } else if (id) {
+          const found = (stickers || []).find(s => s.id === id);
+          if (found) {
+            f4Stars.push({
+              id: found.id,
+              name: found.name || "Sticker 4 Sao",
+              image: found.url || "",
+              rarity: 4,
+              type: "sticker"
+            });
+          }
+        }
+      }
+
+      const bannerData: any = {
+        name: gbName.trim(),
+        description: gbDescription.trim(),
+        image: gbImage.trim() || "https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?q=80&w=600&auto=format&fit=crop",
+        type: gbType,
+        active: gbActive,
+        startDate: gbStartDate || null,
+        endDate: gbEndDate || null,
+        featured5Star: f5Star,
+        featured4Stars: f4Stars
+      };
+
+      if (selectedBannerId) {
+        await updateDoc(doc(db, "gacha_banners", selectedBannerId), bannerData);
+        alert("Cập nhật banner thành công!");
+      } else {
+        // Create new
+        const newBanner = {
+          ...bannerData,
+          pool5Star: [],
+          pool4Star: [],
+          pool3Star: [
+            { id: "s3-1", name: "10 Mảnh Choco", rarity: 3, type: "fragment" }
+          ]
+        };
+        await addDoc(collection(db, "gacha_banners"), newBanner);
+        alert("Tạo chiến dịch banner mới thành công!");
+      }
+      // Reset campaign form fields
+      setGbName("");
+      setGbDescription("");
+      setGbImage("");
+      setGbStartDate("");
+      setGbEndDate("");
+      setGbActive(true);
+      setSelectedBannerId("");
+      setFeatured5StarId("");
+      setCustomFeatured5StarName("");
+      setCustomFeatured5StarImage("");
+      setFeatured4Star1Id("");
+      setCustomFeatured4Star1Name("");
+      setCustomFeatured4Star1Image("");
+      setFeatured4Star2Id("");
+      setCustomFeatured4Star2Name("");
+      setCustomFeatured4Star2Image("");
+      setFeatured4Star3Id("");
+      setCustomFeatured4Star3Name("");
+      setCustomFeatured4Star3Image("");
+    } catch (err: any) {
+      console.error(err);
+      alert("Đã xảy ra lỗi khi lưu banner: " + err.message);
+    }
+  };
+
+  const handleEditBannerSelect = (banner: any) => {
+    setSelectedBannerId(banner.id);
+    setGbName(banner.name || "");
+    setGbDescription(banner.description || "");
+    setGbImage(banner.image || "");
+    setGbType(banner.type || "standard");
+    setGbActive(banner.active !== false);
+    setGbStartDate(banner.startDate || "");
+    setGbEndDate(banner.endDate || "");
+    setGachaSubTab(banner.type || "standard");
+
+    const f5 = banner.featured5Star;
+    if (f5) {
+      if (f5.id && !f5.id.startsWith("custom-")) {
+        setFeatured5StarId(f5.id);
+        setCustomFeatured5StarName("");
+        setCustomFeatured5StarImage("");
+      } else {
+        setFeatured5StarId("custom");
+        setCustomFeatured5StarName(f5.name || "");
+        setCustomFeatured5StarImage(f5.image || "");
+      }
+    } else {
+      setFeatured5StarId("");
+      setCustomFeatured5StarName("");
+      setCustomFeatured5StarImage("");
+    }
+
+    const f4s = banner.featured4Stars || [];
+    if (f4s[0]) {
+      if (f4s[0].id && !f4s[0].id.startsWith("custom-")) {
+        setFeatured4Star1Id(f4s[0].id);
+        setCustomFeatured4Star1Name("");
+        setCustomFeatured4Star1Image("");
+      } else {
+        setFeatured4Star1Id("custom");
+        setCustomFeatured4Star1Name(f4s[0].name || "");
+        setCustomFeatured4Star1Image(f4s[0].image || "");
+      }
+    } else {
+      setFeatured4Star1Id("");
+      setCustomFeatured4Star1Name("");
+      setCustomFeatured4Star1Image("");
+    }
+
+    if (f4s[1]) {
+      if (f4s[1].id && !f4s[1].id.startsWith("custom-")) {
+        setFeatured4Star2Id(f4s[1].id);
+        setCustomFeatured4Star2Name("");
+        setCustomFeatured4Star2Image("");
+      } else {
+        setFeatured4Star2Id("custom");
+        setCustomFeatured4Star2Name(f4s[1].name || "");
+        setCustomFeatured4Star2Image(f4s[1].image || "");
+      }
+    } else {
+      setFeatured4Star2Id("");
+      setCustomFeatured4Star2Name("");
+      setCustomFeatured4Star2Image("");
+    }
+
+    if (f4s[2]) {
+      if (f4s[2].id && !f4s[2].id.startsWith("custom-")) {
+        setFeatured4Star3Id(f4s[2].id);
+        setCustomFeatured4Star3Name("");
+        setCustomFeatured4Star3Image("");
+      } else {
+        setFeatured4Star3Id("custom");
+        setCustomFeatured4Star3Name(f4s[2].name || "");
+        setCustomFeatured4Star3Image(f4s[2].image || "");
+      }
+    } else {
+      setFeatured4Star3Id("");
+      setCustomFeatured4Star3Name("");
+      setCustomFeatured4Star3Image("");
+    }
+  };
+
+  const handleDeleteBanner = async (id: string) => {
+    setConfirmDialog({
+      text: "Bạn có chắc chắn muốn xóa banner này cùng toàn bộ thiết lập Gacha của nó?",
+      action: async () => {
+        try {
+          await deleteDoc(doc(db, "gacha_banners", id));
+          if (selectedBannerId === id) {
+            setSelectedBannerId("");
+          }
+          alert("Đã xoá banner thành công!");
+        } catch (err: any) {
+          alert("Lỗi khi xoá banner: " + err.message);
+        }
+      }
+    });
+  };
+
+  const handleAddPoolItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedBannerId) {
+      alert("Vui lòng chọn một Banner từ danh sách bên dưới để cấu hình vật phẩm trước!");
+      return;
+    }
+    if (!poolItemName.trim()) {
+      alert("Vui lòng điền tên vật phẩm!");
+      return;
+    }
+    const currentBanner = gachaBanners.find(b => b.id === selectedBannerId);
+    if (!currentBanner) return;
+
+    try {
+      const newItem = {
+        id: "item-" + Date.now(),
+        name: poolItemName.trim(),
+        rarity: poolItemRarity,
+        type: poolItemType,
+        image: poolItemImage.trim() || "",
+        description: poolItemDesc.trim() || ""
+      };
+
+      const p5 = currentBanner.pool5Star || [];
+      const p4 = currentBanner.pool4Star || [];
+
+      if (poolItemRarity === 5) {
+        await updateDoc(doc(db, "gacha_banners", selectedBannerId), {
+          pool5Star: [...p5, newItem]
+        });
+      } else {
+        await updateDoc(doc(db, "gacha_banners", selectedBannerId), {
+          pool4Star: [...p4, newItem]
+        });
+      }
+
+      alert("Đã thêm vật phẩm vào bể gacha!");
+      setPoolItemName("");
+      setPoolItemImage("");
+      setPoolItemDesc("");
+    } catch (err: any) {
+      console.error(err);
+      alert("Lỗi khi thêm vật phẩm: " + err.message);
+    }
+  };
+
+  const handleRemovePoolItem = async (bannerId: string, itemRarity: number, itemId: string) => {
+    setConfirmDialog({
+      text: "Bạn có chắc muốn xóa vật phẩm này ra khỏi bể tỉ lệ Gacha?",
+      action: async () => {
+        const currentBanner = gachaBanners.find(b => b.id === bannerId);
+        if (!currentBanner) return;
+
+        try {
+          if (itemRarity === 5) {
+            const updated = (currentBanner.pool5Star || []).filter((i: any) => i.id !== itemId);
+            await updateDoc(doc(db, "gacha_banners", bannerId), { pool5Star: updated });
+          } else {
+            const updated = (currentBanner.pool4Star || []).filter((i: any) => i.id !== itemId);
+            await updateDoc(doc(db, "gacha_banners", bannerId), { pool4Star: updated });
+          }
+          alert("Đã xoá vật phẩm!");
+        } catch (err: any) {
+          console.error(err);
+          alert("Lỗi khi xoá vật phẩm: " + err.message);
+        }
+      }
+    });
+  };
+
   const isAdmin =
     email?.toLowerCase() === "cucnau01@gmail.com" ||
     firebaseUser?.email?.toLowerCase() === "cucnau01@gmail.com";
@@ -1914,6 +2259,13 @@ export function Admin() {
           >
             <Radio className="w-5 h-5" />
           </button>
+          <button
+            onClick={() => setActiveTab("gacha")}
+            title="Quản lý Gacha"
+            className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === "gacha" ? "bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm" : "border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]"}`}
+          >
+            <Dices className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Thanh dọc phân cách */}
@@ -1948,6 +2300,7 @@ export function Admin() {
           {activeTab === "accessories" && "👑 Quản lý Phụ kiện"}
           {activeTab === "chucu_accessories" && "🧸 Quản lý Phụ kiện Chucu"}
           {activeTab === "radio" && "📻 Quản lý Choco Radio"}
+          {activeTab === "gacha" && "🎲 Quản lý Gacha"}
           {activeTab === "system" && "🛠️ Quản lý Hệ thống"}
         </span>
       </div>
@@ -2990,6 +3343,720 @@ export function Admin() {
               )}
             </div>
           </div>
+        </>
+      )}
+
+      {activeTab === "gacha" && (
+        <>
+          {/* Sub Tab selection */}
+          <div className="flex gap-3 mb-6 border-b-2 border-stone-200/50 dark:border-stone-800/50 pb-4">
+            <button
+              onClick={() => {
+                setGachaSubTab("standard");
+                setGbType("standard");
+                setSelectedBannerId("");
+              }}
+              className={`px-5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer border-2 ${
+                gachaSubTab === "standard"
+                  ? "bg-[#3E2723] text-white border-[#1A1412] shadow-[2px_2px_0_0_#1A1412] dark:bg-amber-500 dark:text-stone-900 dark:border-amber-600 dark:shadow-none"
+                  : "bg-white/40 border-transparent dark:bg-black/20 text-stone-500 hover:text-[#3E2723] dark:hover:text-[#ECE5DC]"
+              }`}
+            >
+              ⭐ Banner Thường Trực
+            </button>
+            <button
+              onClick={() => {
+                setGachaSubTab("limited");
+                setGbType("limited");
+                setSelectedBannerId("");
+              }}
+              className={`px-5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer border-2 ${
+                gachaSubTab === "limited"
+                  ? "bg-[#3E2723] text-white border-[#1A1412] shadow-[2px_2px_0_0_#1A1412] dark:bg-amber-500 dark:text-stone-900 dark:border-amber-600 dark:shadow-none"
+                  : "bg-white/40 border-transparent dark:bg-black/20 text-stone-500 hover:text-[#3E2723] dark:hover:text-[#ECE5DC]"
+              }`}
+            >
+              🔥 Banner Giới Hạn (Campaign)
+            </button>
+          </div>
+
+          {gachaSubTab === "standard" && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+              {/* Standard active and configuration block */}
+              {(() => {
+                const stdBanner = gachaBanners.find(b => b.type === "standard") || gachaBanners[0];
+                if (!stdBanner) {
+                  return (
+                    <div className="p-8 text-center bg-[#FFFDF9] dark:bg-[#211B18] rounded-3xl border-2 border-dashed">
+                      Đang khơi tạo Banner Thường Trực... Vui lòng đợi.
+                    </div>
+                  );
+                }
+                const isActive = stdBanner.active !== false;
+
+                return (
+                  <div className="flex flex-col gap-6">
+                    {/* Status & Toggle control */}
+                    <div className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}>
+                      <h3 className="text-sm font-black uppercase text-stone-500 tracking-wider">Trạng thái Bể Thường</h3>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-extrabold text-base text-[#3E2723] dark:text-[#ECE5DC]">{stdBanner.name}</div>
+                          <div className="text-xs text-stone-400 mt-1 italic">Tự động kích hoạt khi không có banner giới hạn.</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest text-[#FDF6EC] ${isActive ? 'bg-green-600' : 'bg-red-500'}`}>
+                            {isActive ? "HIỂN THỊ" : "ĐANG ẨN"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await updateDoc(doc(db, "gacha_banners", stdBanner.id), {
+                              active: !isActive
+                            });
+                            alert(`Đã thành công ${!isActive ? "bật" : "tắt"} hiển thị của Banner Thường Trực!`);
+                          } catch (err: any) {
+                            alert("Lỗi: " + err.message);
+                          }
+                        }}
+                        className={`w-full py-2.5 text-center font-bold text-xs uppercase border-2 rounded-xl active:translate-y-[1px] transition-all cursor-pointer ${
+                          isActive 
+                            ? "bg-red-50 hover:bg-red-100 hover:border-red-400 text-red-600 border-red-300 dark:bg-red-950/20 dark:border-red-900/50 dark:hover:bg-red-950/40" 
+                            : "bg-green-50 hover:bg-green-100 hover:border-green-400 text-green-600 border-green-300 dark:bg-green-950/20 dark:border-green-900/50 dark:hover:bg-green-950/40"
+                        }`}
+                      >
+                        {isActive ? "Ẩn Banner Thường" : "Hiện Banner Thường"}
+                      </button>
+                    </div>
+
+                    {/* Standard Sticker pool picker form */}
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        if (!poolItemName.trim()) {
+                          alert("Vui lòng điền tên Sticker!");
+                          return;
+                        }
+                        if (!poolItemImage.trim()) {
+                          alert("Vui lòng điền URL hình ảnh!");
+                          return;
+                        }
+                        try {
+                          const newItem = {
+                            id: "item-" + Date.now(),
+                            name: poolItemName.trim(),
+                            rarity: poolItemRarity,
+                            type: "sticker",
+                            image: poolItemImage.trim(),
+                            description: poolItemDesc.trim() || ""
+                          };
+
+                          if (poolItemRarity === 5) {
+                            const p5 = stdBanner.pool5Star || [];
+                            await updateDoc(doc(db, "gacha_banners", stdBanner.id), {
+                              pool5Star: [...p5, newItem]
+                            });
+                          } else {
+                            const p4 = stdBanner.pool4Star || [];
+                            await updateDoc(doc(db, "gacha_banners", stdBanner.id), {
+                              pool4Star: [...p4, newItem]
+                            });
+                          }
+                          alert(`Đã tải & thêm "${poolItemName}" lên Pool thường thành công!`);
+                          setPoolItemName("");
+                          setPoolItemImage("");
+                          setPoolItemDesc("");
+                        } catch (err: any) {
+                          alert("Lỗi: " + err.message);
+                        }
+                      }}
+                      className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}
+                    >
+                      <h3 className="text-base font-black uppercase text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-1.5">
+                        <Sparkles className="w-5 h-5 text-amber-500 animate-pulse" /> Tải Sticker lên Pool Thường
+                      </h3>
+
+                      <div className="flex flex-col gap-3.5 text-xs font-sans">
+                        <div>
+                          <label className="block text-stone-500 font-bold mb-1 uppercase tracking-wide">Chọn sticker có sẵn trong Cửa Hàng (Tùy chọn)</label>
+                          <select
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val) {
+                                const found = (stickers || []).find(st => st.id === val);
+                                if (found) {
+                                  setPoolItemName(found.name || "");
+                                  setPoolItemImage(found.url || "");
+                                }
+                              }
+                            }}
+                            className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2.5 outline-none font-bold"
+                          >
+                            <option value="">-- Chọn một Sticker từ Cửa hàng để điền nhanh --</option>
+                            {(stickers || []).map(st => (
+                              <option key={st.id} value={st.id}>{st.name || st.id}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-stone-500 font-bold mb-1 uppercase tracking-wide">Tên Sticker *</label>
+                            <input
+                              type="text"
+                              value={poolItemName}
+                              onChange={(e) => setPoolItemName(e.target.value)}
+                              placeholder="Ví dụ: Bé dâu tây"
+                              className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2.5 outline-none font-bold"
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-stone-500 font-bold mb-1 uppercase tracking-wide font-mono">Độ Hiếm *</label>
+                            <select
+                              value={poolItemRarity}
+                              onChange={(e) => setPoolItemRarity(Number(e.target.value) as 4 | 5)}
+                              className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2.5 outline-none font-bold text-amber-600 dark:text-amber-400"
+                            >
+                              <option value="5">5 Sao ⭐⭐⭐⭐⭐</option>
+                              <option value="4">4 Sao ⭐⭐⭐⭐</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-stone-500 font-bold mb-1 uppercase tracking-wide">URL hình ảnh Sticker *</label>
+                          <input
+                            type="text"
+                            value={poolItemImage}
+                            onChange={(e) => setPoolItemImage(e.target.value)}
+                            placeholder="https://..."
+                            className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2.5 outline-none font-semibold text-[11px]"
+                            required
+                          />
+                          {poolItemImage && (
+                            <div className="mt-2 text-center p-2 rounded-xl bg-stone-100 dark:bg-black/30 border border-stone-200">
+                              <span className="block text-[10px] text-stone-400 mb-1">Ảnh xem trước</span>
+                              <img src={poolItemImage} alt="preview" referrerPolicy="no-referrer" className="h-16 w-16 mx-auto object-contain rounded" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-3 mt-2 bg-[#E6D4BF] hover:bg-[#D7CCC8] text-[#3E2723] rounded-2xl font-black border-2 border-[#3E2723] shadow-[2px_2px_0_0_#3E2723] active:translate-y-[2px] active:shadow-none transition-all uppercase text-xs tracking-wider flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" /> Tải lên và thêm Sticker
+                      </button>
+                    </form>
+                  </div>
+                );
+              })()}
+
+              {/* Pool items listing and removals */}
+              {(() => {
+                const stdBanner = gachaBanners.find(b => b.type === "standard") || gachaBanners[0];
+                if (!stdBanner) return null;
+
+                return (
+                  <div className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}>
+                    <h3 className="text-base font-black uppercase text-[#3E2723] dark:text-[#ECE5DC] mb-4">
+                      Vật phẩm trong Pool Thường
+                    </h3>
+
+                    {/* 5 STARS */}
+                    <div className="mb-6">
+                      <h4 className="text-xs font-black uppercase tracking-widest text-amber-500 flex items-center gap-1 border-b border-[#3E2723]/10 pb-1 mb-2">
+                        Sticker 5 Sao ⭐⭐⭐⭐⭐ ({(stdBanner.pool5Star || []).length})
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {(stdBanner.pool5Star || []).map((item: any) => (
+                          <div key={item.id} className="p-2 rounded-xl bg-[#FFFDF9]/50 dark:bg-black/20 border border-stone-200/50 flex flex-col items-center justify-between text-center gap-1 relative group">
+                            <button
+                              type="button"
+                              onClick={() => handleRemovePoolItem(stdBanner.id, 5, item.id)}
+                              className="absolute top-1 right-1 w-5 h-5 bg-red-100 hover:bg-red-500 hover:text-white text-red-600 rounded-full flex items-center justify-center text-[10px] font-black transition-colors border border-red-200 cursor-pointer"
+                              title="Xóa khỏi pool"
+                            >
+                              ×
+                            </button>
+                            <img src={item.image} alt="sticker" referrerPolicy="no-referrer" className="h-10 w-10 object-contain p-0.5 rounded" />
+                            <div className="text-[10px] font-bold text-[#3E2723] dark:text-stone-300 line-clamp-1">{item.name}</div>
+                          </div>
+                        ))}
+                        {(stdBanner.pool5Star || []).length === 0 && (
+                          <div className="col-span-full p-4 text-center text-xs text-stone-400 italic">Thư mục trống. Hãy tải sticker 5 sao đầu tiên ở trên nhé!</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 4 STARS */}
+                    <div>
+                      <h4 className="text-xs font-black uppercase tracking-widest text-[#8D6E63] dark:text-stone-300 flex items-center gap-1 border-b border-[#3E2723]/10 pb-1 mb-2">
+                        Sticker 4 Sao ⭐⭐⭐⭐ ({(stdBanner.pool4Star || []).length})
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {(stdBanner.pool4Star || []).map((item: any) => (
+                          <div key={item.id} className="p-2 rounded-xl bg-[#FFFDF9]/50 dark:bg-black/20 border border-stone-200/50 flex flex-col items-center justify-between text-center gap-1 relative group">
+                            <button
+                              type="button"
+                              onClick={() => handleRemovePoolItem(stdBanner.id, 4, item.id)}
+                              className="absolute top-1 right-1 w-5 h-5 bg-red-100 hover:bg-red-500 hover:text-white text-red-600 rounded-full flex items-center justify-center text-[10px] font-black transition-colors border border-red-200 cursor-pointer"
+                              title="Xóa khỏi pool"
+                            >
+                              ×
+                            </button>
+                            <img src={item.image} alt="sticker" referrerPolicy="no-referrer" className="h-10 w-10 object-contain p-0.5 rounded" />
+                            <div className="text-[10px] font-semibold text-[#3E2723] dark:text-stone-300 line-clamp-1">{item.name}</div>
+                          </div>
+                        ))}
+                        {(stdBanner.pool4Star || []).length === 0 && (
+                          <div className="col-span-full p-4 text-center text-xs text-stone-400 italic">Thư mục trống. Hãy tải sticker 4 sao đầu tiên ở trên nhé!</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
+          {gachaSubTab === "limited" && (
+            <div className="flex flex-col gap-6 animate-in fade-in duration-300">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                
+                {/* Campaigns Maker Form */}
+                <form
+                  onSubmit={handleCreateOrUpdateBanner}
+                  className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 duration-300 ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}
+                >
+                  <h2 className="text-base font-black uppercase text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-2">
+                    <Plus className="w-5 h-5 text-pink-500" /> 
+                    {selectedBannerId ? "Chỉnh Sửa Campaign Giới Hạn" : "Khơi Tạo Campaign mới"}
+                  </h2>
+
+                  <div className="flex flex-col gap-3 font-sans text-xs">
+                    <div>
+                      <label className="block font-bold mb-1 uppercase tracking-wide opacity-80">Tên Banner Campaign *</label>
+                      <input
+                        type="text"
+                        placeholder="Ví dụ: Socola Mùa Hè, Giáng Sinh Ấm Áp..."
+                        value={gbName}
+                        onChange={(e) => setGbName(e.target.value)}
+                        className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2.5 outline-none font-bold"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-bold mb-1 uppercase tracking-wide opacity-80">Mô tả hiển thị khẩu hiệu</label>
+                      <input
+                        type="text"
+                        placeholder="Ví dụ: Chứa đựng những sticker phiên bản siêu hiếm của mùa hè này!"
+                        value={gbDescription}
+                        onChange={(e) => setGbDescription(e.target.value)}
+                        className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2.5"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-bold mb-1 uppercase tracking-wide opacity-80">Ảnh Đại Diện Campaign (16:9)</label>
+                        <input
+                          type="text"
+                          placeholder="https://..."
+                          value={gbImage}
+                          onChange={(e) => setGbImage(e.target.value)}
+                          className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2.5 text-[10px]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1 uppercase tracking-wide opacity-80">Kích Hoạt Chiến Dịch</label>
+                        <select
+                          value={gbActive ? "true" : "false"}
+                          onChange={(e) => setGbActive(e.target.value === "true")}
+                          className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border-2 border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2.5 outline-none font-bold"
+                        >
+                          <option value="true">Bật (Active)</option>
+                          <option value="false">Tắt / Lưu nháp (Draft)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* DURATION RANGE SPECIFICATION */}
+                    <div className="grid grid-cols-2 gap-3 bg-[#E6D4BF]/20 dark:bg-black/30 p-3 rounded-2xl border border-[#3E2723]/10">
+                      <div>
+                        <label className="block font-black text-[#5D4037] dark:text-stone-300 mb-1 uppercase tracking-wider text-[10px]">Thời Gian Bắt Đầu</label>
+                        <input
+                          type="date"
+                          value={gbStartDate}
+                          onChange={(e) => setGbStartDate(e.target.value)}
+                          className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2 outline-none font-bold text-[11px]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-black text-[#5D4037] dark:text-stone-300 mb-1 uppercase tracking-wider text-[10px]">Thời Gian Kết Thúc</label>
+                        <input
+                          type="date"
+                          value={gbEndDate}
+                          onChange={(e) => setGbEndDate(e.target.value)}
+                          className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2 outline-none font-bold text-[11px]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* UP RATE SETTINGS SECTION */}
+                    <div className="bg-amber-500/10 dark:bg-amber-500/5 p-4 rounded-3xl border border-amber-500/30 flex flex-col gap-3">
+                      <div className="font-extrabold text-amber-700 dark:text-amber-400 uppercase text-[10px] tracking-wider">Cấu hình Tỷ Lệ Tăng (Up Rate) - 50% cơ hội trúng</div>
+                      
+                      {/* Featured 5 STAR */}
+                      <div>
+                        <label className="block font-bold mb-1 uppercase text-amber-600 dark:text-amber-400">Chọn 1 Sticker 5⭐ làm UP RATE *</label>
+                        <select
+                          value={featured5StarId}
+                          onChange={(e) => {
+                            setFeatured5StarId(e.target.value);
+                            if (e.target.value !== "custom") {
+                              setCustomFeatured5StarName("");
+                              setCustomFeatured5StarImage("");
+                            }
+                          }}
+                          className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2 font-bold"
+                          required
+                        >
+                          <option value="">-- Chọn Sticker 5 Sao có sẵn --</option>
+                          <option value="custom">-- Nhập Thủ Công (Đặt Tự Do) --</option>
+                          {(stickers || []).map(s => (
+                            <option key={s.id} value={s.id}>{s.name || s.id}</option>
+                          ))}
+                        </select>
+                        {featured5StarId === "custom" && (
+                          <div className="grid grid-cols-2 gap-2 mt-2">
+                            <input
+                              type="text"
+                              placeholder="Tên sticker 5★"
+                              value={customFeatured5StarName}
+                              onChange={(e) => setCustomFeatured5StarName(e.target.value)}
+                              className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border rounded-lg p-1.5"
+                              required
+                            />
+                            <input
+                              type="text"
+                              placeholder="Ảnh URL"
+                              value={customFeatured5StarImage}
+                              onChange={(e) => setCustomFeatured5StarImage(e.target.value)}
+                              className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border rounded-lg p-1.5"
+                              required
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Featured 4 STARS (Select 3) */}
+                      <div className="flex flex-col gap-2">
+                        <label className="block font-bold uppercase text-[#8D6E63] dark:text-stone-300">Chọn 3 Sticker 4⭐ làm UP RATE</label>
+                        
+                        {/* 4s #1 */}
+                        <div>
+                          <select
+                            value={featured4Star1Id}
+                            onChange={(e) => {
+                              setFeatured4Star1Id(e.target.value);
+                              if (e.target.value !== "custom") {
+                                setCustomFeatured4Star1Name("");
+                                setCustomFeatured4Star1Image("");
+                              }
+                            }}
+                            className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2 font-semibold text-[11px]"
+                          >
+                            <option value="">-- Chọn Sticker 4⭐ Nhóm 1 --</option>
+                            <option value="custom">- Tự nhập thủ công -</option>
+                            {(stickers || []).map(s => (
+                              <option key={s.id} value={s.id}>{s.name || s.id}</option>
+                            ))}
+                          </select>
+                          {featured4Star1Id === "custom" && (
+                            <div className="grid grid-cols-2 gap-2 mt-1.5">
+                              <input
+                                type="text"
+                                placeholder="Tên Sticker"
+                                value={customFeatured4Star1Name}
+                                onChange={(e) => setCustomFeatured4Star1Name(e.target.value)}
+                                className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border rounded-lg p-1.5"
+                                required
+                              />
+                              <input
+                                type="text"
+                                placeholder="URL hình ảnh"
+                                value={customFeatured4Star1Image}
+                                onChange={(e) => setCustomFeatured4Star1Image(e.target.value)}
+                                className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border rounded-lg p-1.5 text-[10px]"
+                                required
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 4s #2 */}
+                        <div>
+                          <select
+                            value={featured4Star2Id}
+                            onChange={(e) => {
+                              setFeatured4Star2Id(e.target.value);
+                              if (e.target.value !== "custom") {
+                                setCustomFeatured4Star2Name("");
+                                setCustomFeatured4Star2Image("");
+                              }
+                            }}
+                            className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2 font-semibold text-[11px]"
+                          >
+                            <option value="">-- Chọn Sticker 4⭐ Nhóm 2 --</option>
+                            <option value="custom">- Tự nhập thủ công -</option>
+                            {(stickers || []).map(s => (
+                              <option key={s.id} value={s.id}>{s.name || s.id}</option>
+                            ))}
+                          </select>
+                          {featured4Star2Id === "custom" && (
+                            <div className="grid grid-cols-2 gap-2 mt-1.5">
+                              <input
+                                type="text"
+                                placeholder="Tên Sticker"
+                                value={customFeatured4Star2Name}
+                                onChange={(e) => setCustomFeatured4Star2Name(e.target.value)}
+                                className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border rounded-lg p-1.5"
+                                required
+                              />
+                              <input
+                                type="text"
+                                placeholder="URL hình ảnh"
+                                value={customFeatured4Star2Image}
+                                onChange={(e) => setCustomFeatured4Star2Image(e.target.value)}
+                                className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border rounded-lg p-1.5 text-[10px]"
+                                required
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 4s #3 */}
+                        <div>
+                          <select
+                            value={featured4Star3Id}
+                            onChange={(e) => {
+                              setFeatured4Star3Id(e.target.value);
+                              if (e.target.value !== "custom") {
+                                setCustomFeatured4Star3Name("");
+                                setCustomFeatured4Star3Image("");
+                              }
+                            }}
+                            className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border border-[#3E2723]/20 dark:border-white/10 rounded-xl p-2 font-semibold text-[11px]"
+                          >
+                            <option value="">-- Chọn Sticker 4⭐ Nhóm 3 --</option>
+                            <option value="custom">- Tự nhập thủ công -</option>
+                            {(stickers || []).map(s => (
+                              <option key={s.id} value={s.id}>{s.name || s.id}</option>
+                            ))}
+                          </select>
+                          {featured4Star3Id === "custom" && (
+                            <div className="grid grid-cols-2 gap-2 mt-1.5">
+                              <input
+                                type="text"
+                                placeholder="Tên Sticker"
+                                value={customFeatured4Star3Name}
+                                onChange={(e) => setCustomFeatured4Star3Name(e.target.value)}
+                                className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border rounded-lg p-1.5"
+                                required
+                              />
+                              <input
+                                type="text"
+                                placeholder="URL hình ảnh"
+                                value={customFeatured4Star3Image}
+                                onChange={(e) => setCustomFeatured4Star3Image(e.target.value)}
+                                className="w-full bg-[#FFFDF9] dark:bg-[#1A1412] border rounded-lg p-1.5 text-[10px]"
+                                required
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2.5 mt-2">
+                    <button
+                      type="submit"
+                      className="flex-1 py-3 bg-[#3E2723] text-[#FDF6EC] rounded-2xl font-black border-2 border-[#1A1412] shadow-[2px_2px_0_0_#1A1412] active:translate-y-[2px] active:shadow-none hover:bg-[#2D1B19] transition-all uppercase text-xs tracking-wider flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Save className="w-4 h-4" /> {selectedBannerId ? "Cập Nhật Campaign" : "Thả xích Campaign Mới"}
+                    </button>
+                    {selectedBannerId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedBannerId("");
+                          setGbName("");
+                          setGbDescription("");
+                          setGbImage("");
+                          setGbActive(true);
+                          setGbStartDate("");
+                          setGbEndDate("");
+                          setFeatured5StarId("");
+                          setFeatured4Star1Id("");
+                          setFeatured4Star2Id("");
+                          setFeatured4Star3Id("");
+                        }}
+                        className="px-4 py-3 bg-stone-200 hover:bg-stone-300 text-[#3E2723] border-2 border-stone-300 rounded-2xl font-bold text-xs uppercase cursor-pointer text-shadow"
+                      >
+                        Huỷ
+                      </button>
+                    )}
+                  </div>
+                </form>
+
+                {/* Info and quick setup campaign guidelines */}
+                <div className={`p-6 rounded-3xl border-2 shadow-[2px_2px_0_0_#3E2723] leading-relaxed dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 font-sans text-xs ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}>
+                  <h3 className="text-base font-black text-[#3E2723] dark:text-[#ECE5DC] uppercase">Quy tắt quay Gacha Chiến dịch</h3>
+                  <p className="text-stone-500 dark:text-stone-300">
+                    Khi người dùng bấm Gacha tại trang chủ sử dụng <strong className="text-[#3E2723] dark:text-[#ECE5DC]">Vé Gacha Gchoco</strong>:
+                  </p>
+                  <ul className="list-disc list-inside flex flex-col gap-2 pl-1.5 text-stone-500 dark:text-stone-400">
+                    <li>Nếu lượt quay đạt được <strong className="text-amber-500">5 Sao ⭐⭐⭐⭐⭐</strong> (Căn cứ thời gian thực hiện, bảo hiểm 90 lượt):
+                      <div className="pl-4 mt-0.5"><strong className="text-amber-600">50% Tỷ lệ</strong> nhận trực tiếp Sticker <strong className="text-amber-600">Up Rate 5 Sao</strong> được chọn ở bên trái. 50% còn lại trúng ngẫu nhiên sticker khác trong bể gạch gốc.</div>
+                    </li>
+                    <li>Nếu đạt được <strong className="text-[#8D6E63] dark:text-stone-200">4 Sao ⭐⭐⭐⭐</strong> (Bảo hiểm 10 lượt):
+                      <div className="pl-4 mt-0.5"><strong className="text-[#8D6E63] dark:text-stone-200">50% Tỷ lệ</strong> chia đều cho 3 Sticker <strong className="text-[#8D6E63] dark:text-stone-200">Up Rate 4 Sao</strong> bạn cài đặt. 50% còn lại trúng sticker 4 sao gốc.</div>
+                    </li>
+                    <li>Sẽ tự động hiển thị tab Chiến dịch Gacha màu sắc tại màn hình <strong className="text-pink-500 font-extrabold uppercase text-[10px]">Cầu Nguyện Hộp Công Cụ</strong> của người dùng theo khoản thời gian cấu hình!</li>
+                  </ul>
+                  
+                  {gbName && (
+                    <div className="mt-4 border-2 border-dashed border-[#3E2723]/20 p-4 rounded-3xl">
+                      <span className="block text-[10px] font-black uppercase text-stone-400 mb-2">Xem Trước Thiết lập Gacha Chiến dịch</span>
+                      <div className="flex flex-col gap-2">
+                        <div className="font-extrabold text-sm uppercase text-[#3E2723] dark:text-stone-200">{gbName}</div>
+                        {gbStartDate && gbEndDate && <div className="text-[10px] text-amber-600 font-bold">Lịch trình: {gbStartDate} đến {gbEndDate}</div>}
+                        
+                        <div className="flex gap-2 items-center mt-1 border-t pt-2 border-stone-200/50">
+                          <span className="text-[10px] font-bold text-amber-500 uppercase">Sticker 5★ UP (50%):</span>
+                          {featured5StarId && (
+                            <span className="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded-lg border font-bold">
+                              {featured5StarId === "custom" ? (customFeatured5StarName || "Đang tự gõ...") : (stickers.find(s=>s.id===featured5StarId)?.name || "Chưa chọn")}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* BANNERS LIST */}
+              <div className={`p-6 sm:p-8 rounded-[32px] border-4 shadow-[4px_4px_0_0_#3E2723] dark:shadow-[4px_4px_0_0_#0D0907] mt-4 ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}>
+                <h3 className="text-xl font-black text-[#3E2723] dark:text-[#ECE5DC] uppercase mb-4 tracking-tighter">
+                  Danh sách Chiến dịch / Campaign Gacha
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {gachaBanners.filter(b => b.type === "limited").map((banner) => {
+                    const isSelected = selectedBannerId === banner.id;
+                    const b5 = banner.featured5Star;
+                    const b4s = banner.featured4Stars || [];
+
+                    return (
+                      <div
+                        key={banner.id}
+                        onClick={() => handleEditBannerSelect(banner)}
+                        className={`p-4 rounded-3xl border-[3px] cursor-pointer hover:scale-[1.01] transition-all flex flex-col gap-3 relative ${
+                          isSelected 
+                            ? "border-[#B5952F] bg-amber-500/5 dark:bg-amber-400/5 shadow-[2px_2px_0_0_#B5952F]" 
+                            : "border-[#3E2723]/20 dark:border-white/10 hover:border-[#3E2723] dark:hover:border-amber-400"
+                        }`}
+                      >
+                        {/* Status indicators */}
+                        <div className="absolute top-3 right-3 flex gap-1.5 z-10">
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider text-white ${banner.active ? 'bg-green-600' : 'bg-red-500'}`}>
+                            {banner.active ? 'HIỆN' : 'ẨN'}
+                          </span>
+                        </div>
+
+                        <div className="flex gap-3 items-center">
+                          <img
+                            src={banner.image || "https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?q=80&w=600&auto=format&fit=crop"}
+                            alt={banner.name}
+                            className="w-16 h-12 rounded-lg object-cover border border-[#3E2723]/20 shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-extrabold text-sm text-[#3E2723] dark:text-[#ECE5DC] truncate">{banner.name}</h4>
+                            <p className="text-[10px] text-stone-500 dark:text-stone-400 truncate">{banner.description || "Không có mô tả"}</p>
+                            {banner.startDate && banner.endDate && (
+                              <p className="text-[9px] text-[#8D6E63] font-bold">Lịch: {banner.startDate} ~ {banner.endDate}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Rate-up Items Previews */}
+                        <div className="border-t border-[#3E2723]/10 dark:border-white/10 pt-2 text-xs font-sans flex flex-col gap-1.5">
+                          {b5 && (
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[9px] font-black uppercase text-amber-600 bg-amber-100 dark:bg-amber-950/40 px-1 py-0.5 rounded">5★ UP</span>
+                              {b5.image && <img src={b5.image} referrerPolicy="no-referrer" className="w-5 h-5 object-contain" />}
+                              <span className="font-bold text-stone-700 dark:text-stone-300 text-[11px] truncate">{b5.name}</span>
+                            </div>
+                          )}
+
+                          {b4s.length > 0 && (
+                            <div className="flex flex-wrap gap-2 items-center">
+                              <span className="text-[9px] font-black uppercase text-purple-600 bg-purple-100 dark:bg-purple-950/45 px-1 py-0.5 rounded">4★ UP</span>
+                              <div className="flex gap-1.5">
+                                {b4s.map((item: any, i: number) => (
+                                  <div key={i} className="flex items-center gap-1 bg-stone-100 dark:bg-black/40 px-1.5 py-0.5 rounded-lg border">
+                                    {item.image && <img src={item.image} referrerPolicy="no-referrer" className="w-3.5 h-3.5 object-contain" />}
+                                    <span className="text-[9px] font-semibold text-stone-600 dark:text-stone-300 max-w-[50px] truncate">{item.name}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2 justify-end mt-2 pt-2 border-t border-[#3E2723]/10 dark:border-white/10">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditBannerSelect(banner);
+                            }}
+                            className="px-3 py-1 text-xs font-bold text-amber-600 hover:text-amber-700 cursor-pointer"
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteBanner(banner.id);
+                            }}
+                            className="px-3 py-1 text-xs font-bold text-red-500 hover:text-red-700 cursor-pointer"
+                          >
+                            Xoá Campaign
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {gachaBanners.filter(b => b.type === "limited").length === 0 && (
+                    <div className="col-span-full p-8 text-center text-stone-400 italic">Chưa có Banner giới hạn nào. Hãy tạo campaign đầu tiên nhé!</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
 
