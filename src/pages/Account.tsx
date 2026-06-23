@@ -15,8 +15,10 @@ export function Account() {
     choco, goldenChoco, level, exp, unlockedAchievements, activeTitle, setActiveTitle, 
     ownedStickers, equipSticker, setStickerPosition, firebaseUser, updateUserDoc, unlockAchievement,
     customTitles, getTitleColor, lastClaimedRewardLevel, ownedMysteryBoxes,
-    equippedAccessory, accessoryPosition, ownedAccessories, equipAccessory, setAccessoryPosition
+    equippedAccessory, accessoryPosition, ownedAccessories, equipAccessory, setAccessoryPosition,
+    theme
   } = useStore();
+  const isDark = theme === "dark";
   const nextLevelExp = (level || 1) * 100;
   const currentExp = exp || 0;
   const percent = Math.min(100, Math.round((currentExp / nextLevelExp) * 100));
@@ -293,36 +295,36 @@ export function Account() {
               </div>
             </div>
             <div className="order-3">
-              <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Tên hiển thị</label>
+              <label className="block text-sm font-semibold mb-1 text-[#5D4037] dark:text-[#ECE5DC]">Tên hiển thị</label>
               <input type="text" value={name} onChange={e => setName(e.target.value)} required className="w-full px-4 py-2 rounded-xl border-2 border-[#3E2723] shadow-[inset_0_2px_0_0_#D7CCC8] bg-[#FDF6EC]/50 focus:outline-none focus:border-[#8D6E63] text-sm font-semibold" />
             </div>
             <div className="order-4">
-              <label className="block text-sm font-semibold mb-1 text-[#5D4037]">Email</label>
-              <input type="text" value={email || ''} disabled className="w-full px-4 py-2 rounded-lg border-2 border-[#3E2723] bg-[#EFEBE9] shadow-[inset_0_2px_0_0_#D7CCC8] text-stone-500 cursor-not-allowed text-sm" />
+              <label className="block text-sm font-semibold mb-1 text-[#5D4037] dark:text-[#ECE5DC]">Email</label>
+              <input type="text" value={email || ''} disabled className="w-full px-4 py-2 rounded-lg border-2 border-[#3E2723] bg-[#EFEBE9] dark:bg-[#1C1310] shadow-[inset_0_2px_0_0_#D7CCC8] text-stone-500 cursor-not-allowed text-sm" />
             </div>
 
             <div className="order-5">
-              <label className="block text-sm font-semibold mb-2 text-[#5D4037]">Cài đặt Sticker</label>
+              <label className="block text-sm font-semibold mb-2 text-[#5D4037] dark:text-[#ECE5DC]">Cài đặt Sticker</label>
               {(ownedStickers || []).length === 0 ? (
-                 <p className="text-xs text-stone-500 italic bg-stone-50 p-3 rounded-lg border">Bạn chưa sở hữu sticker nào. Hãy vào Cửa hàng để mua!</p>
+                 <p className="text-xs text-stone-500 dark:text-stone-400 italic bg-stone-50 dark:bg-[#1A1412] p-3 rounded-lg border border-transparent dark:border-stone-800">Bạn chưa sở hữu sticker nào. Hãy vào Cửa hàng để mua!</p>
               ) : (
                 <div className="space-y-4">
                   <div className="flex border-b-[3px] border-[#3E2723] dark:border-[#4E342E] px-4">
-                     <button type="button" onClick={() => setActiveStickerTab('comment')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'comment' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-stone-400 hover:text-stone-600'}`}>Bình Luận</button>
-                     <button type="button" onClick={() => setActiveStickerTab('chat')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'chat' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-stone-400 hover:text-stone-600'}`}>Chat Bubble</button>
-                     <button type="button" onClick={() => setActiveStickerTab('post')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'post' ? 'border-b-2 border-[#8D6E63] text-[#3E2723]' : 'text-stone-400 hover:text-stone-600'}`}>Bài Đăng</button>
+                     <button type="button" onClick={() => setActiveStickerTab('comment')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'comment' ? 'border-b-2 border-[#8D6E63] text-[#3E2723] dark:text-[#E6D4BF]' : 'text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'}`}>Bình Luận</button>
+                     <button type="button" onClick={() => setActiveStickerTab('chat')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'chat' ? 'border-b-2 border-[#8D6E63] text-[#3E2723] dark:text-[#E6D4BF]' : 'text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'}`}>Chat Bubble</button>
+                     <button type="button" onClick={() => setActiveStickerTab('post')} className={`px-4 py-2 font-bold text-xs uppercase tracking-wider ${activeStickerTab === 'post' ? 'border-b-2 border-[#8D6E63] text-[#3E2723] dark:text-[#E6D4BF]' : 'text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300'}`}>Bài Đăng</button>
                   </div>
                   
                   {/* Common sticker picker based on active tab */}
-                  <div className="flex flex-wrap gap-4 p-4 bg-stone-50 border rounded-lg">
+                  <div className="flex flex-wrap gap-4 p-4 bg-stone-50 dark:bg-[#120D0C] border border-transparent dark:border-stone-800 rounded-lg animate-fade-in">
                     <div 
                        onClick={() => equipSticker(activeStickerTab, null)} 
                        title="Tháo sticker"
                        className={`w-14 h-14 cursor-pointer flex items-center justify-center border-2 border-dashed transition-all rounded-xl ${
                           !(activeStickerTab === 'comment' ? equippedStickerComment : activeStickerTab === 'chat' ? equippedStickerChat : equippedStickerPost) 
-                          ? 'border-[#8D6E63] bg-[#8D6E63]/10 shadow-sm' : 'border-stone-300 hover:border-stone-400 bg-white'}`}
+                           ? 'border-[#8D6E63] bg-[#8D6E63]/10 shadow-sm' : 'border-stone-300 dark:border-stone-700 hover:border-stone-400 bg-white dark:bg-[#1C1310]'}`}
                     >
-                       <span className="text-xs font-bold text-stone-500">Trống</span>
+                       <span className="text-xs font-bold text-stone-500 dark:text-stone-400">Trống</span>
                     </div>
                     {(ownedStickers || []).map(url => {
                        const isEquipped = (activeStickerTab === 'comment' ? equippedStickerComment : activeStickerTab === 'chat' ? equippedStickerChat : equippedStickerPost) === url;
@@ -330,7 +332,7 @@ export function Account() {
                           <div 
                             key={url} 
                             onClick={() => equipSticker(activeStickerTab, url)}
-                            className={`w-14 h-14 cursor-pointer relative p-1 transition-all rounded-xl border flex items-center justify-center ${isEquipped ? 'ring-2 ring-offset-2 ring-[#8D6E63] bg-white border-transparent' : 'hover:scale-105 bg-white shadow-sm'}`}
+                            className={`w-14 h-14 cursor-pointer relative p-1 transition-all rounded-xl border flex items-center justify-center ${isEquipped ? 'ring-2 ring-offset-2 ring-[#8D6E63] dark:ring-offset-[#1A1412] bg-white dark:bg-[#1C1310] border-transparent' : 'hover:scale-105 bg-white dark:bg-[#1C1310] border-stone-200 dark:border-stone-800 shadow-sm'}`}
                            >
                              <img src={url} alt="Sticker preview" className="w-10 h-10 object-contain pointer-events-none" />
                           </div>
@@ -342,22 +344,22 @@ export function Account() {
             </div>
 
             <div className="order-2">
-              <label className="block text-sm font-semibold mb-2 text-[#5D4037]">Cài đặt Phụ kiện Avatar</label>
+              <label className="block text-sm font-semibold mb-2 text-[#5D4037] dark:text-[#ECE5DC]">Cài đặt Phụ kiện Avatar</label>
               {(!ownedAccessories || ownedAccessories.length === 0) ? (
-                <p className="text-xs text-stone-400 italic bg-stone-50 border border-[#D7CCC8] p-3 rounded-xl">
+                <p className="text-xs text-stone-400 dark:text-stone-300 italic bg-stone-50 dark:bg-[#1A1412] border border-[#D7CCC8]/30 dark:border-stone-800 p-3 rounded-xl animate-fade-in">
                   Bạn chưa sở hữu phụ kiện nào. Hãy vào Cửa hàng để sở hữu phụ kiện!
                 </p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 animate-fade-in">
                   {/* Accessory selector picker */}
-                  <div className="flex flex-wrap gap-3 p-3 bg-stone-50 border border-[#D7CCC8]/80 rounded-xl">
+                  <div className="flex flex-wrap gap-3 p-3 bg-stone-50 dark:bg-[#120D0C] border border-stone-200 dark:border-stone-800 rounded-xl">
                     <div 
                       type="button"
                       onClick={() => equipAccessory(null)}
                       className={`w-14 h-14 cursor-pointer flex flex-col items-center justify-center border-2 border-dashed transition-all rounded-xl ${
                         !equippedAccessory 
                           ? 'border-[#8D6E63] bg-[#8D6E63]/10 text-[#8D6E63]' 
-                          : 'border-stone-300 hover:border-stone-400 bg-white text-stone-500'}`}
+                          : 'border-stone-300 dark:border-stone-700 hover:border-stone-400 bg-white dark:bg-[#1C1310] text-stone-500 dark:text-stone-400'}`}
                     >
                       <span className="text-[10px] font-extrabold uppercase text-center">Tháo ra</span>
                     </div>
@@ -370,8 +372,8 @@ export function Account() {
                           onClick={() => equipAccessory(url)}
                           className={`w-14 h-14 cursor-pointer relative p-1 transition-all rounded-xl border flex items-center justify-center ${
                             isEquipped 
-                              ? 'ring-2 ring-offset-2 ring-[#8D6E63] bg-white border-transparent' 
-                              : 'hover:scale-105 bg-white shadow-sm border-stone-200'}`}
+                              ? 'ring-2 ring-offset-2 ring-[#8D6E63] dark:ring-offset-[#1A1412] bg-white dark:bg-[#1C1310] border-transparent' 
+                              : 'hover:scale-105 bg-white dark:bg-[#1C1310] shadow-sm border-stone-200 dark:border-stone-800'}`}
                         >
                           <img src={url} alt="Accessory preview" className="w-10 h-10 object-contain pointer-events-none" referrerPolicy="no-referrer" />
                         </div>
@@ -380,17 +382,17 @@ export function Account() {
                   </div>
 
                   {equippedAccessory && (
-                    <div className="bg-[#FDF6EC] border border-[#F5E6D3] p-4 rounded-xl space-y-4">
-                      <div className="text-xs font-bold uppercase tracking-wide text-[#8D6E63] mb-1">
+                    <div className="bg-[#FDF6EC] dark:bg-[#120D0C] border border-[#F5E6D3] dark:border-stone-800 p-4 rounded-xl space-y-4">
+                      <div className="text-xs font-bold uppercase tracking-wide text-[#8D6E63] dark:text-[#BF9F95] mb-1">
                         🛠️ Điều chỉnh vị trí phụ kiện
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Horizontal X Slider */}
                         <div>
-                          <div className="flex justify-between text-xs font-bold text-stone-600 mb-1">
+                          <div className="flex justify-between text-xs font-bold text-stone-600 dark:text-stone-300 mb-1">
                             <span>Ngang (X)</span>
-                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.x || 0}%</span>
+                            <span className="font-mono text-[#8D6E63] dark:text-pink-400">{accessoryPosition?.x || 0}%</span>
                           </div>
                           <input 
                             type="range" 
@@ -410,9 +412,9 @@ export function Account() {
 
                         {/* Vertical Y Slider */}
                         <div>
-                          <div className="flex justify-between text-xs font-bold text-stone-600 mb-1">
+                          <div className="flex justify-between text-xs font-bold text-stone-600 dark:text-stone-300 mb-1">
                             <span>Dọc (Y)</span>
-                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.y || 0}%</span>
+                            <span className="font-mono text-[#8D6E63] dark:text-pink-400">{accessoryPosition?.y || 0}%</span>
                           </div>
                           <input 
                             type="range" 
@@ -432,9 +434,9 @@ export function Account() {
 
                         {/* Scale Slider */}
                         <div>
-                          <div className="flex justify-between text-xs font-bold text-stone-600 mb-1">
+                          <div className="flex justify-between text-xs font-bold text-stone-600 dark:text-stone-300 mb-1">
                             <span>Kích thước (Scale)</span>
-                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.scale ?? 100}%</span>
+                            <span className="font-mono text-[#8D6E63] dark:text-pink-400">{accessoryPosition?.scale ?? 100}%</span>
                           </div>
                           <input 
                             type="range" 
@@ -454,9 +456,9 @@ export function Account() {
 
                         {/* Rotate Slider */}
                         <div>
-                          <div className="flex justify-between text-xs font-bold text-stone-600 mb-1">
+                          <div className="flex justify-between text-xs font-bold text-stone-600 dark:text-stone-300 mb-1">
                             <span>Xoay (Rotation)</span>
-                            <span className="font-mono text-[#8D6E63]">{accessoryPosition?.rotate || 0}°</span>
+                            <span className="font-mono text-[#8D6E63] dark:text-pink-400">{accessoryPosition?.rotate || 0}°</span>
                           </div>
                           <input 
                             type="range" 
@@ -475,7 +477,7 @@ export function Account() {
                         </div>
                       </div>
 
-                      <div className="text-[10px] text-stone-500 italic bg-white/60 p-2 rounded border border-dashed border-[#D7CCC8]/60 mt-1">
+                      <div className="text-[10px] text-stone-500 dark:text-stone-400 italic bg-white/60 dark:bg-black/30 p-2 rounded border border-dashed border-[#D7CCC8]/60 dark:border-stone-800 mt-1">
                         * Bạn có thể kéo các thanh trượt trên để dịch chuyển vật phẩm gắn tự do tới bất kỳ tọa độ, xoay góc hoặc thu phóng tùy ý trên avatar của bạn!
                       </div>
                     </div>
