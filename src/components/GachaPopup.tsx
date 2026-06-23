@@ -12,12 +12,14 @@ export function cn(...classes: (string | undefined | null | false)[]) {
 export default function GachaPopup() {
   const { 
      isGachaOpen, setGachaOpen, 
-     choco, ownedGachaTickets = 0, 
+     choco, goldenChoco, ownedGachaTickets = 0, 
+     spendChoco, spendGoldenChoco,
      updateUserDoc, gachaPity5Star = 0, gachaPity4Star = 0, 
      addOwnedSticker, addChucuGameFragments,
-     theme
+     theme, email, firebaseUser
   } = useStore();
   const isDark = theme === "dark";
+  const [pendingExchange, setPendingExchange] = useState<{ times: number; neededTickets: number; currency: 'golden' | 'choco'; cost: number } | null>(null);
   
   // Custom limited banner loaded from DB
   const [banners, setBanners] = useState<GachaBanner[]>([]);
@@ -188,9 +190,36 @@ export default function GachaPopup() {
     return { item: pulledItem, newPity5: nextPity5, newPity4: nextPity4 };
   };
 
-  const executePulls = async (times: number) => {
-    if (ownedGachaTickets < times) {
-       alert(`Không đủ Vé Gacha! Bạn cần ${times} vé.`);
+  const executePulls = async (times: number, ticketsToUse?: number) => {
+    const currentTickets = ticketsToUse !== undefined ? ticketsToUse : ownedGachaTickets;
+    
+    if (currentTickets < times) {
+       const neededTickets = times - currentTickets;
+       const neededGChoco = neededTickets * 2;
+       const neededChoco = neededTickets * 6;
+       
+       if ((goldenChoco || 0) >= neededGChoco) {
+         setPendingExchange({
+           times,
+           neededTickets,
+           currency: 'golden',
+           cost: neededGChoco
+         });
+       } else if ((choco || 0) >= neededChoco) {
+         setPendingExchange({
+           times,
+           neededTickets,
+           currency: 'choco',
+           cost: neededChoco
+         });
+       } else {
+         setPendingExchange({
+           times,
+           neededTickets,
+           currency: 'none',
+           cost: 0
+         });
+       }
        return;
     }
     
@@ -226,7 +255,7 @@ export default function GachaPopup() {
     
     // Save state
     await updateUserDoc({
-       ownedGachaTickets: ownedGachaTickets - times,
+       ownedGachaTickets: currentTickets - times,
        gachaPity5Star: currentPity5,
        gachaPity4Star: currentPity4
     });
@@ -257,24 +286,37 @@ export default function GachaPopup() {
         </button>
 
         {/* Header Currency */}
-        <div className="absolute top-4 right-20 z-20 flex gap-3">
+        <div className="absolute top-4 right-20 z-20 flex gap-2 sm:gap-3">
           <div className={cn(
-            "flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full border shadow-lg",
+            "flex items-center gap-1.5 sm:gap-2 backdrop-blur px-3 sm:px-4 py-2 rounded-full border shadow-lg",
             isDark 
               ? "bg-black/40 border-white/10 text-white" 
               : "bg-white/80 border-[#3E2723]/10 text-[#3E2723]"
           )}>
-            <span className="font-bold text-sm">{choco}</span>
-            <span className={cn("text-xs", isDark ? "text-[#E6D8C9]" : "text-[#8D6E63]")}>Choco</span>
+            <span className="font-bold text-xs sm:text-sm">
+              {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}
+            </span>
+            <span className={cn("text-[10px] sm:text-xs", isDark ? "text-[#E6D8C9]" : "text-[#8D6E63]")}>Choco</span>
           </div>
           <div className={cn(
-            "flex items-center gap-2 backdrop-blur px-4 py-2 rounded-full border shadow-lg lg:shadow-[0_0_15px_rgba(236,72,153,0.15)]",
+            "flex items-center gap-1.5 sm:gap-2 backdrop-blur px-3 sm:px-4 py-2 rounded-full border shadow-lg",
+            isDark 
+              ? "bg-[#3E2723]/60 border-white/10 text-white" 
+              : "bg-[#FFF9C4]/80 border-[#3E2723]/15 text-[#5D4037]"
+          )}>
+            <span className="font-bold text-xs sm:text-sm">
+              {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : (goldenChoco || 0)}
+            </span>
+            <span className={cn("text-[10px] sm:text-xs font-bold text-amber-500", isDark ? "text-amber-400" : "text-amber-700")}>Gchoco</span>
+          </div>
+          <div className={cn(
+            "flex items-center gap-1.5 sm:gap-2 backdrop-blur px-3 sm:px-4 py-2 rounded-full border shadow-lg lg:shadow-[0_0_15px_rgba(236,72,153,0.15)]",
             isDark 
               ? "bg-pink-500/20 border-pink-500/30 text-white" 
               : "bg-pink-500/10 border-pink-500/20 text-[#C2185B]"
           )}>
-            <Sparkles className="w-4 h-4 text-pink-500" />
-            <span className="font-bold text-sm tracking-wide">{ownedGachaTickets || 0}</span>
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-500 animate-pulse" />
+            <span className="font-bold text-xs sm:text-sm tracking-wide">{ownedGachaTickets || 0}</span>
           </div>
         </div>
 
@@ -332,9 +374,9 @@ export default function GachaPopup() {
           )} />
 
           {/* Banner Info Content */}
-          <div className="relative z-10 p-8 flex-grow flex flex-col justify-center text-shadow-sm select-text">
+          <div className="relative z-10 p-8 flex-grow flex flex-col justify-between text-shadow-sm select-text">
             <h1 className={cn(
-              "text-4xl md:text-6xl font-black font-sans uppercase italic tracking-tighter mb-2 transition-all duration-300",
+              "text-4xl md:text-6xl font-black font-sans uppercase italic tracking-tighter transition-all duration-300 mt-2 sm:mt-4",
               isDark 
                 ? "text-[#FFFDF9] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" 
                 : "text-[#3E2723] drop-shadow-[0_1px_2px_rgba(0,0,0,0.1)]"
@@ -342,9 +384,9 @@ export default function GachaPopup() {
               {activeBanner.name}
             </h1>
             
-            <div className="mt-8 flex gap-3">
+            <div className="mb-2 sm:mb-4 flex gap-3">
                <button className={cn(
-                 "flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur transition-all text-sm font-bold border",
+                 "flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur transition-all text-sm font-bold border cursor-pointer",
                  isDark 
                    ? "bg-white/10 hover:bg-white/20 text-white border-white/20" 
                    : "bg-[#3E2723]/10 hover:bg-[#3E2723]/20 text-[#3E2723] border-[#3E2723]/20"
@@ -352,7 +394,7 @@ export default function GachaPopup() {
                  <History className="w-4 h-4" /> Lịch sử
                </button>
                <button className={cn(
-                 "flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur transition-all text-sm font-bold border",
+                 "flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur transition-all text-sm font-bold border cursor-pointer",
                  isDark 
                    ? "bg-white/10 hover:bg-white/20 text-white border-white/20" 
                    : "bg-[#3E2723]/10 hover:bg-[#3E2723]/20 text-[#3E2723] border-[#3E2723]/20"
@@ -520,6 +562,112 @@ export default function GachaPopup() {
             >
               Xác Nhận
             </button>
+        </div>
+      )}
+
+      {pendingExchange && (
+        <div className="absolute inset-0 z-55 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 rounded-3xl animate-in fade-in duration-200">
+          <div className={cn(
+            "w-full max-w-sm rounded-2xl p-6 shadow-2xl border transition-all duration-300 transform scale-100",
+            isDark 
+              ? "bg-[#251C1A] text-white border-white/10" 
+              : "bg-white text-[#3E2723] border-[#3E2723]/10"
+          )}>
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-pink-500 animate-pulse" />
+              <h3 className="font-black text-sm sm:text-base uppercase tracking-wide">
+                Xác Nhận Đổi Vé
+              </h3>
+            </div>
+            
+            <p className={cn("text-xs leading-relaxed mb-5", isDark ? "text-stone-300" : "text-[#5D4037]")}>
+              Bạn đang thiếu <strong className="text-pink-500 font-extrabold">{pendingExchange.neededTickets} Vé Gacha</strong> để thực hiện quay {pendingExchange.times} lần. 
+              {pendingExchange.currency !== 'none' ? (
+                <>
+                  {" "}Hệ thống đề xuất quy đổi bằng{' '}
+                  <strong className={pendingExchange.currency === 'golden' ? "text-amber-500 font-extrabold" : "text-amber-600 font-extrabold"}>
+                    {pendingExchange.cost} {pendingExchange.currency === 'golden' ? 'Gchoco' : 'Choco'}
+                  </strong>{' '}
+                  để tiếp tục.
+                </>
+              ) : (
+                <>
+                  {" "}Rất tiếc, bạn không đủ Gchoco hoặc Choco để quy đổi thêm vé. Vui lòng kiếm thêm ở Chucu Game hoặc Radio nhé!
+                </>
+              )}
+            </p>
+
+            <div className={cn("flex gap-3 text-xs font-black uppercase text-stone-500 mb-5 p-3 rounded-xl border border-dashed", isDark ? "bg-[#1A1412]/50 border-white/10" : "bg-[#FDF9F3] border-[#3E2723]/10")}>
+              <div className="flex-1 flex flex-col items-center gap-1">
+                <span className="text-[9px] text-stone-400 font-normal">Số dư hiện tại:</span>
+                <span className={cn("text-xs font-black", pendingExchange.currency === 'golden' ? "text-amber-500" : isDark ? "text-stone-300" : "text-[#3E2723]")}>
+                  {goldenChoco || 0} Gchoco
+                </span>
+                <span className={cn("text-[10px] text-stone-400 font-normal")}>
+                  {choco || 0} Choco
+                </span>
+              </div>
+              <div className="w-px h-8 bg-stone-300 dark:bg-stone-700 self-center" />
+              <div className="flex-1 flex flex-col items-center gap-1">
+                <span className="text-[9px] text-stone-400 font-normal">Chi phí đổi:</span>
+                {pendingExchange.currency !== 'none' ? (
+                  <span className="text-xs font-black text-red-500">
+                    -{pendingExchange.cost} {pendingExchange.currency === 'golden' ? 'Gchoco' : 'Choco'}
+                  </span>
+                ) : (
+                  <span className="text-xs font-black text-rose-500">Không đủ số dư</span>
+                )}
+                <span className="text-[10px] text-green-500 font-extrabold">
+                  +{pendingExchange.neededTickets} Vé Gacha
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPendingExchange(null)}
+                className={cn(
+                  "flex-1 py-3 px-4 rounded-xl font-bold transition-all uppercase tracking-wider text-xs cursor-pointer",
+                  isDark 
+                    ? "bg-[#1A1412] hover:bg-[#32231F] text-stone-300 border border-white/5" 
+                    : "bg-stone-100 hover:bg-stone-200 text-[#3E2723]"
+                )}
+              >
+                Hủy
+              </button>
+              {pendingExchange.currency !== 'none' && (
+                <button
+                  onClick={async () => {
+                    const { times, neededTickets, currency, cost } = pendingExchange;
+                    setPendingExchange(null);
+                    
+                    let success = false;
+                    if (currency === 'golden') {
+                      success = spendGoldenChoco(cost, `Quy đổi ${neededTickets} Vé Gacha`);
+                    } else if (currency === 'choco') {
+                      success = spendChoco(cost, `Quy đổi ${neededTickets} Vé Gacha`);
+                    }
+                    
+                    if (success) {
+                      const newTicketBalance = (ownedGachaTickets || 0) + neededTickets;
+                      await updateUserDoc({
+                        ownedGachaTickets: newTicketBalance
+                      });
+                      executePulls(times, newTicketBalance);
+                    }
+                  }}
+                  className={cn(
+                    "flex-1 py-3 px-4 rounded-xl font-black transition-all uppercase tracking-wider text-xs cursor-pointer text-center",
+                    pendingExchange.currency === 'golden' 
+                      ? "bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 shadow-md hover:brightness-110"
+                      : "bg-[#795548] text-white border border-[#5d4037] shadow-md hover:brightness-110"
+                  )}
+                >
+                  Xác Nhận Đổi
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
