@@ -158,6 +158,11 @@ export function ChucuGamePopup() {
   const floatingTexts = useRef<FloatingText[]>([]);
   const screenFlash = useRef(0);
   const magnetActive = useRef(false);
+  const consecutiveChocoCatches = useRef(0);
+  const maxConsecutiveChocoCatchesThisGame = useRef(0);
+  const totalChocoCaughtThisGame = useRef(0);
+  const goldMissedThisGame = useRef(false);
+  const hitBombOrAppleThisGame = useRef(false);
   const magnetTimer = useRef<any>(null);
   const animationFrameId = useRef<number | null>(null);
   const timerIntervalId = useRef<number | null>(null);
@@ -391,6 +396,11 @@ export function ChucuGamePopup() {
     items.current = [];
     floatingTexts.current = [];
     screenFlash.current = 0;
+    consecutiveChocoCatches.current = 0;
+    maxConsecutiveChocoCatchesThisGame.current = 0;
+    totalChocoCaughtThisGame.current = 0;
+    goldMissedThisGame.current = false;
+    hitBombOrAppleThisGame.current = false;
     lastSpawnTime.current = Date.now();
     pointerInputRef.current = 150;
 
@@ -424,7 +434,13 @@ export function ChucuGamePopup() {
       gFragRef.current,
       scoreRef.current,
       isNoRewardPlay,
-      satietyRequiredPerNoRewardPlay
+      satietyRequiredPerNoRewardPlay,
+      {
+         maxConsecutiveCatches: maxConsecutiveChocoCatchesThisGame.current,
+         totalCaught: totalChocoCaughtThisGame.current,
+         goldMissed: goldMissedThisGame.current,
+         hitBombOrApple: hitBombOrAppleThisGame.current,
+      }
     );
   };
 
@@ -1032,15 +1048,24 @@ export function ChucuGamePopup() {
         items.current.splice(idx, 1);
         
         if (item.type === 'white') {
+          totalChocoCaughtThisGame.current++;
+          consecutiveChocoCatches.current++;
+          maxConsecutiveChocoCatchesThisGame.current = Math.max(maxConsecutiveChocoCatchesThisGame.current, consecutiveChocoCatches.current);
           setScore(prev => prev + 5);
           floatingTexts.current.push({ x: item.x, y: item.y, text: '+5', color: '#10B981', alpha: 1.0 });
           gameSounds.playCatch();
         } else if (item.type === 'brown') {
+          totalChocoCaughtThisGame.current++;
+          consecutiveChocoCatches.current++;
+          maxConsecutiveChocoCatchesThisGame.current = Math.max(maxConsecutiveChocoCatchesThisGame.current, consecutiveChocoCatches.current);
           setChucuFragmentsEarned(prev => prev + 1);
           setScore(prev => prev + 15);
           floatingTexts.current.push({ x: item.x, y: item.y, text: '+15', color: '#8B5A2B', alpha: 1.0 });
           gameSounds.playCatch();
         } else if (item.type === 'gold') {
+          totalChocoCaughtThisGame.current++;
+          consecutiveChocoCatches.current++;
+          maxConsecutiveChocoCatchesThisGame.current = Math.max(maxConsecutiveChocoCatchesThisGame.current, consecutiveChocoCatches.current);
           setChucuGFragmentsEarned(prev => prev + 1);
           setScore(prev => prev + 35);
           floatingTexts.current.push({ x: item.x, y: item.y, text: '+35 Vàng', color: '#F59E0B', alpha: 1.0 });
@@ -1065,12 +1090,16 @@ export function ChucuGamePopup() {
           }, 7000) as any;
         } else if (item.type === 'bomb') {
           // Mischief bomb: Deducts 20 points score
+          hitBombOrAppleThisGame.current = true;
+          consecutiveChocoCatches.current = 0;
           gameSounds.playBomb();
           screenFlash.current = 0.5;
           floatingTexts.current.push({ x: item.x, y: item.y, text: '-20', color: '#EF4444', alpha: 1.0 });
           setScore(prev => Math.max(0, prev - 20));
         } else if (item.type === 'rotten_apple') {
           // Táo thối bốc mùi decreases lives by 1, if 0 it triggers gameOver
+          hitBombOrAppleThisGame.current = true;
+          consecutiveChocoCatches.current = 0;
           gameSounds.playBomb();
           screenFlash.current = 0.7;
           floatingTexts.current.push({ x: item.x, y: item.y, text: '-1 ♥', color: '#EF4444', alpha: 1.0 });
@@ -1086,6 +1115,12 @@ export function ChucuGamePopup() {
       // Out of bounds check
       if (item.y > H + 20) {
         items.current.splice(idx, 1);
+        if (item.type === 'white' || item.type === 'brown' || item.type === 'gold') {
+          consecutiveChocoCatches.current = 0;
+          if (item.type === 'gold') {
+            goldMissedThisGame.current = true;
+          }
+        }
       }
     });
 
