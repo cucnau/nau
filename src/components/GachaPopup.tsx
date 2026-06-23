@@ -922,48 +922,83 @@ export default function GachaPopup() {
                     )} />
 
                     {/* Interactive Gift Box container */}
-                    <div className="relative w-52 h-52 sm:w-60 sm:h-60 flex flex-col items-center justify-center">
+                    <div className="relative w-56 h-56 sm:w-64 sm:h-64 flex flex-col items-center justify-center">
                       
-                      {/* Box Lid */}
+                      {/* Left Ribbon Bow Wing */}
                       <motion.div 
                         animate={{ 
-                          y: [0, -6, 0],
+                          rotate: [-15, -12, -15],
+                          scale: [1, 1.03, 1]
+                        }}
+                        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                        className="absolute z-25 top-[52px] left-[45px] w-14 h-8 bg-gradient-to-tr from-amber-200 via-amber-300 to-amber-500 rounded-full border-2 border-amber-600/30 shadow-md origin-right"
+                      />
+                      {/* Right Ribbon Bow Wing */}
+                      <motion.div 
+                        animate={{ 
+                          rotate: [15, 12, 15],
+                          scale: [1, 1.03, 1]
+                        }}
+                        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut", delay: 0.1 }}
+                        className="absolute z-25 top-[52px] right-[45px] w-14 h-8 bg-gradient-to-tl from-amber-200 via-amber-300 to-amber-500 rounded-full border-2 border-amber-600/30 shadow-md origin-left"
+                      />
+
+                      {/* Box Lid - Vintage Chocolate Craft Paper Style */}
+                      <motion.div 
+                        animate={{ 
+                          y: [0, -5, 0],
                           rotate: [0, -1, 1, 0]
                         }}
                         transition={{ 
                           repeat: Infinity, 
-                          duration: 1.8, 
+                          duration: 2, 
                           ease: "easeInOut" 
                         }}
-                        whileHover={{ scale: 1.05 }}
-                        className="w-[140px] h-[36px] sm:w-[160px] sm:h-[40px] bg-gradient-to-r from-pink-500 via-rose-500 to-pink-500 rounded-lg border-b-4 border-stone-800 shadow-xl relative z-20 flex items-center justify-center"
+                        whileHover={{ scale: 1.04 }}
+                        className="w-[160px] h-[44px] sm:w-[180px] sm:h-[48px] bg-gradient-to-r from-[#4E342E] via-[#5D4037] to-[#4E342E] rounded-xl border-[3px] border-[#3E2723] shadow-2xl relative z-20 flex items-center justify-center overflow-hidden"
                       >
-                        {/* Ribbon Tie / Knot Icon */}
-                        <div className="w-10 h-10 -mt-10 bg-amber-400 absolute rounded-full border-[3px] border-[#3E2723] shadow-md flex items-center justify-center">
-                          <Gift className="w-5 h-5 text-[#3E2723]" />
+                        {/* Golden Decorative Inner Border line */}
+                        <div className="absolute inset-1.5 rounded-lg border border-amber-400/40 pointer-events-none" />
+                        
+                        {/* Vertical Satin Ribbon running through lid */}
+                        <div className="w-8 h-full bg-gradient-to-r from-amber-200 via-amber-300 to-amber-400 absolute left-1/2 -translate-x-1/2 border-x border-amber-500/20 shadow-sm" />
+
+                        {/* Luxury Chocolate Wax Seal stamp */}
+                        <div className="w-11 h-11 bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 absolute rounded-full border-2 border-stone-800 shadow-[0_3px_8px_rgba(0,0,0,0.4)] flex items-center justify-center z-30">
+                          <div className="w-8 h-8 rounded-full border border-amber-200/50 flex items-center justify-center">
+                            <Sparkles className="w-4 h-4 text-[#3E2723] animate-pulse" />
+                          </div>
                         </div>
-                        {/* Horizontal Ribbon on Lid */}
-                        <div className="w-6 h-full bg-amber-400 absolute left-1/2 -translate-x-1/2 border-x-[2px] border-[#3E2723]/30" />
                       </motion.div>
 
-                      {/* Box Body */}
+                      {/* Box Body - Gourmet Box base with ribbon wrappers */}
                       <motion.div 
                         animate={{ 
-                          scaleY: [1, 0.97, 1.02, 1],
-                          y: [0, 4, -2, 0]
+                          scaleY: [1, 0.98, 1.02, 1],
+                          y: [0, 3, -1, 0]
                         }}
                         transition={{ 
                           repeat: Infinity, 
-                          duration: 1.8, 
+                          duration: 2, 
                           ease: "easeInOut",
                           delay: 0.1
                         }}
-                        className="w-[124px] h-[100px] sm:w-[140px] sm:h-[120px] bg-gradient-to-b from-[#3E2723] to-[#201311] rounded-b-xl border-[4px] border-[#3E2723] shadow-2xl relative z-10"
+                        className="w-[140px] h-[110px] sm:w-[160px] sm:h-[125px] bg-gradient-to-b from-[#3E2723] via-[#2D1A17] to-[#1E0F0D] rounded-b-2xl border-[4px] border-[#3E2723] shadow-[0_20px_35px_rgba(0,0,0,0.7)] relative z-10 overflow-hidden mt-[-4px]"
                       >
+                        {/* Premium Golden Vintage Stripe Pattern inside Box Body */}
+                        <div className="absolute inset-x-2 top-2 bottom-2 rounded-lg border border-white/[0.04] pointer-events-none" />
+                        
                         {/* Vertical Ribbon */}
-                        <div className="w-6 h-full bg-amber-400 absolute left-1/2 -translate-x-1/2 border-x-[2px] border-[#3E2723]/30" />
-                        {/* Horizontal Ribbon */}
-                        <div className="h-6 w-full bg-amber-400 absolute top-1/3 -translate-y-1/2 left-0 border-y-[2px] border-[#3E2723]/30" />
+                        <div className="w-8 h-full bg-gradient-to-r from-amber-200 via-amber-300 to-amber-400 absolute left-1/2 -translate-x-1/2 border-x border-amber-500/20 shadow-inner" />
+                        
+                        {/* Horizontal Gourmet Seal Wrap */}
+                        <div className="h-8 w-full bg-gradient-to-b from-amber-200/90 via-amber-300 to-amber-400 absolute top-1/3 -translate-y-1/2 left-0 border-y border-amber-500/20 shadow-inner flex items-center px-2 justify-between">
+                          <span className="text-[7px] text-[#3E2723] font-black tracking-widest opacity-40">CHOCO</span>
+                          <span className="text-[7px] text-[#3E2723] font-black tracking-widest opacity-40">CAFE</span>
+                        </div>
+
+                        {/* Glossy Reflection Highlight */}
+                        <div className="absolute top-0 left-0 w-full h-[60%] bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
                       </motion.div>
 
                     </div>
@@ -1086,10 +1121,10 @@ export default function GachaPopup() {
             <button 
               onClick={() => setShowResults(null)}
               className={cn(
-                "mt-16 px-10 py-3 font-extrabold rounded-full transition-all uppercase tracking-widest cursor-pointer shadow-lg",
+                "mt-16 px-12 py-3.5 font-extrabold rounded-full transition-all uppercase tracking-widest cursor-pointer shadow-lg hover:scale-105 active:scale-95 text-xs sm:text-sm border-2",
                 isDark 
-                  ? "bg-[#FFFDF9] hover:bg-stone-200 text-[#1A1412]" 
-                  : "bg-[#3E2723] hover:bg-[#5D4037] text-white"
+                  ? "bg-amber-400 hover:bg-amber-500 border-amber-300 text-stone-950 dark:bg-amber-400 dark:text-stone-950" 
+                  : "bg-[#3E2723] hover:bg-[#5D4037] border-[#3E2723] text-white"
               )}
             >
               Xác Nhận
