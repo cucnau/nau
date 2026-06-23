@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Star, History, Info, Clock, Loader2 } from 'lucide-react';
+import { X, Sparkles, Star, History, Info, Clock, Loader2, Gift } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../store';
 import { PITY_5_STAR, PITY_4_STAR, GACHA_STANDARD_BANNER, GachaBanner, GachaItem } from '../types/gacha';
 import { collection, onSnapshot } from 'firebase/firestore';
@@ -29,6 +30,7 @@ export default function GachaPopup() {
   const [activeBanner, setActiveBanner] = useState<GachaBanner>(GACHA_STANDARD_BANNER);
   const [isPulling, setIsPulling] = useState(false);
   const [showResults, setShowResults] = useState<GachaItem[] | null>(null);
+  const [openingAnimation, setOpeningAnimation] = useState<{ active: boolean; highestRarity: number; items: GachaItem[]; currentIndex: number; isOpened: boolean } | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [historyList, setHistoryList] = useState<{ name: string; rarity: number; time: string; bannerName: string }[]>([]);
@@ -390,26 +392,39 @@ export default function GachaPopup() {
     let currentPity5 = gachaPity5Star;
     let currentPity4 = gachaPity4Star;
     const results: GachaItem[] = [];
+    const currentOwnedSet = new Set(ownedStickers || []);
     
     for (let i = 0; i < times; i++) {
        const res = performSinglePull(currentPity5, currentPity4);
-       results.push(res.item);
+       const pullResultItem = { ...res.item };
        currentPity5 = res.newPity5;
        currentPity4 = res.newPity4;
        
-       // Grant item to user
-       if (res.item.type === 'sticker') {
-         const stickerUrl = res.item.image || 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?q=80&w=120&auto=format&fit=crop';
-         addOwnedSticker(stickerUrl);
-       } else if (res.item.type === 'fragment') {
+       // Grant item to user with duplicate check
+       if (pullResultItem.type === 'sticker') {
+         const stickerUrl = pullResultItem.image || 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?q=80&w=120&auto=format&fit=crop';
+         
+         if (currentOwnedSet.has(stickerUrl)) {
+           // Duplicate sticker: convert to fragments
+           const refundAmt = pullResultItem.rarity === 5 ? 200 : 100;
+           addGachaFragments(refundAmt);
+           (pullResultItem as any).isDuplicate = true;
+           (pullResultItem as any).refundFragments = refundAmt;
+         } else {
+           // New sticker: grant to user & add to local tracking for current batch
+           addOwnedSticker(stickerUrl);
+           currentOwnedSet.add(stickerUrl);
+         }
+       } else if (pullResultItem.type === 'fragment') {
          // rough parse of number from name: "10 Mảnh..."
-         const amtMatch = res.item.name.match(/\d+/);
+         const amtMatch = pullResultItem.name.match(/\d+/);
          if (amtMatch) {
             addGachaFragments(parseInt(amtMatch[0]));
          } else {
             addGachaFragments(5); // default
          }
        }
+       results.push(pullResultItem);
     }
     
     // Save state
@@ -421,7 +436,9 @@ export default function GachaPopup() {
     
     // update local history
     const newHistoryItems = results.map(item => ({
-      name: item.name,
+      name: (item as any).isDuplicate 
+        ? `${item.name} (Trùng +${(item as any).refundFragments} Mảnh Choco Gacha)`
+        : item.name,
       rarity: item.rarity,
       time: new Date().toLocaleString('vi-VN', { 
         hour: '2-digit', 
@@ -441,7 +458,14 @@ export default function GachaPopup() {
     });
 
     setIsPulling(false);
-    setShowResults(results);
+    const highestRarity = Math.max(...results.map(item => item.rarity));
+    setOpeningAnimation({
+      active: true,
+      highestRarity,
+      items: results,
+      currentIndex: 0,
+      isOpened: false
+    });
   };
 
   const pullOnce = () => executePulls(1);
@@ -662,6 +686,340 @@ export default function GachaPopup() {
       </div>
       
       {/* Pull Animation/Result Overlay Area - to be implemented in details */}
+      {openingAnimation && (
+        <div 
+          onClick={() => {
+            if (openingAnimation.isOpened) {
+              if (openingAnimation.currentIndex < openingAnimation.items.length - 1) {
+                setOpeningAnimation(prev => prev ? { ...prev, currentIndex: prev.currentIndex + 1 } : null);
+              } else {
+                setShowResults(openingAnimation.items);
+                setOpeningAnimation(null);
+              }
+            }
+          }}
+          className="absolute inset-0 z-50 bg-[#0C0604] flex flex-col items-center justify-between p-4 py-8 select-none overflow-hidden animate-in fade-in duration-500 cursor-pointer"
+        >
+          
+          {/* Animated Stars Background */}
+          <div className="absolute inset-0 opacity-40 pointer-events-none">
+            <div className="absolute top-10 left-1/4 w-2 h-2 bg-yellow-300 rounded-full animate-ping" />
+            <div className="absolute top-1/3 right-1/4 w-3.5 h-3.5 bg-purple-400 rounded-full animate-pulse" />
+            <div className="absolute bottom-1/4 left-1/3 w-2.5 h-2.5 bg-blue-400 rounded-full animate-pulse" />
+            <div className="absolute bottom-10 right-10 w-2 h-2 bg-amber-400 rounded-full animate-ping" />
+          </div>
+
+          {/* Top Info Bar */}
+          <div className="w-full max-w-md px-4 flex justify-between items-center relative z-20">
+            <div className="text-stone-400 text-xs font-mono">
+              {openingAnimation.isOpened && (
+                <span>VẬT PHẨM {openingAnimation.currentIndex + 1} / {openingAnimation.items.length}</span>
+              )}
+            </div>
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowResults(openingAnimation.items);
+                setOpeningAnimation(null);
+              }}
+              className="text-stone-500 hover:text-stone-300 text-xs px-2.5 py-1 rounded bg-stone-900/40 border border-white/5 transition-colors"
+            >
+              Bỏ Qua Tất Cả
+            </button>
+          </div>
+
+          <div className="text-center my-2 max-w-md px-4 relative z-20">
+            <motion.h2 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-2xl sm:text-3xl font-black tracking-widest text-[#FFFDF9] italic uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]"
+            >
+              {openingAnimation.isOpened ? "CHÚC MỪNG!" : "HỘP QUÀ GACHA"}
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.6, 1, 0.6] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="text-xs sm:text-sm text-amber-200 mt-2 font-medium tracking-wide drop-shadow-sm uppercase"
+            >
+              {openingAnimation.isOpened ? "Nhấn vào bất kỳ đâu trên màn hình để tiếp tục" : "Nhấp vào hộp quà để khui báu vật!"}
+            </motion.p>
+          </div>
+
+          {/* Core Animation Stage */}
+          <div className="relative w-full max-w-md h-[300px] sm:h-[360px] flex items-center justify-center">
+            
+            {/* Glowing Aura depending on CURRENT item rarity */}
+            <AnimatePresence mode="wait">
+              {openingAnimation.isOpened && (
+                <motion.div 
+                  key={openingAnimation.currentIndex}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: [1, 1.3, 1.15], opacity: [0.8, 1, 0.9] }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
+                  className={cn(
+                    "absolute w-72 h-72 sm:w-80 sm:h-80 rounded-full filter blur-[45px] pointer-events-none mix-blend-screen z-0 animate-pulse",
+                    openingAnimation.items[openingAnimation.currentIndex]?.rarity === 5 
+                      ? "bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 shadow-[0_0_120px_rgba(234,179,8,1)]" 
+                      : (openingAnimation.items[openingAnimation.currentIndex]?.rarity === 4 
+                          ? "bg-gradient-to-r from-purple-500 via-pink-400 to-indigo-500 shadow-[0_0_120px_rgba(168,85,247,1)]" 
+                          : "bg-gradient-to-r from-teal-500 via-cyan-400 to-blue-600 shadow-[0_0_120px_rgba(6,182,212,1)]")
+                  )}
+                />
+              )}
+            </AnimatePresence>
+
+            {/* Rotating Starburst Rays behind opened item */}
+            {openingAnimation.isOpened && (
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden z-0">
+                <div className={cn(
+                  "w-[450px] h-[450px] bg-[radial-gradient(circle,rgba(255,255,255,0.15)_0%,rgba(0,0,0,0)_60%)] animate-spin",
+                  openingAnimation.items[openingAnimation.currentIndex]?.rarity === 5 
+                    ? "text-amber-500" 
+                    : (openingAnimation.items[openingAnimation.currentIndex]?.rarity === 4 ? "text-purple-500" : "text-cyan-500")
+                )} style={{ animationDuration: '18s' }}>
+                  <svg className="w-full h-full opacity-35" viewBox="0 0 100 100">
+                    <path d="M50,50 L50,0 A50,50 0 0,1 60,3 L50,50 Z" fill="currentColor"/>
+                    <path d="M50,50 L50,100 A50,50 0 0,1 40,97 L50,50 Z" fill="currentColor"/>
+                    <path d="M50,50 L0,50 A50,50 0 0,1 3,40 L50,50 Z" fill="currentColor"/>
+                    <path d="M50,50 L100,50 A50,50 0 0,1 97,60 L50,50 Z" fill="currentColor"/>
+                    <path d="M50,50 L15,15 A50,50 0 0,1 25,10 L50,50 Z" fill="currentColor"/>
+                    <path d="M50,50 L85,85 A50,50 0 0,1 75,90 L50,50 Z" fill="currentColor"/>
+                    <path d="M50,50 L15,85 A50,50 0 0,1 10,75 L50,50 Z" fill="currentColor"/>
+                    <path d="M50,50 L85,15 A50,50 0 0,1 90,25 L50,50 Z" fill="currentColor"/>
+                  </svg>
+                </div>
+              </div>
+            )}
+
+            {/* Floating Opened Premium Item */}
+            <AnimatePresence mode="wait">
+              {openingAnimation.isOpened && (
+                <motion.div 
+                  key={openingAnimation.currentIndex}
+                  initial={{ scale: 0.6, y: 50, opacity: 0, rotate: -5 }}
+                  animate={{ scale: 1.1, y: -20, opacity: 1, rotate: 0 }}
+                  exit={{ scale: 0.6, y: -50, opacity: 0, rotate: 5 }}
+                  transition={{ type: 'spring', stiffness: 120, damping: 14 }}
+                  className="absolute z-30 flex flex-col items-center justify-center pointer-events-none"
+                >
+                  {/* Rarity Star badge */}
+                  <div className="flex gap-1 mb-3">
+                    {Array.from({ length: openingAnimation.items[openingAnimation.currentIndex]?.rarity || 3 }).map((_, i) => (
+                      <Star key={i} className={cn(
+                        "w-6 h-6 fill-current drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] animate-bounce",
+                        openingAnimation.items[openingAnimation.currentIndex]?.rarity === 5 
+                          ? "text-yellow-300" 
+                          : (openingAnimation.items[openingAnimation.currentIndex]?.rarity === 4 
+                              ? "text-fuchsia-300" 
+                              : "text-cyan-300")
+                      )} style={{ animationDelay: `${i * 100}ms` }} />
+                    ))}
+                  </div>
+
+                  {/* High Quality Render of Current Item */}
+                  {(() => {
+                    const currentItem = openingAnimation.items[openingAnimation.currentIndex];
+                    if (!currentItem) return null;
+                    return (
+                      <div className={cn(
+                        "w-40 h-40 sm:w-44 sm:h-44 rounded-3xl flex items-center justify-center shadow-2xl relative border-[4px] p-4 bg-gradient-to-tr",
+                        currentItem.rarity === 5 
+                          ? "from-amber-200 to-yellow-500 border-yellow-300" 
+                          : (currentItem.rarity === 4 
+                              ? "from-purple-300 to-fuchsia-600 border-fuchsia-400" 
+                              : "from-blue-200 to-cyan-500 border-cyan-300")
+                      )}>
+                        
+                        {/* Shimmer overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent animate-pulse rounded-2xl" />
+
+                        {currentItem.image ? (
+                          <img src={currentItem.image} alt={currentItem.name} referrerPolicy="no-referrer" className="w-full h-full object-contain filter drop-shadow-lg scale-105" />
+                        ) : (
+                          <span className="text-6xl">{currentItem.type === 'sticker' ? '🏷️' : '🧩'}</span>
+                        )}
+
+                        {/* Custom duplicate banner inside card */}
+                        {(currentItem as any).isDuplicate && (
+                          <div className="absolute -top-3 -right-3 bg-rose-600 text-stone-100 text-[9px] font-black uppercase px-2.5 py-1 rounded-full shadow-lg border border-rose-400 z-40 animate-pulse tracking-tight">
+                            +{(currentItem as any).refundFragments} MẢNH
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Name of Best Item */}
+                  {(() => {
+                    const currentItem = openingAnimation.items[openingAnimation.currentIndex];
+                    if (!currentItem) return null;
+                    return (
+                      <div className="flex flex-col items-center gap-2 mt-4 text-center">
+                        <motion.div 
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="bg-black/60 backdrop-blur-md px-6 py-2 rounded-full border border-white/10"
+                        >
+                          <span className={cn(
+                            "text-sm sm:text-base font-black uppercase tracking-widest drop-shadow-md",
+                            currentItem.rarity === 5 
+                              ? "text-yellow-300" 
+                              : (currentItem.rarity === 4 
+                                  ? "text-fuchsia-300" 
+                                  : "text-cyan-300")
+                          )}>
+                            {currentItem.name}
+                          </span>
+                        </motion.div>
+
+                        {(currentItem as any).isDuplicate && (
+                          <motion.p 
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-[11px] sm:text-xs text-rose-300 font-bold bg-rose-950/40 border border-rose-500/20 px-3 py-1 rounded-full backdrop-blur-sm"
+                          >
+                            Đã sở hữu! Tự động quy đổi thành +{(currentItem as any).refundFragments} Mảnh
+                          </motion.p>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Tap/Click Area Container */}
+            <div 
+              onClick={(e) => {
+                if (!openingAnimation.isOpened) {
+                  e.stopPropagation();
+                  setOpeningAnimation(prev => prev ? { ...prev, isOpened: true } : null);
+                }
+              }}
+              className="relative select-none z-10 w-full h-full flex items-center justify-center cursor-pointer"
+            >
+              <AnimatePresence>
+                {!openingAnimation.isOpened && (
+                  <motion.div 
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.5, opacity: 0, y: 100 }}
+                    transition={{ type: "spring", stiffness: 120, damping: 12 }}
+                    className="flex flex-col items-center"
+                  >
+                    
+                    {/* Glowing Aura of the unopened gift box according to highestRarity */}
+                    <div className={cn(
+                      "absolute w-56 h-56 rounded-full blur-[40px] animate-pulse opacity-60",
+                      openingAnimation.highestRarity === 5 
+                        ? "bg-amber-500 shadow-[0_0_80px_rgba(234,179,8,0.5)]" 
+                        : (openingAnimation.highestRarity === 4 
+                            ? "bg-purple-500 shadow-[0_0_80px_rgba(168,85,247,0.5)]" 
+                            : "bg-teal-500 shadow-[0_0_80px_rgba(6,182,212,0.5)]")
+                    )} />
+
+                    {/* Interactive Gift Box container */}
+                    <div className="relative w-52 h-52 sm:w-60 sm:h-60 flex flex-col items-center justify-center">
+                      
+                      {/* Box Lid */}
+                      <motion.div 
+                        animate={{ 
+                          y: [0, -6, 0],
+                          rotate: [0, -1, 1, 0]
+                        }}
+                        transition={{ 
+                          repeat: Infinity, 
+                          duration: 1.8, 
+                          ease: "easeInOut" 
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        className="w-[140px] h-[36px] sm:w-[160px] sm:h-[40px] bg-gradient-to-r from-pink-500 via-rose-500 to-pink-500 rounded-lg border-b-4 border-stone-800 shadow-xl relative z-20 flex items-center justify-center"
+                      >
+                        {/* Ribbon Tie / Knot Icon */}
+                        <div className="w-10 h-10 -mt-10 bg-amber-400 absolute rounded-full border-[3px] border-[#3E2723] shadow-md flex items-center justify-center">
+                          <Gift className="w-5 h-5 text-[#3E2723]" />
+                        </div>
+                        {/* Horizontal Ribbon on Lid */}
+                        <div className="w-6 h-full bg-amber-400 absolute left-1/2 -translate-x-1/2 border-x-[2px] border-[#3E2723]/30" />
+                      </motion.div>
+
+                      {/* Box Body */}
+                      <motion.div 
+                        animate={{ 
+                          scaleY: [1, 0.97, 1.02, 1],
+                          y: [0, 4, -2, 0]
+                        }}
+                        transition={{ 
+                          repeat: Infinity, 
+                          duration: 1.8, 
+                          ease: "easeInOut",
+                          delay: 0.1
+                        }}
+                        className="w-[124px] h-[100px] sm:w-[140px] sm:h-[120px] bg-gradient-to-b from-[#3E2723] to-[#201311] rounded-b-xl border-[4px] border-[#3E2723] shadow-2xl relative z-10"
+                      >
+                        {/* Vertical Ribbon */}
+                        <div className="w-6 h-full bg-amber-400 absolute left-1/2 -translate-x-1/2 border-x-[2px] border-[#3E2723]/30" />
+                        {/* Horizontal Ribbon */}
+                        <div className="h-6 w-full bg-amber-400 absolute top-1/3 -translate-y-1/2 left-0 border-y-[2px] border-[#3E2723]/30" />
+                      </motion.div>
+
+                    </div>
+
+                    <div className="flex flex-col items-center gap-1.5 mt-6">
+                      {/* Box items count */}
+                      <span className="text-stone-400 text-xs font-mono tracking-tight uppercase">
+                        Hộp quà chứa {openingAnimation.items.length} phần quà
+                      </span>
+                      {/* Quick Pulsing text */}
+                      <span className="text-yellow-400 font-extrabold text-[11px] sm:text-xs tracking-widest uppercase animate-pulse border-2 border-yellow-400/20 px-4 py-1.5 rounded-full bg-yellow-400/5 backdrop-blur shadow-[0_0_12px_rgba(234,179,8,0.1)]">
+                        Chạm Để Khui
+                      </span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Bottom Control Bar / Navigation */}
+          <div className="w-full max-w-sm px-4 text-center relative z-20">
+            {openingAnimation.isOpened ? (
+              <div className="flex flex-col items-center gap-2">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (openingAnimation.currentIndex < openingAnimation.items.length - 1) {
+                      setOpeningAnimation(prev => prev ? { ...prev, currentIndex: prev.currentIndex + 1 } : null);
+                    } else {
+                      setShowResults(openingAnimation.items);
+                      setOpeningAnimation(null);
+                    }
+                  }}
+                  className={cn(
+                    "w-full py-4.5 font-extrabold rounded-full uppercase tracking-widest text-xs sm:text-sm cursor-pointer shadow-2xl active:scale-95 transition-transform duration-150 border-[2.5px] text-[#3E2723] bg-gradient-to-r select-none animate-pulse",
+                    openingAnimation.items[openingAnimation.currentIndex]?.rarity === 5 
+                      ? "from-amber-300 via-yellow-400 to-amber-500 border-amber-200 shadow-[0_0_30px_rgba(234,179,8,0.3)]" 
+                      : (openingAnimation.items[openingAnimation.currentIndex]?.rarity === 4 
+                          ? "from-fuchsia-300 via-purple-400 to-indigo-400 border-fuchsia-200 shadow-[0_0_30px_rgba(168,85,247,0.3)]" 
+                          : "from-cyan-300 via-teal-400 to-blue-400 border-cyan-200 shadow-[0_0_30px_rgba(6,182,212,0.3)]")
+                  )}
+                >
+                  {openingAnimation.currentIndex === openingAnimation.items.length - 1 
+                    ? "HOÀN THÀNH & XEM TẤT CẢ" 
+                    : "XEM VẬT PHẨM TIẾP THEO"}
+                </button>
+                <p className="text-[10px] text-stone-500 uppercase tracking-widest">
+                  (Hoặc nhấn vào bất kỳ vùng trống nào trên màn hình)
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      )}
+
       {showResults && (
         <div className={cn(
           "absolute inset-0 z-50 flex flex-col items-center justify-center animate-in fade-in duration-500 p-4 transition-all duration-300",
@@ -684,6 +1042,13 @@ export default function GachaPopup() {
                              ? "bg-gradient-to-br from-[#2D221D] to-stone-800 border-stone-800 text-white" 
                              : "bg-gradient-to-br from-stone-100 to-stone-200 border-stone-200 text-[#3E2723]"))
                 )} style={{ animationDelay: `${idx * 100}ms` }}>
+                  
+                  {/* Duplicate Badge */}
+                  {(item as any).isDuplicate && (
+                    <div className="absolute -top-2.5 -right-1.5 bg-rose-600 text-stone-100 text-[8px] sm:text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow-lg border border-rose-400 z-10 animate-bounce tracking-tight">
+                      +{(item as any).refundFragments} Mảnh
+                    </div>
+                  )}
                   
                   {/* Item Icon */}
                   <div className={cn(
