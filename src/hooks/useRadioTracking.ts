@@ -76,6 +76,7 @@ export function useRadioTracking() {
        // Update one track love
        const currentTrackSec = (state.radioTrackSeconds || 0) + TICK_S;
        updates.radioTrackSeconds = currentTrackSec;
+       updates.totalRadioSeconds = (state.totalRadioSeconds || 0) + TICK_S;
        
        const maxTrackSec = Math.max(state.maxRadioTrackSeconds || 0, currentTrackSec);
        if (maxTrackSec > (state.maxRadioTrackSeconds || 0)) {
