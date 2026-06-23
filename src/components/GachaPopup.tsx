@@ -264,12 +264,32 @@ export default function GachaPopup() {
         {/* Banner Area */}
         <div className="relative w-full h-[70vh] sm:h-[65vh] rounded-3xl overflow-hidden shadow-2xl border-[4px] border-[#FFFDF9]/20 flex flex-col md:flex-row bg-[#1A1412]">
           
-          {/* Background Image / Art */}
-          <div className="absolute inset-0 z-0">
-            <img src={activeBanner.image} alt="Banner bg" className="w-full h-full object-cover opacity-60" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1A1412] via-transparent to-transparent" />
+          {/* Background Grid of Stickers */}
+          <div className="absolute inset-0 z-0 overflow-hidden opacity-40 p-6 flex flex-wrap gap-4 items-center justify-center content-center select-none pointer-events-none">
+            {[
+              ...(activeBanner.pool5Star || []).filter((item: any) => item.type === 'sticker' || item.image),
+              ...(activeBanner.pool4Star || []).filter((item: any) => item.type === 'sticker' || item.image)
+            ].map((item, idx) => (
+              <div 
+                key={item.id || idx} 
+                className={cn(
+                  "w-16 h-16 sm:w-20 sm:h-20 bg-[#2B1B17] rounded-2xl flex items-center justify-center relative p-1.5 border-2 transition-all shadow-md shrink-0",
+                  item.rarity === 5 
+                    ? "border-amber-400 shadow-[0_0_12px_rgba(245,158,11,0.3)] bg-gradient-to-br from-amber-500/10 to-amber-500/20" 
+                    : "border-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.3)] bg-gradient-to-br from-purple-500/10 to-purple-500/20"
+                )}
+              >
+                {item.image ? (
+                  <img src={item.image} alt={item.name} referrerPolicy="no-referrer" className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+                ) : (
+                  <span className="text-xl">🏷️</span>
+                )}
+              </div>
+            ))}
           </div>
+          {/* Gradient overlays to ensure text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1A1412] via-[#1A1412]/80 to-[#1A1412]/40 z-[1] pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1A1412] via-transparent to-transparent z-[1] pointer-events-none" />
 
           {/* Banner Info Content */}
           <div className="relative z-10 p-8 flex-1 flex flex-col justify-center text-white text-shadow-sm">
