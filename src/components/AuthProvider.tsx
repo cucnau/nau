@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { onAuthStateChanged, getRedirectResult } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, collection, updateDoc, deleteField, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, collection, updateDoc, deleteField, addDoc, getDocs, query, where, deleteDoc } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 import { auth, db } from '../lib/firebase';
 import { useStore, getDailyMissions, getWeeklyMissions, getPermanentMissions } from '../store';
@@ -360,6 +360,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                           await updateDoc(doc(db, 'users', user.uid, 'owned_stickers', docObj.docId), {
                             url: actualUrl
                           });
+                        }
+                      } else {
+                        // The item no longer exists in the DB! Delete it from owned_stickers
+                        await deleteDoc(doc(db, 'users', user.uid, 'owned_stickers', docObj.docId));
+                        currentUrl = null;
+                        changed = true;
+
+                        // Check if this invalid id is currently equipped anywhere and reset it
+                        const userRef = doc(db, 'users', user.uid);
+                        const cleanUpdates: any = {};
+                        let cleanNeeded = false;
+                        const currentState = useStore.getState();
+                        if (currentState.equippedStickerComment === docObj.url) {
+                          cleanUpdates.equippedStickerComment = null;
+                          useStore.setState({ equippedStickerComment: null });
+                          cleanNeeded = true;
+                        }
+                        if (currentState.equippedStickerChat === docObj.url) {
+                          cleanUpdates.equippedStickerChat = null;
+                          useStore.setState({ equippedStickerChat: null });
+                          cleanNeeded = true;
+                        }
+                        if (currentState.equippedStickerPost === docObj.url) {
+                          cleanUpdates.equippedStickerPost = null;
+                          useStore.setState({ equippedStickerPost: null });
+                          cleanNeeded = true;
+                        }
+                        if (cleanNeeded) {
+                          await updateDoc(userRef, cleanUpdates);
+                          console.log("Cleaned up orphaned equipped sticker fields!");
                         }
                       }
                     } catch (err) {
