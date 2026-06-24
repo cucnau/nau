@@ -6,6 +6,7 @@ import { db, checkIfQuotaError } from './lib/firebase';
 import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit, writeBatch, addDoc, deleteField } from 'firebase/firestore';
 import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement, getGMT7Date } from './types/achievements';
 import { logTransaction } from './lib/transactions';
+import { addStoryFire } from './lib/storyFire';
 
 export function compressBase64Image(dataUrl: string, maxWidth = 180, maxHeight = 180, quality = 0.85): Promise<string> {
    return new Promise((resolve) => {
@@ -1522,8 +1523,10 @@ export const useStore = create<UserState>()(
           let newSavedStories: string[];
           if (isSaved) {
              newSavedStories = (state.savedStories || []).filter(id => id !== storyId);
+             addStoryFire(storyId, -1);
           } else {
              newSavedStories = [...(state.savedStories || []), storyId];
+             addStoryFire(storyId, 1);
           }
           
           const uid = state.uid;
@@ -1905,6 +1908,9 @@ export const useStore = create<UserState>()(
             $chocoDiff: -amount,
             activePoints: finalActivePoints,
           }, "Tặng Choco cho truyện");
+
+          // Add fire points equal to gifted choco
+          addStoryFire(storyId, amount);
 
           // Unlock generous_donor (gifting choco first time)
           get().unlockAchievement('generous_donor');
