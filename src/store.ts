@@ -177,6 +177,7 @@ interface UserState {
   totalEarnedChoco: number;
   totalEarnedGChoco: number;
   totalSpentChoco: number;
+  totalGiftedChoco: number;
   totalCheckIns: number;
   perfectDailyDates: string[];
   sentMessagesCount: number;
@@ -424,6 +425,7 @@ export const useStore = create<UserState>()(
       totalEarnedChoco: 0,
       totalEarnedGChoco: 0,
       totalSpentChoco: 0,
+      totalGiftedChoco: 0,
       totalCheckIns: 0,
       perfectDailyDates: [],
       sentMessagesCount: 0,
@@ -524,6 +526,7 @@ export const useStore = create<UserState>()(
         totalEarnedChoco: 0,
         totalEarnedGChoco: 0,
         totalSpentChoco: 0,
+        totalGiftedChoco: 0,
         totalCheckIns: 0,
         perfectDailyDates: [],
         sentMessagesCount: 0,
@@ -813,6 +816,7 @@ export const useStore = create<UserState>()(
             totalEarnedChoco: data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco,
             totalEarnedGChoco: data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco,
             totalSpentChoco: totalSpentChocoFallback,
+            totalGiftedChoco: data.totalGiftedChoco !== undefined ? data.totalGiftedChoco : (state.totalGiftedChoco || 0),
             totalCheckIns: computedCheckIns !== undefined ? computedCheckIns : state.totalCheckIns,
             perfectDailyDates: data.perfectDailyDates !== undefined ? data.perfectDailyDates : state.perfectDailyDates,
             sentMessagesCount: data.sentMessagesCount !== undefined ? data.sentMessagesCount : state.sentMessagesCount,
@@ -1884,17 +1888,20 @@ export const useStore = create<UserState>()(
           
           const newChoco = state.choco - amount;
           const newTotalSpent = (state.totalSpentChoco || 0) + amount;
+          const newTotalGifted = (state.totalGiftedChoco || 0) + amount;
           const finalActivePoints = (state.activePoints || 0) + 1;
 
           set({ 
             choco: newChoco,
             totalSpentChoco: newTotalSpent,
+            totalGiftedChoco: newTotalGifted,
             activePoints: finalActivePoints,
           });
 
           get().updateUserDoc({ 
             choco: newChoco,
             totalSpentChoco: newTotalSpent,
+            totalGiftedChoco: newTotalGifted,
             $chocoDiff: -amount,
             activePoints: finalActivePoints,
           }, "Tặng Choco cho truyện");
@@ -2177,7 +2184,7 @@ export const useStore = create<UserState>()(
             get().unlockAchievement('big_spender');
          }
 
-         if (!currentUnlocked.includes('generous_donor') && (state.totalSpentChoco || 0) > 0) {
+         if (!currentUnlocked.includes('generous_donor') && (state.totalGiftedChoco || 0) > 0) {
             get().unlockAchievement('generous_donor');
          }
 
