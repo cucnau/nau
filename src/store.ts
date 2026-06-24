@@ -156,6 +156,7 @@ interface UserState {
         totalCaught: number;
         goldMissed: boolean;
         hitBombOrApple: boolean;
+        chocoMissed?: boolean;
      }
   ) => void;
 
@@ -1781,6 +1782,7 @@ export const useStore = create<UserState>()(
             totalCaught: number;
             goldMissed: boolean;
             hitBombOrApple: boolean;
+            chocoMissed?: boolean;
          }
       ) => {
          const state = get();
