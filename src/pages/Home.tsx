@@ -358,8 +358,7 @@ export function Home() {
                                 <span>Top {i + 1}: {u.displayName}</span>
                                 {isMe && <span className="text-[9px] text-[#5D4037] dark:text-[#ECE5DC] shrink-0">(Bạn)</span>}
                              </div>
-                             <div className="text-[10px] text-[#8D6E63] dark:text-stone-400 font-extrabold flex items-center gap-1">
-                                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                             <div className="text-[10px] text-[#8D6E63] dark:text-stone-400 font-extrabold">
                                 {(u.chucuGameMaxScore || 0).toLocaleString()} điểm
                              </div>
                           </div>
