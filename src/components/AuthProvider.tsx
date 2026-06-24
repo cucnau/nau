@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { onAuthStateChanged, getRedirectResult } from 'firebase/auth';
-import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, collection, updateDoc, deleteField, addDoc, getDocs, query, where, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, collection, updateDoc, deleteField, addDoc, getDocs, query, where, deleteDoc, increment } from 'firebase/firestore';
+import { format } from 'date-fns';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 import { auth, db } from '../lib/firebase';
 import { useStore, getDailyMissions, getWeeklyMissions, getPermanentMissions } from '../store';
@@ -491,6 +492,81 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       unsubAchColors();
       unsubMaintenance();
     };
+  }, []);
+
+  useEffect(() => {
+    const runLegacyCommentsSync = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'comments'));
+        const uncounted = snap.docs.filter(docSnap => docSnap.data().countedAsFire !== true);
+        if (uncounted.length === 0) return;
+
+        console.log(`[Sync] Found ${uncounted.length} uncounted comments. Syncing fire points...`);
+
+        const getGMT7DateFromDate = (d: Date): Date => {
+          const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+          return new Date(utc + (3600000 * 7));
+        };
+
+        const getWeeklyIdFromDate = (date: Date): string => {
+          const d = getGMT7DateFromDate(date);
+          d.setHours(0, 0, 0, 0);
+          d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+          const yearStart = new Date(d.getFullYear(), 0, 1);
+          const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+          return `${d.getFullYear()}-W${weekNo}`;
+        };
+
+        for (const commentDoc of uncounted) {
+          const commentData = commentDoc.data();
+          const storyId = commentData.storyId || commentData.targetId;
+          if (!storyId) continue;
+
+          let points = 1;
+          if (commentData.type === 'choco_gift' && typeof commentData.giftAmount === 'number') {
+            points = commentData.giftAmount;
+          }
+
+          let date = new Date();
+          if (commentData.createdAt) {
+            if (typeof commentData.createdAt.toDate === 'function') {
+              date = commentData.createdAt.toDate();
+            } else if (typeof commentData.createdAt.toMillis === 'function') {
+              date = new Date(commentData.createdAt.toMillis());
+            } else if (commentData.createdAt.seconds) {
+              date = new Date(commentData.createdAt.seconds * 1000);
+            }
+          }
+
+          const todayStr = format(getGMT7DateFromDate(date), 'yyyy-MM-dd');
+          const weekId = getWeeklyIdFromDate(date);
+
+          // Update story
+          await updateDoc(doc(db, 'stories', storyId), {
+            viewCount: increment(points),
+            [`dailyViews.${todayStr}`]: increment(points),
+            [`weeklyViews.${weekId}`]: increment(points)
+          });
+
+          // Mark comment as counted
+          await updateDoc(doc(db, 'comments', commentDoc.id), {
+            countedAsFire: true
+          });
+        }
+        console.log(`[Sync] Successfully synced ${uncounted.length} legacy comments.`);
+      } catch (err) {
+        console.error('[Sync] Error syncing legacy comments:', err);
+      }
+    };
+
+    // Run sync when auth state is resolved and a user is signed in
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const timer = setTimeout(runLegacyCommentsSync, 2000);
+        return () => clearTimeout(timer);
+      }
+    });
+    return () => unsub();
   }, []);
 
   return <>{children}</>;
