@@ -485,9 +485,6 @@ export function Reader() {
          if (storyId) {
             addStoryFire(storyId, 1);
          }
-         if (storyId) {
-            addStoryFire(storyId, 1);
-         }
          notifyAdminOfComment({
             authorName: displayName || 'Nhà lữ hành ẩn danh',
             storyTitle: story?.title || 'Truyện',
@@ -552,6 +549,10 @@ export function Reader() {
             accessoryPosition: useStore.getState().accessoryPosition || null,
            createdAt: serverTimestamp()
         });
+
+        if (storyId) {
+           addStoryFire(storyId, 1);
+        }
 
         notifyAdminOfComment({
            authorName: displayName || 'Nhà lữ hành ẩn danh',
