@@ -159,6 +159,7 @@ interface UserState {
         goldMissed: boolean;
         hitBombOrApple: boolean;
         chocoMissed?: boolean;
+        goldGenerated?: number;
      }
   ) => void;
 
@@ -1793,6 +1794,7 @@ export const useStore = create<UserState>()(
             goldMissed: boolean;
             hitBombOrApple: boolean;
             chocoMissed?: boolean;
+            goldGenerated?: number;
          }
       ) => {
          const state = get();
@@ -1831,7 +1833,12 @@ export const useStore = create<UserState>()(
             updates.consecutiveDodgeClears = newDodgeClears;
 
             const currentGoldClears = state.consecutiveGoldClears || 0;
-            const newGoldClears = stats.goldMissed ? 0 : (currentGoldClears + 1);
+            let newGoldClears = currentGoldClears;
+            if (stats.goldMissed) {
+               newGoldClears = 0;
+            } else if ((stats.goldGenerated || 0) > 0) {
+               newGoldClears = currentGoldClears + 1;
+            }
             nextState.consecutiveGoldClears = newGoldClears;
             updates.consecutiveGoldClears = newGoldClears;
          }
