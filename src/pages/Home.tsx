@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GlobalChat } from '../components/GlobalChat';
 import { NewsFeed } from '../components/NewsFeed';
 import { useStore } from '../store';
-import { CalendarCheck, ClipboardList, ShoppingBag, Trophy, Star, BookOpen, Flame, User, PackageOpen, Library, Gamepad2, Radio, ShoppingBasket, Sparkles } from 'lucide-react';
+import { CalendarCheck, ClipboardList, ShoppingBag, Trophy, Star, BookOpen, Flame, User, PackageOpen, Library, Gamepad2, Radio, ShoppingBasket, Sparkles, Info } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { UserAvatar } from '../components/UserAvatar';
@@ -25,6 +25,7 @@ export function Home() {
   const [topActiveUsers, setTopActiveUsers] = useState<any[]>([]);
   const [topChucuGameUsers, setTopChucuGameUsers] = useState<any[]>([]);
   const [showCheckInModal, setShowCheckInModal] = useState(false);
+  const [showCheckInInfo, setShowCheckInInfo] = useState(false);
 
   useEffect(() => {
     const qStories = query(collection(db, 'stories'), orderBy('createdAt', 'desc'), limit(50));
@@ -81,6 +82,7 @@ export function Home() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-[#FFFDF9] rounded-3xl max-w-sm w-full p-6 relative border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] flex flex-col items-center animate-in fade-in zoom-in duration-200">
             <button onClick={() => setShowCheckInModal(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-[#FDF6EC] hover:bg-[#E6D8C9] border-[3px] border-[#3E2723] shadow-[0_3px_0_0_#3E2723] text-[#3E2723] rounded-xl active:translate-y-0.5 active:shadow-none transition-all">×</button>
+            <button onClick={() => setShowCheckInInfo(true)} className="absolute top-4 left-4 w-8 h-8 flex items-center justify-center bg-[#FDF6EC] hover:bg-[#E6D8C9] border-[3px] border-[#3E2723] shadow-[0_3px_0_0_#3E2723] text-[#3E2723] rounded-xl active:translate-y-0.5 active:shadow-none transition-all"><Info className="w-5 h-5" /></button>
             <div className="w-16 h-16 bg-[#F5E6D3] text-[#8D6E63] rounded-2xl flex items-center justify-center mb-4 transform -rotate-6 border-2 border-[#D7CCC8]">
               <CalendarCheck className="w-8 h-8" />
             </div>
@@ -210,6 +212,43 @@ export function Home() {
             {isCheckedInToday && (
               <p className="text-sm font-bold text-[#8D6E63] mt-2 bg-[#F5E6D3] px-4 py-2 rounded-lg border border-[#D7CCC8] w-full text-center">Bạn đã điểm danh hôm nay!</p>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Check-In Info Modal Overlay */}
+      {showCheckInInfo && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#FFFDF9] rounded-3xl max-w-sm w-full p-6 relative border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] flex flex-col items-center animate-in fade-in zoom-in duration-200">
+            <button onClick={() => setShowCheckInInfo(false)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-[#FDF6EC] hover:bg-[#E6D8C9] border-[3px] border-[#3E2723] shadow-[0_3px_0_0_#3E2723] text-[#3E2723] rounded-xl active:translate-y-0.5 active:shadow-none transition-all">×</button>
+            <div className="w-16 h-16 bg-[#F5E6D3] text-[#8D6E63] rounded-2xl flex items-center justify-center mb-4 border-2 border-[#D7CCC8]">
+              <Info className="w-8 h-8" />
+            </div>
+            <h2 className="text-xl font-black text-[#3E2723] uppercase tracking-tight mb-4 text-center">Cơ Chế Điểm Danh</h2>
+            <div className="text-sm text-stone-700 font-medium w-full text-left flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+              <p><strong>1. Chuỗi Điểm Danh:</strong> Mỗi ngày bạn đăng nhập và điểm danh sẽ tăng chuỗi liên tiếp của bạn.</p>
+              <p><strong>2. Phần Thưởng Choco:</strong> Chuỗi càng dài, phần thưởng <strong className="text-[#8D6E63]">Choco</strong> mỗi ngày càng lớn.</p>
+              <div className="bg-[#FDF6EC] p-3 rounded-xl border border-[#EFDCD5]">
+                <ul className="text-xs flex flex-col gap-1">
+                  <li>Ngày 1: <strong className="text-[#8D6E63]">+1 Choco</strong></li>
+                  <li>Ngày 2 - 3: <strong className="text-[#8D6E63]">+2 Choco</strong></li>
+                  <li>Ngày 4 - 6: <strong className="text-[#8D6E63]">+3 Choco</strong></li>
+                  <li>Ngày 7 - 10: <strong className="text-[#8D6E63]">+4 Choco</strong></li>
+                  <li>Ngày 11 - 15: <strong className="text-[#8D6E63]">+5 Choco</strong></li>
+                  <li>Ngày 16 - 21: <strong className="text-[#8D6E63]">+6 Choco</strong></li>
+                  <li>Ngày 22 - 28: <strong className="text-[#8D6E63]">+7 Choco</strong></li>
+                  <li>Ngày 29 - 36: <strong className="text-[#8D6E63]">+8 Choco</strong></li>
+                  <li>Ngày 37 - 45: <strong className="text-[#8D6E63]">+9 Choco</strong></li>
+                  <li>Ngày 46+: <strong className="text-[#8D6E63]">+10 Choco</strong></li>
+                </ul>
+              </div>
+              <p><strong>3. Giữ Chuỗi & Lượt Miễn Phí:</strong> Nếu quên điểm danh, chuỗi của bạn sẽ bị đứt. Tuy nhiên:</p>
+              <ul className="list-disc pl-5 text-xs flex flex-col gap-1">
+                <li>Mỗi tháng bạn có <strong className="text-[#5D4037]">1 lượt bảo vệ chuỗi miễn phí</strong>. Nếu bạn quên 1 ngày, hệ thống sẽ tự động dùng lượt này để bảo vệ chuỗi (bạn chỉ được bảo vệ tối đa 1 ngày đó, nếu quên thêm sẽ đứt).</li>
+                <li>Bạn cũng có thể mua <strong className="text-[#5D4037]">Vé Giữ Chuỗi</strong> trong Cửa hàng bằng <strong className="text-amber-500">GCHOCO</strong> để dự phòng. Mỗi vé cho phép bạn bỏ lỡ thêm 1 ngày mà không bị đứt chuỗi.</li>
+              </ul>
+              <p><strong>4. Mẹo:</strong> Nếu bạn nghỉ quá số ngày bảo vệ (vượt quá lượt miễn phí và vé đã mua), chuỗi sẽ trở về 1 vào lần điểm danh tiếp theo.</p>
+            </div>
           </div>
         </div>
       )}
