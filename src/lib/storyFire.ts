@@ -14,6 +14,7 @@ export async function addStoryFire(storyId: string, firePoints: number) {
     const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
     const weekId = getWeeklyId();
     await updateDoc(doc(db, 'stories', storyId), {
+      viewCount: increment(firePoints),
       [`dailyViews.${todayStr}`]: increment(firePoints),
       [`weeklyViews.${weekId}`]: increment(firePoints)
     });
