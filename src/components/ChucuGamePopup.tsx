@@ -163,6 +163,7 @@ export function ChucuGamePopup() {
   const maxConsecutiveChocoCatchesThisGame = useRef(0);
   const totalChocoCaughtThisGame = useRef(0);
   const goldMissedThisGame = useRef(false);
+  const goldGeneratedThisGame = useRef(0);
   const chocoMissedThisGame = useRef(false);
   const hitBombOrAppleThisGame = useRef(false);
   const magnetTimer = useRef<any>(null);
@@ -402,6 +403,7 @@ export function ChucuGamePopup() {
     maxConsecutiveChocoCatchesThisGame.current = 0;
     totalChocoCaughtThisGame.current = 0;
     goldMissedThisGame.current = false;
+    goldGeneratedThisGame.current = 0;
     chocoMissedThisGame.current = false;
     hitBombOrAppleThisGame.current = false;
     lastSpawnTime.current = Date.now();
@@ -444,6 +446,7 @@ export function ChucuGamePopup() {
          goldMissed: goldMissedThisGame.current,
          hitBombOrApple: hitBombOrAppleThisGame.current,
          chocoMissed: chocoMissedThisGame.current,
+         goldGenerated: goldGeneratedThisGame.current,
       }
     );
   };
@@ -660,7 +663,10 @@ export function ChucuGamePopup() {
       else if (r < 0.90) randType = 'milk'; // Sữa ngọt ngào power-up (5%)
       else if (r < 0.95) randType = 'magnet'; // Nam châm hút (5%)
       else if (r < 0.985) randType = 'brown'; // Brown Choco fragment (Hiếm - 3.5%)
-      else randType = 'gold'; // Gold fragment (Siêu hiếm - 1.5%)
+      else {
+        randType = 'gold'; // Gold fragment (Siêu hiếm - 1.5%)
+        goldGeneratedThisGame.current += 1;
+      }
 
       items.current.push({
         x: spawnX,
