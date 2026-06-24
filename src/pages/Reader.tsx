@@ -9,6 +9,7 @@ import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapsho
 import { format } from 'date-fns';
 import { getWeeklyId, getGMT7Date } from '../types/achievements';
 import { useUserProfilesCache } from '../hooks/useUserProfilesCache';
+import { addStoryFire } from '../lib/storyFire';
 
 const ParagraphCommentNode = ({
    comment,
@@ -481,6 +482,12 @@ export function Reader() {
             accessoryPosition: useStore.getState().accessoryPosition || null
          });
          addCommentProgress();
+         if (storyId) {
+            addStoryFire(storyId, 1);
+         }
+         if (storyId) {
+            addStoryFire(storyId, 1);
+         }
          notifyAdminOfComment({
             authorName: displayName || 'Nhà lữ hành ẩn danh',
             storyTitle: story?.title || 'Truyện',
