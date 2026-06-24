@@ -23,6 +23,7 @@ export function Home() {
   const [stories, setStories] = useState<any[]>([]);
   const [topUsers, setTopUsers] = useState<any[]>([]);
   const [topActiveUsers, setTopActiveUsers] = useState<any[]>([]);
+  const [topChucuGameUsers, setTopChucuGameUsers] = useState<any[]>([]);
   const [showCheckInModal, setShowCheckInModal] = useState(false);
 
   useEffect(() => {
@@ -43,10 +44,17 @@ export function Home() {
       setTopActiveUsers(users.slice(0, 4));
     });
 
+    const qChucuGameUsers = query(collection(db, 'users'), orderBy('chucuGameMaxScore', 'desc'), limit(15));
+    const unsubChucuGameUsers = onSnapshot(qChucuGameUsers, (snap) => {
+      const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((u: any) => u.email?.toLowerCase() !== 'cucnau01@gmail.com');
+      setTopChucuGameUsers(users.slice(0, 4));
+    });
+
     return () => {
       unsubStories();
       unsubUsers();
       unsubActiveUsers();
+      unsubChucuGameUsers();
     };
   }, []);
 
@@ -322,6 +330,44 @@ export function Home() {
                  })}
               </div>
            </div>
+
+
+            {/* Bảng Xếp Hạng Hứng Choco */}
+            <div className="bg-[#FFFDF9] dark:bg-[#211B18] rounded-3xl border-[3px] border-[#3E2723] p-5 shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden">
+               <div className="absolute top-0 left-0 right-0 h-3 bg-[#E6D8C9] dark:bg-[#3C2E27] border-b-[3px] border-[#3E2723] dark:border-[#4E342E]" />
+               <h2 className="font-black text-lg border-l-[6px] border-[#3E2723] pl-3 mb-4 mt-2 uppercase tracking-widest flex items-center gap-2 text-[#3E2723] dark:text-[#ECE5DC] drop-shadow-[1px_1px_0_#D7CCC8] dark:drop-shadow-[1px_1px_0_#1A1412]">
+                <ShoppingBasket className="w-5 h-5 text-[#8D6E63] animate-bounce" />
+                Cao Thủ Hứng Choco
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                 {topChucuGameUsers.length === 0 && <p className="text-stone-400 italic text-sm text-center py-4 col-span-2">Chưa có dữ liệu kỷ lục.</p>}
+                 {topChucuGameUsers.slice(0, 4).map((u, i) => {
+                    const isMe = u.id === uid;
+                    return (
+                       <div key={u.id} className={`flex items-center gap-3 p-3 rounded-2xl border-2 shadow-[1px_1px_0_0_#3E2723] hover:-translate-y-0.5 hover:shadow-[1.5px_1.5px_0_0_#3E2723] transition-all cursor-pointer ${isMe ? 'bg-[#F5E6D3] border-[#8D6E63] dark:bg-[#322420] dark:border-[#8D6E63]' : 'bg-[#FDF6EC] border-[#3E2723] hover:border-[#8D6E63] dark:bg-[#1C1613] dark:border-[#5D4037] dark:hover:border-[#C29D70]'}`}>
+                           <UserAvatar 
+                              avatarUrl={u.avatarUrl} 
+                              equippedAccessory={u.equippedAccessory}
+                              accessoryPosition={u.accessoryPosition} 
+                              className="w-10 h-10" 
+                              fallbackIconSizeClass="w-5 h-5 text-[#8D6E63]" 
+                              borderClass="border-2 border-[#D7CCC8] dark:border-[#5D4037]"
+                           />
+                          <div className="flex-1 min-w-0">
+                             <div className="text-xs font-bold truncate flex items-center gap-1" style={{ color: getTitleColor(u.activeTitle) || (theme === 'dark' ? '#ECE5DC' : '#3E2723') }}>
+                                <span>Top {i + 1}: {u.displayName}</span>
+                                {isMe && <span className="text-[9px] text-[#5D4037] dark:text-[#ECE5DC] shrink-0">(Bạn)</span>}
+                             </div>
+                             <div className="text-[10px] text-[#8D6E63] dark:text-stone-400 font-extrabold flex items-center gap-1">
+                                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                                {(u.chucuGameMaxScore || 0).toLocaleString()} điểm
+                             </div>
+                          </div>
+                       </div>
+                    );
+                 })}
+              </div>
+            </div>
 
            <div className="bg-[#FFFDF9] dark:bg-[#211B18] rounded-3xl border-[3px] border-[#3E2723] p-5 shadow-[1px_1px_0_0_#3E2723] relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-3 bg-[#E6D8C9] dark:bg-[#3C2E27] border-b-[3px] border-[#3E2723] dark:border-[#4E342E]" />
