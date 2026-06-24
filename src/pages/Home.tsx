@@ -19,7 +19,7 @@ export function Home() {
   
   const hasUnclaimedMissions = isCheckedInToday && missions.some(m => m.completed && !m.claimed);
   const hasUnclaimedAchievements = isCheckedInToday && unlockedAchievements.some(id => !claimedAchievements.includes(id));
-  const [bxhTab, setBxhTab] = useState<'day' | 'week'>('week');
+  const [bxhTab, setBxhTab] = useState<'day' | 'week' | 'all'>('week');
   const [stories, setStories] = useState<any[]>([]);
   const [topUsers, setTopUsers] = useState<any[]>([]);
   const [topActiveUsers, setTopActiveUsers] = useState<any[]>([]);
@@ -224,18 +224,19 @@ export function Home() {
                    Bảng Xếp Hạng Truyện
                  </h2>
                  <div className="flex text-[10px] font-bold gap-3">
-                   <button onClick={() => setBxhTab('day')} className={`uppercase transition-colors ${bxhTab === 'day' ? 'text-[#3E2723] dark:text-[#ECE5DC] underline decoration-2 underline-offset-4' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'}`}>NGÀY</button>
-                   <button onClick={() => setBxhTab('week')} className={`uppercase transition-colors ${bxhTab === 'week' ? 'text-[#3E2723] dark:text-[#ECE5DC] underline decoration-2 underline-offset-4' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'}`}>TUẦN</button>
-                 </div>
+                    <button onClick={() => setBxhTab('day')} className={`uppercase transition-colors ${bxhTab === 'day' ? 'text-[#3E2723] dark:text-[#ECE5DC] underline decoration-2 underline-offset-4' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'}`}>NGÀY</button>
+                    <button onClick={() => setBxhTab('week')} className={`uppercase transition-colors ${bxhTab === 'week' ? 'text-[#3E2723] dark:text-[#ECE5DC] underline decoration-2 underline-offset-4' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'}`}>TUẦN</button>
+                    <button onClick={() => setBxhTab('all')} className={`uppercase transition-colors ${bxhTab === 'all' ? 'text-[#3E2723] dark:text-[#ECE5DC] underline decoration-2 underline-offset-4' : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'}`}>TỔNG</button>
+                  </div>
               </div>
               <div className="space-y-3">
                  {stories.length === 0 && <p className="text-stone-400 italic text-sm text-center py-4">Chưa có truyện nào.</p>}
                  {[...stories].sort((a,b) => {
-                    const viewA = bxhTab === 'day' ? (a.dailyViews?.[todayStr] || 0) : (a.weeklyViews?.[getWeeklyId()] || 0);
-                    const viewB = bxhTab === 'day' ? (b.dailyViews?.[todayStr] || 0) : (b.weeklyViews?.[getWeeklyId()] || 0);
+                    const viewA = bxhTab === 'day' ? (a.dailyViews?.[todayStr] || 0) : bxhTab === 'week' ? (a.weeklyViews?.[getWeeklyId()] || 0) : (a.viewCount || 0);
+                     const viewB = bxhTab === 'day' ? (b.dailyViews?.[todayStr] || 0) : bxhTab === 'week' ? (b.weeklyViews?.[getWeeklyId()] || 0) : (b.viewCount || 0);
                     return viewB - viewA;
                  }).slice(0, 3).map((story, i) => {
-                    const views = bxhTab === 'day' ? (story.dailyViews?.[todayStr] || 0) : (story.weeklyViews?.[getWeeklyId()] || 0);
+                    const views = bxhTab === 'day' ? (story.dailyViews?.[todayStr] || 0) : bxhTab === 'week' ? (story.weeklyViews?.[getWeeklyId()] || 0) : (story.viewCount || 0);
                     return (
                     <div key={story.id} className="group flex items-center gap-4 p-3 bg-[#FDF6EC] dark:bg-[#1C1613] rounded-2xl border-2 border-[#F5E6D3] dark:border-[#5D4037] cursor-pointer hover:border-[#8D6E63] dark:hover:border-[#C29D70] hover:shadow-[0_2px_0_0_#8D6E63] dark:hover:shadow-[0_2px_0_0_#C29D70] active:translate-y-[2px] active:shadow-none transition-all duration-200 mb-2 shadow-[0_2px_0_0_#F5E6D3] dark:shadow-[0_2px_0_0_#0D0907] min-w-0" onClick={() => navigate(`/truyen/${story.id}`)}>
                        <span className="font-black text-xl italic text-[#8D6E63] dark:text-[#C29D70] w-6 transition-transform group-hover:scale-110 shrink-0">0{i + 1}</span>
