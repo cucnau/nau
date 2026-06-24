@@ -4,6 +4,7 @@ import { BookOpen, Users, Lock, Unlock, Zap, ChevronRight, Bookmark, Gift, Heart
 import { cn } from '../components/Layout';
 import React, { useEffect, useState } from 'react';
 import { db, checkIfQuotaError } from '../lib/firebase';
+import { addStoryFire } from '../lib/storyFire';
 import { doc, getDoc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, limit } from 'firebase/firestore';
 import { UserAvatar } from '../components/UserAvatar';
 
@@ -440,6 +441,7 @@ export function StoryView() {
            accessoryPosition: useStore.getState().accessoryPosition || null,
            createdAt: serverTimestamp()
         });
+        addStoryFire(story.id, 1);
 
         if (parentComment.uid && parentComment.uid !== uid) {
            await addDoc(collection(db, 'notifications'), {
@@ -500,6 +502,7 @@ export function StoryView() {
            paragraphIdx: null,
            createdAt: serverTimestamp()
         });
+        addStoryFire(story.id, 1);
         notifyAdminOfComment({
            authorName: displayName || 'Nhà lữ hành ẩn danh',
            storyTitle: story.title || 'Truyện',
