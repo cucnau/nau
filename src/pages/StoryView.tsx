@@ -293,11 +293,14 @@ export function StoryView() {
 
   useEffect(() => {
     if (!id) return;
-    const fetchStory = async () => {
+    const unsubStory = onSnapshot(doc(db, 'stories', id), (snap) => {
+      if (snap.exists()) setStory({ id: snap.id, ...snap.data() });
+    }, (err) => {
+      console.error(err);
+    });
+
+    const fetchChapters = async () => {
       try {
-        const snap = await getDoc(doc(db, 'stories', id));
-        if (snap.exists()) setStory({ id: snap.id, ...snap.data() });
-        
         const cSnap = await getDocs(query(collection(db, `stories/${id}/chapters`), orderBy('order', 'asc')));
         setChapters(cSnap.docs.map(d => ({ id: d.id, ...d.data() })));
       } catch (err) {
@@ -306,7 +309,8 @@ export function StoryView() {
         setLoading(false);
       }
     };
-    fetchStory();
+    fetchChapters();
+    return () => unsubStory();
   }, [id]);
 
   useEffect(() => {
@@ -557,7 +561,7 @@ export function StoryView() {
                    </div>
                    <div className="w-[3px] h-10 bg-[#3E2723]/25 dark:bg-stone-600/40 rounded-full"></div>
                    <div className="flex flex-col">
-                       <span className="text-[#8D6E63] text-xs uppercase font-extrabold tracking-widest">Lượt đọc</span>
+                       <span className="text-[#8D6E63] text-xs uppercase font-extrabold tracking-widest">Hỏa lực 🔥</span>
                        <span className="font-extrabold text-2xl text-[#3E2723] dark:text-[#ECE5DC]">{new Intl.NumberFormat('en-US', { notation: 'compact' }).format(story.viewCount || 0)}</span>
                    </div>
                    <div className="w-[3px] h-10 bg-[#3E2723]/25 dark:bg-stone-600/40 rounded-full"></div>
