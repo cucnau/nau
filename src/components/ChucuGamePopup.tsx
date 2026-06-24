@@ -98,6 +98,7 @@ interface FallingItem {
   speed: number;
   type: 'white' | 'brown' | 'gold' | 'milk' | 'bomb' | 'rotten_apple' | 'magnet';
   radius: number;
+  missed?: boolean;
 }
 
 interface FloatingText {
@@ -162,6 +163,7 @@ export function ChucuGamePopup() {
   const maxConsecutiveChocoCatchesThisGame = useRef(0);
   const totalChocoCaughtThisGame = useRef(0);
   const goldMissedThisGame = useRef(false);
+  const chocoMissedThisGame = useRef(false);
   const hitBombOrAppleThisGame = useRef(false);
   const magnetTimer = useRef<any>(null);
   const animationFrameId = useRef<number | null>(null);
@@ -400,6 +402,7 @@ export function ChucuGamePopup() {
     maxConsecutiveChocoCatchesThisGame.current = 0;
     totalChocoCaughtThisGame.current = 0;
     goldMissedThisGame.current = false;
+    chocoMissedThisGame.current = false;
     hitBombOrAppleThisGame.current = false;
     lastSpawnTime.current = Date.now();
     pointerInputRef.current = 150;
@@ -440,6 +443,7 @@ export function ChucuGamePopup() {
          totalCaught: totalChocoCaughtThisGame.current,
          goldMissed: goldMissedThisGame.current,
          hitBombOrApple: hitBombOrAppleThisGame.current,
+         chocoMissed: chocoMissedThisGame.current,
       }
     );
   };
@@ -669,7 +673,8 @@ export function ChucuGamePopup() {
     }
 
     // Physics update falling items
-    items.current.forEach((item, idx) => {
+    for (let idx = items.current.length - 1; idx >= 0; idx--) {
+      const item = items.current[idx];
       // magnet pull logic
       if (magnetActive.current && ['white', 'brown', 'gold'].includes(item.type)) {
         const dx = basketX.current - item.x;
@@ -1112,17 +1117,23 @@ export function ChucuGamePopup() {
         }
       }
 
-      // Out of bounds check
-      if (item.y > H + 20) {
-        items.current.splice(idx, 1);
+      // Missed check (as soon as the item falls below the basket catch zone bottom)
+      if (item.y > (H - 30) && !item.missed) {
+        item.missed = true;
         if (item.type === 'white' || item.type === 'brown' || item.type === 'gold') {
           consecutiveChocoCatches.current = 0;
+          chocoMissedThisGame.current = true;
           if (item.type === 'gold') {
             goldMissedThisGame.current = true;
           }
         }
       }
-    });
+
+      // Out of bounds check (remove from array)
+      if (item.y > H + 20) {
+        items.current.splice(idx, 1);
+      }
+    }
 
     // Draw Floating Texts
     for (let i = floatingTexts.current.length - 1; i >= 0; i--) {
