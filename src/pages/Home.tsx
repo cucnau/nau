@@ -242,7 +242,7 @@ export function Home() {
                        <img src={story.coverUrl} alt={story.title} className="w-10 h-14 object-cover rounded-xl opacity-90 border border-transparent dark:border-[#5D4037] transition-transform group-hover:scale-105 duration-300 shrink-0" />
                        <div className="flex-1 min-w-0">
                           <p className="font-extrabold text-sm text-[#3E2723] dark:text-[#ECE5DC] group-hover:text-[#8D6E63] dark:group-hover:text-[#BF9F95] transition-colors truncate">{story.title}</p>
-                          <p className="text-[10px] opacity-70 italic dark:text-stone-400">Lượt đọc: {views.toLocaleString()}</p>
+                          <p className="text-[10px] opacity-70 italic dark:text-stone-400">Hỏa lực: {views.toLocaleString()}</p>
                        </div>
                        <span className="text-xs font-bold text-[#8D6E63] dark:text-[#C29D70] shrink-0">{new Intl.NumberFormat('en-US', { notation: 'compact' }).format(views)} 🔥</span>
                     </div>
