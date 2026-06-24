@@ -666,25 +666,28 @@ export const useStore = create<UserState>()(
 
             newAllMissions[uid] = resolvedMissions;
 
-            // Bù đắp dữ liệu gacha/radio từ trước cho những feature mới thêm
+            // Bù đắp dữ liệu gacha/radio từ trước cho những feature mới thêm bằng cách lấy MAX giữa Firestore và LocalState
             const totalGachaPullsFallback = Math.max(
-                data.totalGachaPulls !== undefined ? data.totalGachaPulls : (state.totalGachaPulls || 0),
-                data.gachaSinglePullCount !== undefined ? data.gachaSinglePullCount : (state.gachaSinglePullCount || 0)
+                data.totalGachaPulls || 0,
+                state.totalGachaPulls || 0,
+                data.gachaSinglePullCount || 0,
+                state.gachaSinglePullCount || 0
             );
             // Bù đắp radio
-            let totalRadioSecondsFallback = data.totalRadioSeconds !== undefined ? data.totalRadioSeconds : (state.totalRadioSeconds || 0);
-            if (totalRadioSecondsFallback <= 0) {
-                const prevNightChill = data.radioNightChillSeconds !== undefined ? data.radioNightChillSeconds : (state.radioNightChillSeconds || 0);
-                const prevMaxTrack = data.maxRadioTrackSeconds !== undefined ? data.maxRadioTrackSeconds : (state.maxRadioTrackSeconds || 0);
-                totalRadioSecondsFallback = Math.max(totalRadioSecondsFallback, prevNightChill + prevMaxTrack);
-            }
+            let totalRadioSecondsFallback = Math.max(
+                data.totalRadioSeconds || 0,
+                state.totalRadioSeconds || 0
+            );
+            const prevNightChill = Math.max(data.radioNightChillSeconds || 0, state.radioNightChillSeconds || 0);
+            const prevMaxTrack = Math.max(data.maxRadioTrackSeconds || 0, state.maxRadioTrackSeconds || 0);
+            totalRadioSecondsFallback = Math.max(totalRadioSecondsFallback, prevNightChill + prevMaxTrack);
 
             // Bù đắp tiêu Choco = số Choco đã tiêu + (số GChoco đã tiêu * 3)
-            const getEarnedTotalC = data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : (state.totalEarnedChoco || 0);
+            const getEarnedTotalC = Math.max(data.totalEarnedChoco || 0, state.totalEarnedChoco || 0);
             const getCurrentC = data.choco !== undefined ? data.choco : (state.choco || 0);
-            const getEarnedTotalG = data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : (state.totalEarnedGChoco || 0);
+            const getEarnedTotalG = Math.max(data.totalEarnedGChoco || 0, state.totalEarnedGChoco || 0);
             const getCurrentG = data.goldenChoco !== undefined ? data.goldenChoco : (state.goldenChoco || 0);
-            let totalSpentChocoFallback = data.totalSpentChoco !== undefined ? data.totalSpentChoco : (state.totalSpentChoco || 0);
+            let totalSpentChocoFallback = Math.max(data.totalSpentChoco || 0, state.totalSpentChoco || 0);
             const spentGChocoApprox = Math.max(0, getEarnedTotalG - getCurrentG);
             const spentChocoApprox = Math.max(0, getEarnedTotalC - getCurrentC);
             if (totalSpentChocoFallback < spentChocoApprox + (spentGChocoApprox * 3)) {
@@ -692,12 +695,48 @@ export const useStore = create<UserState>()(
             }
 
             // Bù đắp Hứng Choco (nếu trước kia chưa lưu totalChocoCaught)
-            let totalChocoCaughtFallback = data.totalChocoCaught !== undefined ? data.totalChocoCaught : (state.totalChocoCaught || 0);
-            if (totalChocoCaughtFallback <= 0) {
-               // Ước tính số viên đã hứng dựa trên điểm thưởng hiện có và exp của Chucu
-               const approxFromExp = data.chucuExp ? Math.floor(data.chucuExp / 2) : 0;
-               const approxFromPoints = data.chucuGameBonusPoints ? Math.floor(data.chucuGameBonusPoints / 8) : 0;
-               totalChocoCaughtFallback = Math.max(approxFromExp, approxFromPoints, data.chucuGameFragments || 0);
+            let totalChocoCaughtFallback = Math.max(
+                data.totalChocoCaught || 0,
+                state.totalChocoCaught || 0
+            );
+            const approxFromExp = (data.chucuExp || state.chucuExp || 0) ? Math.floor((data.chucuExp || state.chucuExp || 0) / 2) : 0;
+            const approxFromPoints = (data.chucuGameBonusPoints || state.chucuGameBonusPoints || 0) ? Math.floor((data.chucuGameBonusPoints || state.chucuGameBonusPoints || 0) / 8) : 0;
+            let approxFromAchievements = 0;
+            const unlockedAch = data.unlockedAchievements || state.unlockedAchievements || [];
+            if (unlockedAch.includes('choco_rain_10000')) {
+                approxFromAchievements = 10000;
+            } else if (unlockedAch.includes('choco_rain_5000')) {
+                approxFromAchievements = 5000;
+            } else if (unlockedAch.includes('choco_rain_1000')) {
+                approxFromAchievements = 1000;
+            }
+            totalChocoCaughtFallback = Math.max(
+                totalChocoCaughtFallback,
+                approxFromExp,
+                approxFromPoints,
+                approxFromAchievements,
+                data.chucuGameFragments || 0,
+                state.chucuGameFragments || 0
+            );
+
+            // Lưu bù đắp ngược lại lên Firestore nếu giá trị mới cao hơn trong Firestore
+            const writeBack: any = {};
+            if (totalGachaPullsFallback > (data.totalGachaPulls || 0)) {
+               writeBack.totalGachaPulls = totalGachaPullsFallback;
+            }
+            if (totalRadioSecondsFallback > (data.totalRadioSeconds || 0)) {
+               writeBack.totalRadioSeconds = totalRadioSecondsFallback;
+            }
+            if (totalSpentChocoFallback > (data.totalSpentChoco || 0)) {
+               writeBack.totalSpentChoco = totalSpentChocoFallback;
+            }
+            if (totalChocoCaughtFallback > (data.totalChocoCaught || 0)) {
+               writeBack.totalChocoCaught = totalChocoCaughtFallback;
+            }
+            if (Object.keys(writeBack).length > 0) {
+               setTimeout(() => {
+                   get().updateUserDoc(writeBack);
+               }, 100);
             }
 
             return {
