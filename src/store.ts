@@ -136,6 +136,7 @@ interface UserState {
   chucuGameFragments: number;
   chucuGameGFragments: number;
   chucuGameBonusPoints: number;
+  chucuGameMaxScore: number;
   chucuGamePlaysToday: number;
   chucuGameLastPlayDate: string | null;
   gachaFragments: number;
@@ -369,6 +370,7 @@ export const useStore = create<UserState>()(
       chucuGameGFragments: 0,
       gachaFragments: 0,
       chucuGameBonusPoints: 0,
+      chucuGameMaxScore: 0,
       chucuGamePlaysToday: 0,
       chucuGameLastPlayDate: null,
       ownedPassTickets: 0,
@@ -801,6 +803,7 @@ export const useStore = create<UserState>()(
             chucuGameGFragments: data.chucuGameGFragments !== undefined ? data.chucuGameGFragments : state.chucuGameGFragments,
             gachaFragments: data.gachaFragments !== undefined ? data.gachaFragments : state.gachaFragments,
             chucuGameBonusPoints: data.chucuGameBonusPoints !== undefined ? data.chucuGameBonusPoints : state.chucuGameBonusPoints,
+            chucuGameMaxScore: data.chucuGameMaxScore !== undefined ? data.chucuGameMaxScore : (state.chucuGameMaxScore || 0),
             chucuGamePlaysToday: data.chucuGamePlaysToday !== undefined ? data.chucuGamePlaysToday : state.chucuGamePlaysToday,
             chucuGameLastPlayDate: data.chucuGameLastPlayDate !== undefined ? data.chucuGameLastPlayDate : state.chucuGameLastPlayDate,
 
@@ -1851,6 +1854,12 @@ export const useStore = create<UserState>()(
             const newSatiety = Math.max(0, (state.chucuSatiety || 70) - satietyDeduct);
             nextState.chucuSatiety = newSatiety;
             updates.chucuSatiety = newSatiety;
+         }
+
+         const currentMaxScore = state.chucuGameMaxScore || 0;
+         if (bonusPoints > currentMaxScore) {
+            nextState.chucuGameMaxScore = bonusPoints;
+            updates.chucuGameMaxScore = bonusPoints;
          }
 
          set(nextState);
