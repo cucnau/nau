@@ -133,9 +133,10 @@ interface UserState {
 
   // Choco Match States
   chocoMatchLevel: number;
+  chocoMatchWinStreak: number;
   chocoMatchHearts: number;
   chocoMatchLastHeartTick: number | null;
-  updateChocoMatchState: (updates: Partial<{ chocoMatchLevel: number; chocoMatchHearts: number; chocoMatchLastHeartTick: number | null }>) => void;
+  updateChocoMatchState: (updates: Partial<{ chocoMatchLevel: number; chocoMatchWinStreak: number; chocoMatchHearts: number; chocoMatchLastHeartTick: number | null }>) => void;
 
   isGachaOpen: boolean;
   setGachaOpen: (open: boolean) => void;
@@ -373,6 +374,7 @@ export const useStore = create<UserState>()(
       showChucu: true,
 
       chocoMatchLevel: 1,
+      chocoMatchWinStreak: 0,
       chocoMatchHearts: 5,
       chocoMatchLastHeartTick: null,
 
@@ -826,6 +828,7 @@ export const useStore = create<UserState>()(
             chucuGameLastPlayDate: data.chucuGameLastPlayDate !== undefined ? data.chucuGameLastPlayDate : state.chucuGameLastPlayDate,
 
             chocoMatchLevel: data.chocoMatchLevel !== undefined ? data.chocoMatchLevel : state.chocoMatchLevel,
+            chocoMatchWinStreak: data.chocoMatchWinStreak !== undefined ? data.chocoMatchWinStreak : (state.chocoMatchWinStreak || 0),
             chocoMatchHearts: data.chocoMatchHearts !== undefined ? data.chocoMatchHearts : state.chocoMatchHearts,
             chocoMatchLastHeartTick: data.chocoMatchLastHeartTick !== undefined ? data.chocoMatchLastHeartTick : state.chocoMatchLastHeartTick,
 
