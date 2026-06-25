@@ -523,7 +523,7 @@ export function Account() {
               {/* Hệ thống level độc giả */}
               <div className="w-full mb-4 bg-[#F5E6D3]/40 dark:bg-[#34221A] p-4 rounded-2xl border-2 border-[#3E2723] text-left">
                  <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#3E2723] dark:text-white/90">Độc giả Level</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#3E2723] dark:text-white/90">Level</span>
                     <div className="flex items-center gap-2">
                        {totalBoxes > 0 && (
                           <button 
