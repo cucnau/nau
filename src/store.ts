@@ -126,8 +126,16 @@ interface UserState {
   // Chucu Game & Radio Popups States
   isChucuGameOpen: boolean;
   setChucuGameOpen: (open: boolean) => void;
+  isChocoMatchOpen: boolean;
+  setChocoMatchOpen: (open: boolean) => void;
   isChocoRadioOpen: boolean;
   setChocoRadioOpen: (open: boolean) => void;
+
+  // Choco Match States
+  chocoMatchLevel: number;
+  chocoMatchHearts: number;
+  chocoMatchLastHeartTick: number | null;
+  updateChocoMatchState: (updates: Partial<{ chocoMatchLevel: number; chocoMatchHearts: number; chocoMatchLastHeartTick: number | null }>) => void;
 
   isGachaOpen: boolean;
   setGachaOpen: (open: boolean) => void;
@@ -364,8 +372,13 @@ export const useStore = create<UserState>()(
       equippedChucuAccessory: null,
       showChucu: true,
 
+      chocoMatchLevel: 1,
+      chocoMatchHearts: 5,
+      chocoMatchLastHeartTick: null,
+
       // Chucu Game & Radio default states
       isChucuGameOpen: false,
+      isChocoMatchOpen: false,
       isChocoRadioOpen: false,
       isGachaOpen: false,
       isGachaAdminOpen: false,
@@ -812,6 +825,9 @@ export const useStore = create<UserState>()(
             chucuGamePlaysToday: data.chucuGamePlaysToday !== undefined ? data.chucuGamePlaysToday : state.chucuGamePlaysToday,
             chucuGameLastPlayDate: data.chucuGameLastPlayDate !== undefined ? data.chucuGameLastPlayDate : state.chucuGameLastPlayDate,
 
+            chocoMatchLevel: data.chocoMatchLevel !== undefined ? data.chocoMatchLevel : state.chocoMatchLevel,
+            chocoMatchHearts: data.chocoMatchHearts !== undefined ? data.chocoMatchHearts : state.chocoMatchHearts,
+            chocoMatchLastHeartTick: data.chocoMatchLastHeartTick !== undefined ? data.chocoMatchLastHeartTick : state.chocoMatchLastHeartTick,
 
             unlockedAchievements: data.unlockedAchievements !== undefined ? data.unlockedAchievements : state.unlockedAchievements,
             claimedAchievements: data.claimedAchievements !== undefined ? data.claimedAchievements : state.claimedAchievements,
@@ -872,6 +888,14 @@ export const useStore = create<UserState>()(
          
          set({ exp: newExp, level: newLevel });
          get().updateUserDoc({ exp: newExp, level: newLevel });
+      },
+
+      updateChocoMatchState: (updates) => {
+         const state = get();
+         set({ ...updates });
+         if (state.isLoggedIn && state.uid) {
+            state.updateUserDoc(updates);
+         }
       },
 
       updateChucuStats: (stats) => {
@@ -1727,6 +1751,10 @@ export const useStore = create<UserState>()(
 
       setChucuGameOpen: (open: boolean) => {
          set({ isChucuGameOpen: open });
+      },
+
+      setChocoMatchOpen: (open: boolean) => {
+         set({ isChocoMatchOpen: open });
       },
 
       setChocoRadioOpen: (open: boolean) => {
