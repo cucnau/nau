@@ -2712,29 +2712,63 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 
                     {/* Win Streak Bonus Info */}
                     {chocoMatchWinStreak > 0 && (
-                      <div className="w-full bg-[#FFD54F]/20 rounded-xl border-2 border-[#FFB300] p-1.5 mb-2 [@media(min-height:560px)]:p-2 flex items-center gap-2">
-                        <div className="flex-1 flex flex-col items-center">
-                          <span className="text-[9px] [@media(min-height:720px)]:text-[10px] font-black text-[#FF8F00] uppercase tracking-wider mb-0.5">
-                            Chuỗi Thắng x{chocoMatchWinStreak}
-                          </span>
-                          <span className="text-[8px] [@media(min-height:720px)]:text-[9px] text-[#5D4037] font-bold text-center leading-tight">
-                            Bắt đầu với:{" "}
-                            {chocoMatchWinStreak >= 3 ? "🍫x2 " : (chocoMatchWinStreak >= 1 ? "🍫 " : "")}
-                            {chocoMatchWinStreak >= 3 ? "🍩x2 " : (chocoMatchWinStreak >= 1 ? "🍩 " : "")}
-                            {chocoMatchWinStreak >= 4 ? "🌈x2 " : (chocoMatchWinStreak >= 2 ? "🌈 " : "")}
-                            {chocoMatchWinStreak >= 5 && "+3 Lượt"}
-                          </span>
+                      <div className="w-full bg-[#FFD54F]/20 rounded-xl border-2 border-[#FFB300] p-1 mb-1.5 [@media(min-height:560px)]:p-1.5 flex flex-col items-center justify-center">
+                        <span className="text-[8.5px] [@media(min-height:720px)]:text-[10px] font-black text-[#FF8F00] uppercase tracking-wider leading-none mb-1">
+                          Chuỗi Thắng x{chocoMatchWinStreak}
+                        </span>
+                        
+                        <div className="flex items-center justify-center gap-1.5 flex-wrap w-full px-1">
+                          <span className="text-[7.5px] [@media(min-height:720px)]:text-[9px] text-[#5D4037] font-bold">Bắt đầu với:</span>
+                          
+                          {chocoMatchWinStreak >= 1 && (
+                            <div className="flex items-center gap-0.5">
+                              <div className="w-3 h-3 relative shrink-0">
+                                <div style={{ background: "linear-gradient(135deg, #F8BBD0 0%, #D81B60 100%)", borderColor: "#880E4F" }} className="absolute inset-0 rounded-[40%] border-b border-r-[0.5px] shadow-sm flex items-center justify-center overflow-hidden">
+                                  <div className="absolute top-[10%] left-[20%] w-[40%] h-[30%] bg-white/30 rounded-full blur-[0.5px] transform -rotate-12" />
+                                  <div className="absolute inset-0 flex flex-col justify-evenly opacity-50"><div className="h-[20%] bg-white/60 w-full" /><div className="h-[20%] bg-white/60 w-full" /></div>
+                                </div>
+                              </div>
+                              <span className="text-[7.5px] [@media(min-height:720px)]:text-[9px] font-black text-[#880E4F]">x{chocoMatchWinStreak >= 3 ? 2 : 1}</span>
+                            </div>
+                          )}
+
+                          {chocoMatchWinStreak >= 1 && (
+                            <div className="flex items-center gap-0.5">
+                              <div className="w-3 h-3 relative shrink-0">
+                                <div style={{ background: "linear-gradient(135deg, #A5D6A7 0%, #388E3C 100%)", borderColor: "#1B5E20" }} className="absolute inset-0 rounded-[40%] border-b border-r-[0.5px] shadow-sm flex items-center justify-center overflow-hidden">
+                                  <div className="absolute top-[10%] left-[20%] w-[40%] h-[30%] bg-white/30 rounded-full blur-[0.5px] transform -rotate-12" />
+                                  <div className="absolute inset-0 m-[10%] border border-white/60 rounded-sm flex items-center justify-center bg-white/10"><div className="w-1/3 h-1/3 bg-white/80 rounded-full shadow-inner" /></div>
+                                </div>
+                              </div>
+                              <span className="text-[7.5px] [@media(min-height:720px)]:text-[9px] font-black text-[#1B5E20]">x{chocoMatchWinStreak >= 3 ? 2 : 1}</span>
+                            </div>
+                          )}
+
+                          {chocoMatchWinStreak >= 2 && (
+                            <div className="flex items-center gap-0.5">
+                              <div className="w-3 h-3 rounded-full bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] animate-spin-slow shadow-sm border border-white flex items-center justify-center relative shrink-0">
+                                <div className="absolute top-[10%] left-[20%] w-[40%] h-[30%] bg-white/40 rounded-full blur-[0.5px]" />
+                              </div>
+                              <span className="text-[7.5px] [@media(min-height:720px)]:text-[9px] font-black text-purple-800">x{chocoMatchWinStreak >= 4 ? 2 : 1}</span>
+                            </div>
+                          )}
+
+                          {chocoMatchWinStreak >= 5 && (
+                            <div className="flex items-center gap-0.5 ml-0.5 bg-[#4CAF50] text-white px-1 py-0.5 rounded text-[7px] font-black shadow-sm">
+                              +3 LƯỢT
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
 
                     {/* Pre-game Boosters Panel */}
-                    <div className="w-full bg-[#FFF8E7] rounded-xl border border-[#D7CCC8] p-2 mb-2 [@media(min-height:720px)]:p-3 [@media(min-height:720px)]:mb-4 flex flex-col items-center">
-                      <h4 className="text-[9px] [@media(min-height:720px)]:text-[11px] font-black text-[#5D4037] uppercase mb-1.5 tracking-wider">
+                    <div className="w-full bg-[#FFF8E7] rounded-xl border border-[#D7CCC8] p-1.5 mb-2 [@media(min-height:720px)]:p-2 flex flex-col items-center">
+                      <h4 className="text-[8px] [@media(min-height:720px)]:text-[10px] font-black text-[#5D4037] uppercase mb-1 tracking-wider">
                         Vật phẩm hỗ trợ chọn trước:
                       </h4>
                       
-                      <div className="grid grid-cols-4 gap-1.5 w-full">
+                      <div className="grid grid-cols-4 gap-1 w-full">
                         {[
                           { key: "striped_wrapped", label: "Sọc & Gói", icon: "🍫🍩", price: 50, desc: "Tạo 1 choco sọc & 1 choco gói" },
                           { key: "color_bomb", label: "Bom Màu", icon: "🌈", price: 80, desc: "Tạo 1 quả bom sắc màu siêu nổ" },
@@ -2747,19 +2781,21 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                             <button
                               key={b.key}
                               onClick={() => togglePreGameBooster(b.key as any)}
-                              className={`flex flex-col items-center justify-center p-1 rounded-lg border-2 transition-all cursor-pointer relative ${
+                              className={`flex flex-col items-center justify-center p-0.5 rounded-lg border-2 transition-all cursor-pointer relative ${
                                 isEquipped
                                   ? "bg-[#E8F5E9] border-[#4CAF50] scale-[1.03] shadow-md"
                                   : "bg-white border-[#E0E0E0] hover:border-[#BDBDBD]"
                               }`}
                               title={b.desc}
                             >
-                              {renderBoosterIllustration(b.key)}
-                              <span className="text-[6.5px] [@media(min-height:560px)]:text-[7.5px] font-black text-[#3E2723] leading-none mt-1 text-center whitespace-nowrap">
+                              <div className="scale-75 [@media(min-height:560px)]:scale-90 origin-bottom">
+                                {renderBoosterIllustration(b.key)}
+                              </div>
+                              <span className="text-[5.5px] [@media(min-height:560px)]:text-[6.5px] font-black text-[#3E2723] leading-none text-center whitespace-nowrap">
                                 {b.label}
                               </span>
                               
-                              <div className="absolute -top-1.5 -right-1 bg-[#3E2723] text-white rounded-full px-1 py-0.5 text-[5.5px] [@media(min-height:560px)]:text-[6.5px] font-bold">
+                              <div className="absolute -top-1.5 -right-1 bg-[#3E2723] text-white rounded-full px-1 py-0.5 text-[5px] [@media(min-height:560px)]:text-[6px] font-bold">
                                 {count > 0 ? `x${count}` : `${b.price}🍫`}
                               </div>
                             </button>
@@ -2767,26 +2803,26 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                         })}
                       </div>
                       
-                      <p className="text-[6px] [@media(min-height:560px)]:text-[7.5px] text-stone-500 mt-1 leading-tight text-center">
-                        Nhấn để Trang bị. Nếu hết sẽ tự động mua bằng Choco của bạn.
+                      <p className="text-[5.5px] [@media(min-height:560px)]:text-[6.5px] text-stone-500 mt-1 leading-tight text-center">
+                        Nhấn để Trang bị. Nếu hết tự mua.
                       </p>
                     </div>
 
                     {/* Hearts cost */}
-                    <div className="flex items-center gap-1 text-[9px] [@media(min-height:560px)]:text-[10px] [@media(min-height:720px)]:text-xs font-bold text-stone-600 mb-2 [@media(min-height:560px)]:mb-3 [@media(min-height:720px)]:mb-5 bg-[#FDF6EC] px-2.5 py-0.5 [@media(min-height:720px)]:px-3.5 [@media(min-height:720px)]:py-1.5 rounded-lg [@media(min-height:720px)]:rounded-xl border border-[#F5E6D3]">
+                    <div className="flex items-center gap-1 text-[8.5px] [@media(min-height:560px)]:text-[9.5px] [@media(min-height:720px)]:text-xs font-bold text-stone-600 mb-1.5 [@media(min-height:720px)]:mb-3 bg-[#FDF6EC] px-2 py-0.5 rounded-lg border border-[#F5E6D3]">
                       <span>Chi phí:</span>
                       <span className="flex items-center gap-0.5 font-black text-[#C62828]">
                         1 ❤️
                       </span>
                       {chocoMatchHearts <= 0 && (
-                        <span className="text-[8px] [@media(min-height:560px)]:text-[9px] [@media(min-height:720px)]:text-[10px] text-red-500 font-bold ml-1">
+                        <span className="text-[7.5px] [@media(min-height:560px)]:text-[8.5px] text-red-500 font-bold ml-1">
                           (Hết!)
                         </span>
                       )}
                     </div>
 
                     {/* Action buttons */}
-                    <div className="flex flex-col gap-1 [@media(min-height:560px)]:gap-1.5 [@media(min-height:720px)]:gap-2.5 w-full">
+                    <div className="flex flex-col w-full">
                       <button
                         onClick={() => {
                           if (chocoMatchHearts > 0) {
@@ -2802,13 +2838,6 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                         }`}
                       >
                         ▶️ BẮT ĐẦU CHƠI
-                      </button>
-                      
-                      <button
-                        onClick={() => setSelectedLevelForIntro(null)}
-                        className="w-full py-1 [@media(min-height:720px)]:py-2 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-lg [@media(min-height:720px)]:rounded-xl font-bold text-[9px] [@media(min-height:560px)]:text-[10px] [@media(min-height:720px)]:text-xs border border-stone-300 transition-all cursor-pointer"
-                      >
-                        Đóng
                       </button>
                     </div>
                   </div>
