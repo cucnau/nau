@@ -5,7 +5,7 @@ import {
   Menu, Search, User, Key, LogOut, X, Trophy, BookOpen, Zap, Flame, ShieldCheck, 
   Camera, Calendar, Mail, Clock, Settings, Copy, Home, ClipboardList, ShoppingBag, List, Edit2, Library,
   Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck, Sun, Moon, Eye, EyeOff,
-  RefreshCw, Gamepad2, Radio, ShoppingBasket, Cookie, Target, Crown, ChevronLeft, LayoutGrid, Star
+  RefreshCw, Gamepad2, Radio, ShoppingBasket, Cookie, Target, Crown, ChevronLeft, LayoutGrid, Star, Candy
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
@@ -20,6 +20,7 @@ import { Inventory } from '../pages/Inventory';
 import { UserAvatar } from './UserAvatar';
 import { ChocoMascot } from './ChocoMascot';
 import { ChucuGamePopup } from './ChucuGamePopup';
+import { ChocoMatchPopup } from './ChocoMatchPopup';
 import { ChocoRadioPopup } from './ChocoRadioPopup';
 import GachaPopup from './GachaPopup';
 
@@ -75,7 +76,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   const { 
     isLoggedIn, email, missions, level, lastClaimedRewardLevel,
     setStoreOpen, setMissionsOpen, setAchievementsOpen,
-    setChucuGameOpen, setChocoRadioOpen,
+    setChucuGameOpen, setChocoRadioOpen, setChocoMatchOpen,
     firebaseUser, showChucu, setShowChucu, logout
   } = useStore();
 
@@ -236,6 +237,17 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                    <Radio className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-black leading-normal uppercase tracking-tight">Choco Radio</span>
+             </button>
+
+             {/* Ghép Choco */}
+             <button 
+                onClick={() => { onClose(); setChocoMatchOpen(true); }}
+                className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 group cursor-pointer"
+             >
+                <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
+                   <Candy className="w-5 h-5 text-[#8D6E63]" />
+                </div>
+                <span className="text-xs font-black leading-normal uppercase tracking-tight">Ghép Choco</span>
              </button>
 
               {/* Tài Khoản */}
@@ -597,9 +609,9 @@ export function AppLayout() {
     equippedAccessory, accessoryPosition,
     choco, goldenChoco, email, level, lastClaimedRewardLevel, missions,
     isStoreOpen, isMissionsOpen, isAchievementsOpen, isInventoryOpen,
-    isChucuGameOpen, isChocoRadioOpen, isGachaOpen, isGachaAdminOpen,
+    isChucuGameOpen, isChocoMatchOpen, isChocoRadioOpen, isGachaOpen, isGachaAdminOpen,
     setStoreOpen, setMissionsOpen, setAchievementsOpen, setInventoryOpen,
-    setChucuGameOpen, setChocoRadioOpen, setGachaOpen, setGachaAdminOpen,
+    setChucuGameOpen, setChocoMatchOpen, setChocoRadioOpen, setGachaOpen, setGachaAdminOpen,
     isQuotaExceeded, firebaseUser, activeTitle, getTitleColor,
     theme, setTheme, logout
   } = useStore();
@@ -943,6 +955,9 @@ export function AppLayout() {
       {/* Global Modals for Chucu Games & Radio */}
       <AnimatePresence>
         {isChucuGameOpen && <ChucuGamePopup />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isChocoMatchOpen && <ChocoMatchPopup onClose={() => setChocoMatchOpen(false)} />}
       </AnimatePresence>
       <AnimatePresence>
         {isChocoRadioOpen && <ChocoRadioPopup />}
