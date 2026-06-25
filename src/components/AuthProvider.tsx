@@ -111,6 +111,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               chucuGamePlaysToday: state.chucuGamePlaysToday || 0,
               chucuGameLastPlayDate: state.chucuGameLastPlayDate || null,
               
+              chocoMatchLevel: state.chocoMatchLevel || 1,
+              chocoMatchHearts: state.chocoMatchHearts || 5,
+              chocoMatchLastHeartTick: state.chocoMatchLastHeartTick || null,
+
               missions: state.missions || [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()],
               storyProgress: state.storyProgress || {},
               readHistoryList: state.readHistoryList || [],
