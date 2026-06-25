@@ -237,6 +237,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 }) => {
   const {
     chocoMatchLevel,
+    chocoMatchWinStreak,
     chocoMatchHearts,
     chocoMatchLastHeartTick,
     updateChocoMatchState,
@@ -631,6 +632,43 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
       });
     }
 
+    // Apply Win Streak Boosters
+    let extraMoves = 0;
+    
+    // Striped Candy
+    const numStriped = chocoMatchWinStreak >= 3 ? 2 : (chocoMatchWinStreak >= 1 ? 1 : 0);
+    if (numStriped > 0) {
+      const tiles = getRandomValidTiles(numStriped);
+      tiles.forEach((tile) => {
+        const t = modBoard.find((x) => x.id === tile.id);
+        if (t) t.special = Math.random() > 0.5 ? "striped_h" : "striped_v";
+      });
+    }
+
+    // Wrapped Candy
+    const numWrapped = chocoMatchWinStreak >= 3 ? 2 : (chocoMatchWinStreak >= 1 ? 1 : 0);
+    if (numWrapped > 0) {
+      const tiles = getRandomValidTiles(numWrapped);
+      tiles.forEach((tile) => {
+        const t = modBoard.find((x) => x.id === tile.id);
+        if (t) t.special = "wrapped";
+      });
+    }
+
+    // Color Bomb
+    const numColorBomb = chocoMatchWinStreak >= 4 ? 2 : (chocoMatchWinStreak >= 2 ? 1 : 0);
+    if (numColorBomb > 0) {
+      const tiles = getRandomValidTiles(numColorBomb);
+      tiles.forEach((tile) => {
+        const t = modBoard.find((x) => x.id === tile.id);
+        if (t) t.special = "color_bomb";
+      });
+    }
+
+    if (chocoMatchWinStreak >= 5) {
+      extraMoves = 3;
+    }
+
     if (Object.keys(inventoryUpdates).length > 0) {
       setBoosterInventory((prev) => ({ ...prev, ...inventoryUpdates }));
     }
@@ -641,7 +679,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
     setBoard(modBoard);
     setFoilBoard(foil);
     updateGoalsState(initialGoals);
-    setMoves(initialMoves);
+    setMoves(initialMoves + extraMoves);
     setScore(0);
     setGameState("playing");
     setSelectedTile(null);
@@ -1707,6 +1745,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
     if (currentPlayingLevel === chocoMatchLevel) {
       updateChocoMatchState({ chocoMatchLevel: chocoMatchLevel + 1 });
     }
+    updateChocoMatchState({ chocoMatchWinStreak: chocoMatchWinStreak + 1 });
     addChoco(3);
     if (currentPlayingLevel % 10 === 0) addGoldenChoco(1);
     setViewMode("map");
@@ -1966,7 +2005,12 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
           <div className="bg-[#3E2723] text-[#F5E6D3] py-2 px-3 flex justify-between items-center gap-2 relative z-20 shadow-[0_4px_12px_rgba(62,39,35,0.5)] border-b-4 border-[#5D4037] shrink-0">
             <div className="flex items-center gap-1.5 min-w-0">
               <button
-                onClick={() => setViewMode("map")}
+                onClick={() => {
+                  if (gameState === "playing") {
+                    updateChocoMatchState({ chocoMatchWinStreak: 0 });
+                  }
+                  setViewMode("map");
+                }}
                 className="p-1.5 bg-[#5D4037] rounded-lg border border-[#4E342E] hover:bg-[#6D4C41] shrink-0 cursor-pointer"
                 title="Bản đồ"
               >
@@ -2031,7 +2075,12 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 
               {/* Close button */}
               <button
-                onClick={onClose}
+                onClick={() => {
+                  if (gameState === "playing") {
+                    updateChocoMatchState({ chocoMatchWinStreak: 0 });
+                  }
+                  onClose();
+                }}
                 className="w-7 h-7 sm:w-8 sm:h-8 bg-[#FFFDF9] border-2 border-[#3E2723] rounded-lg flex items-center justify-center hover:bg-[#F5E6D3] shadow-[0_2px_0_0_#3E2723] transition-all active:translate-y-0.5 active:shadow-none cursor-pointer text-[#3E2723] shrink-0"
               >
                 <X className="w-4 h-4 stroke-[2.5]" />
@@ -2054,13 +2103,21 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                     </span>
                   </span>
                   {timeUntilNextHeart && (
-                    <span className="text-[10px] text-stone-400 ml-1">
+                    <span className="text-[10px] text-stone-400 ml-1 font-mono">
                       {timeUntilNextHeart}
                     </span>
                   )}
                 </div>
               </div>
             </div>
+
+            {chocoMatchWinStreak > 0 && (
+              <div className="flex flex-col items-center bg-[#FFD54F]/20 px-2 py-1 rounded-lg border-2 border-[#FFB300] ml-2">
+                <span className="text-[9px] font-black text-[#FFECB3] uppercase">Streak 🔥</span>
+                <span className="text-sm font-black text-[#FFB300] leading-none">x{chocoMatchWinStreak}</span>
+              </div>
+            )}
+            <div className="flex-1" />
 
             <button
               onClick={onClose}
@@ -2436,8 +2493,8 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                 {/* In-game Boosters Panel */}
                 <div className="w-full max-w-[400px] mx-auto bg-[#3E2723]/95 border-b-2 border-[#5D4037] rounded-2xl p-2 flex justify-around items-center mt-1 shadow-lg shrink-0 relative border-2 border-[#5D4037]">
                   {[
-                    { key: "lollipop", label: "Búa Mút", icon: "🍭", price: 40, desc: "Đập vỡ 1 kẹo/blocker" },
-                    { key: "free_switch", label: "Tráo Đổi", icon: "🔄", price: 45, desc: "Tráo 2 ô kẹo cạnh nhau" },
+                    { key: "lollipop", label: "Búa Choco", icon: "🔨", price: 40, desc: "Đập vỡ 1 ô choco/blocker" },
+                    { key: "free_switch", label: "Tráo Đổi", icon: "🔄", price: 45, desc: "Tráo 2 ô choco cạnh nhau" },
                     { key: "sweet_teeth", label: "Răng Hàm", icon: "🦷", price: 90, desc: "Hàm răng đồ chơi ăn 12 ô" },
                     { key: "bomb_cooler", label: "Băng Bom", icon: "❄️", price: 30, desc: "Cộng +5 lượt cho tất cả bom" },
                   ].map((b) => {
@@ -2531,7 +2588,10 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                           {lostReason || "Hết lượt đi. Khách hàng đã rời đi."}
                         </p>
                         <button
-                          onClick={() => setViewMode("map")}
+                          onClick={() => {
+                            updateChocoMatchState({ chocoMatchWinStreak: 0 });
+                            setViewMode("map");
+                          }}
                           className="w-full py-4 bg-[#F44336] hover:bg-[#E53935] text-white rounded-xl font-bold text-lg shadow-[0_4px_0_0_#C62828] active:translate-y-1 active:shadow-none transition-all"
                         >
                           Quay Về Bản Đồ
@@ -2650,6 +2710,24 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                       })()}
                     </div>
 
+                    {/* Win Streak Bonus Info */}
+                    {chocoMatchWinStreak > 0 && (
+                      <div className="w-full bg-[#FFD54F]/20 rounded-xl border-2 border-[#FFB300] p-1.5 mb-2 [@media(min-height:560px)]:p-2 flex items-center gap-2">
+                        <div className="flex-1 flex flex-col items-center">
+                          <span className="text-[9px] [@media(min-height:720px)]:text-[10px] font-black text-[#FF8F00] uppercase tracking-wider mb-0.5">
+                            Chuỗi Thắng x{chocoMatchWinStreak}
+                          </span>
+                          <span className="text-[8px] [@media(min-height:720px)]:text-[9px] text-[#5D4037] font-bold text-center leading-tight">
+                            Bắt đầu với:{" "}
+                            {chocoMatchWinStreak >= 3 ? "🍫x2 " : (chocoMatchWinStreak >= 1 ? "🍫 " : "")}
+                            {chocoMatchWinStreak >= 3 ? "🍩x2 " : (chocoMatchWinStreak >= 1 ? "🍩 " : "")}
+                            {chocoMatchWinStreak >= 4 ? "🌈x2 " : (chocoMatchWinStreak >= 2 ? "🌈 " : "")}
+                            {chocoMatchWinStreak >= 5 && "+3 Lượt"}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Pre-game Boosters Panel */}
                     <div className="w-full bg-[#FFF8E7] rounded-xl border border-[#D7CCC8] p-2 mb-2 [@media(min-height:720px)]:p-3 [@media(min-height:720px)]:mb-4 flex flex-col items-center">
                       <h4 className="text-[9px] [@media(min-height:720px)]:text-[11px] font-black text-[#5D4037] uppercase mb-1.5 tracking-wider">
@@ -2658,10 +2736,10 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                       
                       <div className="grid grid-cols-4 gap-1.5 w-full">
                         {[
-                          { key: "striped_wrapped", label: "Sọc & Gói", icon: "🍭🍬", price: 50, desc: "Tạo 1 kẹo sọc & 1 kẹo bọc đường" },
-                          { key: "color_bomb", label: "Bom Màu", icon: "🌈💣", price: 80, desc: "Tạo 1 quả bom sắc màu siêu nổ" },
+                          { key: "striped_wrapped", label: "Sọc & Gói", icon: "🍫🍩", price: 50, desc: "Tạo 1 choco sọc & 1 choco gói" },
+                          { key: "color_bomb", label: "Bom Màu", icon: "🌈", price: 80, desc: "Tạo 1 quả bom sắc màu siêu nổ" },
                           { key: "jellyfish", label: "Cá Thạch", icon: "🐠", price: 60, desc: "Thêm 3 chú cá Jellyfish dọn bảng" },
-                          { key: "lucky_candy", label: "May Mắn", icon: "🍀", price: 50, desc: "Thêm 2 kẹo may mắn biến hình" },
+                          { key: "lucky_candy", label: "May Mắn", icon: "🍀", price: 50, desc: "Thêm 2 choco may mắn biến hình" },
                         ].map((b) => {
                           const isEquipped = equippedPreBoosters.includes(b.key);
                           const count = boosterInventory[b.key as keyof BoosterInventory] || 0;
