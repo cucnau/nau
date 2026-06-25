@@ -344,8 +344,10 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
         const currentEl = document.getElementById(`level-btn-${chocoMatchLevel}`);
         if (container && currentEl) {
           const containerHeight = container.clientHeight || 500;
+          const maxLevels = Math.max(50, chocoMatchLevel + 20);
+          const mapHeight = maxLevels * 110 + 300;
           const i = chocoMatchLevel - 1;
-          const y = (50 * 110 + 300) - 250 - i * 110;
+          const y = mapHeight - 250 - i * 110;
           const targetScrollTop = y - containerHeight / 2;
           
           container.scrollTo({
@@ -2086,78 +2088,82 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                   backgroundSize: "30px 30px"
                 }}
               >
-                <div className="relative w-full" style={{ height: `${50 * 110 + 300}px` }}>
-                  {/* Decor elements */}
-                  {Array.from({ length: 30 }).map((_, i) => {
-                    const y = 100 + i * 180;
-                    const isLeft = i % 2 === 0;
-                    const emojis = ['🍩', '🍫', '☕', '🥐', '🧁', '🍰', '🍬', '🍭', '🍪', '🍧'];
-                    const emoji = emojis[i % emojis.length];
-                    return (
-                      <div
-                        key={`decor-${i}`}
-                        className={`absolute text-5xl opacity-30 drop-shadow-sm ${isLeft ? 'left-8 rotate-12' : 'right-8 -rotate-12'}`}
-                        style={{ top: `${y}px`, zIndex: 1 }}
-                      >
-                        {emoji}
+                {(() => {
+                  const maxLevels = Math.max(50, chocoMatchLevel + 20);
+                  const mapHeight = maxLevels * 110 + 300;
+                  return (
+                    <div className="relative w-full" style={{ height: `${mapHeight}px` }}>
+                      {/* Decor elements */}
+                      {Array.from({ length: Math.floor(mapHeight / 180) }).map((_, i) => {
+                        const y = 100 + i * 180;
+                        const isLeft = i % 2 === 0;
+                        const emojis = ['🍩', '🍫', '☕', '🥐', '🧁', '🍰', '🍬', '🍭', '🍪', '🍧'];
+                        const emoji = emojis[i % emojis.length];
+                        return (
+                          <div
+                            key={`decor-${i}`}
+                            className={`absolute text-5xl opacity-30 drop-shadow-sm ${isLeft ? 'left-8 rotate-12' : 'right-8 -rotate-12'}`}
+                            style={{ top: `${y}px`, zIndex: 1 }}
+                          >
+                            {emoji}
+                          </div>
+                        );
+                      })}
+
+                      {/* Chocolate Shop (Bottom) */}
+                      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-48 h-48 bg-[#6D4C41] rounded-3xl border-8 border-[#4E342E] shadow-2xl flex flex-col items-center justify-center z-10 overflow-hidden">
+                        <div className="absolute top-0 w-full flex">
+                          <div className="flex-1 h-6 bg-red-400 rounded-b-full"></div>
+                          <div className="flex-1 h-6 bg-white rounded-b-full"></div>
+                          <div className="flex-1 h-6 bg-red-400 rounded-b-full"></div>
+                          <div className="flex-1 h-6 bg-white rounded-b-full"></div>
+                        </div>
+                        <span className="text-4xl mt-4">🏪</span>
+                        <span className="font-bold text-[#FFECB3] mt-2 text-center text-sm px-2">Choco Factory</span>
                       </div>
-                    );
-                  })}
 
-                  {/* Chocolate Shop (Bottom) */}
-                  <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-48 h-48 bg-[#6D4C41] rounded-3xl border-8 border-[#4E342E] shadow-2xl flex flex-col items-center justify-center z-10 overflow-hidden">
-                    <div className="absolute top-0 w-full flex">
-                      <div className="flex-1 h-6 bg-red-400 rounded-b-full"></div>
-                      <div className="flex-1 h-6 bg-white rounded-b-full"></div>
-                      <div className="flex-1 h-6 bg-red-400 rounded-b-full"></div>
-                      <div className="flex-1 h-6 bg-white rounded-b-full"></div>
-                    </div>
-                    <span className="text-4xl mt-4">🏪</span>
-                    <span className="font-bold text-[#FFECB3] mt-2 text-center text-sm px-2">Choco Factory</span>
-                  </div>
+                      {/* Levels */}
+                      {Array.from({ length: maxLevels }).map((_, i) => {
+                        const lvl = i + 1;
+                        const isUnlocked = lvl <= chocoMatchLevel;
+                        const isCurrent = lvl === chocoMatchLevel;
+                        const y = mapHeight - 250 - i * 110; // Bottom to top
+                        const offset = Math.sin(i * 0.9) * 90; // Zig-zag amplitude
 
-                  {/* Levels */}
-                  {Array.from({ length: 50 }).map((_, i) => {
-                    const lvl = i + 1;
-                    const isUnlocked = lvl <= chocoMatchLevel;
-                    const isCurrent = lvl === chocoMatchLevel;
-                    const y = (50 * 110 + 300) - 250 - i * 110; // Bottom to top
-                    const offset = Math.sin(i * 0.9) * 90; // Zig-zag amplitude
+                        let lineSegment = null;
+                        if (i < maxLevels - 1) {
+                          const nextY = mapHeight - 250 - (i + 1) * 110;
+                          const nextOffset = Math.sin((i + 1) * 0.9) * 90;
+                          const dx = nextOffset - offset;
+                          const dy = nextY - y;
+                          const length = Math.sqrt(dx * dx + dy * dy);
+                          const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
-                    let lineSegment = null;
-                    if (i < 49) {
-                      const nextY = (50 * 110 + 300) - 250 - (i + 1) * 110;
-                      const nextOffset = Math.sin((i + 1) * 0.9) * 90;
-                      const dx = nextOffset - offset;
-                      const dy = nextY - y;
-                      const length = Math.sqrt(dx * dx + dy * dy);
-                      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                          lineSegment = (
+                            <div
+                              className="absolute"
+                              style={{
+                                left: `calc(50% + ${offset}px)`,
+                                top: `${y}px`,
+                                width: `${length}px`,
+                                height: '10px',
+                                borderBottom: '6px dashed #8D6E63',
+                                transformOrigin: '0 0',
+                                transform: `rotate(${angle}deg)`,
+                                zIndex: 0,
+                                opacity: isUnlocked ? 0.9 : 0.3
+                              }}
+                            />
+                          );
+                        }
 
-                      lineSegment = (
-                        <div
-                          className="absolute"
-                          style={{
-                            left: `calc(50% + ${offset}px)`,
-                            top: `${y}px`,
-                            width: `${length}px`,
-                            height: '10px',
-                            borderBottom: '6px dashed #8D6E63',
-                            transformOrigin: '0 0',
-                            transform: `rotate(${angle}deg)`,
-                            zIndex: 0,
-                            opacity: isUnlocked ? 0.9 : 0.3
-                          }}
-                        />
-                      );
-                    }
-
-                    return (
-                      <React.Fragment key={lvl}>
-                        {lineSegment}
-                        <div
-                          id={`level-btn-${lvl}`}
-                          className="absolute flex flex-col items-center justify-center -translate-x-1/2 -translate-y-1/2"
-                          style={{ left: `calc(50% + ${offset}px)`, top: `${y}px`, zIndex: 10 }}
+                        return (
+                          <React.Fragment key={lvl}>
+                            {lineSegment}
+                            <div
+                              id={`level-btn-${lvl}`}
+                              className="absolute flex flex-col items-center justify-center -translate-x-1/2 -translate-y-1/2"
+                              style={{ left: `calc(50% + ${offset}px)`, top: `${y}px`, zIndex: 10 }}
                         >
                           {isCurrent && (
                             <div className="absolute -top-12 animate-bounce bg-[#FF5252] text-white text-[10px] font-black px-3 py-1.5 rounded-xl shadow-lg border-2 border-white whitespace-nowrap z-30">
@@ -2215,6 +2221,8 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                     );
                   })}
                 </div>
+                );
+              })()}
               </motion.div>
             )}
 
