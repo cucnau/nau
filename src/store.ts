@@ -305,7 +305,7 @@ export const getPermanentMissions = (): Mission[] => {
    }
    // Level (10, 20...)
    for (let i = 1; i <= 10; i++) {
-       res.push({ id: `p_level_${i}`, type: 'permanent', description: `Đạt độc giả cấp độ ${i * 10}`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 10, completed: false, claimed: false });
+       res.push({ id: `p_level_${i}`, type: 'permanent', description: `Đạt level ${i * 10}`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 10, completed: false, claimed: false });
    }
    // Bình luận (50, 100...)
    for (let i = 1; i <= 20; i++) {
