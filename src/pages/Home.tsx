@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GlobalChat } from '../components/GlobalChat';
 import { NewsFeed } from '../components/NewsFeed';
 import { useStore } from '../store';
-import { CalendarCheck, ClipboardList, ShoppingBag, Trophy, Star, BookOpen, Flame, User, PackageOpen, Library, Gamepad2, Radio, ShoppingBasket, Sparkles, Info } from 'lucide-react';
+import { CalendarCheck, ClipboardList, ShoppingBag, Trophy, Star, BookOpen, Flame, User, PackageOpen, Library, Candy, Radio, ShoppingBasket, Sparkles, Info } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { UserAvatar } from '../components/UserAvatar';
@@ -12,7 +12,7 @@ import { getWeeklyId, getGMT7Date } from '../types/achievements';
 
 export function Home() {
   const navigate = useNavigate();
-  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, setChucuGameOpen, setChocoRadioOpen, setGachaOpen, lastCheckInDate, checkInStreak, getTitleColor, lastFreeStreakRecoveryMonth, activeStreakProtection, ownedStreakTickets, theme } = useStore();
+  const { checkIn, isLoggedIn, uid, unlockAchievement, unlockedAchievements, missions, claimedAchievements, setMissionsOpen, setAchievementsOpen, setStoreOpen, setInventoryOpen, setChucuGameOpen, setChocoMatchOpen, setChocoRadioOpen, setGachaOpen, lastCheckInDate, checkInStreak, getTitleColor, lastFreeStreakRecoveryMonth, activeStreakProtection, ownedStreakTickets, theme } = useStore();
   
   const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
   const isCheckedInToday = lastCheckInDate === todayStr;
@@ -510,6 +510,13 @@ export function Home() {
                        <ShoppingBasket className="w-4 h-4 text-[#8D6E63]" />
                     </div>
                     <span className="font-bold text-[9px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors leading-[1.1] truncate max-w-full">Hứng Choco</span>
+                 </button>
+
+                 <button onClick={() => setChocoMatchOpen(true)} className="flex flex-col items-center justify-center text-center p-2 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_2px_0_0_#D7CCC8] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-0.5 active:shadow-none cursor-pointer">
+                    <div className="w-10 h-10 rounded-lg bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center mb-1 border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30 group-hover:scale-105 transition-transform">
+                       <Candy className="w-4 h-4 text-[#8D6E63]" />
+                    </div>
+                    <span className="font-bold text-[9px] text-[#3E2723] dark:text-[#ECE5DC] uppercase tracking-wide group-hover:text-[#5D4037] dark:group-hover:text-[#FFF] transition-colors leading-[1.1] truncate max-w-full">Ghép Choco</span>
                  </button>
 
                  <button onClick={() => setChocoRadioOpen(true)} className="flex flex-col items-center justify-center text-center p-2 bg-[#FDF6EC] dark:bg-[#2C221D] rounded-xl transition-all group border-2 border-[#D7CCC8]/40 dark:border-[#5D4037] shadow-[0_2px_0_0_#D7CCC8] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 hover:border-[#8D6E63] dark:hover:border-[#C29D70] active:translate-y-0.5 active:shadow-none cursor-pointer">
