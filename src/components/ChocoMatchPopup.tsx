@@ -2618,6 +2618,13 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                   <div className="absolute -top-3.5 [@media(min-height:720px)]:-top-6 bg-[#3E2723] text-[#F5E6D3] px-4 py-1 [@media(min-height:720px)]:px-6 [@media(min-height:720px)]:py-2 rounded-full border-4 border-[#FFFDF9] shadow-lg font-black text-[9px] [@media(min-height:560px)]:text-[10px] [@media(min-height:720px)]:text-xs [@media(min-height:850px)]:text-sm whitespace-nowrap">
                     ĐƠN HÀNG #{selectedLevelForIntro}
                   </div>
+                  
+                  <button
+                    onClick={() => setSelectedLevelForIntro(null)}
+                    className="absolute top-2 right-2 w-6 h-6 [@media(min-height:720px)]:w-7 [@media(min-height:720px)]:h-7 bg-[#FFFDF9] hover:bg-[#FDF6EC] border-2 border-[#3E2723] rounded-lg [@media(min-height:720px)]:rounded-xl flex items-center justify-center text-[#3E2723] shadow-[0_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none transition-all z-10 cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5 [@media(min-height:720px)]:w-4 [@media(min-height:720px)]:h-4 stroke-[2.5]" />
+                  </button>
 
                   <div className="mt-2 [@media(min-height:560px)]:mt-3 [@media(min-height:720px)]:mt-4 flex flex-col items-center w-full">
                     {/* Difficulty Badge */}
