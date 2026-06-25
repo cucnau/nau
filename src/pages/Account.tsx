@@ -520,7 +520,7 @@ export function Account() {
               </h2>
               <p className="text-xs font-mono text-stone-500 mb-4">{email}</p>
               
-              {/* Hệ thống level độc giả */}
+              {/* Hệ thống level */}
               <div className="w-full mb-4 bg-[#F5E6D3]/40 dark:bg-[#34221A] p-4 rounded-2xl border-2 border-[#3E2723] text-left">
                  <div className="flex justify-between items-center mb-1.5">
                     <span className="text-[10px] font-black uppercase tracking-widest text-[#3E2723] dark:text-white/90">Level</span>
