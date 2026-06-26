@@ -544,7 +544,7 @@ export default function GachaPopup() {
                   : "bg-white/90 border-[#3E2723]/10 text-[#3E2723]"
               )}>
                 <span className="font-bold text-[10px] sm:text-xs">
-                  {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}
+                  {choco}
                 </span>
                 <span className={cn("text-[8px] sm:text-[10px]", isDark ? "text-[#E6D8C9]" : "text-[#8D6E63]")}>Choco</span>
               </div>
@@ -555,7 +555,7 @@ export default function GachaPopup() {
                   : "bg-[#FFF9C4]/90 border-[#3E2723]/15 text-[#5D4037]"
               )}>
                 <span className="font-bold text-[10px] sm:text-xs">
-                  {(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : (goldenChoco || 0)}
+                  {goldenChoco || 0}
                 </span>
                 <span className={cn("text-[8px] sm:text-[10px] font-bold text-amber-500", isDark ? "text-amber-400" : "text-amber-700")}>Gchoco</span>
               </div>
