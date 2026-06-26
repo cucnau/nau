@@ -1181,14 +1181,16 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 
         // 3. Game Over & Win check
         const isWon = goalsRef.current.every((g) => g.current >= g.target);
-        if (bombExploded) {
+        if (isWon) {
+          setGameState("won");
+        } else if (bombExploded) {
           setLostReason("Bùm! Bom Choco hẹn giờ đã phát nổ!");
           setGameState("lost");
         } else if (currentMoves <= 0) {
           setLostReason("Hết lượt đi. Khách hàng đã rời đi.");
           setGameState("lost");
         } else {
-          setGameState(isWon ? "won" : "playing");
+          setGameState("playing");
         }
         return;
       }
@@ -2072,7 +2074,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
             </div>
 
             {/* Integrated Goals in Header */}
-            <div className="flex-1 flex justify-center items-center gap-1.5 px-1 overflow-x-auto no-scrollbar">
+            <div className="flex-1 flex justify-center items-center gap-1.5 px-1 overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {goals.map((g, i) => (
                 <div
                   key={i}
@@ -2100,7 +2102,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                     <span className="text-xs">🌰</span>
                   )}
                   {g.type === "rainbow_candy" && (
-                    <span className="text-xs animate-spin" style={{ animationDuration: "12s" }}>🌈</span>
+                    <span className="text-xs animate-pulse">🌈</span>
                   )}
                   <span className="text-[10px] font-black text-[#FFECB3] whitespace-nowrap">
                     {g.current}/{g.target}
@@ -2763,7 +2765,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                             )}
                             {g.type === "rainbow_candy" && (
                               <>
-                                <span className="text-base [@media(min-height:720px)]:text-3xl animate-spin" style={{ animationDuration: "12s" }}>🌈</span>
+                                <span className="text-base [@media(min-height:720px)]:text-3xl animate-pulse">🌈</span>
                                 <span className="text-[8px] [@media(min-height:560px)]:text-[9px] [@media(min-height:720px)]:text-[11px] [@media(min-height:850px)]:text-xs font-black text-[#5D4037] text-center whitespace-nowrap">
                                   {g.target} Cầu Vồng
                                 </span>
