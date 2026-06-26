@@ -422,6 +422,24 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
 ];
 
 export const getGMT7Date = (): Date => {
+  try {
+    const options = { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false } as const;
+    const formatter = new Intl.DateTimeFormat('en-US', options);
+    const parts = formatter.formatToParts(new Date());
+    
+    const year = parts.find(p => p.type === 'year')?.value;
+    const month = parts.find(p => p.type === 'month')?.value;
+    const day = parts.find(p => p.type === 'day')?.value;
+    const hour = parts.find(p => p.type === 'hour')?.value;
+    const minute = parts.find(p => p.type === 'minute')?.value;
+    const second = parts.find(p => p.type === 'second')?.value;
+    
+    if (year && month && day && hour && minute && second) {
+      return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), Number(second));
+    }
+  } catch (e) {
+    console.error('Error in robust getGMT7Date, falling back:', e);
+  }
   const d = new Date();
   const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
   return new Date(utc + (3600000 * 7));
