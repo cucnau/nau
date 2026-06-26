@@ -153,18 +153,27 @@ export function Admin() {
       let restoredCount = 0;
 
       for (const u of users) {
-        setRestorationLogs(prev => [...prev, `Đang xử lý tài khoản: ${u.displayName || u.email || u.id}...`]);
+        setRestorationLogs(prev => [...prev, `----------------------------------------`, `🔍 Đang phân tích tài khoản: ${u.displayName || u.email || u.id}...`]);
         
         const txSnap = await getDocs(collection(db, `users/${u.id}/transactions`));
         const txs = txSnap.docs.map(doc => doc.data());
         
+        // Sắp xếp các giao dịch theo thời gian tăng dần để phân tích vết
+        const getTxTime = (tx: any) => {
+          if (!tx.createdAt) return 0;
+          if (typeof tx.createdAt.toMillis === 'function') return tx.createdAt.toMillis();
+          if (tx.createdAt.seconds !== undefined) return tx.createdAt.seconds * 1000;
+          return new Date(tx.createdAt).getTime() || 0;
+        };
+        const sortedTxs = [...txs].sort((a, b) => getTxTime(a) - getTxTime(b));
+
         let calculatedEarnedChoco = 0;
         let calculatedEarnedGChoco = 0;
         let calculatedSpentChoco = 0;
         let calculatedSpentGChoco = 0;
         const restoredAchievements = new Set<string>();
 
-        txs.forEach(t => {
+        sortedTxs.forEach(t => {
           const amt = Number(t.amount) || 0;
           if (t.currency === 'choco') {
             if (t.type === 'earn') {
@@ -190,18 +199,92 @@ export function Admin() {
           }
         });
 
-        const calculatedCurrentChoco = Math.max(0, calculatedEarnedChoco - calculatedSpentChoco);
-        const calculatedCurrentGChoco = Math.max(0, calculatedEarnedGChoco - calculatedSpentGChoco);
+        // Tìm kiếm vết số dư gần nhất có ghi nhận balanceAfter
+        let latestChocoBalanceAfter: number | null = null;
+        let lastChocoIdx = -1;
+        for (let i = sortedTxs.length - 1; i >= 0; i--) {
+          const t = sortedTxs[i];
+          if (t.currency === 'choco' && t.balanceAfter !== undefined && t.balanceAfter !== null) {
+            latestChocoBalanceAfter = Number(t.balanceAfter);
+            lastChocoIdx = i;
+            break;
+          }
+        }
+
+        let historyBalanceChoco = latestChocoBalanceAfter !== null ? latestChocoBalanceAfter : Math.max(0, calculatedEarnedChoco - calculatedSpentChoco);
+        if (latestChocoBalanceAfter !== null) {
+          // Cộng dồn các giao dịch phát sinh sau giao dịch ghi nhận balanceAfter cuối cùng
+          for (let i = lastChocoIdx + 1; i < sortedTxs.length; i++) {
+            const t = sortedTxs[i];
+            if (t.currency === 'choco') {
+              const amt = Number(t.amount) || 0;
+              if (t.type === 'earn') historyBalanceChoco += amt;
+              else if (t.type === 'spend') historyBalanceChoco -= amt;
+            }
+          }
+        }
+
+        let latestGChocoBalanceAfter: number | null = null;
+        let lastGChocoIdx = -1;
+        for (let i = sortedTxs.length - 1; i >= 0; i--) {
+          const t = sortedTxs[i];
+          if (t.currency === 'gchoco' && t.balanceAfter !== undefined && t.balanceAfter !== null) {
+            latestGChocoBalanceAfter = Number(t.balanceAfter);
+            lastGChocoIdx = i;
+            break;
+          }
+        }
+
+        let historyBalanceGChoco = latestGChocoBalanceAfter !== null ? latestGChocoBalanceAfter : Math.max(0, calculatedEarnedGChoco - calculatedSpentGChoco);
+        if (latestGChocoBalanceAfter !== null) {
+          for (let i = lastGChocoIdx + 1; i < sortedTxs.length; i++) {
+            const t = sortedTxs[i];
+            if (t.currency === 'gchoco') {
+              const amt = Number(t.amount) || 0;
+              if (t.type === 'earn') historyBalanceGChoco += amt;
+              else if (t.type === 'spend') historyBalanceGChoco -= amt;
+            }
+          }
+        }
+
+        const uChoco = u.choco || 0;
+        const uGChoco = u.goldenChoco || 0;
+
+        // Tổng hợp ba phương án tính toán để tìm ra số dư tối ưu nhất (tránh mất mát số dư gốc trước đó)
+        const method1Choco = historyBalanceChoco;
+        const method2Choco = uChoco + (calculatedEarnedChoco - calculatedSpentChoco);
+        const method3Choco = Math.max(0, calculatedEarnedChoco - calculatedSpentChoco);
+
+        const method1GChoco = historyBalanceGChoco;
+        const method2GChoco = uGChoco + (calculatedEarnedGChoco - calculatedSpentGChoco);
+        const method3GChoco = Math.max(0, calculatedEarnedGChoco - calculatedSpentGChoco);
+
+        // Lấy giá trị lớn nhất trong tất cả các phương án tính toán để bảo toàn Choco tối đa cho user
+        const finalCalculatedChoco = Math.max(uChoco, method1Choco, method2Choco, method3Choco);
+        const finalCalculatedGChoco = Math.max(uGChoco, method1GChoco, method2GChoco, method3GChoco);
+
+        setRestorationLogs(prev => [
+          ...prev,
+          `📊 Kết quả phân tích:`,
+          `   - Số dư DB hiện tại: ${uChoco.toLocaleString()} Choco / ${uGChoco.toLocaleString()} GChoco`,
+          `   - Lịch sử GD Choco: Earn +${calculatedEarnedChoco.toLocaleString()} / Spend -${calculatedSpentChoco.toLocaleString()} (Hiệu số: ${(calculatedEarnedChoco - calculatedSpentChoco).toLocaleString()})`,
+          `   - Số dư vết cuối cùng (BalanceAfter): ${latestChocoBalanceAfter !== null ? latestChocoBalanceAfter.toLocaleString() : "Không tìm thấy"}`,
+          `   - Các phương án tính Choco:`,
+          `     + Phương án 1 (Vết lịch sử số dư cuối): ${method1Choco.toLocaleString()} Choco`,
+          `     + Phương án 2 (Cộng dồn vào số gốc hiện tại): ${method2Choco.toLocaleString()} Choco`,
+          `     + Phương án 3 (Thu ròng - Chi ròng thuần túy): ${method3Choco.toLocaleString()} Choco`,
+          `   => Kết quả khôi phục tối ưu: ${finalCalculatedChoco.toLocaleString()} Choco`
+        ]);
 
         const updates: any = {};
         let changed = false;
 
-        if (calculatedCurrentChoco > (u.choco || 0)) {
-          updates.choco = calculatedCurrentChoco;
+        if (finalCalculatedChoco > uChoco) {
+          updates.choco = finalCalculatedChoco;
           changed = true;
         }
-        if (calculatedCurrentGChoco > (u.goldenChoco || 0)) {
-          updates.goldenChoco = calculatedCurrentGChoco;
+        if (finalCalculatedGChoco > uGChoco) {
+          updates.goldenChoco = finalCalculatedGChoco;
           changed = true;
         }
         if (calculatedEarnedChoco > (u.totalEarnedChoco || 0)) {
@@ -235,17 +318,17 @@ export function Admin() {
         if (changed) {
           await updateDoc(doc(db, "users", u.id), updates);
           restoredCount++;
-          let logStr = `➡️ Đã khôi phục thành công: `;
-          if (updates.choco !== undefined) logStr += `${updates.choco} Choco (tăng từ ${u.choco || 0}), `;
-          if (updates.goldenChoco !== undefined) logStr += `${updates.goldenChoco} GChoco (tăng từ ${u.goldenChoco || 0}), `;
+          let logStr = `➡️ 🎉 CẬP NHẬT THÀNH CÔNG: `;
+          if (updates.choco !== undefined) logStr += `${updates.choco.toLocaleString()} Choco (tăng từ ${uChoco.toLocaleString()}), `;
+          if (updates.goldenChoco !== undefined) logStr += `${updates.goldenChoco.toLocaleString()} GChoco (tăng từ ${uGChoco.toLocaleString()}), `;
           if (missingUnlocked.length > 0) logStr += `Khôi phục ${missingUnlocked.length} thành tựu (${missingUnlocked.join(", ")}), `;
           setRestorationLogs(prev => [...prev, logStr.replace(/,\s*$/, "")]);
         } else {
-          setRestorationLogs(prev => [...prev, `✅ Tài khoản ${u.displayName || u.email || u.id} khớp dữ liệu, không cần khôi phục.`]);
+          setRestorationLogs(prev => [...prev, `✅ Tài khoản khớp dữ liệu tối ưu, không có thay đổi nào cần cập nhật.`]);
         }
       }
 
-      setRestorationLogs(prev => [...prev, `🎉 HOÀN THÀNH TRUY QUÉT! Đã sửa đổi khôi phục ${restoredCount} tài khoản thành viên.`]);
+      setRestorationLogs(prev => [...prev, `----------------------------------------`, `🎉 HOÀN THÀNH TRUY QUÉT TOÀN DIỆN! Đã xử lý và cập nhật thành công cho ${restoredCount} tài khoản.`]);
     } catch (err: any) {
       console.error(err);
       setRestorationLogs(prev => [...prev, `❌ Thất bại: ${err.message || err}`]);
