@@ -5,7 +5,7 @@ import {
   Menu, Search, User, Key, LogOut, X, Trophy, BookOpen, Zap, Flame, ShieldCheck, 
   Camera, Calendar, Mail, Clock, Settings, Copy, Home, ClipboardList, ShoppingBag, List, Edit2, Library,
   Medal, Award, Lock, Unlock, Users, Sparkles, CheckCircle, Gift, Bell, CheckCheck, Sun, Moon, Eye, EyeOff,
-  RefreshCw, Gamepad2, Radio, ShoppingBasket, Cookie, Target, Crown, ChevronLeft, LayoutGrid, Star, Candy
+  RefreshCw, Gamepad2, Radio, ShoppingBasket, Cookie, Target, Crown, ChevronLeft, LayoutGrid, Star, Candy, Wallet, Activity
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
@@ -409,16 +409,16 @@ function AchievementsModal() {
   };
 
   const filteredAchievements = activeCategory ? ACHIEVEMENTS_LIST.filter(
-    (ach) => activeCategory === 'all' || ach.category === activeCategory
+    (ach) => ach.category === activeCategory
   ) : [];
 
   const getCategoryIcon = (id: string, className: string) => {
     switch (id) {
-      case 'all': return <LayoutGrid className={className} />;
       case 'reading': return <BookOpen className={className} />;
       case 'community': return <Users className={className} />;
-      case 'collection': return <ShoppingBag className={className} />;
-      case 'challenge': return <Target className={className} />;
+      case 'gaming': return <Gamepad2 className={className} />;
+      case 'economy': return <Wallet className={className} />;
+      case 'activity': return <Activity className={className} />;
       case 'legend': return <Crown className={className} />;
       default: return <Star className={className} />;
     }
@@ -427,9 +427,7 @@ function AchievementsModal() {
   const categoryUnclaimedFlags = useMemo(() => {
     return ACHIEVEMENT_CATEGORIES.reduce((acc, cat) => {
       acc[cat.id] = false;
-      const catAchs = cat.id === 'all' 
-          ? ACHIEVEMENTS_LIST 
-          : ACHIEVEMENTS_LIST.filter(a => a.category === cat.id);
+      const catAchs = ACHIEVEMENTS_LIST.filter(a => a.category === cat.id);
       
       for (const ach of catAchs) {
           if (unlockedAchievements.includes(ach.id) && !claimedAchievements.includes(ach.id)) {
