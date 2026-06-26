@@ -199,91 +199,57 @@ export function Admin() {
           }
         });
 
-        // Tìm kiếm vết số dư gần nhất có ghi nhận balanceAfter
-        let latestChocoBalanceAfter: number | null = null;
-        let lastChocoIdx = -1;
-        for (let i = sortedTxs.length - 1; i >= 0; i--) {
+        // Lấy số dư gốc từ giao dịch đầu tiên có ghi nhận balanceAfter
+        let initialChoco = 0;
+        let initialGChoco = 0;
+        
+        for (let i = 0; i < sortedTxs.length; i++) {
           const t = sortedTxs[i];
           if (t.currency === 'choco' && t.balanceAfter !== undefined && t.balanceAfter !== null) {
-            latestChocoBalanceAfter = Number(t.balanceAfter);
-            lastChocoIdx = i;
+            const amt = Number(t.amount) || 0;
+            initialChoco = Number(t.balanceAfter);
+            if (t.type === 'earn') initialChoco -= amt;
+            else if (t.type === 'spend') initialChoco += amt;
             break;
           }
         }
 
-        let historyBalanceChoco = latestChocoBalanceAfter !== null ? latestChocoBalanceAfter : Math.max(0, calculatedEarnedChoco - calculatedSpentChoco);
-        if (latestChocoBalanceAfter !== null) {
-          // Cộng dồn các giao dịch phát sinh sau giao dịch ghi nhận balanceAfter cuối cùng
-          for (let i = lastChocoIdx + 1; i < sortedTxs.length; i++) {
-            const t = sortedTxs[i];
-            if (t.currency === 'choco') {
-              const amt = Number(t.amount) || 0;
-              if (t.type === 'earn') historyBalanceChoco += amt;
-              else if (t.type === 'spend') historyBalanceChoco -= amt;
-            }
-          }
-        }
-
-        let latestGChocoBalanceAfter: number | null = null;
-        let lastGChocoIdx = -1;
-        for (let i = sortedTxs.length - 1; i >= 0; i--) {
+        for (let i = 0; i < sortedTxs.length; i++) {
           const t = sortedTxs[i];
           if (t.currency === 'gchoco' && t.balanceAfter !== undefined && t.balanceAfter !== null) {
-            latestGChocoBalanceAfter = Number(t.balanceAfter);
-            lastGChocoIdx = i;
+            const amt = Number(t.amount) || 0;
+            initialGChoco = Number(t.balanceAfter);
+            if (t.type === 'earn') initialGChoco -= amt;
+            else if (t.type === 'spend') initialGChoco += amt;
             break;
-          }
-        }
-
-        let historyBalanceGChoco = latestGChocoBalanceAfter !== null ? latestGChocoBalanceAfter : Math.max(0, calculatedEarnedGChoco - calculatedSpentGChoco);
-        if (latestGChocoBalanceAfter !== null) {
-          for (let i = lastGChocoIdx + 1; i < sortedTxs.length; i++) {
-            const t = sortedTxs[i];
-            if (t.currency === 'gchoco') {
-              const amt = Number(t.amount) || 0;
-              if (t.type === 'earn') historyBalanceGChoco += amt;
-              else if (t.type === 'spend') historyBalanceGChoco -= amt;
-            }
           }
         }
 
         const uChoco = u.choco || 0;
         const uGChoco = u.goldenChoco || 0;
 
-        // Tổng hợp ba phương án tính toán để tìm ra số dư tối ưu nhất (tránh mất mát số dư gốc trước đó)
-        const method1Choco = historyBalanceChoco;
-        const method2Choco = uChoco + (calculatedEarnedChoco - calculatedSpentChoco);
-        const method3Choco = Math.max(0, calculatedEarnedChoco - calculatedSpentChoco);
-
-        const method1GChoco = historyBalanceGChoco;
-        const method2GChoco = uGChoco + (calculatedEarnedGChoco - calculatedSpentGChoco);
-        const method3GChoco = Math.max(0, calculatedEarnedGChoco - calculatedSpentGChoco);
-
-        // Lấy giá trị lớn nhất trong tất cả các phương án tính toán để bảo toàn Choco tối đa cho user
-        const finalCalculatedChoco = Math.max(uChoco, method1Choco, method2Choco, method3Choco);
-        const finalCalculatedGChoco = Math.max(uGChoco, method1GChoco, method2GChoco, method3GChoco);
+        // Tính toán số dư cuối cùng dựa trên số dư gốc và toàn bộ lịch sử giao dịch
+        const finalCalculatedChoco = Math.max(0, initialChoco + calculatedEarnedChoco - calculatedSpentChoco);
+        const finalCalculatedGChoco = Math.max(0, initialGChoco + calculatedEarnedGChoco - calculatedSpentGChoco);
 
         setRestorationLogs(prev => [
           ...prev,
           `📊 Kết quả phân tích:`,
           `   - Số dư DB hiện tại: ${uChoco.toLocaleString()} Choco / ${uGChoco.toLocaleString()} GChoco`,
-          `   - Lịch sử GD Choco: Earn +${calculatedEarnedChoco.toLocaleString()} / Spend -${calculatedSpentChoco.toLocaleString()} (Hiệu số: ${(calculatedEarnedChoco - calculatedSpentChoco).toLocaleString()})`,
-          `   - Số dư vết cuối cùng (BalanceAfter): ${latestChocoBalanceAfter !== null ? latestChocoBalanceAfter.toLocaleString() : "Không tìm thấy"}`,
-          `   - Các phương án tính Choco:`,
-          `     + Phương án 1 (Vết lịch sử số dư cuối): ${method1Choco.toLocaleString()} Choco`,
-          `     + Phương án 2 (Cộng dồn vào số gốc hiện tại): ${method2Choco.toLocaleString()} Choco`,
-          `     + Phương án 3 (Thu ròng - Chi ròng thuần túy): ${method3Choco.toLocaleString()} Choco`,
-          `   => Kết quả khôi phục tối ưu: ${finalCalculatedChoco.toLocaleString()} Choco`
+          `   - Lịch sử GD Choco: Earn +${calculatedEarnedChoco.toLocaleString()} / Spend -${calculatedSpentChoco.toLocaleString()}`,
+          `   - Lịch sử GD GChoco: Earn +${calculatedEarnedGChoco.toLocaleString()} / Spend -${calculatedSpentGChoco.toLocaleString()}`,
+          `   - Số dư gốc suy luận (trước GD đầu tiên): ${initialChoco.toLocaleString()} Choco / ${initialGChoco.toLocaleString()} GChoco`,
+          `   => Kết quả khôi phục: ${finalCalculatedChoco.toLocaleString()} Choco / ${finalCalculatedGChoco.toLocaleString()} GChoco`
         ]);
 
         const updates: any = {};
         let changed = false;
 
-        if (finalCalculatedChoco > uChoco) {
+        if (finalCalculatedChoco !== uChoco) {
           updates.choco = finalCalculatedChoco;
           changed = true;
         }
-        if (finalCalculatedGChoco > uGChoco) {
+        if (finalCalculatedGChoco !== uGChoco) {
           updates.goldenChoco = finalCalculatedGChoco;
           changed = true;
         }
