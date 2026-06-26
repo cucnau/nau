@@ -418,6 +418,36 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     goldenReward: 0,
     progressTarget: 1,
     category: 'challenge'
+  },
+  {
+    id: 'choco_destroyer',
+    name: 'Kẻ Hủy Diệt Choco',
+    description: 'Phá hủy tổng cộng 100,000 viên Choco các loại.',
+    rewardText: '+100 Choco',
+    chocoReward: 100,
+    goldenReward: 0,
+    progressTarget: 100000,
+    category: 'challenge'
+  },
+  {
+    id: 'choco_color_bomb',
+    name: 'Choco Sắc Màu',
+    description: 'Ghép thành công 5 viên Choco thẳng hàng để tạo ra Bom Màu 10,000 lần.',
+    rewardText: '+100 Choco',
+    chocoReward: 100,
+    goldenReward: 0,
+    progressTarget: 10000,
+    category: 'challenge'
+  },
+  {
+    id: 'choco_special_combo',
+    name: 'Chuyên Gia Chế Tạo Choco',
+    description: 'Kết hợp thành công hai viên Choco đặc biệt với nhau tổng cộng 10,000 lần.',
+    rewardText: '+100 Choco',
+    chocoReward: 100,
+    goldenReward: 0,
+    progressTarget: 10000,
+    category: 'challenge'
   }
 ];
 
