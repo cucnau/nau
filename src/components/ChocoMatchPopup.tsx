@@ -1807,6 +1807,41 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 
   const renderBoosterIllustration = (key: string) => {
     switch (key) {
+      case "striped":
+        return (
+          <div className="w-10 h-10 relative flex items-center justify-center shrink-0">
+            <div
+              style={{
+                background: "linear-gradient(135deg, #F8BBD0 0%, #D81B60 100%)",
+                borderColor: "#880E4F",
+              }}
+              className="w-7 h-7 rounded-[40%] border-b-2 border-r-[1px] shadow-md flex items-center justify-center overflow-hidden"
+            >
+              <div className="absolute top-[10%] left-[20%] w-[40%] h-[30%] bg-white/30 rounded-full blur-[0.5px] transform -rotate-12" />
+              <div className="absolute inset-0 flex flex-col justify-evenly opacity-50">
+                <div className="h-[20%] bg-white/60 w-full" />
+                <div className="h-[20%] bg-white/60 w-full" />
+              </div>
+            </div>
+          </div>
+        );
+      case "wrapped":
+        return (
+          <div className="w-10 h-10 relative flex items-center justify-center shrink-0">
+            <div
+              style={{
+                background: "linear-gradient(135deg, #A5D6A7 0%, #388E3C 100%)",
+                borderColor: "#1B5E20",
+              }}
+              className="w-7 h-7 rounded-[40%] border-b-2 border-r-[1px] shadow-md flex items-center justify-center overflow-hidden"
+            >
+              <div className="absolute top-[10%] left-[20%] w-[40%] h-[30%] bg-white/30 rounded-full blur-[0.5px] transform -rotate-12" />
+              <div className="absolute inset-0 m-[10%] border border-white/60 rounded-sm flex items-center justify-center bg-white/10">
+                <div className="w-1/3 h-1/3 bg-white/80 rounded-full shadow-inner" />
+              </div>
+            </div>
+          </div>
+        );
       case "striped_wrapped":
         return (
           <div className="w-10 h-10 relative flex items-center justify-center shrink-0">
@@ -2295,7 +2330,10 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                 {/* Baking Tray Wrapper to prevent overflow on small height screens */}
                 <div className="flex-1 min-h-0 w-full flex items-center justify-center py-1 overflow-hidden">
                   <div
-                    style={{ width: "min(100%, calc(85vh - 170px))", height: "min(100%, calc(85vh - 170px))" }}
+                    style={{
+                      width: `min(100%, calc(85vh - ${activeInGameBooster ? "215px" : "170px"}))`,
+                      height: `min(100%, calc(85vh - ${activeInGameBooster ? "215px" : "170px"}))`
+                    }}
                     className="bg-[#2C2C2C] rounded-2xl relative shadow-[inset_0_10px_20px_rgba(0,0,0,0.5),0_10px_20px_rgba(62,39,35,0.2)] border-8 border-[#1A1A1A] shrink-0 aspect-square"
                   >
                     <div className="absolute inset-1.5">
@@ -2473,25 +2511,32 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 
                 {/* Active Booster Prompt Overlay / Info */}
                 {activeInGameBooster && (
-                  <div className="w-full max-w-[400px] mx-auto bg-amber-100 border-2 border-amber-400 text-[#5D4037] text-[10px] [@media(min-height:720px)]:text-xs font-black px-3 py-1.5 rounded-xl flex justify-between items-center mb-1 shadow-md animate-pulse shrink-0">
-                    <span>
-                      {activeInGameBooster === "lollipop" && "🍭 Nhấn vào một ô/chướng ngại vật bất kỳ để đập vỡ!"}
-                      {activeInGameBooster === "free_switch" && "🔄 Nhấn vào hai ô cạnh nhau để tráo đổi miễn phí!"}
+                  <div className="w-full max-w-[360px] mx-auto bg-[#FFFDF9] border-2 border-[#3E2723] text-[#3E2723] text-[9px] sm:text-[10px] font-black px-3 py-1 rounded-full flex justify-between items-center mb-2.5 sm:mb-3.5 shadow-[0_2.5px_0_0_#3E2723] shrink-0 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <span className="flex items-center gap-1.5 truncate">
+                      <div className="w-5 h-5 flex items-center justify-center shrink-0 scale-[0.5] origin-center -mx-2">
+                        {renderBoosterIllustration(activeInGameBooster)}
+                      </div>
+                      <span className="truncate">
+                        {activeInGameBooster === "lollipop" 
+                          ? "Nhấn vào ô/vật cản bất kỳ để đập vỡ!" 
+                          : "Nhấn hai ô cạnh nhau để tráo đổi miễn phí!"}
+                      </span>
                     </span>
                     <button
                       onClick={() => {
                         setActiveInGameBooster(null);
                         setSelectedTile(null);
                       }}
-                      className="bg-red-500 hover:bg-red-600 text-white px-2 py-0.5 rounded text-[9px] cursor-pointer font-black"
+                      title="Hủy kích hoạt vật phẩm"
+                      className="w-5 h-5 flex items-center justify-center bg-[#FFF2E2] hover:bg-[#F3DFCA] border-2 border-[#3E2723] shadow-[0_1.5px_0_0_#3E2723] text-[#3E2723] rounded-lg active:translate-y-0.5 active:shadow-none transition-all font-black text-xs pb-0.5 shrink-0 ml-2 cursor-pointer"
                     >
-                      Hủy
+                      ×
                     </button>
                   </div>
                 )}
 
                 {/* In-game Boosters Panel */}
-                <div className="w-full max-w-[400px] mx-auto bg-[#3E2723]/95 border-b-2 border-[#5D4037] rounded-2xl p-2 flex justify-around items-center mt-1 shadow-lg shrink-0 relative border-2 border-[#5D4037]">
+                <div className="w-full max-w-[400px] mx-auto bg-[#3E2723]/95 border-b-2 border-[#5D4037] rounded-2xl p-1 [@media(min-height:720px)]:p-1.5 flex justify-around items-center mt-0.5 [@media(min-height:720px)]:mt-1 shadow-lg shrink-0 relative border-2 border-[#5D4037]">
                   {[
                     { key: "lollipop", label: "Búa Choco", icon: "🔨", price: 40, desc: "Đập vỡ 1 ô choco/blocker" },
                     { key: "free_switch", label: "Tráo Đổi", icon: "🔄", price: 45, desc: "Tráo 2 ô choco cạnh nhau" },
@@ -2504,19 +2549,21 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                       <button
                         key={b.key}
                         onClick={() => handleUseInGameBooster(b.key as any)}
-                        className={`flex flex-col items-center justify-center p-1.5 rounded-xl border-2 transition-all cursor-pointer relative min-w-[70px] ${
+                        className={`flex flex-col items-center justify-center p-1 rounded-xl border-2 transition-all cursor-pointer relative min-w-[62px] [@media(min-height:720px)]:min-w-[72px] ${
                           isActive
-                            ? "bg-green-100 border-[#4CAF50] scale-[1.05] shadow-lg animate-pulse"
+                            ? "bg-green-100 border-[#4CAF50] scale-[1.03] shadow-lg animate-pulse"
                             : "bg-[#FFF8E7] border-[#D7CCC8] hover:border-[#8D6E63]"
                         }`}
                         title={b.desc}
                       >
-                        {renderBoosterIllustration(b.key)}
-                        <span className="text-[7.5px] [@media(min-height:720px)]:text-[9px] font-black text-[#5D4037] leading-tight mt-0.5 whitespace-nowrap">
+                        <div className="scale-[0.7] [@media(min-height:560px)]:scale-[0.8] [@media(min-height:720px)]:scale-[0.95] origin-center h-7 [@media(min-height:720px)]:h-9 flex items-center justify-center shrink-0">
+                          {renderBoosterIllustration(b.key)}
+                        </div>
+                        <span className="text-[6.5px] [@media(min-height:560px)]:text-[7.5px] [@media(min-height:720px)]:text-[8.5px] font-black text-[#5D4037] leading-tight mt-0.5 whitespace-nowrap">
                           {b.label}
                         </span>
                         
-                        <div className="absolute -top-1.5 -right-1.5 bg-[#3E2723] text-white rounded-full px-1.5 py-0.5 text-[6.5px] font-bold shadow-sm">
+                        <div className="absolute -top-1.5 -right-1.5 bg-[#3E2723] text-white rounded-full px-1.5 py-0.5 text-[5.5px] [@media(min-height:560px)]:text-[6px] [@media(min-height:720px)]:text-[6.5px] font-bold shadow-sm">
                           {count > 0 ? `x${count}` : `${b.price}🍫`}
                         </div>
                       </button>
@@ -2729,11 +2776,8 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                           
                           {chocoMatchWinStreak >= 1 && (
                             <div className="flex items-center gap-0.5">
-                              <div className="w-3 h-3 relative shrink-0">
-                                <div style={{ background: "linear-gradient(135deg, #F8BBD0 0%, #D81B60 100%)", borderColor: "#880E4F" }} className="absolute inset-0 rounded-[40%] border-b border-r-[0.5px] shadow-sm flex items-center justify-center overflow-hidden">
-                                  <div className="absolute top-[10%] left-[20%] w-[40%] h-[30%] bg-white/30 rounded-full blur-[0.5px] transform -rotate-12" />
-                                  <div className="absolute inset-0 flex flex-col justify-evenly opacity-50"><div className="h-[20%] bg-white/60 w-full" /><div className="h-[20%] bg-white/60 w-full" /></div>
-                                </div>
+                              <div className="w-5 h-5 flex items-center justify-center shrink-0 scale-[0.6] origin-center -mx-1">
+                                {renderBoosterIllustration("striped")}
                               </div>
                               <span className="text-[7.5px] [@media(min-height:720px)]:text-[9px] font-black text-[#880E4F]">x{chocoMatchWinStreak >= 3 ? 2 : 1}</span>
                             </div>
@@ -2741,11 +2785,8 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 
                           {chocoMatchWinStreak >= 1 && (
                             <div className="flex items-center gap-0.5">
-                              <div className="w-3 h-3 relative shrink-0">
-                                <div style={{ background: "linear-gradient(135deg, #A5D6A7 0%, #388E3C 100%)", borderColor: "#1B5E20" }} className="absolute inset-0 rounded-[40%] border-b border-r-[0.5px] shadow-sm flex items-center justify-center overflow-hidden">
-                                  <div className="absolute top-[10%] left-[20%] w-[40%] h-[30%] bg-white/30 rounded-full blur-[0.5px] transform -rotate-12" />
-                                  <div className="absolute inset-0 m-[10%] border border-white/60 rounded-sm flex items-center justify-center bg-white/10"><div className="w-1/3 h-1/3 bg-white/80 rounded-full shadow-inner" /></div>
-                                </div>
+                              <div className="w-5 h-5 flex items-center justify-center shrink-0 scale-[0.6] origin-center -mx-1">
+                                {renderBoosterIllustration("wrapped")}
                               </div>
                               <span className="text-[7.5px] [@media(min-height:720px)]:text-[9px] font-black text-[#1B5E20]">x{chocoMatchWinStreak >= 3 ? 2 : 1}</span>
                             </div>
@@ -2753,8 +2794,8 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 
                           {chocoMatchWinStreak >= 2 && (
                             <div className="flex items-center gap-0.5">
-                              <div className="w-3 h-3 rounded-full bg-[conic-gradient(red,yellow,lime,aqua,blue,magenta,red)] animate-spin-slow shadow-sm border border-white flex items-center justify-center relative shrink-0">
-                                <div className="absolute top-[10%] left-[20%] w-[40%] h-[30%] bg-white/40 rounded-full blur-[0.5px]" />
+                              <div className="w-5 h-5 flex items-center justify-center shrink-0 scale-[0.6] origin-center -mx-1">
+                                {renderBoosterIllustration("color_bomb")}
                               </div>
                               <span className="text-[7.5px] [@media(min-height:720px)]:text-[9px] font-black text-purple-800">x{chocoMatchWinStreak >= 4 ? 2 : 1}</span>
                             </div>
