@@ -818,8 +818,8 @@ export function AppLayout() {
             <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
               <div className="hidden md:flex items-center gap-3 text-sm font-medium">
                 <span className="bg-[#EFEBE9] dark:bg-[#2C221D] text-[#3E2723] dark:text-[#ECE5DC] px-3 py-1.5 rounded-xl text-xs font-black border-2 border-[#3E2723] dark:border-[#ECE5DC] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#ECE5DC]">Lv. {level || 1}</span>
-                <span className="bg-[#FDF6EC] dark:bg-[#1A1412] px-3 py-1.5 rounded-xl text-[#5D4037] dark:text-[#D7CCC8] border-2 border-[#8D6E63] dark:border-[#8D6E63] shadow-[0_2px_0_0_#8D6E63] dark:shadow-[0_2px_0_0_#8D6E63] font-black text-xs">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco} Choco</span>
-                <span className="bg-[#D7CCC8] dark:bg-[#3E2723] text-[#5D4037] dark:text-[#D4AF37] border-2 border-[#5D4037] dark:border-[#D4AF37] shadow-[0_2px_0_0_#5D4037] dark:shadow-[0_2px_0_0_#D4AF37] font-black px-3 py-1.5 rounded-xl text-xs">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : goldenChoco} Gchoco</span>
+                <span className="bg-[#FDF6EC] dark:bg-[#1A1412] px-3 py-1.5 rounded-xl text-[#5D4037] dark:text-[#D7CCC8] border-2 border-[#8D6E63] dark:border-[#8D6E63] shadow-[0_2px_0_0_#8D6E63] dark:shadow-[0_2px_0_0_#8D6E63] font-black text-xs">{choco} Choco</span>
+                <span className="bg-[#D7CCC8] dark:bg-[#3E2723] text-[#5D4037] dark:text-[#D4AF37] border-2 border-[#5D4037] dark:border-[#D4AF37] shadow-[0_2px_0_0_#5D4037] dark:shadow-[0_2px_0_0_#D4AF37] font-black px-3 py-1.5 rounded-xl text-xs">{goldenChoco} Gchoco</span>
               </div>
 
               {/* Notification Bell */}
