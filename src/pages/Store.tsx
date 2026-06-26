@@ -553,10 +553,7 @@ export function Store() {
               Choco
             </span>
             <span className="text-sm font-bold bg-[#FDF6EC] text-[#3E2723] px-3 py-1 rounded-full border border-[#8D6E63]">
-              {email?.toLowerCase() === "cucnau01@gmail.com" ||
-              firebaseUser?.email?.toLowerCase() === "cucnau01@gmail.com"
-                ? "∞"
-                : choco}
+              {choco}
             </span>
           </div>
           <div className="w-px h-8 bg-[#8D6E63]"></div>
@@ -565,10 +562,7 @@ export function Store() {
               Gchoco
             </span>
             <span className="text-sm font-bold bg-[#D4AF37]/20 text-[#D4AF37] px-3 py-1 rounded-full border border-[#D4AF37]/50">
-              {email?.toLowerCase() === "cucnau01@gmail.com" ||
-              firebaseUser?.email?.toLowerCase() === "cucnau01@gmail.com"
-                ? "∞"
-                : goldenChoco}
+              {goldenChoco}
             </span>
           </div>
         </div>
