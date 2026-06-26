@@ -553,12 +553,12 @@ export function Account() {
               <div className="w-full bg-[#FDF6EC] dark:bg-[#34221A] rounded-2xl p-4 border-2 border-[#3E2723] flex items-center justify-between">
                  <div className="flex flex-col items-center flex-1">
                     <span className="text-[9px] uppercase font-black tracking-widest text-[#8D6E63] dark:text-stone-400 mb-1">Choco</span>
-                    <span className="font-black text-[#3E2723] dark:text-white text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : choco}</span>
+                    <span className="font-black text-[#3E2723] dark:text-white text-lg">{choco}</span>
                  </div>
                  <div className="w-[3px] h-8 bg-[#3E2723]/30 rounded-full"></div>
                  <div className="flex flex-col items-center flex-1">
                     <span className="text-[9px] uppercase font-black tracking-widest text-[#D4AF37] mb-1">Gchoco</span>
-                    <span className="font-black text-[#D4AF37] text-lg">{(email?.toLowerCase() === 'cucnau01@gmail.com' || firebaseUser?.email?.toLowerCase() === 'cucnau01@gmail.com') ? '∞' : goldenChoco}</span>
+                    <span className="font-black text-[#D4AF37] text-lg">{goldenChoco}</span>
                   </div>
                </div>
 
