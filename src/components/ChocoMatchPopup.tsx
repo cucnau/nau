@@ -95,28 +95,25 @@ const playCrunchSound = () => {
       window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioContext) return;
     const ctx = new AudioContext();
-    const bufferSize = ctx.sampleRate * 0.15; // 150ms
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
-    }
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
 
-    const bandpass = ctx.createBiquadFilter();
-    bandpass.type = "bandpass";
-    bandpass.frequency.value = 800 + Math.random() * 400; // randomize pitch
-
+    const osc = ctx.createOscillator();
     const gainNode = ctx.createGain();
-    gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+
+    // Cute pop / plop sound
+    osc.type = "sine";
+    const baseFreq = 500 + Math.random() * 300; 
+    osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, ctx.currentTime + 0.1);
+
+    gainNode.gain.setValueAtTime(0, ctx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.015);
     gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
 
-    noise.connect(bandpass);
-    bandpass.connect(gainNode);
+    osc.connect(gainNode);
     gainNode.connect(ctx.destination);
 
-    noise.start();
+    osc.start();
+    osc.stop(ctx.currentTime + 0.15);
   } catch (e) {}
 };
 
@@ -2344,7 +2341,6 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                   <div
                     style={{
                       width: `min(100%, calc(85vh - ${activeInGameBooster ? "215px" : "170px"}))`,
-                      height: `min(100%, calc(85vh - ${activeInGameBooster ? "215px" : "170px"}))`
                     }}
                     className="bg-[#2C2C2C] rounded-2xl relative shadow-[inset_0_10px_20px_rgba(0,0,0,0.5),0_10px_20px_rgba(62,39,35,0.2)] border-8 border-[#1A1A1A] shrink-0 aspect-square"
                   >
@@ -2378,7 +2374,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                       )}
 
                       {/* Ingredient Collection Zone Arrows */}
-                      <div className="absolute bottom-[-14px] left-0 right-0 h-4 flex justify-between pointer-events-none z-20 px-[2.5%]">
+                      <div className="absolute bottom-[-14px] left-0 right-0 h-4 flex pointer-events-none z-20">
                         {Array.from({ length: BOARD_SIZE }).map((_, col) => (
                           <div key={col} className="w-[12.5%] flex flex-col items-center justify-center animate-bounce" style={{ animationDuration: "1.5s" }}>
                             <span className="text-[10px] sm:text-xs font-black text-[#81C784] drop-shadow-[0_1.5px_2px_rgba(0,0,0,0.95)]">▼</span>
