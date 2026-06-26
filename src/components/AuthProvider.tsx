@@ -172,25 +172,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 updates.choco = 9999999;
                 updates.goldenChoco = 9999999;
               }
-              
-              // Evict choco_cute achievement from admin account
-              let unlocked = Array.isArray(data.unlockedAchievements) ? [...data.unlockedAchievements] : [];
-              let claimed = Array.isArray(data.claimedAchievements) ? [...data.claimedAchievements] : [];
-              let needsEvict = false;
-              if (unlocked.includes('choco_cute')) {
-                unlocked = unlocked.filter((id: string) => id !== 'choco_cute');
-                needsEvict = true;
-              }
-              if (claimed.includes('choco_cute')) {
-                claimed = claimed.filter((id: string) => id !== 'choco_cute');
-                needsEvict = true;
-              }
-              if (needsEvict) {
-                updates.unlockedAchievements = unlocked;
-                updates.claimedAchievements = claimed;
-                data.unlockedAchievements = unlocked;
-                data.claimedAchievements = claimed;
-              }
 
               if (Object.keys(updates).length > 0) {
                 try {
