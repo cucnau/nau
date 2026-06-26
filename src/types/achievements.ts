@@ -10,12 +10,12 @@ export interface Achievement {
 }
 
 export const ACHIEVEMENT_CATEGORIES = [
-  { id: 'all', name: 'Tất Cả' },
   { id: 'reading', name: 'Đọc Truyện' },
   { id: 'community', name: 'Cộng Đồng' },
-  { id: 'collection', name: 'Cửa Hàng & Sưu Tầm' },
-  { id: 'challenge', name: 'Điểm Danh & Nhiệm Vụ' },
-  { id: 'legend', name: 'Huyền Thoại & Tài Sản' }
+  { id: 'gaming', name: 'Mini-game & Giải Trí' },
+  { id: 'economy', name: 'Tài Sản & Gacha' },
+  { id: 'activity', name: 'Hoạt Động' },
+  { id: 'legend', name: 'Huyền Thoại' }
 ];
 
 export const ACHIEVEMENTS_LIST: Achievement[] = [
@@ -77,7 +77,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 10,
     goldenReward: 0,
     progressTarget: 10,
-    category: 'collection'
+    category: 'reading'
   },
   {
     id: 'sticker_collector',
@@ -87,7 +87,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 30,
     goldenReward: 0,
     progressTarget: 30,
-    category: 'collection'
+    category: 'economy'
   },
   {
     id: 'big_spender',
@@ -97,7 +97,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 100,
     goldenReward: 0,
     progressTarget: 10000,
-    category: 'collection'
+    category: 'economy'
   },
   {
     id: 'blogger_choco_new',
@@ -147,7 +147,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 7,
     goldenReward: 0,
     progressTarget: 7,
-    category: 'challenge'
+    category: 'activity'
   },
   {
     id: 'monthly_checkin',
@@ -157,7 +157,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 30,
     goldenReward: 0,
     progressTarget: 30,
-    category: 'challenge'
+    category: 'activity'
   },
   {
     id: 'weekly_missions_perfect',
@@ -167,7 +167,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 10,
     goldenReward: 0,
     progressTarget: 7,
-    category: 'challenge'
+    category: 'activity'
   },
   {
     id: 'generous_donor',
@@ -177,7 +177,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 5,
     goldenReward: 0,
     progressTarget: 1,
-    category: 'legend'
+    category: 'community'
   },
   {
     id: 'choco_king',
@@ -247,7 +247,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 50,
     goldenReward: 0,
     progressTarget: 500,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'chucu_an_sang',
@@ -257,7 +257,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 0,
     goldenReward: 10,
     progressTarget: 100,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'chucu_master_100',
@@ -267,7 +267,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 100,
     goldenReward: 0,
     progressTarget: 100,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'chucu_fashion_5',
@@ -277,7 +277,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 50,
     goldenReward: 0,
     progressTarget: 5,
-    category: 'collection'
+    category: 'economy'
   },
   {
     id: 'choco_catch_no_miss',
@@ -287,7 +287,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 20,
     goldenReward: 0,
     progressTarget: 20,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'choco_rain_1000',
@@ -297,7 +297,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 100,
     goldenReward: 0,
     progressTarget: 1000,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'choco_rain_5000',
@@ -307,7 +307,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 500,
     goldenReward: 0,
     progressTarget: 5000,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'choco_rain_10000',
@@ -317,7 +317,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 1000,
     goldenReward: 0,
     progressTarget: 10000,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'gold_choco_perfect',
@@ -327,7 +327,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 0,
     goldenReward: 5,
     progressTarget: 5,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'dodge_negative_perfect',
@@ -337,7 +337,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 0,
     goldenReward: 5,
     progressTarget: 5,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'radio_night_chill',
@@ -347,7 +347,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 10,
     goldenReward: 0,
     progressTarget: 30,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'radio_one_track_love',
@@ -357,7 +357,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 10,
     goldenReward: 0,
     progressTarget: 60,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'radio_universe_explorer',
@@ -367,7 +367,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 0,
     goldenReward: 1,
     progressTarget: 10,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'radio_track_switches',
@@ -377,7 +377,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 15,
     goldenReward: 0,
     progressTarget: 15,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'gacha_first_pull_5star',
@@ -387,7 +387,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 0,
     goldenReward: 5,
     progressTarget: 1,
-    category: 'challenge'
+    category: 'economy'
   },
   {
     id: 'choco_kientri',
@@ -397,7 +397,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 0,
     goldenReward: 0,
     progressTarget: 90,
-    category: 'challenge'
+    category: 'economy'
   },
   {
     id: 'choco_suutam',
@@ -407,7 +407,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 0,
     goldenReward: 0,
     progressTarget: 100,
-    category: 'challenge'
+    category: 'economy'
   },
   {
     id: 'gacha_double_4star',
@@ -417,7 +417,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 20,
     goldenReward: 0,
     progressTarget: 1,
-    category: 'challenge'
+    category: 'economy'
   },
   {
     id: 'choco_destroyer',
@@ -427,7 +427,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 100,
     goldenReward: 0,
     progressTarget: 100000,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'choco_color_bomb',
@@ -437,7 +437,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 100,
     goldenReward: 0,
     progressTarget: 10000,
-    category: 'challenge'
+    category: 'gaming'
   },
   {
     id: 'choco_special_combo',
@@ -447,7 +447,7 @@ export const ACHIEVEMENTS_LIST: Achievement[] = [
     chocoReward: 100,
     goldenReward: 0,
     progressTarget: 10000,
-    category: 'challenge'
+    category: 'gaming'
   }
 ];
 
