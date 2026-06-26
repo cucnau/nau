@@ -237,12 +237,31 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
     chocoMatchWinStreak,
     chocoMatchHearts,
     chocoMatchLastHeartTick,
+    chocoMatchTilesDestroyed,
+    chocoMatchColorBombsCreated,
+    chocoMatchSpecialCombos,
     updateChocoMatchState,
     choco,
     spendChoco,
     addChoco,
     addGoldenChoco,
   } = useStore();
+
+  const sessionStats = useRef({
+    tilesDestroyed: 0,
+    colorBombsCreated: 0,
+    specialCombos: 0,
+  });
+
+  const commitSessionStats = (extraUpdates: any = {}) => {
+    updateChocoMatchState({
+      ...extraUpdates,
+      chocoMatchTilesDestroyed: (chocoMatchTilesDestroyed || 0) + sessionStats.current.tilesDestroyed,
+      chocoMatchColorBombsCreated: (chocoMatchColorBombsCreated || 0) + sessionStats.current.colorBombsCreated,
+      chocoMatchSpecialCombos: (chocoMatchSpecialCombos || 0) + sessionStats.current.specialCombos,
+    });
+    sessionStats.current = { tilesDestroyed: 0, colorBombsCreated: 0, specialCombos: 0 };
+  };
 
   const [viewMode, setViewMode] = useState<ViewMode>("map");
   const [currentPlayingLevel, setCurrentPlayingLevel] = useState(1);
@@ -794,6 +813,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
             color: "rainbow",
             special: "color_bomb",
           });
+          sessionStats.current.colorBombsCreated += 1;
         } else if (hline.length === 4) {
           const target = swapContext
             ? hline.find(
@@ -836,6 +856,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
             color: "rainbow",
             special: "color_bomb",
           });
+          sessionStats.current.colorBombsCreated += 1;
         } else if (vline.length === 4) {
           const target = swapContext
             ? vline.find(
@@ -1333,6 +1354,8 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 
       setBoard([...boardState]);
       setScore((s) => s + finalMatchedIds.size * 10);
+      sessionStats.current.tilesDestroyed += finalMatchedIds.size;
+      
       if (finalMatchedIds.size > 0) playCrunchSound();
 
       await new Promise((resolve) => setTimeout(resolve, 300));
@@ -1514,7 +1537,9 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
     const swapContext = { r1: t1.row, c1: t1.col, r2: t2.row, c2: t2.col };
     const matchResult = findMatchesAndSpecials(tempBoard, swapContext);
 
-    if (!isSpecialCombo) {
+    if (isSpecialCombo) {
+       sessionStats.current.specialCombos += 1;
+    } else {
       matchResult.matchedIds.forEach((id) => matchedIds.add(id));
     }
 
@@ -1751,11 +1776,22 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
   };
 
   const winGame = () => {
+    let nextLevel = chocoMatchLevel;
     if (currentPlayingLevel === chocoMatchLevel) {
-      updateChocoMatchState({ chocoMatchLevel: chocoMatchLevel + 1 });
+      nextLevel = chocoMatchLevel + 1;
     }
-    updateChocoMatchState({ chocoMatchWinStreak: chocoMatchWinStreak + 1 });
-    addChoco(3);
+    commitSessionStats({ 
+      chocoMatchLevel: nextLevel,
+      chocoMatchWinStreak: chocoMatchWinStreak + 1 
+    });
+    
+    const diffName = getLevelDifficulty(currentPlayingLevel).name;
+    let chocoReward = 1; // Default for Dễ, Hướng dẫn, etc.
+    if (diffName === "Khó" || diffName === "Thử Thách") chocoReward = 2;
+    if (diffName === "Siêu Khó") chocoReward = 3;
+    
+    addChoco(chocoReward);
+    
     if (currentPlayingLevel % 10 === 0) addGoldenChoco(1);
     setViewMode("map");
   };
@@ -2051,7 +2087,9 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
               <button
                 onClick={() => {
                   if (gameState === "playing") {
-                    updateChocoMatchState({ chocoMatchWinStreak: 0 });
+                    commitSessionStats({ chocoMatchWinStreak: 0 });
+                  } else {
+                    commitSessionStats();
                   }
                   setViewMode("map");
                 }}
@@ -2121,7 +2159,9 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
               <button
                 onClick={() => {
                   if (gameState === "playing") {
-                    updateChocoMatchState({ chocoMatchWinStreak: 0 });
+                    commitSessionStats({ chocoMatchWinStreak: 0 });
+                  } else {
+                    commitSessionStats();
                   }
                   onClose();
                 }}
@@ -2251,7 +2291,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                             const i_k = (Math.PI / 2 + k * Math.PI) / 0.9;
                             if (i_k > maxLevels - 1.5) return null;
                             
-                            const y = mapHeight - 250 - i_k * 110 - 90;
+                            const y = mapHeight - 250 - i_k * 110 - 150;
                             
                             // When k is even, path offset is positive (right), so the empty space is on the left.
                             const isLeft = k % 2 === 0;
@@ -2689,7 +2729,12 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                               Phần thưởng
                             </span>
                             <span className="font-bold text-[#8D6E63]">
-                              +3 Choco
+                              +{(() => {
+                                const diffName = getLevelDifficulty(currentPlayingLevel).name;
+                                if (diffName === "Siêu Khó") return 3;
+                                if (diffName === "Khó" || diffName === "Thử Thách") return 2;
+                                return 1;
+                              })()} Choco
                             </span>
                           </div>
                         </div>
@@ -2725,7 +2770,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                         </p>
                         <button
                           onClick={() => {
-                            updateChocoMatchState({ chocoMatchWinStreak: 0 });
+                            commitSessionStats({ chocoMatchWinStreak: 0 });
                             setViewMode("map");
                           }}
                           className="w-full py-4 bg-[#F44336] hover:bg-[#E53935] text-white rounded-xl font-bold text-lg shadow-[0_4px_0_0_#C62828] active:translate-y-1 active:shadow-none transition-all"
