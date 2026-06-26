@@ -136,7 +136,10 @@ interface UserState {
   chocoMatchWinStreak: number;
   chocoMatchHearts: number;
   chocoMatchLastHeartTick: number | null;
-  updateChocoMatchState: (updates: Partial<{ chocoMatchLevel: number; chocoMatchWinStreak: number; chocoMatchHearts: number; chocoMatchLastHeartTick: number | null }>) => void;
+  chocoMatchTilesDestroyed: number;
+  chocoMatchColorBombsCreated: number;
+  chocoMatchSpecialCombos: number;
+  updateChocoMatchState: (updates: Partial<{ chocoMatchLevel: number; chocoMatchWinStreak: number; chocoMatchHearts: number; chocoMatchLastHeartTick: number | null; chocoMatchTilesDestroyed: number; chocoMatchColorBombsCreated: number; chocoMatchSpecialCombos: number }>) => void;
 
   isGachaOpen: boolean;
   setGachaOpen: (open: boolean) => void;
@@ -308,6 +311,10 @@ export const getPermanentMissions = (): Mission[] => {
    for (let i = 1; i <= 10; i++) {
        res.push({ id: `p_level_${i}`, type: 'permanent', description: `Đạt level ${i * 10}`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 10, completed: false, claimed: false });
    }
+   // Choco Match Level (100, 200...)
+   for (let i = 1; i <= 100; i++) {
+       res.push({ id: `p_chocomatchlvl_${i}`, type: 'permanent', description: `Vượt qua level ${i * 100} trên Sông Choco`, chocoReward: i * 100, goldenReward: i * 10, progress: 0, target: i * 100, completed: false, claimed: false });
+   }
    // Bình luận (50, 100...)
    for (let i = 1; i <= 20; i++) {
        res.push({ id: `p_comm_${i}`, type: 'permanent', description: `Bình luận truyện ${i * 50} lần`, chocoReward: i * 50, goldenReward: i * 5, progress: 0, target: i * 50, completed: false, claimed: false });
@@ -377,6 +384,9 @@ export const useStore = create<UserState>()(
       chocoMatchWinStreak: 0,
       chocoMatchHearts: 5,
       chocoMatchLastHeartTick: null,
+      chocoMatchTilesDestroyed: 0,
+      chocoMatchColorBombsCreated: 0,
+      chocoMatchSpecialCombos: 0,
 
       // Chucu Game & Radio default states
       isChucuGameOpen: false,
@@ -901,6 +911,10 @@ export const useStore = create<UserState>()(
          if (state.isLoggedIn && state.uid) {
             state.updateUserDoc(updates);
          }
+         
+         setTimeout(() => {
+            get()._triggerCountAchievementsCheck();
+         }, 50);
       },
 
       updateChucuStats: (stats) => {
@@ -2179,6 +2193,8 @@ export const useStore = create<UserState>()(
                  newProg = state.totalCommentsCount || 0;
              } else if (p.id.startsWith('p_level_')) {
                  newProg = state.level || 1;
+             } else if (p.id.startsWith('p_chocomatchlvl_')) {
+                 newProg = (state.chocoMatchLevel || 1) - 1;
              } else if (p.id.startsWith('p_gacha_')) {
                  newProg = state.totalGachaPulls || 0;
              } else if (p.id.startsWith('p_catch_')) {
@@ -2218,6 +2234,18 @@ export const useStore = create<UserState>()(
 
          if (!currentUnlocked.includes('choco_high_level') && (state.level || 1) >= 100) {
             get().unlockAchievement('choco_high_level');
+         }
+         
+         if (!currentUnlocked.includes('choco_destroyer') && (state.chocoMatchTilesDestroyed || 0) >= 100000) {
+            get().unlockAchievement('choco_destroyer');
+         }
+         
+         if (!currentUnlocked.includes('choco_color_bomb') && (state.chocoMatchColorBombsCreated || 0) >= 10000) {
+            get().unlockAchievement('choco_color_bomb');
+         }
+         
+         if (!currentUnlocked.includes('choco_special_combo') && (state.chocoMatchSpecialCombos || 0) >= 10000) {
+            get().unlockAchievement('choco_special_combo');
          }
          
          // 5. Vua Choco: total earned choco >= 10000
