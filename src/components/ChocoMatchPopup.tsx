@@ -885,14 +885,14 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 
         if (tile.special === "striped_h") {
           boardToCheck.forEach((t) => {
-            if (t.row === tile.row && !matched.has(t.id)) {
+            if (t.row === tile.row && !matched.has(t.id) && t.type !== "cherry" && t.type !== "hazelnut") {
               matched.add(t.id);
               queue.push(t.id);
             }
           });
         } else if (tile.special === "striped_v") {
           boardToCheck.forEach((t) => {
-            if (t.col === tile.col && !matched.has(t.id)) {
+            if (t.col === tile.col && !matched.has(t.id) && t.type !== "cherry" && t.type !== "hazelnut") {
               matched.add(t.id);
               queue.push(t.id);
             }
@@ -906,7 +906,9 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                 Math.abs(t.row - tile.row) <= 1 &&
                 Math.abs(t.col - tile.col) <= 1 &&
                 t.id !== tile.id &&
-                !matched.has(t.id)
+                !matched.has(t.id) &&
+                t.type !== "cherry" &&
+                t.type !== "hazelnut"
               ) {
                 matched.add(t.id);
                 queue.push(t.id);
@@ -921,7 +923,9 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
               if (
                 Math.abs(t.row - tile.row) <= 1 &&
                 Math.abs(t.col - tile.col) <= 1 &&
-                !matched.has(t.id)
+                !matched.has(t.id) &&
+                t.type !== "cherry" &&
+                t.type !== "hazelnut"
               ) {
                 matched.add(t.id);
                 queue.push(t.id);
@@ -939,7 +943,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
             ? activeColors[Math.floor(Math.random() * activeColors.length)]
             : COLORS[0];
           boardToCheck.forEach((t) => {
-            if (t.color === randomColor && !matched.has(t.id) && t.blocker === "none") {
+            if (t.color === randomColor && !matched.has(t.id) && t.blocker === "none" && t.type !== "cherry" && t.type !== "hazelnut") {
               matched.add(t.id);
               queue.push(t.id);
             }
@@ -947,11 +951,11 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
           matched.add(tile.id);
         } else if (tile.special === "fish") {
           // Fish selects 3 random tiles with blockers/locks, or just random tiles if none
-          let targets: TileData[] = boardToCheck.filter((t) => t.id !== tile.id && !matched.has(t.id) && (t.blocker !== "none" || t.isLocked));
+          let targets: TileData[] = boardToCheck.filter((t) => t.id !== tile.id && !matched.has(t.id) && t.type !== "cherry" && t.type !== "hazelnut" && (t.blocker !== "none" || t.isLocked));
           if (targets.length < 3) {
             // Priority 2: cells with foil under them
             const foilCells = foilBoard.filter(f => f.foil > 0);
-            const foilTiles = boardToCheck.filter(t => t.id !== tile.id && !matched.has(t.id) && foilCells.some(f => f.row === t.row && f.col === t.col));
+            const foilTiles = boardToCheck.filter(t => t.id !== tile.id && !matched.has(t.id) && t.type !== "cherry" && t.type !== "hazelnut" && foilCells.some(f => f.row === t.row && f.col === t.col));
             foilTiles.forEach(t => {
               if (targets.length < 3 && !targets.some(x => x.id === t.id)) {
                 targets.push(t);
@@ -960,7 +964,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
           }
           if (targets.length < 3) {
             // Priority 3: standard candies
-            const ordinaryTiles = boardToCheck.filter((t) => t.id !== tile.id && !matched.has(t.id) && t.blocker === "none");
+            const ordinaryTiles = boardToCheck.filter((t) => t.id !== tile.id && !matched.has(t.id) && t.type !== "cherry" && t.type !== "hazelnut" && t.blocker === "none");
             ordinaryTiles.forEach(t => {
               if (targets.length < 3 && !targets.some(x => x.id === t.id)) {
                 targets.push(t);
@@ -985,7 +989,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                 (stType === "striped_v" && t.col === tile.col) ||
                 (stType === "striped_h" && t.row === tile.row)
               ) {
-                if (!matched.has(t.id)) {
+                if (!matched.has(t.id) && t.type !== "cherry" && t.type !== "hazelnut") {
                   matched.add(t.id);
                   queue.push(t.id);
                 }
@@ -997,7 +1001,9 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
               if (
                 Math.abs(t.row - tile.row) <= 1 &&
                 Math.abs(t.col - tile.col) <= 1 &&
-                !matched.has(t.id)
+                !matched.has(t.id) &&
+                t.type !== "cherry" &&
+                t.type !== "hazelnut"
               ) {
                 matched.add(t.id);
                 queue.push(t.id);
@@ -1007,7 +1013,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
             // Color bomb: clear a whole color!
             const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
             boardToCheck.forEach((t) => {
-              if (t.color === randomColor && !matched.has(t.id) && t.blocker === "none") {
+              if (t.color === randomColor && !matched.has(t.id) && t.blocker === "none" && t.type !== "cherry" && t.type !== "hazelnut") {
                 matched.add(t.id);
                 queue.push(t.id);
               }
@@ -1227,7 +1233,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
             // Special blocker explosions on destruction
             if (t.blocker === "mixer") {
               boardState.forEach((other) => {
-                if ((other.row === t.row || other.col === t.col) && !other.isMatched && other.id !== t.id) {
+                if (other.type !== "cherry" && other.type !== "hazelnut" && (other.row === t.row || other.col === t.col) && !other.isMatched && other.id !== t.id) {
                   other.isMatched = true;
                   if (other.color !== "none") {
                     matchedColors[other.color] = (matchedColors[other.color] || 0) + 1;
@@ -1236,7 +1242,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
               });
             } else if (t.blocker === "cake_bomb") {
               boardState.forEach((other) => {
-                if (!other.isMatched && other.id !== t.id) {
+                if (other.type !== "cherry" && other.type !== "hazelnut" && !other.isMatched && other.id !== t.id) {
                   other.isMatched = true;
                   if (other.color !== "none") {
                     matchedColors[other.color] = (matchedColors[other.color] || 0) + 1;
@@ -1426,7 +1432,11 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
 
     if (t1.special === "color_bomb" && t2.special === "color_bomb") {
       // Clear whole board
-      tempBoard.forEach((t) => matchedIds.add(t.id));
+      tempBoard.forEach((t) => {
+        if (t.type !== "cherry" && t.type !== "hazelnut") {
+          matchedIds.add(t.id);
+        }
+      });
       isSpecialCombo = true;
     } else if (t1.special === "color_bomb" || t2.special === "color_bomb") {
       const bomb = t1.special === "color_bomb" ? t1 : t2;
@@ -1439,7 +1449,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
       ) {
         // Change all tiles of target.color to random horizontal/vertical stripes so they blast in both directions
         tempBoard.forEach((t) => {
-          if (t.color === target.color && t.blocker === "none") {
+          if (t.color === target.color && t.blocker === "none" && t.type !== "cherry" && t.type !== "hazelnut") {
             t.special = Math.random() > 0.5 ? "striped_h" : "striped_v";
             matchedIds.add(t.id);
           }
@@ -1447,7 +1457,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
       } else if (target.special === "wrapped") {
         // Change all tiles of target.color to wrapped
         tempBoard.forEach((t) => {
-          if (t.color === target.color && t.blocker === "none") {
+          if (t.color === target.color && t.blocker === "none" && t.type !== "cherry" && t.type !== "hazelnut") {
             t.special = "wrapped";
             matchedIds.add(t.id);
           }
@@ -1455,7 +1465,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
       } else {
         // Just clear all tiles of that color
         tempBoard.forEach((t) => {
-          if (t.color === target.color) matchedIds.add(t.id);
+          if (t.color === target.color && t.type !== "cherry" && t.type !== "hazelnut") matchedIds.add(t.id);
         });
       }
       isSpecialCombo = true;
@@ -1471,7 +1481,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
       const row = t2.row;
       const col = t2.col;
       tempBoard.forEach((t) => {
-        if (Math.abs(t.row - row) <= 1 || Math.abs(t.col - col) <= 1) {
+        if ((Math.abs(t.row - row) <= 1 || Math.abs(t.col - col) <= 1) && t.type !== "cherry" && t.type !== "hazelnut") {
           matchedIds.add(t.id);
         }
       });
@@ -1486,7 +1496,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
       const row = t2.row;
       const col = t2.col;
       tempBoard.forEach((t) => {
-        if (t.row === row || t.col === col) matchedIds.add(t.id);
+        if ((t.row === row || t.col === col) && t.type !== "cherry" && t.type !== "hazelnut") matchedIds.add(t.id);
       });
       isSpecialCombo = true;
     } else if (t1.special === "wrapped" && t2.special === "wrapped") {
@@ -1496,7 +1506,7 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
       const row = t2.row;
       const col = t2.col;
       tempBoard.forEach((t) => {
-        if (Math.abs(t.row - row) <= 2 && Math.abs(t.col - col) <= 2)
+        if (Math.abs(t.row - row) <= 2 && Math.abs(t.col - col) <= 2 && t.type !== "cherry" && t.type !== "hazelnut")
           matchedIds.add(t.id);
       });
       isSpecialCombo = true;
