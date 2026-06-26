@@ -2183,147 +2183,228 @@ export const ChocoMatchPopup: React.FC<{ onClose: () => void }> = ({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 overflow-y-auto bg-[#FFF8E7] custom-scrollbar scroll-smooth"
+                className="absolute inset-0 overflow-y-auto custom-scrollbar scroll-smooth bg-[#FFF8E1]"
                 style={{
-                  backgroundImage: "radial-gradient(#D7CCC8 2px, transparent 2px)",
+                  backgroundImage: `radial-gradient(#D7CCC8 3px, transparent 3px)`,
                   backgroundSize: "30px 30px"
                 }}
               >
                 {(() => {
                   const maxLevels = Math.max(50, chocoMatchLevel + 20);
                   const mapHeight = maxLevels * 110 + 300;
+                  
+                  const points = Array.from({ length: maxLevels }).map((_, i) => {
+                    const y = mapHeight - 250 - i * 110;
+                    const offset = Math.sin(i * 0.9) * 110;
+                    return { x: 200 + offset, y };
+                  });
+
+                  let pathData = `M ${points[0].x} ${points[0].y + 100}`;
+                  for (let i = 0; i < points.length; i++) {
+                    const curr = points[i];
+                    if (i === 0) {
+                       pathData += ` L ${curr.x} ${curr.y}`;
+                    } else {
+                      const prev = points[i - 1];
+                      pathData += ` C ${prev.x} ${prev.y - 55}, ${curr.x} ${curr.y + 55}, ${curr.x} ${curr.y}`;
+                    }
+                  }
+
+                  let riverPath = `M ${200 + Math.sin(-1 * 0.9) * 110 - 40} ${mapHeight}`;
+                  for (let i = 0; i < points.length; i++) {
+                    const curr = points[i];
+                    const offset = Math.sin(i * 0.9 - 1.5) * 120 - 30; // phase shifted river
+                    const x = 200 + offset;
+                    if (i === 0) {
+                      riverPath += ` L ${x} ${curr.y}`;
+                    } else {
+                      const prevY = points[i - 1].y;
+                      riverPath += ` C ${200 + Math.sin((i-1) * 0.9 - 1.5) * 120 - 30} ${prevY - 55}, ${x} ${curr.y + 55}, ${x} ${curr.y}`;
+                    }
+                  }
+
                   return (
-                    <div className="relative w-full" style={{ height: `${mapHeight}px` }}>
+                    <div className="relative w-full overflow-hidden" style={{ height: `${mapHeight}px` }}>
+                      
+                      {/* SVG Background Layer */}
+                      <div className="absolute inset-0 pointer-events-none flex justify-center">
+                        <svg width="400" height={mapHeight} viewBox={`0 0 400 ${mapHeight}`} className="overflow-visible">
+                          {/* Shadow for river */}
+                          <path d={riverPath} stroke="#3E2723" strokeWidth="60" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" transform="translate(0, 4)" />
+                          {/* Main chocolate river */}
+                          <path d={riverPath} stroke="#5D4037" strokeWidth="50" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                          {/* Chocolate river highlights */}
+                          <path d={riverPath} stroke="#6D4C41" strokeWidth="15" strokeDasharray="30 40" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+                          
+                          {/* Path Shadow */}
+                          <path d={pathData} stroke="#795548" strokeWidth="18" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.4" transform="translate(0, 4)" />
+                          {/* Main Path (Wafer/Biscuit color) */}
+                          <path d={pathData} stroke="#FFE0B2" strokeWidth="18" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d={pathData} stroke="#FFB300" strokeWidth="10" strokeDasharray="15 15" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </div>
+
                       {/* Decor elements */}
-                      {Array.from({ length: Math.floor(mapHeight / 180) }).map((_, i) => {
-                        const y = 100 + i * 180;
-                        const isLeft = i % 2 === 0;
-                        const emojis = ['🍩', '🍫', '☕', '🥐', '🧁', '🍰', '🍬', '🍭', '🍪', '🍧'];
-                        const emoji = emojis[i % emojis.length];
-                        return (
-                          <div
-                            key={`decor-${i}`}
-                            className={`absolute text-5xl opacity-30 drop-shadow-sm ${isLeft ? 'left-8 rotate-12' : 'right-8 -rotate-12'}`}
-                            style={{ top: `${y}px`, zIndex: 1 }}
-                          >
-                            {emoji}
-                          </div>
-                        );
-                      })}
+                      <div className="absolute inset-0 pointer-events-none flex justify-center z-0">
+                        <div className="relative w-[400px]" style={{ height: `${mapHeight}px` }}>
+                          {Array.from({ length: Math.floor((maxLevels * 0.9) / Math.PI) }).map((_, k) => {
+                            const i_k = (Math.PI / 2 + k * Math.PI) / 0.9;
+                            if (i_k > maxLevels - 1.5) return null;
+                            
+                            const y = mapHeight - 250 - i_k * 110 - 90;
+                            
+                            // When k is even, path offset is positive (right), so the empty space is on the left.
+                            const isLeft = k % 2 === 0;
+                            const x = isLeft ? 50 : 350;
+                            
+                            const houseType = k % 3;
+                            
+                            const HouseSVG = ({ type }: { type: number }) => {
+                              if (type === 0) return (
+                                <svg viewBox="0 0 100 100" className="w-32 h-32 sm:w-40 sm:h-40 drop-shadow-2xl overflow-visible pointer-events-auto">
+                                  <path d="M25 90 L15 60 h70 L75 90 Z" fill="#FFCC80" />
+                                  <path d="M25 60 L32 90 M35 60 L40 90 M45 60 L48 90 M55 60 L52 90 M65 60 L60 90 M75 60 L68 90" stroke="#EF6C00" strokeWidth="1.5" fill="none" opacity="0.6" />
+                                  <path d="M42 90 v-15 a 8 8 0 0 1 16 0 v15 z" fill="#5D4037" />
+                                  <circle cx="54" cy="82" r="2" fill="#FFD54F" />
+                                  <path d="M10 65 C 5 35, 25 15, 50 15 C 75 15, 95 35, 90 65 C 95 75, 80 75, 75 65 C 70 75, 60 75, 55 65 C 50 75, 40 75, 35 65 C 30 75, 20 75, 15 65 C 10 75, -5 75, 10 65 Z" fill="#F8BBD0" />
+                                  <circle cx="50" cy="10" r="8" fill="#D32F2F" />
+                                  <path d="M50 2 C 55 -5, 65 0, 70 10" stroke="#795548" strokeWidth="2" fill="none" />
+                                  <rect x="35" y="35" width="6" height="2" fill="#FFF" transform="rotate(30 35 35)" />
+                                  <rect x="65" y="30" width="6" height="2" fill="#4CAF50" transform="rotate(-45 65 30)" />
+                                  <rect x="50" y="45" width="6" height="2" fill="#2196F3" transform="rotate(15 50 45)" />
+                                </svg>
+                              );
+                              if (type === 1) return (
+                                <svg viewBox="0 0 100 100" className="w-32 h-32 sm:w-40 sm:h-40 drop-shadow-2xl overflow-visible pointer-events-auto">
+                                  <rect x="20" y="45" width="60" height="45" fill="#FFE0B2" rx="2" />
+                                  <path d="M20 55 H80 M20 65 H80 M20 75 H80 M20 85 H80" stroke="#FFB300" strokeWidth="1.5" opacity="0.5" />
+                                  <path d="M30 45 V90 M40 45 V90 M50 45 V90 M60 45 V90 M70 45 V90" stroke="#FFB300" strokeWidth="1.5" opacity="0.5" />
+                                  <rect x="40" y="70" width="20" height="20" fill="#4E342E" />
+                                  <circle cx="50" cy="55" r="8" fill="#FFF" />
+                                  <path d="M44 49 L56 61 M56 49 L44 61 M50 47 V63 M42 55 H58" stroke="#E53935" strokeWidth="1.5" />
+                                  <circle cx="50" cy="55" r="8" fill="none" stroke="#E53935" strokeWidth="1" />
+                                  <path d="M10 50 Q 30 20 50 20 Q 70 20 90 50 Q 80 55 70 45 Q 60 55 50 45 Q 40 55 30 45 Q 20 55 10 50 Z" fill="#A5D6A7" />
+                                  <circle cx="35" cy="30" r="6" fill="#EC407A" />
+                                  <circle cx="65" cy="30" r="6" fill="#29B6F6" />
+                                </svg>
+                              );
+                              return (
+                                <svg viewBox="0 0 100 100" className="w-32 h-32 sm:w-40 sm:h-40 drop-shadow-2xl overflow-visible pointer-events-auto">
+                                  <path d="M15 80 A 35 35 0 0 1 85 80 Z" fill="#E1BEE7" />
+                                  <path d="M25 80 v10 h50 v-10 Z" fill="#FFE0B2" />
+                                  <rect x="42" y="75" width="16" height="15" fill="#8D6E63" rx="2" />
+                                  <path d="M15 80 Q 25 90 35 80 T 50 80 T 65 80 T 85 80 Q 75 65 50 65 Q 25 65 15 80" fill="#81D4FA" opacity="0.8" />
+                                  <path d="M50 45 L53 35 L63 35 L55 28 L58 18 L50 24 L42 18 L45 28 L37 35 L47 35 Z" fill="#FFF59D" />
+                                  <circle cx="35" cy="55" r="4" fill="#5C6BC0" />
+                                  <circle cx="65" cy="55" r="4" fill="#FF8A65" />
+                                </svg>
+                              );
+                            };
+
+                            return (
+                              <div
+                                key={`decor-${k}`}
+                                className="absolute transition-transform hover:scale-105 -translate-x-1/2 -translate-y-1/2"
+                                style={{ top: `${y}px`, left: `${x}px` }}
+                              >
+                                <div style={{ transform: isLeft ? 'rotate(-3deg)' : 'rotate(3deg) scaleX(-1)' }}>
+                                  <HouseSVG type={houseType} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
 
                       {/* Chocolate Shop (Bottom) */}
-                      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-48 h-48 bg-[#6D4C41] rounded-3xl border-8 border-[#4E342E] shadow-2xl flex flex-col items-center justify-center z-10 overflow-hidden">
+                      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-48 h-48 bg-[#6D4C41] rounded-[40px] border-8 border-[#4E342E] shadow-[0_10px_25px_rgba(62,39,35,0.5)] flex flex-col items-center justify-center z-10 overflow-hidden transform hover:scale-105 transition-transform">
                         <div className="absolute top-0 w-full flex">
-                          <div className="flex-1 h-6 bg-red-400 rounded-b-full"></div>
-                          <div className="flex-1 h-6 bg-white rounded-b-full"></div>
-                          <div className="flex-1 h-6 bg-red-400 rounded-b-full"></div>
-                          <div className="flex-1 h-6 bg-white rounded-b-full"></div>
+                          <div className="flex-1 h-8 bg-[#EF5350] rounded-b-full shadow-sm"></div>
+                          <div className="flex-1 h-8 bg-[#FAFAFA] rounded-b-full shadow-sm"></div>
+                          <div className="flex-1 h-8 bg-[#EF5350] rounded-b-full shadow-sm"></div>
+                          <div className="flex-1 h-8 bg-[#FAFAFA] rounded-b-full shadow-sm"></div>
                         </div>
-                        <span className="text-4xl mt-4">🏪</span>
-                        <span className="font-bold text-[#FFECB3] mt-2 text-center text-sm px-2">Choco Factory</span>
+                        <span className="text-5xl mt-6 drop-shadow-md">🏪</span>
+                        <div className="bg-[#3E2723] px-4 py-1.5 rounded-xl border-2 border-[#5D4037] mt-3 shadow-inner">
+                          <span className="font-black text-[#FFECB3] text-sm tracking-widest uppercase">Choco Town</span>
+                        </div>
                       </div>
 
                       {/* Levels */}
-                      {Array.from({ length: maxLevels }).map((_, i) => {
+                      {points.map((pt, i) => {
                         const lvl = i + 1;
                         const isUnlocked = lvl <= chocoMatchLevel;
                         const isCurrent = lvl === chocoMatchLevel;
-                        const y = mapHeight - 250 - i * 110; // Bottom to top
-                        const offset = Math.sin(i * 0.9) * 90; // Zig-zag amplitude
-
-                        let lineSegment = null;
-                        if (i < maxLevels - 1) {
-                          const nextY = mapHeight - 250 - (i + 1) * 110;
-                          const nextOffset = Math.sin((i + 1) * 0.9) * 90;
-                          const dx = nextOffset - offset;
-                          const dy = nextY - y;
-                          const length = Math.sqrt(dx * dx + dy * dy);
-                          const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-
-                          lineSegment = (
-                            <div
-                              className="absolute"
-                              style={{
-                                left: `calc(50% + ${offset}px)`,
-                                top: `${y}px`,
-                                width: `${length}px`,
-                                height: '10px',
-                                borderBottom: '6px dashed #8D6E63',
-                                transformOrigin: '0 0',
-                                transform: `rotate(${angle}deg)`,
-                                zIndex: 0,
-                                opacity: isUnlocked ? 0.9 : 0.3
-                              }}
-                            />
-                          );
-                        }
-
+                        
                         return (
-                          <React.Fragment key={lvl}>
-                            {lineSegment}
-                            <div
-                              id={`level-btn-${lvl}`}
-                              className="absolute flex flex-col items-center justify-center -translate-x-1/2 -translate-y-1/2"
-                              style={{ left: `calc(50% + ${offset}px)`, top: `${y}px`, zIndex: 10 }}
-                        >
-                          {isCurrent && (
-                            <div className="absolute -top-12 animate-bounce bg-[#FF5252] text-white text-[10px] font-black px-3 py-1.5 rounded-xl shadow-lg border-2 border-white whitespace-nowrap z-30">
-                              CHƠI NGAY
-                              <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-[#FF5252] border-b-2 border-r-2 border-white rotate-45" />
-                            </div>
-                          )}
-                          <button
-                            onClick={() => isUnlocked && setSelectedLevelForIntro(lvl)}
-                            disabled={!isUnlocked}
-                            className={`w-16 h-16 rounded-full flex items-center justify-center border-4 shadow-[0_6px_0_rgba(0,0,0,0.2)] transition-all active:translate-y-1 active:shadow-[0_2px_0_rgba(0,0,0,0.2)] cursor-pointer ${
-                              isCurrent
-                                ? "scale-110 z-20 border-[#FFF8E7] bg-gradient-to-b from-[#FFD54F] to-[#FFA000] ring-4 ring-[#8D6E63]"
-                                : isUnlocked
-                                ? (() => {
-                                    const diff = getLevelDifficulty(lvl);
-                                    if (diff.name === "Siêu Khó") return "border-red-900 bg-gradient-to-b from-red-400 to-red-600 hover:brightness-110";
-                                    if (diff.name === "Khó") return "border-purple-900 bg-gradient-to-b from-purple-400 to-purple-600 hover:brightness-110";
-                                    if (diff.name === "Thử Thách") return "border-amber-800 bg-gradient-to-b from-amber-400 to-amber-600 hover:brightness-110";
-                                    return "border-[#5D4037] bg-gradient-to-b from-[#EFEBE9] to-[#D7CCC8] hover:brightness-110";
-                                  })()
-                                : "border-[#A1887F] bg-[#D7CCC8] opacity-60"
-                            }`}
+                          <div
+                            key={lvl}
+                            id={`level-btn-${lvl}`}
+                            className="absolute flex flex-col items-center justify-center -translate-x-1/2 -translate-y-1/2"
+                            style={{ left: `calc(50% + ${pt.x - 200}px)`, top: `${pt.y}px`, zIndex: 10 }}
                           >
-                            {isUnlocked ? (
-                              <span className={`font-black text-2xl drop-shadow-sm ${
-                                isCurrent
-                                  ? "text-[#3E2723]"
-                                  : (() => {
-                                      const name = getLevelDifficulty(lvl).name;
-                                      return name === "Dễ" ? "text-[#5D4037]" : "text-white";
-                                    })()
-                              }`}>
-                                {lvl}
-                              </span>
-                            ) : (
-                              <Lock className="w-6 h-6 text-[#8D6E63]" />
+                            {isCurrent && (
+                              <div className="absolute -top-12 animate-bounce bg-[#FF5252] text-white text-[10px] font-black px-3 py-1.5 rounded-xl shadow-lg border-2 border-white whitespace-nowrap z-30">
+                                CHƠI NGAY
+                                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-[#FF5252] border-b-2 border-r-2 border-white rotate-45" />
+                              </div>
                             )}
-                          </button>
+                            <button
+                              onClick={() => isUnlocked && setSelectedLevelForIntro(lvl)}
+                              disabled={!isUnlocked}
+                              className={`w-16 h-16 rounded-full flex items-center justify-center border-4 shadow-[0_6px_0_rgba(0,0,0,0.2)] transition-all active:translate-y-1 active:shadow-[0_2px_0_rgba(0,0,0,0.2)] cursor-pointer relative ${
+                                isCurrent
+                                  ? "scale-110 z-20 border-[#FFF8E7] bg-gradient-to-b from-[#FFD54F] to-[#FFA000] ring-4 ring-[#8D6E63]"
+                                  : isUnlocked
+                                  ? (() => {
+                                      const diff = getLevelDifficulty(lvl);
+                                      if (diff.name === "Siêu Khó") return "border-red-900 bg-gradient-to-b from-red-400 to-red-600 hover:brightness-110";
+                                      if (diff.name === "Khó") return "border-purple-900 bg-gradient-to-b from-purple-400 to-purple-600 hover:brightness-110";
+                                      if (diff.name === "Thử Thách") return "border-amber-800 bg-gradient-to-b from-amber-400 to-amber-600 hover:brightness-110";
+                                      return "border-[#5D4037] bg-gradient-to-b from-[#EFEBE9] to-[#D7CCC8] hover:brightness-110";
+                                    })()
+                                  : "border-[#A1887F] bg-[#D7CCC8] opacity-60"
+                              }`}
+                            >
+                              {/* Shiny inner highlight */}
+                              <div className="absolute top-1 left-2 w-4 h-4 bg-white/40 rounded-full blur-[1px]"></div>
+                              
+                              {isUnlocked ? (
+                                <span className={`font-black text-2xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)] ${
+                                  isCurrent
+                                    ? "text-[#3E2723]"
+                                    : (() => {
+                                        const name = getLevelDifficulty(lvl).name;
+                                        return name === "Dễ" ? "text-[#5D4037]" : "text-white";
+                                      })()
+                                }`}>
+                                  {lvl}
+                                </span>
+                              ) : (
+                                <Lock className="w-6 h-6 text-[#8D6E63]" />
+                              )}
+                            </button>
 
-                          {/* Hard Level Indicator (Purple) */}
-                          {lvl % 10 === 0 && lvl % 25 !== 0 && (
-                            <div className="absolute -right-2 -bottom-2 w-7 h-7 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center text-xs shadow-md z-20">
-                              😈
-                            </div>
-                          )}
-                          {/* Super Hard Level Indicator (Red) */}
-                          {lvl % 25 === 0 && (
-                            <div className="absolute -left-2 -bottom-2 w-8 h-8 bg-red-600 rounded-full border-2 border-white flex items-center justify-center text-sm shadow-md z-20 animate-pulse">
-                              🔥
-                            </div>
-                          )}
-                        </div>
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-                );
-              })()}
+                            {/* Hard Level Indicator (Purple) */}
+                            {lvl % 10 === 0 && lvl % 25 !== 0 && (
+                              <div className="absolute -right-2 -bottom-2 w-8 h-8 bg-purple-500 rounded-full border-2 border-white flex items-center justify-center text-sm shadow-md z-20">
+                                😈
+                              </div>
+                            )}
+                            {/* Super Hard Level Indicator (Red) */}
+                            {lvl % 25 === 0 && (
+                              <div className="absolute -left-2 -bottom-2 w-9 h-9 bg-red-600 rounded-full border-2 border-white flex items-center justify-center text-base shadow-md z-20 animate-pulse">
+                                🔥
+                              </div>
+                            )}
+                            
+                            {/* Star ratings if we had them, can be added later */}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </motion.div>
             )}
 
