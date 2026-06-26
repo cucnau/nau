@@ -468,6 +468,8 @@ export const useStore = create<UserState>()(
       prevActiveWeek: '',
       activeTitle: null,
       setActiveTitle: (title) => {
+         const state = get();
+         if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
          set({ activeTitle: title });
          get().updateUserDoc({ activeTitle: title });
       },
@@ -772,8 +774,8 @@ export const useStore = create<UserState>()(
             allUsersOwnedStickers: newAllStickers,
             allUsersOwnedAccessories: newAllAccessories,
             isFirebaseSynced: true,
-            choco: data.choco !== undefined ? data.choco : state.choco,
-            goldenChoco: data.goldenChoco !== undefined ? data.goldenChoco : state.goldenChoco,
+            choco: typeof data.choco === 'number' ? data.choco : (typeof state.choco === 'number' ? state.choco : 0),
+            goldenChoco: typeof data.goldenChoco === 'number' ? data.goldenChoco : (typeof state.goldenChoco === 'number' ? state.goldenChoco : 0),
             level: data.level !== undefined ? data.level : state.level,
             exp: data.exp !== undefined ? data.exp : state.exp,
             checkInStreak: data.checkInStreak !== undefined ? data.checkInStreak : state.checkInStreak,
@@ -832,8 +834,8 @@ export const useStore = create<UserState>()(
             chocoMatchHearts: data.chocoMatchHearts !== undefined ? data.chocoMatchHearts : state.chocoMatchHearts,
             chocoMatchLastHeartTick: data.chocoMatchLastHeartTick !== undefined ? data.chocoMatchLastHeartTick : state.chocoMatchLastHeartTick,
 
-            unlockedAchievements: data.unlockedAchievements !== undefined ? data.unlockedAchievements : state.unlockedAchievements,
-            claimedAchievements: data.claimedAchievements !== undefined ? data.claimedAchievements : state.claimedAchievements,
+            unlockedAchievements: Array.isArray(data.unlockedAchievements) ? data.unlockedAchievements : (Array.isArray(state.unlockedAchievements) ? state.unlockedAchievements : []),
+            claimedAchievements: Array.isArray(data.claimedAchievements) ? data.claimedAchievements : (Array.isArray(state.claimedAchievements) ? state.claimedAchievements : []),
             totalEarnedChoco: data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco,
             totalEarnedGChoco: data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco,
             totalSpentChoco: totalSpentChocoFallback,
@@ -915,6 +917,7 @@ export const useStore = create<UserState>()(
       updateUserDoc: async (updates: any, transactionReason?: string) => {
          const state = get();
          const uid = state.uid;
+         if (!uid || !state.isFirebaseSynced) return;
          
          // Luon cap nhat Zustand State cuc bo ngay va luon de luu xuong LocalStorage tuc thi
          set((currentState) => {
@@ -1059,7 +1062,7 @@ export const useStore = create<UserState>()(
       checkIn: () => {
         get()._checkResetMissions();
         const state = get();
-        if (!state.isLoggedIn) return;
+        if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
         
         const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
         if (state.lastCheckInDate === todayStr) return; // Already checked in
@@ -1177,6 +1180,7 @@ export const useStore = create<UserState>()(
       
       addChoco: (amount, reason = "Nhận Choco") => {
           const state = get();
+          if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
           const newChoco = state.choco + amount;
           const newTotalEarned = (state.totalEarnedChoco || 0) + amount;
           
@@ -1189,6 +1193,7 @@ export const useStore = create<UserState>()(
       },
       addGoldenChoco: (amount, reason = "Nhận GChoco") => {
           const state = get();
+          if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
           const newGolden = state.goldenChoco + amount;
           const newTotalEarnedG = (state.totalEarnedGChoco || 0) + amount;
           
@@ -1201,6 +1206,7 @@ export const useStore = create<UserState>()(
       },
       spendChoco: (amount, reason = "Dùng Choco") => {
           const state = get();
+          if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return false;
           if (state.choco >= amount) {
               const newChoco = state.choco - amount;
               const newTotalSpent = (state.totalSpentChoco || 0) + amount;
@@ -1217,6 +1223,7 @@ export const useStore = create<UserState>()(
       },
       spendGoldenChoco: (amount, reason = "Dùng GChoco") => {
           const state = get();
+          if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return false;
           if (state.goldenChoco >= amount) {
               const newTotalSpent = (state.totalSpentChoco || 0) + (amount * 3);
               set({ goldenChoco: state.goldenChoco - amount, totalSpentChoco: newTotalSpent });
@@ -1234,7 +1241,7 @@ export const useStore = create<UserState>()(
       markStoryRead: (storyId, chapterOrder, genres) => {
         get()._checkResetMissions();
         const state = get();
-        if (!state.isLoggedIn) return;
+        if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
         
         const prevProgress = state.storyProgress[storyId];
         let currentArray: number[] = [];
@@ -1336,7 +1343,7 @@ export const useStore = create<UserState>()(
       addCommentProgress: () => {
          get()._checkResetMissions();
          const state = get();
-         if (!state.isLoggedIn) return;
+         if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
          const ms = [...state.missions];
          
          const dComm = ms.find(m => m.id === 'd3');
@@ -2034,7 +2041,7 @@ export const useStore = create<UserState>()(
 
       incrementSentMessages: () => {
          const state = get();
-         if (!state.isLoggedIn) return;
+         if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
          const newCount = (state.sentMessagesCount || 0) + 1;
          set({ sentMessagesCount: newCount });
          get().updateUserDoc({ sentMessagesCount: newCount });
