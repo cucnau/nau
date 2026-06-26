@@ -67,8 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             
             const newUser = {
               uid: user.uid,
-              choco: isEditor ? 9999999 : localChoco,
-              goldenChoco: isEditor ? 9999999 : localGChoco,
+              choco: localChoco,
+              goldenChoco: localGChoco,
               level: localLevel,
               exp: localExp,
               createdAt: serverTimestamp(),
@@ -83,8 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               // Initializing Achievements and Active Points fields
               unlockedAchievements: state.unlockedAchievements || [],
               claimedAchievements: state.claimedAchievements || [],
-              totalEarnedChoco: isEditor ? 9999999 : (state.totalEarnedChoco || 0),
-              totalEarnedGChoco: isEditor ? 9999999 : (state.totalEarnedGChoco || 0),
+              totalEarnedChoco: state.totalEarnedChoco || 0,
+              totalEarnedGChoco: state.totalEarnedGChoco || 0,
               totalSpentChoco: state.totalSpentChoco || 0,
               totalCheckIns: localTotalCheckIns,
               perfectDailyDates: state.perfectDailyDates || [],
@@ -164,21 +164,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 try {
                   await setDoc(userRef, { isBanned: false, banExpiresAt: null }, { merge: true });
                 } catch(e) {}
-              }
-            }
-            if (user.email?.toLowerCase() === 'cucnau01@gmail.com') {
-              const updates: any = {};
-              if (data.choco < 999999 || data.goldenChoco < 999999) {
-                updates.choco = 9999999;
-                updates.goldenChoco = 9999999;
-              }
-
-              if (Object.keys(updates).length > 0) {
-                try {
-                  await setDoc(userRef, updates, { merge: true });
-                } catch (e) {
-                  console.error('Error updating admin doc', e);
-                }
               }
             }
 
