@@ -139,6 +139,121 @@ export function Admin() {
     action: () => void;
   } | null>(null);
 
+  const [restorationLogs, setRestorationLogs] = useState<string[]>([]);
+  const [isRestoring, setIsRestoring] = useState(false);
+
+  const runChocoRestoration = async () => {
+    setIsRestoring(true);
+    setRestorationLogs(["Bắt đầu tiến trình quét và khôi phục Choco/Thành tựu cho tất cả thành viên..."]);
+    try {
+      const usersSnap = await getDocs(collection(db, "users"));
+      const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+      setRestorationLogs(prev => [...prev, `Tìm thấy ${users.length} thành viên.`]);
+
+      let restoredCount = 0;
+
+      for (const u of users) {
+        setRestorationLogs(prev => [...prev, `Đang xử lý tài khoản: ${u.displayName || u.email || u.id}...`]);
+        
+        const txSnap = await getDocs(collection(db, `users/${u.id}/transactions`));
+        const txs = txSnap.docs.map(doc => doc.data());
+        
+        let calculatedEarnedChoco = 0;
+        let calculatedEarnedGChoco = 0;
+        let calculatedSpentChoco = 0;
+        let calculatedSpentGChoco = 0;
+        const restoredAchievements = new Set<string>();
+
+        txs.forEach(t => {
+          const amt = Number(t.amount) || 0;
+          if (t.currency === 'choco') {
+            if (t.type === 'earn') {
+              calculatedEarnedChoco += amt;
+            } else if (t.type === 'spend') {
+              calculatedSpentChoco += amt;
+            }
+          } else if (t.currency === 'gchoco') {
+            if (t.type === 'earn') {
+              calculatedEarnedGChoco += amt;
+            } else if (t.type === 'spend') {
+              calculatedSpentGChoco += amt;
+            }
+          }
+
+          const match = t.reason && t.reason.match(/Nhận thưởng thành tựu:\s*(.+)/);
+          if (match) {
+            const achName = match[1].trim();
+            const foundAch = ACHIEVEMENTS_LIST.find(a => a.name.trim().toLowerCase() === achName.toLowerCase());
+            if (foundAch) {
+              restoredAchievements.add(foundAch.id);
+            }
+          }
+        });
+
+        const calculatedCurrentChoco = Math.max(0, calculatedEarnedChoco - calculatedSpentChoco);
+        const calculatedCurrentGChoco = Math.max(0, calculatedEarnedGChoco - calculatedSpentGChoco);
+
+        const updates: any = {};
+        let changed = false;
+
+        if (calculatedCurrentChoco > (u.choco || 0)) {
+          updates.choco = calculatedCurrentChoco;
+          changed = true;
+        }
+        if (calculatedCurrentGChoco > (u.goldenChoco || 0)) {
+          updates.goldenChoco = calculatedCurrentGChoco;
+          changed = true;
+        }
+        if (calculatedEarnedChoco > (u.totalEarnedChoco || 0)) {
+          updates.totalEarnedChoco = calculatedEarnedChoco;
+          changed = true;
+        }
+        if (calculatedEarnedGChoco > (u.totalEarnedGChoco || 0)) {
+          updates.totalEarnedGChoco = calculatedEarnedGChoco;
+          changed = true;
+        }
+        if (calculatedSpentChoco > (u.totalSpentChoco || 0)) {
+          updates.totalSpentChoco = calculatedSpentChoco;
+          changed = true;
+        }
+
+        const currentUnlocked = Array.isArray(u.unlockedAchievements) ? u.unlockedAchievements : [];
+        const currentClaimed = Array.isArray(u.claimedAchievements) ? u.claimedAchievements : [];
+
+        const missingUnlocked = [...restoredAchievements].filter(id => !currentUnlocked.includes(id));
+        const missingClaimed = [...restoredAchievements].filter(id => !currentClaimed.includes(id));
+
+        if (missingUnlocked.length > 0) {
+          updates.unlockedAchievements = Array.from(new Set([...currentUnlocked, ...missingUnlocked]));
+          changed = true;
+        }
+        if (missingClaimed.length > 0) {
+          updates.claimedAchievements = Array.from(new Set([...currentClaimed, ...missingClaimed]));
+          changed = true;
+        }
+
+        if (changed) {
+          await updateDoc(doc(db, "users", u.id), updates);
+          restoredCount++;
+          let logStr = `➡️ Đã khôi phục thành công: `;
+          if (updates.choco !== undefined) logStr += `${updates.choco} Choco (tăng từ ${u.choco || 0}), `;
+          if (updates.goldenChoco !== undefined) logStr += `${updates.goldenChoco} GChoco (tăng từ ${u.goldenChoco || 0}), `;
+          if (missingUnlocked.length > 0) logStr += `Khôi phục ${missingUnlocked.length} thành tựu (${missingUnlocked.join(", ")}), `;
+          setRestorationLogs(prev => [...prev, logStr.replace(/,\s*$/, "")]);
+        } else {
+          setRestorationLogs(prev => [...prev, `✅ Tài khoản ${u.displayName || u.email || u.id} khớp dữ liệu, không cần khôi phục.`]);
+        }
+      }
+
+      setRestorationLogs(prev => [...prev, `🎉 HOÀN THÀNH TRUY QUÉT! Đã sửa đổi khôi phục ${restoredCount} tài khoản thành viên.`]);
+    } catch (err: any) {
+      console.error(err);
+      setRestorationLogs(prev => [...prev, `❌ Thất bại: ${err.message || err}`]);
+    } finally {
+      setIsRestoring(false);
+    }
+  };
+
   // Stories Management
   const [stories, setStories] = useState<Book[]>([]);
   const [title, setTitle] = useState("");
@@ -2546,6 +2661,43 @@ export function Admin() {
             >
               {isMaintenance ? "Tắt Bảo Trì" : "Bật Bảo Trì"}
             </button>
+          </div>
+
+          <div className="p-6 rounded-2xl border-2 flex flex-col gap-6 bg-[#FDF6EC] dark:bg-[#1A1412] border-[#3E2723]/10 dark:border-[#4E342E]/30 transition-all">
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-2">
+                <Award className="w-6 h-6 text-[#8D6E63] dark:text-[#A1887F]" />
+                Truy quét & Khôi phục Lịch sử Choco / Thành Tựu
+              </h3>
+              <p className="text-[#5D4037] dark:text-[#A1887F] text-sm">
+                Công cụ này sẽ tự động duyệt toàn bộ tài khoản người dùng, phân tích chi tiết lịch sử giao dịch (transactions) trong Firestore để tính toán lại chính xác số lượng Choco, Golden Choco, và tự động khôi phục các thành tựu (claimed/unlocked achievements) đã đạt được cho người dùng nếu bị lỗi reset.
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={() => {
+                  setConfirmDialog({
+                    text: "Bạn có chắc chắn muốn chạy tiến trình TRUY QUÉT và KHÔI PHỤC Choco / Thành tựu cho tất cả người dùng không?",
+                    action: runChocoRestoration
+                  });
+                }}
+                disabled={isRestoring}
+                className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap self-start ${isRestoring ? 'bg-stone-500 cursor-not-allowed border-2 border-stone-800' : 'bg-[#C29D70] hover:bg-[#b08b5f] border-2 border-[#3E2723]'}`}
+              >
+                {isRestoring ? "Đang truy quét và khôi phục..." : "Chạy Tiến Trình Khôi Phục"}
+              </button>
+
+              {restorationLogs.length > 0 && (
+                <div className="p-4 rounded-xl bg-stone-900 text-stone-100 font-mono text-xs max-h-60 overflow-y-auto space-y-1">
+                  {restorationLogs.map((log, index) => (
+                    <div key={index} className={log.startsWith("❌") ? "text-red-400" : log.startsWith("🎉") ? "text-green-400" : log.startsWith("➡️") ? "text-amber-400" : "text-stone-300"}>
+                      {log}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
