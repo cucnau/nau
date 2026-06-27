@@ -41,7 +41,7 @@ import {
   Music,
   Dices,
 } from "lucide-react";
-import { ACHIEVEMENTS_LIST } from "../types/achievements";
+import { ACHIEVEMENTS_LIST, getGMT7Date } from "../types/achievements";
 
 interface Book {
   id: string;
@@ -144,7 +144,7 @@ export function Admin() {
 
   const runChocoRestoration = async () => {
     setIsRestoring(true);
-    setRestorationLogs(["Bắt đầu tiến trình quét và khôi phục Choco/Thành tựu cho tất cả thành viên..."]);
+    setRestorationLogs(["Bắt đầu tiến trình TRUY QUÉT TOÀN DIỆN và ĐỐI SOÁT khôi phục dữ liệu cho tất cả thành viên..."]);
     try {
       const usersSnap = await getDocs(collection(db, "users"));
       const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
@@ -153,12 +153,23 @@ export function Admin() {
       let restoredCount = 0;
 
       for (const u of users) {
-        setRestorationLogs(prev => [...prev, `----------------------------------------`, `🔍 Đang phân tích tài khoản: ${u.displayName || u.email || u.id}...`]);
+        setRestorationLogs(prev => [
+          ...prev, 
+          `--------------------------------------------------------------------------------`, 
+          `🔍 Đang phân tích & đối soát toàn diện: ${u.displayName || u.email || u.id}...`
+        ]);
         
+        // 1. Fetch subcollections
         const txSnap = await getDocs(collection(db, `users/${u.id}/transactions`));
         const txs = txSnap.docs.map(doc => doc.data());
         
-        // Sắp xếp các giao dịch theo thời gian tăng dần để phân tích vết
+        const stickersSnap = await getDocs(collection(db, `users/${u.id}/owned_stickers`));
+        const currentStickerUrls = new Set(stickersSnap.docs.map(doc => doc.data().url).filter(Boolean));
+        
+        const accessoriesSnap = await getDocs(collection(db, `users/${u.id}/owned_accessories`));
+        const currentAccessoryUrls = new Set(accessoriesSnap.docs.map(doc => doc.data().url).filter(Boolean));
+        
+        // Sort transactions ascending by timestamp
         const getTxTime = (tx: any) => {
           if (!tx.createdAt) return 0;
           if (typeof tx.createdAt.toMillis === 'function') return tx.createdAt.toMillis();
@@ -167,29 +178,107 @@ export function Admin() {
         };
         const sortedTxs = [...txs].sort((a, b) => getTxTime(a) - getTxTime(b));
 
+        // 2. Reconstruct balances & analyze activities
         let calculatedEarnedChoco = 0;
         let calculatedEarnedGChoco = 0;
         let calculatedSpentChoco = 0;
         let calculatedSpentGChoco = 0;
+        
+        let conversionEarnedGChoco = 0;
+        let adminGiftsChoco = 0;
+        let adminGiftsGChoco = 0;
+        
+        const txBoughtStickerUrls = new Set<string>();
+        const txBoughtAccessoryUrls = new Set<string>();
+        const txUnlockedChapters = new Set<string>();
+        const txUnlockedEarlyAccessChapters = new Set<string>();
         const restoredAchievements = new Set<string>();
+        const checkInDates = new Set<string>();
+        
+        let playCountChocoMatch = 0;
+        let playCountChucuGame = 0;
+        let gachaDrawCount = 0;
+        let commentsCount = 0;
 
         sortedTxs.forEach(t => {
           const amt = Number(t.amount) || 0;
+          const desc = t.description || t.reason || "";
+          const isSpecialEarn = desc.includes("Admin") || desc.includes("Tặng") || desc.includes("Quà") || desc.includes("gift") || desc.includes("Bù") || desc.includes("Khôi phục");
+          
           if (t.currency === 'choco') {
             if (t.type === 'earn') {
               calculatedEarnedChoco += amt;
+              if (isSpecialEarn) {
+                adminGiftsChoco += amt;
+              }
             } else if (t.type === 'spend') {
               calculatedSpentChoco += amt;
             }
           } else if (t.currency === 'gchoco') {
             if (t.type === 'earn') {
               calculatedEarnedGChoco += amt;
+              if (desc.includes("Đổi") || desc.includes("convert")) {
+                conversionEarnedGChoco += amt;
+              }
+              if (isSpecialEarn) {
+                adminGiftsGChoco += amt;
+              }
             } else if (t.type === 'spend') {
               calculatedSpentGChoco += amt;
             }
           }
 
-          const match = t.reason && t.reason.match(/Nhận thưởng thành tựu:\s*(.+)/);
+          // Check if this was a check-in
+          if (desc.includes("Điểm danh")) {
+            const tTime = getTxTime(t);
+            if (tTime) {
+               const dateStr = format(new Date(tTime), 'yyyy-MM-dd');
+               checkInDates.add(dateStr);
+            }
+          }
+
+          // Check if this is a game play
+          if (desc.includes("Choco Match") || desc.includes("Choco_Match") || desc.includes("ChocoMatch")) {
+            playCountChocoMatch++;
+          }
+          if (desc.includes("Chucu") || desc.includes("Hứng Choco") || desc.includes("Nuôi Chucu")) {
+            playCountChucuGame++;
+          }
+          if (desc.includes("Gacha")) {
+            gachaDrawCount++;
+          }
+          if (desc.includes("Bình luận") || desc.includes("comment")) {
+            commentsCount++;
+          }
+
+          // Detect Sticker/Accessory purchases from image URLs or names
+          const urlRegex = /(https?:\/\/[^\s]+)/g;
+          const urlMatches = desc.match(urlRegex);
+          if (urlMatches) {
+            urlMatches.forEach((url: string) => {
+              const cleanedUrl = url.trim();
+              if (cleanedUrl.includes("sticker") || cleanedUrl.includes("gacha") || cleanedUrl.includes("nhan_dan")) {
+                txBoughtStickerUrls.add(cleanedUrl);
+              } else if (cleanedUrl.includes("accessory") || cleanedUrl.includes("phu_kien") || cleanedUrl.includes("pet")) {
+                txBoughtAccessoryUrls.add(cleanedUrl);
+              }
+            });
+          }
+
+          // Parse explicit chapters
+          if (desc.includes("Mở khóa chương") || desc.includes("Mở khóa sớm")) {
+             const chapMatch = desc.match(/chương\s*([a-zA-Z0-9_\-]+)/i) || desc.match(/chapter\s*([a-zA-Z0-9_\-]+)/i);
+             if (chapMatch) {
+               if (desc.includes("sớm") || desc.includes("early")) {
+                 txUnlockedEarlyAccessChapters.add(chapMatch[1].trim());
+               } else {
+                 txUnlockedChapters.add(chapMatch[1].trim());
+               }
+             }
+          }
+
+          // Detect achievements
+          const match = desc.match(/Nhận thưởng thành tựu:\s*(.+)/);
           if (match) {
             const achName = match[1].trim();
             const foundAch = ACHIEVEMENTS_LIST.find(a => a.name.trim().toLowerCase() === achName.toLowerCase());
@@ -202,7 +291,7 @@ export function Admin() {
         const uChoco = u.choco || 0;
         const uGChoco = u.goldenChoco || 0;
 
-        // Tính toán số dư cuối cùng dựa trên giao dịch có balanceAfter cuối cùng cộng với các biến động sau đó
+        // Restore using last transaction with balanceAfter + following deltas
         let finalCalculatedChoco = uChoco;
         let lastChocoTxIndex = -1;
         for (let i = sortedTxs.length - 1; i >= 0; i--) {
@@ -273,16 +362,118 @@ export function Admin() {
           }
         }
 
-        setRestorationLogs(prev => [
-          ...prev,
-          `📊 Kết quả phân tích:`,
-          `   - Số dư DB hiện tại: ${uChoco.toLocaleString()} Choco / ${uGChoco.toLocaleString()} GChoco`,
-          `   - Lịch sử GD Choco: Earn +${calculatedEarnedChoco.toLocaleString()} / Spend -${calculatedSpentChoco.toLocaleString()}`,
-          `   - Lịch sử GD GChoco: Earn +${calculatedEarnedGChoco.toLocaleString()} / Spend -${calculatedSpentGChoco.toLocaleString()}`,
-          `   - Chỉ số GD choco cuối có balanceAfter: ${lastChocoTxIndex !== -1 ? `Index ${lastChocoTxIndex} (bal: ${sortedTxs[lastChocoTxIndex].balanceAfter})` : 'Không có'}`,
-          `   - Chỉ số GD gchoco cuối có balanceAfter: ${lastGChocoTxIndex !== -1 ? `Index ${lastGChocoTxIndex} (bal: ${sortedTxs[lastGChocoTxIndex].balanceAfter})` : 'Không có'}`,
-          `   => Kết quả khôi phục: ${finalCalculatedChoco.toLocaleString()} Choco / ${finalCalculatedGChoco.toLocaleString()} GChoco`
-        ]);
+        // Compute check-in streak dynamically from dates
+        const sortedCheckInDates = Array.from(checkInDates).sort().reverse();
+        let calculatedStreak = u.checkInStreak || 0;
+        
+        if (sortedCheckInDates.length > 0) {
+          const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
+          const yesterdayStr = format(new Date(getGMT7Date().getTime() - 24*60*60*1000), 'yyyy-MM-dd');
+          
+          let startStr = "";
+          if (sortedCheckInDates.includes(todayStr)) {
+            startStr = todayStr;
+          } else if (sortedCheckInDates.includes(yesterdayStr)) {
+            startStr = yesterdayStr;
+          }
+          
+          if (startStr !== "") {
+            let tempStreak = 0;
+            let currentCheck = new Date(startStr + 'T00:00:00Z');
+            while (true) {
+              const checkStr = format(currentCheck, 'yyyy-MM-dd');
+              if (sortedCheckInDates.includes(checkStr)) {
+                tempStreak++;
+                currentCheck = new Date(currentCheck.getTime() - 24*60*60*1000);
+              } else {
+                break;
+              }
+            }
+            calculatedStreak = Math.max(u.checkInStreak || 0, tempStreak);
+          }
+        }
+
+        // Reconstruct EXP and Level
+        const totalCheckIns = Math.max(u.totalCheckIns || 0, checkInDates.size);
+        const totalChaptersRead = u.totalChaptersRead || 0;
+        const totalComments = u.totalCommentsCount || 0;
+        const currentUnlockedAchievementsCount = (u.unlockedAchievements || []).length;
+        
+        // Est: 10 exp check-in, 3 exp reading, 5 exp comment, 30 exp achievements
+        const totalEstimatedExp = (totalCheckIns * 10) + (totalChaptersRead * 3) + (totalComments * 5) + (currentUnlockedAchievementsCount * 30);
+        
+        let calculatedLevel = 1;
+        let remainingExp = totalEstimatedExp;
+        while (true) {
+          const expNeeded = calculatedLevel * 100;
+          if (remainingExp >= expNeeded) {
+             remainingExp -= expNeeded;
+             calculatedLevel++;
+          } else {
+             break;
+          }
+        }
+        
+        if ((u.level || 1) > calculatedLevel) {
+          calculatedLevel = u.level || 1;
+          remainingExp = u.exp || 0;
+        }
+
+        // Evaluate achievements
+        const mergedUnlocked = new Set<string>(Array.isArray(u.unlockedAchievements) ? u.unlockedAchievements : []);
+        const mergedClaimed = new Set<string>(Array.isArray(u.claimedAchievements) ? u.claimedAchievements : []);
+        
+        if (totalChaptersRead >= 100) mergedUnlocked.add('read_100_chapters');
+        if (totalChaptersRead >= 500) mergedUnlocked.add('choco_mot_sach');
+        if (totalComments >= 100) mergedUnlocked.add('commenter_choco');
+        if (totalComments >= 500) mergedUnlocked.add('choco_tuong_tac');
+        if (calculatedStreak >= 7) mergedUnlocked.add('streak_7');
+        if (totalCheckIns >= 30) mergedUnlocked.add('monthly_checkin');
+        if (calculatedLevel >= 100) mergedUnlocked.add('choco_high_level');
+        if (calculatedEarnedChoco >= 10000) mergedUnlocked.add('choco_king');
+        if (calculatedEarnedGChoco >= 10000) mergedUnlocked.add('gchoco_king');
+        if (calculatedSpentChoco >= 10000) mergedUnlocked.add('big_spender');
+        if (stickersSnap.size >= 30) mergedUnlocked.add('sticker_collector');
+
+        restoredAchievements.forEach(id => {
+          mergedUnlocked.add(id);
+          mergedClaimed.add(id);
+        });
+
+        // Determine sticker and accessory gaps
+        const missingStickerUrlsToRestore = [...txBoughtStickerUrls].filter(url => !currentStickerUrls.has(url));
+        const missingAccessoryUrlsToRestore = [...txBoughtAccessoryUrls].filter(url => !currentAccessoryUrls.has(url));
+
+        // Compute claimed achievements rewards
+        const claimedAchievementsList = Array.from(mergedClaimed);
+        let claimedAchievementsChocoReward = 0;
+        let claimedAchievementsGChocoReward = 0;
+        claimedAchievementsList.forEach(achId => {
+          const ach = ACHIEVEMENTS_LIST.find(a => a.id === achId);
+          if (ach) {
+            claimedAchievementsChocoReward += ach.chocoReward || 0;
+            claimedAchievementsGChocoReward += ach.goldenReward || 0;
+          }
+        });
+
+        // Compute Verifiable Upper Bounds
+        const finalCheckInsCount = Math.max(u.totalCheckIns || 0, checkInDates.size);
+        const maxVerifiableChocoEarned = (finalCheckInsCount * 10) + claimedAchievementsChocoReward + (playCountChocoMatch * 15) + (playCountChucuGame * 15) + adminGiftsChoco + 300;
+        const maxVerifiableGChocoEarned = claimedAchievementsGChocoReward + Math.ceil(playCountChocoMatch / 10) + conversionEarnedGChoco + adminGiftsGChoco + 5;
+
+        let chocoCapped = false;
+        const originalCalculatedChoco = finalCalculatedChoco;
+        if (finalCalculatedChoco > maxVerifiableChocoEarned) {
+          finalCalculatedChoco = maxVerifiableChocoEarned;
+          chocoCapped = true;
+        }
+
+        let gchocoCapped = false;
+        const originalCalculatedGChoco = finalCalculatedGChoco;
+        if (finalCalculatedGChoco > maxVerifiableGChocoEarned) {
+          finalCalculatedGChoco = maxVerifiableGChocoEarned;
+          gchocoCapped = true;
+        }
 
         const updates: any = {};
         let changed = false;
@@ -296,47 +487,118 @@ export function Admin() {
           changed = true;
         }
         if (calculatedEarnedChoco !== (u.totalEarnedChoco || 0)) {
-          updates.totalEarnedChoco = calculatedEarnedChoco;
+          updates.totalEarnedChoco = Math.min(calculatedEarnedChoco, maxVerifiableChocoEarned);
           changed = true;
         }
         if (calculatedEarnedGChoco !== (u.totalEarnedGChoco || 0)) {
-          updates.totalEarnedGChoco = calculatedEarnedGChoco;
+          updates.totalEarnedGChoco = Math.min(calculatedEarnedGChoco, maxVerifiableGChocoEarned);
           changed = true;
         }
         if (calculatedSpentChoco !== (u.totalSpentChoco || 0)) {
           updates.totalSpentChoco = calculatedSpentChoco;
           changed = true;
         }
-
-        const currentUnlocked = Array.isArray(u.unlockedAchievements) ? u.unlockedAchievements : [];
-        const currentClaimed = Array.isArray(u.claimedAchievements) ? u.claimedAchievements : [];
-
-        const missingUnlocked = [...restoredAchievements].filter(id => !currentUnlocked.includes(id));
-        const missingClaimed = [...restoredAchievements].filter(id => !currentClaimed.includes(id));
-
-        if (missingUnlocked.length > 0) {
-          updates.unlockedAchievements = Array.from(new Set([...currentUnlocked, ...missingUnlocked]));
+        if (calculatedStreak !== (u.checkInStreak || 0)) {
+          updates.checkInStreak = calculatedStreak;
           changed = true;
         }
-        if (missingClaimed.length > 0) {
-          updates.claimedAchievements = Array.from(new Set([...currentClaimed, ...missingClaimed]));
+        if (totalCheckIns !== (u.totalCheckIns || 0)) {
+          updates.totalCheckIns = totalCheckIns;
           changed = true;
         }
+        if (calculatedLevel !== (u.level || 1)) {
+          updates.level = calculatedLevel;
+          changed = true;
+        }
+        if (remainingExp !== (u.exp || 0)) {
+          updates.exp = remainingExp;
+          changed = true;
+        }
+
+        // Story/Pass chapters
+        const uUnlockedChaps = Array.isArray(u.unlockedPassChapters) ? u.unlockedPassChapters : [];
+        const missingUnlockedChaps = [...txUnlockedChapters].filter(id => !uUnlockedChaps.includes(id));
+        if (missingUnlockedChaps.length > 0) {
+          updates.unlockedPassChapters = Array.from(new Set([...uUnlockedChaps, ...missingUnlockedChaps]));
+          changed = true;
+        }
+
+        const uUnlockedEarlyChaps = Array.isArray(u.unlockedEarlyAccessChapters) ? u.unlockedEarlyAccessChapters : [];
+        const missingEarlyChaps = [...txUnlockedEarlyAccessChapters].filter(id => !uUnlockedEarlyChaps.includes(id));
+        if (missingEarlyChaps.length > 0) {
+          updates.unlockedEarlyAccessChapters = Array.from(new Set([...uUnlockedEarlyChaps, ...missingEarlyChaps]));
+          changed = true;
+        }
+
+        // Achievements state
+        const currentUnlockedList = Array.from(mergedUnlocked);
+        const currentClaimedList = Array.from(mergedClaimed);
+        
+        const existingUnlocked = Array.isArray(u.unlockedAchievements) ? u.unlockedAchievements : [];
+        if (currentUnlockedList.length !== existingUnlocked.length || currentUnlockedList.some(id => !existingUnlocked.includes(id))) {
+          updates.unlockedAchievements = currentUnlockedList;
+          changed = true;
+        }
+        const existingClaimed = Array.isArray(u.claimedAchievements) ? u.claimedAchievements : [];
+        if (currentClaimedList.length !== existingClaimed.length || currentClaimedList.some(id => !existingClaimed.includes(id))) {
+          updates.claimedAchievements = currentClaimedList;
+          changed = true;
+        }
+
+        setRestorationLogs(prev => [
+          ...prev,
+          `📊 Báo cáo đối soát & kiểm định thực tế:`,
+          `   - Số dư DB hiện tại: ${uChoco.toLocaleString()} Choco / ${uGChoco.toLocaleString()} GChoco`,
+          `   - Số dư sau tái dựng (Từ GD): ${originalCalculatedChoco.toLocaleString()} Choco / ${originalCalculatedGChoco.toLocaleString()} GChoco`,
+          `   - Hạn mức thực tế tối đa (Minh chứng): ≤ ${maxVerifiableChocoEarned.toLocaleString()} Choco / ≤ ${maxVerifiableGChocoEarned.toLocaleString()} GChoco`,
+          chocoCapped || gchocoCapped
+            ? `   ⚠️ PHÁT HIỆN LỆCH BẤT THƯỜNG: Số dư tái dựng vượt quá minh chứng hoạt động thực tế! Đã áp trần bảo vệ thành công.`
+            : `   ✅ ĐỐI SOÁT HỢP LỆ: Số dư sau tái dựng khớp hoàn toàn trong giới hạn thực tế cho phép.`,
+          `   - Điểm danh ghi nhận: ${checkInDates.size} ngày. Chuỗi liên tục: ${calculatedStreak} ngày.`,
+          `   - Giao dịch: Gacha: ${gachaDrawCount} lượt, ChocoMatch: ${playCountChocoMatch} lượt, Chucu: ${playCountChucuGame} lượt.`,
+          `   - Đẳng cấp: Cấp ${calculatedLevel} (EXP tích lũy ước tính: ${totalEstimatedExp.toLocaleString()})`,
+          `   - Nhãn dán: Có trong túi: ${stickersSnap.size} / Phát hiện trong GD: ${txBoughtStickerUrls.size}`,
+          `   - Phụ kiện: Có trong túi: ${accessoriesSnap.size} / Phát hiện trong GD: ${txBoughtAccessoryUrls.size}`
+        ]);
 
         if (changed) {
           await updateDoc(doc(db, "users", u.id), updates);
+        }
+
+        // Re-add missing subcollection items
+        for (const sUrl of missingStickerUrlsToRestore) {
+          await addDoc(collection(db, "users", u.id, "owned_stickers"), {
+            url: sUrl,
+            createdAt: serverTimestamp()
+          });
+          setRestorationLogs(prev => [...prev, `   🎉 Đã khôi phục Nhãn dán: ${sUrl}`]);
+        }
+
+        for (const aUrl of missingAccessoryUrlsToRestore) {
+          await addDoc(collection(db, "users", u.id, "owned_accessories"), {
+            url: aUrl,
+            createdAt: serverTimestamp()
+          });
+          setRestorationLogs(prev => [...prev, `   🎉 Đã khôi phục Phụ kiện: ${aUrl}`]);
+        }
+
+        if (changed || missingStickerUrlsToRestore.length > 0 || missingAccessoryUrlsToRestore.length > 0) {
           restoredCount++;
-          let logStr = `➡️ 🎉 CẬP NHẬT THÀNH CÔNG: `;
-          if (updates.choco !== undefined) logStr += `${updates.choco.toLocaleString()} Choco (tăng từ ${uChoco.toLocaleString()}), `;
-          if (updates.goldenChoco !== undefined) logStr += `${updates.goldenChoco.toLocaleString()} GChoco (tăng từ ${uGChoco.toLocaleString()}), `;
-          if (missingUnlocked.length > 0) logStr += `Khôi phục ${missingUnlocked.length} thành tựu (${missingUnlocked.join(", ")}), `;
+          let logStr = `➡️ 🎉 ĐÃ KHÔI PHỤC TOÀN DIỆN THÀNH CÔNG: `;
+          if (updates.choco !== undefined) logStr += `${updates.choco.toLocaleString()} Choco, `;
+          if (updates.goldenChoco !== undefined) logStr += `${updates.goldenChoco.toLocaleString()} GChoco, `;
+          if (updates.level !== undefined) logStr += `Level ${updates.level}, `;
+          if (updates.checkInStreak !== undefined) logStr += `Chuỗi ${updates.checkInStreak} ngày, `;
+          if (missingStickerUrlsToRestore.length > 0) logStr += `Thêm ${missingStickerUrlsToRestore.length} Nhãn dán, `;
+          if (missingAccessoryUrlsToRestore.length > 0) logStr += `Thêm ${missingAccessoryUrlsToRestore.length} Phụ kiện, `;
+          if (missingUnlockedChaps.length > 0) logStr += `Bù ${missingUnlockedChaps.length} chương truyện, `;
           setRestorationLogs(prev => [...prev, logStr.replace(/,\s*$/, "")]);
         } else {
-          setRestorationLogs(prev => [...prev, `✅ Tài khoản khớp dữ liệu tối ưu, không có thay đổi nào cần cập nhật.`]);
+          setRestorationLogs(prev => [...prev, `✅ Trạng thái tài khoản này hoàn toàn chính xác.`]);
         }
       }
 
-      setRestorationLogs(prev => [...prev, `----------------------------------------`, `🎉 HOÀN THÀNH TRUY QUÉT TOÀN DIỆN! Đã xử lý và cập nhật thành công cho ${restoredCount} tài khoản.`]);
+      setRestorationLogs(prev => [...prev, `--------------------------------------------------------------------------------`, `🎉 HOÀN THÀNH TRUY QUÉT & KHÔI PHỤC TOÀN DIỆN! Đã xử lý & chuẩn hóa thành công ${restoredCount} tài khoản.`]);
     } catch (err: any) {
       console.error(err);
       setRestorationLogs(prev => [...prev, `❌ Thất bại: ${err.message || err}`]);
