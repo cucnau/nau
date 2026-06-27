@@ -160,8 +160,17 @@ export function Admin() {
             if (item.image) stickerRarities.set(item.image, 5);
           });
         }
+        if (b.featured5Star) {
+          const item = b.featured5Star;
+          if (item.image) stickerRarities.set(item.image, 5);
+        }
         if (b.pool4Star) {
           b.pool4Star.forEach((item: any) => {
+            if (item.image) stickerRarities.set(item.image, 4);
+          });
+        }
+        if (b.featured4Stars) {
+          b.featured4Stars.forEach((item: any) => {
             if (item.image) stickerRarities.set(item.image, 4);
           });
         }
@@ -579,70 +588,63 @@ export function Admin() {
         const minPullsFromStickers = sortedStickersWithRarity.length;
         const reconstructedTotalPulls = Math.max(u.totalGachaPulls || 0, maxPullsFromTxs, minPullsFromStickers);
 
-        let calculatedPity5 = u.gachaPity5Star !== undefined && u.gachaPity5Star !== null ? u.gachaPity5Star : 0;
-        let calculatedPity4 = u.gachaPity4Star !== undefined && u.gachaPity4Star !== null ? u.gachaPity4Star : 0;
+        let calculatedPity5 = 0;
+        let calculatedPity4 = 0;
+        const totalPulls = reconstructedTotalPulls;
+        const totalUniqueStickers = sortedStickersWithRarity.length;
         
-        // Chỉ ước tính/tái dựng nếu dữ liệu bảo hiểm (pity) chưa từng được ghi nhận trong cơ sở dữ liệu (ví dụ: tài khoản từ phiên bản cũ chưa có tính năng này)
-        if (u.gachaPity5Star === undefined || u.gachaPity5Star === null) {
-          const totalPulls = reconstructedTotalPulls;
-          const totalUniqueStickers = sortedStickersWithRarity.length;
-          
-          if (totalPulls > 0) {
-            if (totalUniqueStickers > 0) {
-              const last5StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(5);
-              if (last5StarIndex === -1) {
-                calculatedPity5 = totalPulls;
-              } else {
-                const stickersAfterLast5 = sortedStickersWithRarity.slice(last5StarIndex + 1);
-                const uniqueCountAfterLast5 = stickersAfterLast5.length;
-                const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
-                const estimatedPullsAfterLast5 = Math.round(uniqueCountAfterLast5 * pullsPerUniqueSticker);
-                calculatedPity5 = Math.max(uniqueCountAfterLast5, estimatedPullsAfterLast5);
-              }
-            } else {
-              calculatedPity5 = totalPulls;
-            }
-          }
-          calculatedPity5 = Math.min(calculatedPity5, 89);
+        // Tái dựng Bảo hiểm 5⭐ từ lịch sử nhãn dán
+        if (totalPulls > 0) {
           if (totalUniqueStickers > 0) {
-            const count5Star = sortedStickersWithRarity.filter(s => s.rarity === 5).length;
-            if (count5Star === 0 && totalPulls >= 90) {
-              calculatedPity5 = totalPulls % 90;
+            const last5StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(5);
+            if (last5StarIndex === -1) {
+              calculatedPity5 = totalPulls;
+            } else {
+              const stickersAfterLast5 = sortedStickersWithRarity.slice(last5StarIndex + 1);
+              const uniqueCountAfterLast5 = stickersAfterLast5.length;
+              const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+              const estimatedPullsAfterLast5 = Math.round(uniqueCountAfterLast5 * pullsPerUniqueSticker);
+              calculatedPity5 = Math.max(uniqueCountAfterLast5, estimatedPullsAfterLast5);
             }
-          } else if (totalPulls >= 90) {
-            calculatedPity5 = totalPulls % 90;
+          } else {
+            calculatedPity5 = totalPulls;
           }
         }
-
-        if (u.gachaPity4Star === undefined || u.gachaPity4Star === null) {
-          const totalPulls = reconstructedTotalPulls;
-          const totalUniqueStickers = sortedStickersWithRarity.length;
-          
-          if (totalPulls > 0) {
-            if (totalUniqueStickers > 0) {
-              const last4StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(4);
-              if (last4StarIndex === -1) {
-                calculatedPity4 = totalPulls;
-              } else {
-                const stickersAfterLast4 = sortedStickersWithRarity.slice(last4StarIndex + 1);
-                const uniqueCountAfterLast4 = stickersAfterLast4.length;
-                const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
-                const estimatedPullsAfterLast4 = Math.round(uniqueCountAfterLast4 * pullsPerUniqueSticker);
-                calculatedPity4 = Math.max(uniqueCountAfterLast4, estimatedPullsAfterLast4);
-              }
-            } else {
-              calculatedPity4 = totalPulls;
-            }
+        calculatedPity5 = Math.min(calculatedPity5, 89);
+        if (totalUniqueStickers > 0) {
+          const count5Star = sortedStickersWithRarity.filter(s => s.rarity === 5).length;
+          if (count5Star === 0 && totalPulls >= 90) {
+            calculatedPity5 = totalPulls % 90;
           }
-          calculatedPity4 = Math.min(calculatedPity4, 9);
+        } else if (totalPulls >= 90) {
+          calculatedPity5 = totalPulls % 90;
+        }
+
+        // Tái dựng Bảo hiểm 4⭐ từ lịch sử nhãn dán
+        if (totalPulls > 0) {
           if (totalUniqueStickers > 0) {
-            const count4Star = sortedStickersWithRarity.filter(s => s.rarity === 4).length;
-            if (count4Star === 0 && totalPulls >= 10) {
-              calculatedPity4 = totalPulls % 10;
+            const last4StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(4);
+            if (last4StarIndex === -1) {
+              calculatedPity4 = totalPulls;
+            } else {
+              const stickersAfterLast4 = sortedStickersWithRarity.slice(last4StarIndex + 1);
+              const uniqueCountAfterLast4 = stickersAfterLast4.length;
+              const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+              const estimatedPullsAfterLast4 = Math.round(uniqueCountAfterLast4 * pullsPerUniqueSticker);
+              calculatedPity4 = Math.max(uniqueCountAfterLast4, estimatedPullsAfterLast4);
             }
-          } else if (totalPulls >= 10) {
+          } else {
+            calculatedPity4 = totalPulls;
+          }
+        }
+        calculatedPity4 = Math.min(calculatedPity4, 9);
+        if (totalUniqueStickers > 0) {
+          const count4Star = sortedStickersWithRarity.filter(s => s.rarity === 4).length;
+          if (count4Star === 0 && totalPulls >= 10) {
             calculatedPity4 = totalPulls % 10;
           }
+        } else if (totalPulls >= 10) {
+          calculatedPity4 = totalPulls % 10;
         }
 
         // Compute claimed achievements rewards
@@ -660,8 +662,8 @@ export function Admin() {
         // Kiểm tra xem thành viên này có phải là Admin (cucnau01@gmail.com) hay không
         const isUserAdmin = u.email?.toLowerCase() === 'cucnau01@gmail.com';
         if (isUserAdmin) {
-          finalCalculatedChoco = 9999999;
-          finalCalculatedGChoco = 9999999;
+          finalCalculatedChoco = 9999999 + calculatedEarnedChoco - calculatedSpentChoco;
+          finalCalculatedGChoco = 9999999 + calculatedEarnedGChoco - calculatedSpentGChoco;
         } else {
           // Đảm bảo số dư khôi phục không bao giờ thấp hơn số dư hiện tại trong cơ sở dữ liệu
           finalCalculatedChoco = Math.max(finalCalculatedChoco, uChoco);
@@ -699,11 +701,11 @@ export function Admin() {
           changed = true;
         }
         if (calculatedEarnedChoco !== (u.totalEarnedChoco || 0)) {
-          updates.totalEarnedChoco = isUserAdmin ? 9999999 : Math.min(calculatedEarnedChoco, maxVerifiableChocoEarned);
+          updates.totalEarnedChoco = isUserAdmin ? (9999999 + calculatedEarnedChoco) : Math.min(calculatedEarnedChoco, maxVerifiableChocoEarned);
           changed = true;
         }
         if (calculatedEarnedGChoco !== (u.totalEarnedGChoco || 0)) {
-          updates.totalEarnedGChoco = isUserAdmin ? 9999999 : Math.min(calculatedEarnedGChoco, maxVerifiableGChocoEarned);
+          updates.totalEarnedGChoco = isUserAdmin ? (9999999 + calculatedEarnedGChoco) : Math.min(calculatedEarnedGChoco, maxVerifiableGChocoEarned);
           changed = true;
         }
         if (calculatedSpentChoco !== (u.totalSpentChoco || 0)) {
@@ -783,7 +785,7 @@ export function Admin() {
           `📊 Báo cáo đối soát & kiểm định thực tế:`,
           `   - Số dư DB hiện tại: ${uChoco.toLocaleString()} Choco / ${uGChoco.toLocaleString()} GChoco`,
           isUserAdmin 
-            ? `   - Quyền hạn Admin: Tự động khôi phục số dư gốc mặc định (9,999,999 Choco / 9,999,999 GChoco)` 
+            ? `   - Quyền hạn Admin: Tự động khôi phục số dư gốc mặc định cộng tích lũy (${(9999999 + calculatedEarnedChoco - calculatedSpentChoco).toLocaleString()} Choco / ${(9999999 + calculatedEarnedGChoco - calculatedSpentGChoco).toLocaleString()} GChoco) (Gốc 9,999,999 + Kiếm thêm: ${calculatedEarnedChoco.toLocaleString()} Choco / ${calculatedEarnedGChoco.toLocaleString()} GChoco)` 
             : `   - Số dư sau tái dựng (Từ GD): ${originalCalculatedChoco.toLocaleString()} Choco / ${originalCalculatedGChoco.toLocaleString()} GChoco`,
           isUserAdmin 
             ? `   - Hạn mức thực tế tối đa (Minh chứng): Không giới hạn (Tài khoản Admin)` 
