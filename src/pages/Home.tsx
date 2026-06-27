@@ -277,7 +277,7 @@ export function Home() {
                  }).slice(0, 3).map((story, i) => {
                     const views = bxhTab === 'day' ? (story.dailyViews?.[todayStr] || 0) : bxhTab === 'week' ? (story.weeklyViews?.[getWeeklyId()] || 0) : (story.viewCount || 0);
                     return (
-                    <div key={story.id} className="group flex items-center gap-4 p-3 bg-[#FDF6EC] dark:bg-[#1C1613] rounded-2xl border-2 border-[#F5E6D3] dark:border-[#5D4037] cursor-pointer hover:border-[#8D6E63] dark:hover:border-[#C29D70] hover:shadow-[0_2px_0_0_#8D6E63] dark:hover:shadow-[0_2px_0_0_#C29D70] active:translate-y-[2px] active:shadow-none transition-all duration-200 mb-2 shadow-[0_2px_0_0_#F5E6D3] dark:shadow-[0_2px_0_0_#0D0907] min-w-0" onClick={() => navigate(`/truyen/${story.id}`)}>
+                    <div key={story.id} className="group flex items-center gap-4 p-3 bg-[#FDF6EC] dark:bg-[#1C1613] rounded-2xl border-2 border-[#F5E6D3] dark:border-[#5D4037] cursor-pointer hover:border-[#8D6E63] dark:hover:border-[#C29D70] hover:shadow-[0_2px_0_0_#8D6E63] dark:hover:shadow-[0_2px_0_0_#C29D70] active:translate-y-[2px] active:shadow-none transition-all duration-200 mb-2 shadow-[0_2px_0_0_#F5E6D3] dark:shadow-[0_2px_0_0_#0D0907] min-w-0" onClick={() => navigate(`/truyen/${story.slug || story.id}`)}>
                        <span className="font-black text-xl italic text-[#8D6E63] dark:text-[#C29D70] w-6 transition-transform group-hover:scale-110 shrink-0">0{i + 1}</span>
                        <img src={story.coverUrl} alt={story.title} className="w-10 h-14 object-cover rounded-xl opacity-90 border border-transparent dark:border-[#5D4037] transition-transform group-hover:scale-105 duration-300 shrink-0" />
                        <div className="flex-1 min-w-0">
@@ -421,7 +421,7 @@ export function Home() {
                     const timeB = b.updatedAt || (b.createdAt?.toMillis ? b.createdAt.toMillis() : (typeof b.createdAt === 'number' ? b.createdAt : 0)) || 0;
                     return timeB - timeA;
                  }).slice(0, 4).map((story) => (
-                    <div key={story.id} className="group flex gap-3.5 p-3 bg-[#FDF6EC] dark:bg-[#1C1613] rounded-2xl border-[3px] border-[#F5E6D3] dark:border-[#5D4037] cursor-pointer hover:border-[#8D6E63] dark:hover:border-[#C29D70] transition-all hover:-translate-y-1 shadow-[0_2px_0_0_#F5E6D3] dark:shadow-[0_2px_0_0_#0D0907] hover:shadow-[0_2px_0_0_#8D6E63] dark:hover:shadow-[0_2px_0_0_#C29D70] active:translate-y-1 active:shadow-none" onClick={() => navigate(`/truyen/${story.id}`)}>
+                    <div key={story.id} className="group flex gap-3.5 p-3 bg-[#FDF6EC] dark:bg-[#1C1613] rounded-2xl border-[3px] border-[#F5E6D3] dark:border-[#5D4037] cursor-pointer hover:border-[#8D6E63] dark:hover:border-[#C29D70] transition-all hover:-translate-y-1 shadow-[0_2px_0_0_#F5E6D3] dark:shadow-[0_2px_0_0_#0D0907] hover:shadow-[0_2px_0_0_#8D6E63] dark:hover:shadow-[0_2px_0_0_#C29D70] active:translate-y-1 active:shadow-none" onClick={() => navigate(`/truyen/${story.slug || story.id}`)}>
                        <img src={story.coverUrl} alt={story.title} className="w-12 h-16 object-cover rounded-xl shadow-xs border border-white/50 dark:border-black/50 shrink-0 group-hover:scale-105 transition-all duration-300" />
                        <div className="flex flex-col justify-between min-w-0 flex-1 py-0.5">
                           <div>
