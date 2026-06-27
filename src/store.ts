@@ -755,6 +755,15 @@ export const useStore = create<UserState>()(
             );
 
             // Lưu bù đắp ngược lại lên Firestore nếu giá trị mới cao hơn trong Firestore
+            const mergedUnlocked = Array.from(new Set([
+               ...(Array.isArray(data.unlockedAchievements) ? data.unlockedAchievements : []),
+               ...(Array.isArray(state.unlockedAchievements) ? state.unlockedAchievements : [])
+            ]));
+            const mergedClaimed = Array.from(new Set([
+               ...(Array.isArray(data.claimedAchievements) ? data.claimedAchievements : []),
+               ...(Array.isArray(state.claimedAchievements) ? state.claimedAchievements : [])
+            ]));
+
             const writeBack: any = {};
             if (totalGachaPullsFallback > (data.totalGachaPulls || 0)) {
                writeBack.totalGachaPulls = totalGachaPullsFallback;
@@ -767,6 +776,16 @@ export const useStore = create<UserState>()(
             }
             if (totalChocoCaughtFallback > (data.totalChocoCaught || 0)) {
                writeBack.totalChocoCaught = totalChocoCaughtFallback;
+            }
+            if (mergedUnlocked.length > (data.unlockedAchievements?.length || 0)) {
+               writeBack.unlockedAchievements = mergedUnlocked;
+            }
+            if (mergedClaimed.length > (data.claimedAchievements?.length || 0)) {
+               writeBack.claimedAchievements = mergedClaimed;
+            }
+            if ((state.level || 1) > (data.level || 1)) {
+               writeBack.level = state.level;
+               writeBack.exp = state.exp;
             }
             if (Object.keys(writeBack).length > 0) {
                setTimeout(() => {
@@ -786,8 +805,8 @@ export const useStore = create<UserState>()(
             isFirebaseSynced: true,
             choco: typeof data.choco === 'number' ? data.choco : (typeof state.choco === 'number' ? state.choco : 0),
             goldenChoco: typeof data.goldenChoco === 'number' ? data.goldenChoco : (typeof state.goldenChoco === 'number' ? state.goldenChoco : 0),
-            level: data.level !== undefined ? data.level : state.level,
-            exp: data.exp !== undefined ? data.exp : state.exp,
+            level: Math.max(data.level !== undefined ? data.level : 1, state.level || 1),
+            exp: data.exp !== undefined ? ((state.level && data.level && data.level < state.level) ? state.exp : data.exp) : state.exp,
             checkInStreak: data.checkInStreak !== undefined ? data.checkInStreak : state.checkInStreak,
             lastCheckInDate: data.lastCheckInDate !== undefined ? data.lastCheckInDate : state.lastCheckInDate,
             lastDailyResetDate: data.lastDailyResetDate !== undefined ? data.lastDailyResetDate : state.lastDailyResetDate,
@@ -844,8 +863,8 @@ export const useStore = create<UserState>()(
             chocoMatchHearts: data.chocoMatchHearts !== undefined ? data.chocoMatchHearts : state.chocoMatchHearts,
             chocoMatchLastHeartTick: data.chocoMatchLastHeartTick !== undefined ? data.chocoMatchLastHeartTick : state.chocoMatchLastHeartTick,
 
-            unlockedAchievements: Array.isArray(data.unlockedAchievements) ? data.unlockedAchievements : (Array.isArray(state.unlockedAchievements) ? state.unlockedAchievements : []),
-            claimedAchievements: Array.isArray(data.claimedAchievements) ? data.claimedAchievements : (Array.isArray(state.claimedAchievements) ? state.claimedAchievements : []),
+            unlockedAchievements: mergedUnlocked,
+            claimedAchievements: mergedClaimed,
             totalEarnedChoco: data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco,
             totalEarnedGChoco: data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco,
             totalSpentChoco: totalSpentChocoFallback,
@@ -932,6 +951,9 @@ export const useStore = create<UserState>()(
          const state = get();
          const uid = state.uid;
          if (!uid || !state.isFirebaseSynced) return;
+
+         const prevChoco = state.choco || 0;
+         const prevGChoco = state.goldenChoco || 0;
          
          // Luon cap nhat Zustand State cuc bo ngay va luon de luu xuong LocalStorage tuc thi
          set((currentState) => {
@@ -945,8 +967,6 @@ export const useStore = create<UserState>()(
          });
 
          if (!uid) return;
-         
-         const { choco: prevChoco, goldenChoco: prevGChoco } = state;
 
          // Log transactions if amounts changed
          if (transactionReason) {
