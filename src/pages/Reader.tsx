@@ -760,7 +760,7 @@ export function Reader() {
          showHeader ? "translate-y-0" : "-translate-y-full"
        )}>
           <div className="flex flex-col">
-             <button onClick={() => navigate(`/truyen/${story.id}`)} className="text-xs font-black uppercase tracking-wider opacity-70 hover:opacity-100 flex items-center gap-1 mb-1 bg-transparent border-0 cursor-pointer">
+             <button onClick={() => navigate(`/truyen/${story.slug || story.id}`)} className="text-xs font-black uppercase tracking-wider opacity-70 hover:opacity-100 flex items-center gap-1 mb-1 bg-transparent border-0 cursor-pointer">
                 <ArrowLeft className="w-4 h-4" /> {story.title}
              </button>
              <h1 className="text-base sm:text-lg font-black tracking-tight">{currentChapter.title}</h1>
