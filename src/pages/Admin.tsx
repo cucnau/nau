@@ -579,65 +579,71 @@ export function Admin() {
         const minPullsFromStickers = sortedStickersWithRarity.length;
         const reconstructedTotalPulls = Math.max(u.totalGachaPulls || 0, maxPullsFromTxs, minPullsFromStickers);
 
-        let calculatedPity5 = u.gachaPity5Star || 0;
-        let calculatedPity4 = u.gachaPity4Star || 0;
+        let calculatedPity5 = u.gachaPity5Star !== undefined && u.gachaPity5Star !== null ? u.gachaPity5Star : 0;
+        let calculatedPity4 = u.gachaPity4Star !== undefined && u.gachaPity4Star !== null ? u.gachaPity4Star : 0;
         
-        const totalPulls = reconstructedTotalPulls;
-        const totalUniqueStickers = sortedStickersWithRarity.length;
-        
-        if (totalPulls > 0) {
-          if (totalUniqueStickers > 0) {
-            const last5StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(5);
-            if (last5StarIndex === -1) {
-              // Chưa từng nổ 5 sao, toàn bộ lượt gacha là pity
+        // Chỉ ước tính/tái dựng nếu dữ liệu bảo hiểm (pity) chưa từng được ghi nhận trong cơ sở dữ liệu (ví dụ: tài khoản từ phiên bản cũ chưa có tính năng này)
+        if (u.gachaPity5Star === undefined || u.gachaPity5Star === null) {
+          const totalPulls = reconstructedTotalPulls;
+          const totalUniqueStickers = sortedStickersWithRarity.length;
+          
+          if (totalPulls > 0) {
+            if (totalUniqueStickers > 0) {
+              const last5StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(5);
+              if (last5StarIndex === -1) {
+                calculatedPity5 = totalPulls;
+              } else {
+                const stickersAfterLast5 = sortedStickersWithRarity.slice(last5StarIndex + 1);
+                const uniqueCountAfterLast5 = stickersAfterLast5.length;
+                const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+                const estimatedPullsAfterLast5 = Math.round(uniqueCountAfterLast5 * pullsPerUniqueSticker);
+                calculatedPity5 = Math.max(uniqueCountAfterLast5, estimatedPullsAfterLast5);
+              }
+            } else {
               calculatedPity5 = totalPulls;
-            } else {
-              // Tính ước tính số lượt gacha sau lần nổ 5 sao cuối
-              const stickersAfterLast5 = sortedStickersWithRarity.slice(last5StarIndex + 1);
-              const uniqueCountAfterLast5 = stickersAfterLast5.length;
-              const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
-              const estimatedPullsAfterLast5 = Math.round(uniqueCountAfterLast5 * pullsPerUniqueSticker);
-              calculatedPity5 = Math.max(uniqueCountAfterLast5, estimatedPullsAfterLast5);
             }
-            
-            const last4StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(4);
-            if (last4StarIndex === -1) {
-              calculatedPity4 = totalPulls;
-            } else {
-              const stickersAfterLast4 = sortedStickersWithRarity.slice(last4StarIndex + 1);
-              const uniqueCountAfterLast4 = stickersAfterLast4.length;
-              const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
-              const estimatedPullsAfterLast4 = Math.round(uniqueCountAfterLast4 * pullsPerUniqueSticker);
-              calculatedPity4 = Math.max(uniqueCountAfterLast4, estimatedPullsAfterLast4);
-            }
-          } else {
-            calculatedPity5 = totalPulls;
-            calculatedPity4 = totalPulls;
           }
-        }
-        
-        // Giới hạn pity hợp lệ (reset ở 90 / 10)
-        calculatedPity5 = Math.min(calculatedPity5, 89);
-        calculatedPity4 = Math.min(calculatedPity4, 9);
-        
-        // Modulo lại nếu số lượt vượt quá mà chưa nổ (phòng hờ sai lệch)
-        if (totalUniqueStickers > 0) {
-          const count5Star = sortedStickersWithRarity.filter(s => s.rarity === 5).length;
-          if (count5Star === 0 && totalPulls >= 90) {
+          calculatedPity5 = Math.min(calculatedPity5, 89);
+          if (totalUniqueStickers > 0) {
+            const count5Star = sortedStickersWithRarity.filter(s => s.rarity === 5).length;
+            if (count5Star === 0 && totalPulls >= 90) {
+              calculatedPity5 = totalPulls % 90;
+            }
+          } else if (totalPulls >= 90) {
             calculatedPity5 = totalPulls % 90;
           }
-          const count4Star = sortedStickersWithRarity.filter(s => s.rarity === 4).length;
-          if (count4Star === 0 && totalPulls >= 10) {
-            calculatedPity4 = totalPulls % 10;
-          }
-        } else if (totalPulls >= 90) {
-          calculatedPity5 = totalPulls % 90;
-          calculatedPity4 = totalPulls % 10;
         }
 
-        // Bảo vệ dữ liệu người dùng: không bao giờ giảm số pity hiện tại nếu nó đang lớn hơn
-        calculatedPity5 = Math.max(calculatedPity5, u.gachaPity5Star || 0);
-        calculatedPity4 = Math.max(calculatedPity4, u.gachaPity4Star || 0);
+        if (u.gachaPity4Star === undefined || u.gachaPity4Star === null) {
+          const totalPulls = reconstructedTotalPulls;
+          const totalUniqueStickers = sortedStickersWithRarity.length;
+          
+          if (totalPulls > 0) {
+            if (totalUniqueStickers > 0) {
+              const last4StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(4);
+              if (last4StarIndex === -1) {
+                calculatedPity4 = totalPulls;
+              } else {
+                const stickersAfterLast4 = sortedStickersWithRarity.slice(last4StarIndex + 1);
+                const uniqueCountAfterLast4 = stickersAfterLast4.length;
+                const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+                const estimatedPullsAfterLast4 = Math.round(uniqueCountAfterLast4 * pullsPerUniqueSticker);
+                calculatedPity4 = Math.max(uniqueCountAfterLast4, estimatedPullsAfterLast4);
+              }
+            } else {
+              calculatedPity4 = totalPulls;
+            }
+          }
+          calculatedPity4 = Math.min(calculatedPity4, 9);
+          if (totalUniqueStickers > 0) {
+            const count4Star = sortedStickersWithRarity.filter(s => s.rarity === 4).length;
+            if (count4Star === 0 && totalPulls >= 10) {
+              calculatedPity4 = totalPulls % 10;
+            }
+          } else if (totalPulls >= 10) {
+            calculatedPity4 = totalPulls % 10;
+          }
+        }
 
         // Compute claimed achievements rewards
         const claimedAchievementsList = Array.from(mergedClaimed);
@@ -664,12 +670,8 @@ export function Admin() {
 
         // Compute Verifiable Upper Bounds
         const finalCheckInsCount = Math.max(u.totalCheckIns || 0, checkInDates.size);
-        const maxVerifiableChocoEarned = isUserAdmin 
-          ? 9999999 
-          : ((finalCheckInsCount * 10) + claimedAchievementsChocoReward + (playCountChocoMatch * 15) + (playCountChucuGame * 15) + adminGiftsChoco + spentChocoFromAssets + (actualCommentsCount * 1) + 300);
-        const maxVerifiableGChocoEarned = isUserAdmin 
-          ? 9999999 
-          : (claimedAchievementsGChocoReward + Math.ceil(playCountChocoMatch / 10) + conversionEarnedGChoco + adminGiftsGChoco + spentGChocoFromAssets + 5);
+        const maxVerifiableChocoEarned = ((finalCheckInsCount * 10) + claimedAchievementsChocoReward + (playCountChocoMatch * 15) + (playCountChucuGame * 15) + adminGiftsChoco + spentChocoFromAssets + (actualCommentsCount * 1) + 300);
+        const maxVerifiableGChocoEarned = (claimedAchievementsGChocoReward + Math.ceil(playCountChocoMatch / 10) + conversionEarnedGChoco + adminGiftsGChoco + spentGChocoFromAssets + 5);
 
         let chocoCapped = false;
         const originalCalculatedChoco = finalCalculatedChoco;
@@ -697,11 +699,11 @@ export function Admin() {
           changed = true;
         }
         if (calculatedEarnedChoco !== (u.totalEarnedChoco || 0)) {
-          updates.totalEarnedChoco = Math.min(calculatedEarnedChoco, maxVerifiableChocoEarned);
+          updates.totalEarnedChoco = isUserAdmin ? 9999999 : Math.min(calculatedEarnedChoco, maxVerifiableChocoEarned);
           changed = true;
         }
         if (calculatedEarnedGChoco !== (u.totalEarnedGChoco || 0)) {
-          updates.totalEarnedGChoco = Math.min(calculatedEarnedGChoco, maxVerifiableGChocoEarned);
+          updates.totalEarnedGChoco = isUserAdmin ? 9999999 : Math.min(calculatedEarnedGChoco, maxVerifiableGChocoEarned);
           changed = true;
         }
         if (calculatedSpentChoco !== (u.totalSpentChoco || 0)) {
@@ -780,12 +782,18 @@ export function Admin() {
           ...prev,
           `📊 Báo cáo đối soát & kiểm định thực tế:`,
           `   - Số dư DB hiện tại: ${uChoco.toLocaleString()} Choco / ${uGChoco.toLocaleString()} GChoco`,
-          `   - Số dư sau tái dựng (Từ GD): ${originalCalculatedChoco.toLocaleString()} Choco / ${originalCalculatedGChoco.toLocaleString()} GChoco`,
-          `   - Hạn mức thực tế tối đa (Minh chứng): ≤ ${maxVerifiableChocoEarned.toLocaleString()} Choco / ≤ ${maxVerifiableGChocoEarned.toLocaleString()} GChoco`,
+          isUserAdmin 
+            ? `   - Quyền hạn Admin: Tự động khôi phục số dư gốc mặc định (9,999,999 Choco / 9,999,999 GChoco)` 
+            : `   - Số dư sau tái dựng (Từ GD): ${originalCalculatedChoco.toLocaleString()} Choco / ${originalCalculatedGChoco.toLocaleString()} GChoco`,
+          isUserAdmin 
+            ? `   - Hạn mức thực tế tối đa (Minh chứng): Không giới hạn (Tài khoản Admin)` 
+            : `   - Hạn mức thực tế tối đa (Minh chứng): ≤ ${maxVerifiableChocoEarned.toLocaleString()} Choco / ≤ ${maxVerifiableGChocoEarned.toLocaleString()} GChoco`,
           `   - Trị giá tài sản sở hữu thực tế: ${spentChocoFromAssets.toLocaleString()} Choco / ${spentGChocoFromAssets.toLocaleString()} GChoco`,
-          chocoCapped || gchocoCapped
-            ? `   ⚠️ PHÁT HIỆN LỆCH BẤT THƯỜNG: Số dư tái dựng vượt quá minh chứng hoạt động thực tế! Đã áp trần bảo vệ thành công.`
-            : `   ✅ ĐỐI SOÁT HỢP LỆ: Số dư sau tái dựng khớp hoàn toàn trong giới hạn thực tế cho phép.`,
+          isUserAdmin
+            ? `   ✅ ĐỐI SOÁT HỢP LỆ: Tài khoản Admin có đặc quyền vô hạn.`
+            : (chocoCapped || gchocoCapped
+                ? `   ⚠️ PHÁT HIỆN LỆCH BẤT THƯỜNG: Số dư tái dựng vượt quá minh chứng hoạt động thực tế! Đã áp trần bảo vệ thành công.`
+                : `   ✅ ĐỐI SOÁT HỢP LỆ: Số dư sau tái dựng khớp hoàn toàn trong giới hạn thực tế cho phép.`),
           `   - Điểm danh ghi nhận: ${checkInDates.size} ngày. Chuỗi liên tục: ${calculatedStreak} ngày.`,
           `   - Hoạt động cộng đồng: Bình luận thực tế: ${actualCommentsCount} lượt, Tin nhắn Chat: ${actualChatCount} dòng, Bài viết Feed: ${actualFeedCount} bài.`,
           `   - Giao dịch minigame: ChocoMatch: ${playCountChocoMatch} lượt, Chucu: ${playCountChucuGame} lượt.`,
