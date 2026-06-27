@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useStore } from "../store";
 import { format, subDays } from "date-fns";
+import { generateSlug } from "../lib/slug";
 import { CHUCU_PRESET_ACCESSORIES, getChucuAccessoryPreview } from "../components/ChucuPresetAccessories";
 import {
   collection,
@@ -2563,8 +2564,10 @@ export function Admin() {
         .split(",")
         .map((g) => g.trim())
         .filter(Boolean);
+      const slug = generateSlug(title);
       await addDoc(collection(db, "stories"), {
         title,
+        slug,
         author,
         coverUrl,
         description,
@@ -2607,8 +2610,10 @@ export function Admin() {
               .filter(Boolean)
           : editingStory.genres;
 
+      const slug = generateSlug(editingStory.title);
       await updateDoc(doc(db, "stories", editingStory.id), {
         title: editingStory.title,
+        slug,
         author: editingStory.author,
         coverUrl: editingStory.coverUrl,
         description: editingStory.description || "",
