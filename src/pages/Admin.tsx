@@ -150,6 +150,62 @@ export function Admin() {
       const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
       setRestorationLogs(prev => [...prev, `Tìm thấy ${users.length} thành viên.`]);
 
+      // Tải các banner gacha để phân loại độ hiếm nhãn dán
+      const bannersSnap = await getDocs(collection(db, "gacha_banners"));
+      const banners = bannersSnap.docs.map(doc => doc.data() as any);
+      const stickerRarities = new Map<string, number>();
+      banners.forEach(b => {
+        if (b.pool5Star) {
+          b.pool5Star.forEach((item: any) => {
+            if (item.image) stickerRarities.set(item.image, 5);
+          });
+        }
+        if (b.pool4Star) {
+          b.pool4Star.forEach((item: any) => {
+            if (item.image) stickerRarities.set(item.image, 4);
+          });
+        }
+      });
+
+      // Tải các vật phẩm trong cửa hàng để truy quét giá trị tài sản đang sở hữu
+      const storeStickersSnap = await getDocs(collection(db, "store_stickers"));
+      const storeAccessoriesSnap = await getDocs(collection(db, "store_accessories"));
+      const storeChucuAccessoriesSnap = await getDocs(collection(db, "store_chucu_accessories"));
+
+      const stickerPrices = new Map<string, { price: number; currency: string }>();
+      storeStickersSnap.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.url) {
+          stickerPrices.set(data.url, { 
+            price: Number(data.price) || 0, 
+            currency: (data.type || 'choco').toLowerCase() 
+          });
+        }
+      });
+
+      const accessoryPrices = new Map<string, { price: number; currency: string }>();
+      storeAccessoriesSnap.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.url) {
+          accessoryPrices.set(data.url, { 
+            price: Number(data.price) || 0, 
+            currency: (data.type || 'choco').toLowerCase() 
+          });
+        }
+      });
+
+      const chucuAccessoryPrices = new Map<string, { price: number; currency: string }>();
+      storeChucuAccessoriesSnap.docs.forEach(doc => {
+        const data = doc.data();
+        const key = data.url || data.id;
+        if (key) {
+          chucuAccessoryPrices.set(key, { 
+            price: Number(data.price) || 0, 
+            currency: (data.type || 'choco').toLowerCase() 
+          });
+        }
+      });
+
       let restoredCount = 0;
 
       for (const u of users) {
@@ -159,7 +215,7 @@ export function Admin() {
           `🔍 Đang phân tích & đối soát toàn diện: ${u.displayName || u.email || u.id}...`
         ]);
         
-        // 1. Fetch subcollections
+        // 1. Fetch subcollections và các hoạt động thực tế từ mọi ngóc ngách
         const txSnap = await getDocs(collection(db, `users/${u.id}/transactions`));
         const txs = txSnap.docs.map(doc => doc.data());
         
@@ -168,6 +224,16 @@ export function Admin() {
         
         const accessoriesSnap = await getDocs(collection(db, `users/${u.id}/owned_accessories`));
         const currentAccessoryUrls = new Set(accessoriesSnap.docs.map(doc => doc.data().url).filter(Boolean));
+
+        // Quét thêm "mọi ngóc ngách": bình luận, tin nhắn chat, bài viết từ DB thực tế
+        const commentsSnap = await getDocs(query(collection(db, "comments"), where("uid", "==", u.id)));
+        const actualCommentsCount = commentsSnap.size;
+
+        const chatSnap = await getDocs(query(collection(db, "chatMessages"), where("uid", "==", u.id)));
+        const actualChatCount = chatSnap.size;
+
+        const feedSnap = await getDocs(query(collection(db, "newsFeed"), where("uid", "==", u.id)));
+        const actualFeedCount = feedSnap.size;
         
         // Sort transactions ascending by timestamp
         const getTxTime = (tx: any) => {
@@ -287,6 +353,38 @@ export function Admin() {
             }
           }
         });
+
+        let spentChocoFromAssets = 0;
+        let spentGChocoFromAssets = 0;
+
+        currentStickerUrls.forEach(url => {
+          const asset = stickerPrices.get(url);
+          if (asset) {
+            if (asset.currency === 'gchoco') spentGChocoFromAssets += asset.price;
+            else spentChocoFromAssets += asset.price;
+          }
+        });
+
+        currentAccessoryUrls.forEach(url => {
+          const asset = accessoryPrices.get(url);
+          if (asset) {
+            if (asset.currency === 'gchoco') spentGChocoFromAssets += asset.price;
+            else spentChocoFromAssets += asset.price;
+          }
+        });
+
+        const ownedChucuAccs = Array.isArray(u.ownedChucuAccessories) ? u.ownedChucuAccessories : [];
+        ownedChucuAccs.forEach((accKey: string) => {
+          const asset = chucuAccessoryPrices.get(accKey);
+          if (asset) {
+            if (asset.currency === 'gchoco') spentGChocoFromAssets += asset.price;
+            else spentChocoFromAssets += asset.price;
+          }
+        });
+
+        // Điều chỉnh calculatedSpentChoco/GChoco theo giá trị tài sản sở hữu thực tế để không bị thiếu hụt chi tiêu do mất giao dịch
+        calculatedSpentChoco = Math.max(calculatedSpentChoco, spentChocoFromAssets);
+        calculatedSpentGChoco = Math.max(calculatedSpentGChoco, spentGChocoFromAssets);
 
         const uChoco = u.choco || 0;
         const uGChoco = u.goldenChoco || 0;
@@ -444,6 +542,103 @@ export function Admin() {
         const missingStickerUrlsToRestore = [...txBoughtStickerUrls].filter(url => !currentStickerUrls.has(url));
         const missingAccessoryUrlsToRestore = [...txBoughtAccessoryUrls].filter(url => !currentAccessoryUrls.has(url));
 
+        // Tái dựng số lượng Vé Gacha đã sử dụng từ lịch sử giao dịch mua vé
+        let ticketsFromTxs = 0;
+        sortedTxs.forEach(t => {
+          const desc = t.description || t.reason || "";
+          if (desc.includes("Vé Gacha") || desc.includes("Gacha")) {
+            const match = desc.match(/(?:Mua|Đổi\s+sang|Đổi|Tặng)\s*(\d+)/i) || desc.match(/(\d+)\s*Vé/i);
+            if (match) {
+              ticketsFromTxs += parseInt(match[1], 10);
+            }
+          }
+        });
+
+        // Tái dựng Bảo hiểm Gacha (Pity) theo trình tự thời gian nhận nhãn dán
+        const sortedStickersWithRarity = stickersSnap.docs
+          .map(doc => {
+            const data = doc.data();
+            const url = data.url || "";
+            const rarity = stickerRarities.get(url) || 3; // Mặc định là 3 sao
+            
+            let time = 0;
+            if (data.createdAt) {
+              if (typeof data.createdAt.toMillis === 'function') {
+                time = data.createdAt.toMillis();
+              } else if (data.createdAt.seconds !== undefined) {
+                time = data.createdAt.seconds * 1000;
+              } else {
+                time = new Date(data.createdAt).getTime() || 0;
+              }
+            }
+            return { url, rarity, time };
+          })
+          .sort((a, b) => a.time - b.time);
+
+        const maxPullsFromTxs = Math.max(0, ticketsFromTxs - (u.ownedGachaTickets || 0));
+        const minPullsFromStickers = sortedStickersWithRarity.length;
+        const reconstructedTotalPulls = Math.max(u.totalGachaPulls || 0, maxPullsFromTxs, minPullsFromStickers);
+
+        let calculatedPity5 = u.gachaPity5Star || 0;
+        let calculatedPity4 = u.gachaPity4Star || 0;
+        
+        const totalPulls = reconstructedTotalPulls;
+        const totalUniqueStickers = sortedStickersWithRarity.length;
+        
+        if (totalPulls > 0) {
+          if (totalUniqueStickers > 0) {
+            const last5StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(5);
+            if (last5StarIndex === -1) {
+              // Chưa từng nổ 5 sao, toàn bộ lượt gacha là pity
+              calculatedPity5 = totalPulls;
+            } else {
+              // Tính ước tính số lượt gacha sau lần nổ 5 sao cuối
+              const stickersAfterLast5 = sortedStickersWithRarity.slice(last5StarIndex + 1);
+              const uniqueCountAfterLast5 = stickersAfterLast5.length;
+              const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+              const estimatedPullsAfterLast5 = Math.round(uniqueCountAfterLast5 * pullsPerUniqueSticker);
+              calculatedPity5 = Math.max(uniqueCountAfterLast5, estimatedPullsAfterLast5);
+            }
+            
+            const last4StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(4);
+            if (last4StarIndex === -1) {
+              calculatedPity4 = totalPulls;
+            } else {
+              const stickersAfterLast4 = sortedStickersWithRarity.slice(last4StarIndex + 1);
+              const uniqueCountAfterLast4 = stickersAfterLast4.length;
+              const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+              const estimatedPullsAfterLast4 = Math.round(uniqueCountAfterLast4 * pullsPerUniqueSticker);
+              calculatedPity4 = Math.max(uniqueCountAfterLast4, estimatedPullsAfterLast4);
+            }
+          } else {
+            calculatedPity5 = totalPulls;
+            calculatedPity4 = totalPulls;
+          }
+        }
+        
+        // Giới hạn pity hợp lệ (reset ở 90 / 10)
+        calculatedPity5 = Math.min(calculatedPity5, 89);
+        calculatedPity4 = Math.min(calculatedPity4, 9);
+        
+        // Modulo lại nếu số lượt vượt quá mà chưa nổ (phòng hờ sai lệch)
+        if (totalUniqueStickers > 0) {
+          const count5Star = sortedStickersWithRarity.filter(s => s.rarity === 5).length;
+          if (count5Star === 0 && totalPulls >= 90) {
+            calculatedPity5 = totalPulls % 90;
+          }
+          const count4Star = sortedStickersWithRarity.filter(s => s.rarity === 4).length;
+          if (count4Star === 0 && totalPulls >= 10) {
+            calculatedPity4 = totalPulls % 10;
+          }
+        } else if (totalPulls >= 90) {
+          calculatedPity5 = totalPulls % 90;
+          calculatedPity4 = totalPulls % 10;
+        }
+
+        // Bảo vệ dữ liệu người dùng: không bao giờ giảm số pity hiện tại nếu nó đang lớn hơn
+        calculatedPity5 = Math.max(calculatedPity5, u.gachaPity5Star || 0);
+        calculatedPity4 = Math.max(calculatedPity4, u.gachaPity4Star || 0);
+
         // Compute claimed achievements rewards
         const claimedAchievementsList = Array.from(mergedClaimed);
         let claimedAchievementsChocoReward = 0;
@@ -456,21 +651,36 @@ export function Admin() {
           }
         });
 
+        // Kiểm tra xem thành viên này có phải là Admin (cucnau01@gmail.com) hay không
+        const isUserAdmin = u.email?.toLowerCase() === 'cucnau01@gmail.com';
+        if (isUserAdmin) {
+          finalCalculatedChoco = 9999999;
+          finalCalculatedGChoco = 9999999;
+        } else {
+          // Đảm bảo số dư khôi phục không bao giờ thấp hơn số dư hiện tại trong cơ sở dữ liệu
+          finalCalculatedChoco = Math.max(finalCalculatedChoco, uChoco);
+          finalCalculatedGChoco = Math.max(finalCalculatedGChoco, uGChoco);
+        }
+
         // Compute Verifiable Upper Bounds
         const finalCheckInsCount = Math.max(u.totalCheckIns || 0, checkInDates.size);
-        const maxVerifiableChocoEarned = (finalCheckInsCount * 10) + claimedAchievementsChocoReward + (playCountChocoMatch * 15) + (playCountChucuGame * 15) + adminGiftsChoco + 300;
-        const maxVerifiableGChocoEarned = claimedAchievementsGChocoReward + Math.ceil(playCountChocoMatch / 10) + conversionEarnedGChoco + adminGiftsGChoco + 5;
+        const maxVerifiableChocoEarned = isUserAdmin 
+          ? 9999999 
+          : ((finalCheckInsCount * 10) + claimedAchievementsChocoReward + (playCountChocoMatch * 15) + (playCountChucuGame * 15) + adminGiftsChoco + spentChocoFromAssets + (actualCommentsCount * 1) + 300);
+        const maxVerifiableGChocoEarned = isUserAdmin 
+          ? 9999999 
+          : (claimedAchievementsGChocoReward + Math.ceil(playCountChocoMatch / 10) + conversionEarnedGChoco + adminGiftsGChoco + spentGChocoFromAssets + 5);
 
         let chocoCapped = false;
         const originalCalculatedChoco = finalCalculatedChoco;
-        if (finalCalculatedChoco > maxVerifiableChocoEarned) {
+        if (!isUserAdmin && finalCalculatedChoco > maxVerifiableChocoEarned) {
           finalCalculatedChoco = maxVerifiableChocoEarned;
           chocoCapped = true;
         }
 
         let gchocoCapped = false;
         const originalCalculatedGChoco = finalCalculatedGChoco;
-        if (finalCalculatedGChoco > maxVerifiableGChocoEarned) {
+        if (!isUserAdmin && finalCalculatedGChoco > maxVerifiableGChocoEarned) {
           finalCalculatedGChoco = maxVerifiableGChocoEarned;
           gchocoCapped = true;
         }
@@ -515,6 +725,27 @@ export function Admin() {
           changed = true;
         }
 
+        if (reconstructedTotalPulls !== (u.totalGachaPulls || 0)) {
+          updates.totalGachaPulls = reconstructedTotalPulls;
+          changed = true;
+        }
+        if (calculatedPity5 !== (u.gachaPity5Star || 0)) {
+          updates.gachaPity5Star = calculatedPity5;
+          changed = true;
+        }
+        if (calculatedPity4 !== (u.gachaPity4Star || 0)) {
+          updates.gachaPity4Star = calculatedPity4;
+          changed = true;
+        }
+        if (actualCommentsCount !== (u.totalCommentsCount || 0)) {
+          updates.totalCommentsCount = actualCommentsCount;
+          changed = true;
+        }
+        if (actualChatCount !== (u.sentMessagesCount || 0)) {
+          updates.sentMessagesCount = actualChatCount;
+          changed = true;
+        }
+
         // Story/Pass chapters
         const uUnlockedChaps = Array.isArray(u.unlockedPassChapters) ? u.unlockedPassChapters : [];
         const missingUnlockedChaps = [...txUnlockedChapters].filter(id => !uUnlockedChaps.includes(id));
@@ -551,11 +782,15 @@ export function Admin() {
           `   - Số dư DB hiện tại: ${uChoco.toLocaleString()} Choco / ${uGChoco.toLocaleString()} GChoco`,
           `   - Số dư sau tái dựng (Từ GD): ${originalCalculatedChoco.toLocaleString()} Choco / ${originalCalculatedGChoco.toLocaleString()} GChoco`,
           `   - Hạn mức thực tế tối đa (Minh chứng): ≤ ${maxVerifiableChocoEarned.toLocaleString()} Choco / ≤ ${maxVerifiableGChocoEarned.toLocaleString()} GChoco`,
+          `   - Trị giá tài sản sở hữu thực tế: ${spentChocoFromAssets.toLocaleString()} Choco / ${spentGChocoFromAssets.toLocaleString()} GChoco`,
           chocoCapped || gchocoCapped
             ? `   ⚠️ PHÁT HIỆN LỆCH BẤT THƯỜNG: Số dư tái dựng vượt quá minh chứng hoạt động thực tế! Đã áp trần bảo vệ thành công.`
             : `   ✅ ĐỐI SOÁT HỢP LỆ: Số dư sau tái dựng khớp hoàn toàn trong giới hạn thực tế cho phép.`,
           `   - Điểm danh ghi nhận: ${checkInDates.size} ngày. Chuỗi liên tục: ${calculatedStreak} ngày.`,
-          `   - Giao dịch: Gacha: ${gachaDrawCount} lượt, ChocoMatch: ${playCountChocoMatch} lượt, Chucu: ${playCountChucuGame} lượt.`,
+          `   - Hoạt động cộng đồng: Bình luận thực tế: ${actualCommentsCount} lượt, Tin nhắn Chat: ${actualChatCount} dòng, Bài viết Feed: ${actualFeedCount} bài.`,
+          `   - Giao dịch minigame: ChocoMatch: ${playCountChocoMatch} lượt, Chucu: ${playCountChucuGame} lượt.`,
+          `   - Vé Gacha: Đã sở hữu/mua ${ticketsFromTxs} vé. Tổng lượt gacha: ${reconstructedTotalPulls} lượt.`,
+          `   - Bảo hiểm Gacha (Pity): 5⭐: ${calculatedPity5}/90, 4⭐: ${calculatedPity4}/10`,
           `   - Đẳng cấp: Cấp ${calculatedLevel} (EXP tích lũy ước tính: ${totalEstimatedExp.toLocaleString()})`,
           `   - Nhãn dán: Có trong túi: ${stickersSnap.size} / Phát hiện trong GD: ${txBoughtStickerUrls.size}`,
           `   - Phụ kiện: Có trong túi: ${accessoriesSnap.size} / Phát hiện trong GD: ${txBoughtAccessoryUrls.size}`
@@ -589,6 +824,8 @@ export function Admin() {
           if (updates.goldenChoco !== undefined) logStr += `${updates.goldenChoco.toLocaleString()} GChoco, `;
           if (updates.level !== undefined) logStr += `Level ${updates.level}, `;
           if (updates.checkInStreak !== undefined) logStr += `Chuỗi ${updates.checkInStreak} ngày, `;
+          if (updates.totalGachaPulls !== undefined) logStr += `Gacha ${updates.totalGachaPulls} lượt, `;
+          if (updates.gachaPity5Star !== undefined) logStr += `Pity 5⭐: ${updates.gachaPity5Star}/90, `;
           if (missingStickerUrlsToRestore.length > 0) logStr += `Thêm ${missingStickerUrlsToRestore.length} Nhãn dán, `;
           if (missingAccessoryUrlsToRestore.length > 0) logStr += `Thêm ${missingAccessoryUrlsToRestore.length} Phụ kiện, `;
           if (missingUnlockedChaps.length > 0) logStr += `Bù ${missingUnlockedChaps.length} chương truyện, `;
