@@ -107,7 +107,7 @@ export function StoryList() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredStories.map((story) => (
-             <div key={story.id} className="group flex gap-3.5 p-4 sm:p-5 bg-[#FFFDF9] dark:bg-[#211B18] rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] hover:bg-[#FDF6EC] dark:hover:bg-[#2C221D] cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-[1.5px_1.5px_0_0_#3E2723] dark:hover:shadow-[1.5px_1.5px_0_0_#1A1412] shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]" onClick={() => navigate(`/truyen/${story.id}`)}>
+             <div key={story.id} className="group flex gap-3.5 p-4 sm:p-5 bg-[#FFFDF9] dark:bg-[#211B18] rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] hover:bg-[#FDF6EC] dark:hover:bg-[#2C221D] cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-[1.5px_1.5px_0_0_#3E2723] dark:hover:shadow-[1.5px_1.5px_0_0_#1A1412] shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907]" onClick={() => navigate(`/truyen/${story.slug || story.id}`)}>
                 <img src={story.coverUrl} alt={story.title} className="w-16 h-24 sm:w-20 sm:h-28 object-cover rounded-xl shadow-xs border border-gray-100 dark:border-[#5D4037] shrink-0 group-hover:scale-105 group-hover:border-[#8D6E63]/60 transition-all duration-300" />
                 <div className="flex flex-col justify-between min-w-0 flex-1 py-0.5">
                    <div>
