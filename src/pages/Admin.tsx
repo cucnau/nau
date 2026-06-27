@@ -99,6 +99,11 @@ interface AdminUser {
   checkInStreak?: number;
   lastCheckInDate?: string | null;
   ownedStreakTickets?: number;
+  totalCheckIns?: number;
+  totalGachaPulls?: number;
+  gachaPity5Star?: number;
+  gachaPity4Star?: number;
+  ownedGachaTickets?: number;
 }
 
 interface AdminComment {
@@ -142,6 +147,12 @@ export function Admin() {
   const [restorationLogs, setRestorationLogs] = useState<string[]>([]);
   const [isRestoring, setIsRestoring] = useState(false);
 
+  // States for targeted single-user audit module
+  const [auditingUser, setAuditingUser] = useState<any | null>(null);
+  const [auditReport, setAuditReport] = useState<any | null>(null);
+  const [isAuditing, setIsAuditing] = useState(false);
+  const [auditLogs, setAuditLogs] = useState<string[]>([]);
+
   const runChocoRestoration = async () => {
     setIsRestoring(true);
     setRestorationLogs(["Bắt đầu tiến trình TRUY QUÉT TOÀN DIỆN và ĐỐI SOÁT khôi phục dữ liệu cho tất cả thành viên..."]);
@@ -175,6 +186,19 @@ export function Admin() {
           });
         }
       });
+
+      // Tải các vật phẩm Gacha để bổ sung chính xác độ hiếm nhãn dán
+      try {
+        const gachaItemsSnap = await getDocs(collection(db, "gacha_items"));
+        gachaItemsSnap.docs.forEach(doc => {
+          const item = doc.data();
+          if (item.image && item.rarity) {
+            stickerRarities.set(item.image, Number(item.rarity));
+          }
+        });
+      } catch (err) {
+        console.warn("Không thể tải bổ sung danh sách gacha_items:", err);
+      }
 
       // Tải các vật phẩm trong cửa hàng để truy quét giá trị tài sản đang sở hữu
       const storeStickersSnap = await getDocs(collection(db, "store_stickers"));
@@ -588,63 +612,71 @@ export function Admin() {
         const minPullsFromStickers = sortedStickersWithRarity.length;
         const reconstructedTotalPulls = Math.max(u.totalGachaPulls || 0, maxPullsFromTxs, minPullsFromStickers);
 
-        let calculatedPity5 = 0;
-        let calculatedPity4 = 0;
+        let calculatedPity5 = u.gachaPity5Star !== undefined && u.gachaPity5Star !== null ? u.gachaPity5Star : -1;
+        let calculatedPity4 = u.gachaPity4Star !== undefined && u.gachaPity4Star !== null ? u.gachaPity4Star : -1;
         const totalPulls = reconstructedTotalPulls;
         const totalUniqueStickers = sortedStickersWithRarity.length;
         
-        // Tái dựng Bảo hiểm 5⭐ từ lịch sử nhãn dán
-        if (totalPulls > 0) {
-          if (totalUniqueStickers > 0) {
-            const last5StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(5);
-            if (last5StarIndex === -1) {
-              calculatedPity5 = totalPulls;
+        // Tái dựng Bảo hiểm 5⭐ từ lịch sử nhãn dán nếu chưa có
+        if (calculatedPity5 === -1) {
+          if (totalPulls > 0) {
+            if (totalUniqueStickers > 0) {
+              const last5StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(5);
+              if (last5StarIndex === -1) {
+                calculatedPity5 = totalPulls;
+              } else {
+                const stickersAfterLast5 = sortedStickersWithRarity.slice(last5StarIndex + 1);
+                const uniqueCountAfterLast5 = stickersAfterLast5.length;
+                const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+                const estimatedPullsAfterLast5 = Math.round(uniqueCountAfterLast5 * pullsPerUniqueSticker);
+                calculatedPity5 = Math.max(uniqueCountAfterLast5, estimatedPullsAfterLast5);
+              }
             } else {
-              const stickersAfterLast5 = sortedStickersWithRarity.slice(last5StarIndex + 1);
-              const uniqueCountAfterLast5 = stickersAfterLast5.length;
-              const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
-              const estimatedPullsAfterLast5 = Math.round(uniqueCountAfterLast5 * pullsPerUniqueSticker);
-              calculatedPity5 = Math.max(uniqueCountAfterLast5, estimatedPullsAfterLast5);
+              calculatedPity5 = totalPulls;
             }
           } else {
-            calculatedPity5 = totalPulls;
+            calculatedPity5 = 0;
           }
-        }
-        calculatedPity5 = Math.min(calculatedPity5, 89);
-        if (totalUniqueStickers > 0) {
-          const count5Star = sortedStickersWithRarity.filter(s => s.rarity === 5).length;
-          if (count5Star === 0 && totalPulls >= 90) {
+          calculatedPity5 = Math.min(calculatedPity5, 89);
+          if (totalUniqueStickers > 0) {
+            const count5Star = sortedStickersWithRarity.filter(s => s.rarity === 5).length;
+            if (count5Star === 0 && totalPulls >= 90) {
+              calculatedPity5 = totalPulls % 90;
+            }
+          } else if (totalPulls >= 90) {
             calculatedPity5 = totalPulls % 90;
           }
-        } else if (totalPulls >= 90) {
-          calculatedPity5 = totalPulls % 90;
         }
 
-        // Tái dựng Bảo hiểm 4⭐ từ lịch sử nhãn dán
-        if (totalPulls > 0) {
-          if (totalUniqueStickers > 0) {
-            const last4StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(4);
-            if (last4StarIndex === -1) {
-              calculatedPity4 = totalPulls;
+        // Tái dựng Bảo hiểm 4⭐ từ lịch sử nhãn dán nếu chưa có
+        if (calculatedPity4 === -1) {
+          if (totalPulls > 0) {
+            if (totalUniqueStickers > 0) {
+              const last4StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(4);
+              if (last4StarIndex === -1) {
+                calculatedPity4 = totalPulls;
+              } else {
+                const stickersAfterLast4 = sortedStickersWithRarity.slice(last4StarIndex + 1);
+                const uniqueCountAfterLast4 = stickersAfterLast4.length;
+                const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+                const estimatedPullsAfterLast4 = Math.round(uniqueCountAfterLast4 * pullsPerUniqueSticker);
+                calculatedPity4 = Math.max(uniqueCountAfterLast4, estimatedPullsAfterLast4);
+              }
             } else {
-              const stickersAfterLast4 = sortedStickersWithRarity.slice(last4StarIndex + 1);
-              const uniqueCountAfterLast4 = stickersAfterLast4.length;
-              const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
-              const estimatedPullsAfterLast4 = Math.round(uniqueCountAfterLast4 * pullsPerUniqueSticker);
-              calculatedPity4 = Math.max(uniqueCountAfterLast4, estimatedPullsAfterLast4);
+              calculatedPity4 = totalPulls;
             }
           } else {
-            calculatedPity4 = totalPulls;
+            calculatedPity4 = 0;
           }
-        }
-        calculatedPity4 = Math.min(calculatedPity4, 9);
-        if (totalUniqueStickers > 0) {
-          const count4Star = sortedStickersWithRarity.filter(s => s.rarity === 4).length;
-          if (count4Star === 0 && totalPulls >= 10) {
+          calculatedPity4 = Math.min(calculatedPity4, 9);
+          if (totalUniqueStickers > 0) {
+            const count4Star = sortedStickersWithRarity.filter(s => s.rarity === 4).length;
+            if (count4Star === 0 && totalPulls >= 10) {
+              calculatedPity4 = totalPulls % 10;
+            }
+          } else if (totalPulls >= 10) {
             calculatedPity4 = totalPulls % 10;
           }
-        } else if (totalPulls >= 10) {
-          calculatedPity4 = totalPulls % 10;
         }
 
         // Compute claimed achievements rewards
@@ -854,7 +886,583 @@ export function Admin() {
     }
   };
 
-  // Stories Management
+  const runSingleUserAudit = async (u: any) => {
+    setIsAuditing(true);
+    setAuditLogs([`🔍 Bắt đầu đối soát chi tiết cho người dùng: ${u.displayName || u.email || u.id}...`]);
+    setAuditReport(null);
+    try {
+      // 1. Tải các banner gacha để phân loại độ hiếm nhãn dán
+      const bannersSnap = await getDocs(collection(db, "gacha_banners"));
+      const banners = bannersSnap.docs.map(doc => doc.data() as any);
+      const stickerRarities = new Map<string, number>();
+      
+      banners.forEach(b => {
+        if (b.pool5Star) {
+          b.pool5Star.forEach((item: any) => {
+            if (item.image) stickerRarities.set(item.image, 5);
+          });
+        }
+        if (b.featured5Star) {
+          const item = b.featured5Star;
+          if (item.image) stickerRarities.set(item.image, 5);
+        }
+        if (b.pool4Star) {
+          b.pool4Star.forEach((item: any) => {
+            if (item.image) stickerRarities.set(item.image, 4);
+          });
+        }
+        if (b.featured4Stars) {
+          b.featured4Stars.forEach((item: any) => {
+            if (item.image) stickerRarities.set(item.image, 4);
+          });
+        }
+      });
+
+      // Tải các vật phẩm Gacha để bổ sung chính xác độ hiếm nhãn dán
+      try {
+        const gachaItemsSnap = await getDocs(collection(db, "gacha_items"));
+        gachaItemsSnap.docs.forEach(doc => {
+          const item = doc.data();
+          if (item.image && item.rarity) {
+            stickerRarities.set(item.image, Number(item.rarity));
+          }
+        });
+      } catch (err) {
+        console.warn("Không thể tải bổ sung danh sách gacha_items trong đối soát:", err);
+      }
+
+      // Tải giá trong cửa hàng
+      const storeStickersSnap = await getDocs(collection(db, "store_stickers"));
+      const storeAccessoriesSnap = await getDocs(collection(db, "store_accessories"));
+      const storeChucuAccessoriesSnap = await getDocs(collection(db, "store_chucu_accessories"));
+
+      const stickerPrices = new Map<string, { price: number; currency: string }>();
+      storeStickersSnap.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.url) {
+          stickerPrices.set(data.url, { 
+            price: Number(data.price) || 0, 
+            currency: (data.type || 'choco').toLowerCase() 
+          });
+        }
+      });
+
+      const accessoryPrices = new Map<string, { price: number; currency: string }>();
+      storeAccessoriesSnap.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.url) {
+          accessoryPrices.set(data.url, { 
+            price: Number(data.price) || 0, 
+            currency: (data.type || 'choco').toLowerCase() 
+          });
+        }
+      });
+
+      const chucuAccessoryPrices = new Map<string, { price: number; currency: string }>();
+      storeChucuAccessoriesSnap.docs.forEach(doc => {
+        const data = doc.data();
+        const key = data.url || data.id;
+        if (key) {
+          chucuAccessoryPrices.set(key, { 
+            price: Number(data.price) || 0, 
+            currency: (data.type || 'choco').toLowerCase() 
+          });
+        }
+      });
+
+      // Fetch subcollections của user
+      const txSnap = await getDocs(collection(db, `users/${u.id}/transactions`));
+      const txs = txSnap.docs.map(doc => doc.data());
+      setAuditLogs(prev => [...prev, `➡️ Đã tìm thấy ${txs.length} giao dịch trong Firestore.`]);
+
+      const stickersSnap = await getDocs(collection(db, `users/${u.id}/owned_stickers`));
+      const currentStickerUrls = new Set(stickersSnap.docs.map(doc => doc.data().url).filter(Boolean));
+      setAuditLogs(prev => [...prev, `➡️ Đang sở hữu ${stickersSnap.size} Nhãn dán.`]);
+
+      const accessoriesSnap = await getDocs(collection(db, `users/${u.id}/owned_accessories`));
+      const currentAccessoryUrls = new Set(accessoriesSnap.docs.map(doc => doc.data().url).filter(Boolean));
+      setAuditLogs(prev => [...prev, `➡️ Đang sở hữu ${accessoriesSnap.size} Phụ kiện.`]);
+
+      const commentsSnap = await getDocs(query(collection(db, "comments"), where("uid", "==", u.id)));
+      const actualCommentsCount = commentsSnap.size;
+
+      const chatSnap = await getDocs(query(collection(db, "chatMessages"), where("uid", "==", u.id)));
+      const actualChatCount = chatSnap.size;
+
+      const feedSnap = await getDocs(query(collection(db, "newsFeed"), where("uid", "==", u.id)));
+      const actualFeedCount = feedSnap.size;
+
+      // Sắp xếp giao dịch theo thời gian tăng dần
+      const getTxTime = (tx: any) => {
+        if (!tx.createdAt) return 0;
+        if (typeof tx.createdAt.toMillis === 'function') return tx.createdAt.toMillis();
+        if (tx.createdAt.seconds !== undefined) return tx.createdAt.seconds * 1000;
+        return new Date(tx.createdAt).getTime() || 0;
+      };
+      const sortedTxs = [...txs].sort((a, b) => getTxTime(a) - getTxTime(b));
+
+      // Reconstruct balances & analyze activities
+      let calculatedEarnedChoco = 0;
+      let calculatedEarnedGChoco = 0;
+      let calculatedSpentChoco = 0;
+      let calculatedSpentGChoco = 0;
+
+      let conversionEarnedGChoco = 0;
+      let adminGiftsChoco = 0;
+      let adminGiftsGChoco = 0;
+
+      const txBoughtStickerUrls = new Set<string>();
+      const txBoughtAccessoryUrls = new Set<string>();
+      const txUnlockedChapters = new Set<string>();
+      const txUnlockedEarlyAccessChapters = new Set<string>();
+      const restoredAchievements = new Set<string>();
+      const checkInDates = new Set<string>();
+
+      let playCountChocoMatch = 0;
+      let playCountChucuGame = 0;
+      let gachaDrawCount = 0;
+      let commentsCount = 0;
+
+      sortedTxs.forEach(t => {
+        const amt = Number(t.amount) || 0;
+        const desc = t.description || t.reason || "";
+        const isSpecialEarn = desc.includes("Admin") || desc.includes("Tặng") || desc.includes("Quà") || desc.includes("gift") || desc.includes("Bù") || desc.includes("Khôi phục");
+        
+        if (t.currency === 'choco') {
+          if (t.type === 'earn') {
+            calculatedEarnedChoco += amt;
+            if (isSpecialEarn) {
+              adminGiftsChoco += amt;
+            }
+          } else if (t.type === 'spend') {
+            calculatedSpentChoco += amt;
+          }
+        } else if (t.currency === 'gchoco') {
+          if (t.type === 'earn') {
+            calculatedEarnedGChoco += amt;
+            if (desc.includes("Đổi") || desc.includes("convert")) {
+              conversionEarnedGChoco += amt;
+            }
+            if (isSpecialEarn) {
+              adminGiftsGChoco += amt;
+            }
+          } else if (t.type === 'spend') {
+            calculatedSpentGChoco += amt;
+          }
+        }
+
+        // Kiểm tra điểm danh
+        if (desc.includes("Điểm danh")) {
+          const tTime = getTxTime(t);
+          if (tTime) {
+             const dateStr = format(new Date(tTime), 'yyyy-MM-dd');
+             checkInDates.add(dateStr);
+          }
+        }
+
+        // Games and other counts
+        if (desc.includes("Choco Match") || desc.includes("Choco_Match") || desc.includes("ChocoMatch")) {
+          playCountChocoMatch++;
+        }
+        if (desc.includes("Chucu") || desc.includes("Hứng Choco") || desc.includes("Nuôi Chucu")) {
+          playCountChucuGame++;
+        }
+        if (desc.includes("Gacha")) {
+          gachaDrawCount++;
+        }
+        if (desc.includes("Bình luận") || desc.includes("comment")) {
+          commentsCount++;
+        }
+
+        // Nhận diện tài sản
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const urlMatches = desc.match(urlRegex);
+        if (urlMatches) {
+          urlMatches.forEach((url: string) => {
+            const cleanedUrl = url.trim();
+            if (cleanedUrl.includes("sticker") || cleanedUrl.includes("gacha") || cleanedUrl.includes("nhan_dan")) {
+              txBoughtStickerUrls.add(cleanedUrl);
+            } else if (cleanedUrl.includes("accessory") || cleanedUrl.includes("phu_kien") || cleanedUrl.includes("pet")) {
+              txBoughtAccessoryUrls.add(cleanedUrl);
+            }
+          });
+        }
+
+        if (t.unlockedChapterId) {
+          txUnlockedChapters.add(t.unlockedChapterId);
+        } else if (desc.includes("Chương") || desc.includes("chapter")) {
+          const m = desc.match(/chương\s+([a-zA-Z0-9_-]+)/i) || desc.match(/chapter\s+([a-zA-Z0-9_-]+)/i);
+          if (m) txUnlockedChapters.add(m[1]);
+        }
+
+        if (t.unlockedEarlyAccessChapterId) {
+          txUnlockedEarlyAccessChapters.add(t.unlockedEarlyAccessChapterId);
+        }
+
+        // Achievements
+        if (desc.includes("Thành tựu") || desc.includes("achievement")) {
+          const m = desc.match(/Thành tựu\s+([a-zA-Z0-9_-]+)/i) || desc.match(/achievement\s+([a-zA-Z0-9_-]+)/i);
+          if (m) restoredAchievements.add(m[1]);
+        }
+      });
+
+      let spentChocoFromAssets = 0;
+      let spentGChocoFromAssets = 0;
+
+      txBoughtStickerUrls.forEach(url => {
+        const itemPrice = stickerPrices.get(url);
+        if (itemPrice) {
+          if (itemPrice.currency === 'gchoco') spentGChocoFromAssets += itemPrice.price;
+          else spentChocoFromAssets += itemPrice.price;
+        }
+      });
+
+      txBoughtAccessoryUrls.forEach(url => {
+        const itemPrice = accessoryPrices.get(url) || chucuAccessoryPrices.get(url);
+        if (itemPrice) {
+          if (itemPrice.currency === 'gchoco') spentGChocoFromAssets += itemPrice.price;
+          else spentChocoFromAssets += itemPrice.price;
+        }
+      });
+
+      calculatedSpentChoco = Math.max(calculatedSpentChoco, spentChocoFromAssets);
+      calculatedSpentGChoco = Math.max(calculatedSpentGChoco, spentGChocoFromAssets);
+
+      const uChoco = u.choco || 0;
+      const uGChoco = u.goldenChoco || 0;
+
+      // Khôi phục theo số dư giao dịch gần nhất
+      let finalCalculatedChoco = uChoco;
+      let lastChocoTxIndex = -1;
+      for (let i = sortedTxs.length - 1; i >= 0; i--) {
+        const t = sortedTxs[i];
+        if (t.currency === 'choco' && t.balanceAfter !== undefined && t.balanceAfter !== null) {
+          lastChocoTxIndex = i;
+          break;
+        }
+      }
+
+      if (lastChocoTxIndex !== -1) {
+        let bal = Number(sortedTxs[lastChocoTxIndex].balanceAfter);
+        for (let i = lastChocoTxIndex + 1; i < sortedTxs.length; i++) {
+          const t = sortedTxs[i];
+          if (t.currency === 'choco') {
+            const amt = Number(t.amount) || 0;
+            if (t.type === 'earn') bal += amt;
+            else if (t.type === 'spend') bal -= amt;
+          }
+        }
+        finalCalculatedChoco = Math.max(0, bal);
+      } else {
+        if (sortedTxs.some(t => t.currency === 'choco')) {
+          let sumChoco = 0;
+          sortedTxs.forEach(t => {
+            if (t.currency === 'choco') {
+              const amt = Number(t.amount) || 0;
+              if (t.type === 'earn') sumChoco += amt;
+              else if (t.type === 'spend') sumChoco -= amt;
+            }
+          });
+          finalCalculatedChoco = Math.max(uChoco, sumChoco);
+        }
+      }
+
+      let finalCalculatedGChoco = uGChoco;
+      let lastGChocoTxIndex = -1;
+      for (let i = sortedTxs.length - 1; i >= 0; i--) {
+        const t = sortedTxs[i];
+        if (t.currency === 'gchoco' && t.balanceAfter !== undefined && t.balanceAfter !== null) {
+          lastGChocoTxIndex = i;
+          break;
+        }
+      }
+
+      if (lastGChocoTxIndex !== -1) {
+        let bal = Number(sortedTxs[lastGChocoTxIndex].balanceAfter);
+        for (let i = lastGChocoTxIndex + 1; i < sortedTxs.length; i++) {
+          const t = sortedTxs[i];
+          if (t.currency === 'gchoco') {
+            const amt = Number(t.amount) || 0;
+            if (t.type === 'earn') bal += amt;
+            else if (t.type === 'spend') bal -= amt;
+          }
+        }
+        finalCalculatedGChoco = Math.max(0, bal);
+      } else {
+        if (sortedTxs.some(t => t.currency === 'gchoco')) {
+          let sumGChoco = 0;
+          sortedTxs.forEach(t => {
+            if (t.currency === 'gchoco') {
+              const amt = Number(t.amount) || 0;
+              if (t.type === 'earn') sumGChoco += amt;
+              else if (t.type === 'spend') sumGChoco -= amt;
+            }
+          });
+          finalCalculatedGChoco = Math.max(uGChoco, sumGChoco);
+        }
+      }
+
+      // Achievement rewards check
+      const mergedClaimed = new Set(u.claimedAchievements || []);
+      const mergedUnlocked = new Set(u.unlockedAchievements || []);
+      restoredAchievements.forEach(id => {
+        mergedUnlocked.add(id);
+        mergedClaimed.add(id);
+      });
+
+      const claimedAchievementsList = Array.from(mergedClaimed);
+      let claimedAchievementsChocoReward = 0;
+      let claimedAchievementsGChocoReward = 0;
+      claimedAchievementsList.forEach(achId => {
+        const ach = ACHIEVEMENTS_LIST.find(a => a.id === achId);
+        if (ach) {
+          claimedAchievementsChocoReward += ach.chocoReward || 0;
+          claimedAchievementsGChocoReward += ach.goldenReward || 0;
+        }
+      });
+
+      // Admin verification - BẢO TOÀN GỐC 9.999.999 và khôi phục cộng thêm tích lũy!
+      const isUserAdmin = u.email?.toLowerCase() === 'cucnau01@gmail.com';
+      if (isUserAdmin) {
+        finalCalculatedChoco = 9999999 + calculatedEarnedChoco - calculatedSpentChoco;
+        finalCalculatedGChoco = 9999999 + calculatedEarnedGChoco - calculatedSpentGChoco;
+      } else {
+        finalCalculatedChoco = Math.max(finalCalculatedChoco, uChoco);
+        finalCalculatedGChoco = Math.max(finalCalculatedGChoco, uGChoco);
+      }
+
+      const finalCheckInsCount = Math.max(u.totalCheckIns || 0, checkInDates.size);
+      const maxVerifiableChocoEarned = ((finalCheckInsCount * 10) + claimedAchievementsChocoReward + (playCountChocoMatch * 15) + (playCountChucuGame * 15) + adminGiftsChoco + spentChocoFromAssets + (actualCommentsCount * 1) + 300);
+      const maxVerifiableGChocoEarned = (claimedAchievementsGChocoReward + Math.ceil(playCountChocoMatch / 10) + conversionEarnedGChoco + adminGiftsGChoco + spentGChocoFromAssets + 5);
+
+      let chocoCapped = false;
+      const originalCalculatedChoco = finalCalculatedChoco;
+      if (!isUserAdmin && finalCalculatedChoco > maxVerifiableChocoEarned) {
+        finalCalculatedChoco = maxVerifiableChocoEarned;
+        chocoCapped = true;
+      }
+
+      let gchocoCapped = false;
+      const originalCalculatedGChoco = finalCalculatedGChoco;
+      if (!isUserAdmin && finalCalculatedGChoco > maxVerifiableGChocoEarned) {
+        finalCalculatedGChoco = maxVerifiableGChocoEarned;
+        gchocoCapped = true;
+      }
+
+      // Restore tickets From Txs
+      let ticketsFromTxs = 0;
+      sortedTxs.forEach(t => {
+        const desc = t.description || t.reason || "";
+        if (desc.includes("Vé Gacha") || desc.includes("Gacha")) {
+          const match = desc.match(/(?:Mua|Đổi\s+sang|Đổi|Tặng)\s*(\d+)/i) || desc.match(/(\d+)\s*Vé/i);
+          if (match) {
+            ticketsFromTxs += parseInt(match[1], 10);
+          }
+        }
+      });
+
+      const maxPullsFromTxs = Math.max(0, ticketsFromTxs - (u.ownedGachaTickets || 0));
+      const sortedStickersWithRarity = stickersSnap.docs
+        .map(doc => {
+          const data = doc.data();
+          const url = data.url || "";
+          const rarity = stickerRarities.get(url) || 3;
+          
+          let time = 0;
+          if (data.createdAt) {
+            if (typeof data.createdAt.toMillis === 'function') {
+              time = data.createdAt.toMillis();
+            } else if (data.createdAt.seconds !== undefined) {
+              time = data.createdAt.seconds * 1000;
+            } else {
+              time = new Date(data.createdAt).getTime() || 0;
+            }
+          }
+          return { url, rarity, time };
+        })
+        .sort((a, b) => a.time - b.time);
+
+      const minPullsFromStickers = sortedStickersWithRarity.length;
+      const reconstructedTotalPulls = Math.max(u.totalGachaPulls || 0, maxPullsFromTxs, minPullsFromStickers);
+
+      // PITY PRESERVATIVE logic: Keep live pity if they are already defined in DB!
+      let calculatedPity5 = u.gachaPity5Star !== undefined && u.gachaPity5Star !== null ? u.gachaPity5Star : -1;
+      let calculatedPity4 = u.gachaPity4Star !== undefined && u.gachaPity4Star !== null ? u.gachaPity4Star : -1;
+
+      if (calculatedPity5 === -1) {
+        const totalPulls = reconstructedTotalPulls;
+        const totalUniqueStickers = sortedStickersWithRarity.length;
+        if (totalPulls > 0) {
+          if (totalUniqueStickers > 0) {
+            const last5StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(5);
+            if (last5StarIndex === -1) {
+              calculatedPity5 = totalPulls;
+            } else {
+              const stickersAfterLast5 = sortedStickersWithRarity.slice(last5StarIndex + 1);
+              const uniqueCountAfterLast5 = stickersAfterLast5.length;
+              const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+              const estimatedPullsAfterLast5 = Math.round(uniqueCountAfterLast5 * pullsPerUniqueSticker);
+              calculatedPity5 = Math.max(uniqueCountAfterLast5, estimatedPullsAfterLast5);
+            }
+          } else {
+            calculatedPity5 = totalPulls;
+          }
+        }
+        calculatedPity5 = Math.min(calculatedPity5, 89);
+        if (totalUniqueStickers > 0) {
+          const count5Star = sortedStickersWithRarity.filter(s => s.rarity === 5).length;
+          if (count5Star === 0 && totalPulls >= 90) {
+            calculatedPity5 = totalPulls % 90;
+          }
+        } else if (totalPulls >= 90) {
+          calculatedPity5 = totalPulls % 90;
+        }
+      }
+
+      if (calculatedPity4 === -1) {
+        const totalPulls = reconstructedTotalPulls;
+        const totalUniqueStickers = sortedStickersWithRarity.length;
+        if (totalPulls > 0) {
+          if (totalUniqueStickers > 0) {
+            const last4StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(4);
+            if (last4StarIndex === -1) {
+              calculatedPity4 = totalPulls;
+            } else {
+              const stickersAfterLast4 = sortedStickersWithRarity.slice(last4StarIndex + 1);
+              const uniqueCountAfterLast4 = stickersAfterLast4.length;
+              const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+              const estimatedPullsAfterLast4 = Math.round(uniqueCountAfterLast4 * pullsPerUniqueSticker);
+              calculatedPity4 = Math.max(uniqueCountAfterLast4, estimatedPullsAfterLast4);
+            }
+          } else {
+            calculatedPity4 = totalPulls;
+          }
+        }
+        calculatedPity4 = Math.min(calculatedPity4, 9);
+        if (totalUniqueStickers > 0) {
+          const count4Star = sortedStickersWithRarity.filter(s => s.rarity === 4).length;
+          if (count4Star === 0 && totalPulls >= 10) {
+            calculatedPity4 = totalPulls % 10;
+          }
+        } else if (totalPulls >= 10) {
+          calculatedPity4 = totalPulls % 10;
+        }
+      }
+
+      // Check differences
+      const updates: any = {};
+      let changed = false;
+
+      if (finalCalculatedChoco !== uChoco) {
+        updates.choco = finalCalculatedChoco;
+        changed = true;
+      }
+      if (finalCalculatedGChoco !== uGChoco) {
+        updates.goldenChoco = finalCalculatedGChoco;
+        changed = true;
+      }
+      if (reconstructedTotalPulls !== (u.totalGachaPulls || 0)) {
+        updates.totalGachaPulls = reconstructedTotalPulls;
+        changed = true;
+      }
+      if (calculatedPity5 !== (u.gachaPity5Star || 0)) {
+        updates.gachaPity5Star = calculatedPity5;
+        changed = true;
+      }
+      if (calculatedPity4 !== (u.gachaPity4Star || 0)) {
+        updates.gachaPity4Star = calculatedPity4;
+        changed = true;
+      }
+
+      setAuditLogs(prev => [
+        ...prev,
+        `📊 KẾT QUẢ ĐỐI SOÁT:`,
+        `   - Số dư hiện tại: ${uChoco.toLocaleString()} Choco / ${uGChoco.toLocaleString()} GChoco`,
+        isUserAdmin 
+          ? `   - Số dư sau đối soát (Admin): Gốc 9.999.999 + Tích lũy thực tế = ${finalCalculatedChoco.toLocaleString()} Choco / ${finalCalculatedGChoco.toLocaleString()} GChoco (Kiếm thêm ${calculatedEarnedChoco.toLocaleString()} Choco)`
+          : `   - Số dư sau đối soát (Tái dựng): ${finalCalculatedChoco.toLocaleString()} Choco / ${finalCalculatedGChoco.toLocaleString()} GChoco`,
+        `   - Bảo hiểm Pity (Firestore): 5⭐: ${u.gachaPity5Star || 0}/90, 4⭐: ${u.gachaPity4Star || 0}/10`,
+        `   - Bảo hiểm Pity (Thực tế): 5⭐: ${calculatedPity5}/90, 4⭐: ${calculatedPity4}/10`,
+        `   - Phát hiện lệch số dư/pity: ${changed ? "CÓ CHÊNH LỆCH (Cần đồng bộ)" : "KHÔNG (Đã chuẩn khớp)"}`
+      ]);
+
+      setAuditReport({
+        user: u,
+        uChoco,
+        uGChoco,
+        finalCalculatedChoco,
+        finalCalculatedGChoco,
+        calculatedEarnedChoco,
+        calculatedSpentChoco,
+        calculatedEarnedGChoco,
+        calculatedSpentGChoco,
+        reconstructedTotalPulls,
+        calculatedPity5,
+        calculatedPity4,
+        ticketsFromTxs,
+        checkInsCount: finalCheckInsCount,
+        commentsCount: actualCommentsCount,
+        chatCount: actualChatCount,
+        feedCount: actualFeedCount,
+        isUserAdmin,
+        updates,
+        changed,
+        missingStickers: [...txBoughtStickerUrls].filter(url => !currentStickerUrls.has(url)),
+        missingAccessories: [...txBoughtAccessoryUrls].filter(url => !currentAccessoryUrls.has(url)),
+        missingUnlockedChaps: Array.from(txUnlockedChapters),
+        missingUnlockedEarlyAccessChaps: Array.from(txUnlockedEarlyAccessChapters),
+        mergedUnlocked: Array.from(mergedUnlocked),
+        mergedClaimed: Array.from(mergedClaimed)
+      });
+    } catch (err: any) {
+      console.error(err);
+      setAuditLogs(prev => [...prev, `❌ Thất bại: ${err.message || err}`]);
+    } finally {
+      setIsAuditing(false);
+    }
+  };
+
+  const executeSingleUserRestore = async () => {
+    if (!auditReport) return;
+    const { user, updates, missingStickers, missingAccessories, missingUnlockedChaps, missingUnlockedEarlyAccessChaps, mergedUnlocked, mergedClaimed } = auditReport;
+    setIsAuditing(true);
+    setAuditLogs(prev => [...prev, `⏳ Đang khôi phục & đồng bộ trực tiếp xuống Firestore...`]);
+    try {
+      const uRef = doc(db, "users", user.id);
+      
+      const finalUpdates = { ...updates };
+      if (mergedUnlocked.length > 0) finalUpdates.unlockedAchievements = mergedUnlocked;
+      if (mergedClaimed.length > 0) finalUpdates.claimedAchievements = mergedClaimed;
+      if (missingUnlockedChaps.length > 0) finalUpdates.unlockedChapters = missingUnlockedChaps;
+      if (missingUnlockedEarlyAccessChaps.length > 0) finalUpdates.unlockedEarlyAccessChapters = missingUnlockedEarlyAccessChaps;
+
+      await updateDoc(uRef, finalUpdates);
+
+      for (const sUrl of missingStickers) {
+        await addDoc(collection(db, "users", user.id, "owned_stickers"), {
+          url: sUrl,
+          createdAt: serverTimestamp()
+        });
+        setAuditLogs(prev => [...prev, `   🎉 Đã khôi phục Nhãn dán: ${sUrl}`]);
+      }
+
+      for (const aUrl of missingAccessories) {
+        await addDoc(collection(db, "users", user.id, "owned_accessories"), {
+          url: aUrl,
+          createdAt: serverTimestamp()
+        });
+        setAuditLogs(prev => [...prev, `   🎉 Đã khôi phục Phụ kiện: ${aUrl}`]);
+      }
+
+      setAuditLogs(prev => [...prev, `🎉 KHÔI PHỤC THÀNH CÔNG CHO ${user.displayName || user.email}! Toàn bộ dữ liệu của thành viên này đã chuẩn hóa.`]);
+      setAuditReport(prev => prev ? { ...prev, changed: false } : null);
+    } catch (err: any) {
+      console.error(err);
+      setAuditLogs(prev => [...prev, `❌ Thất bại: ${err.message || err}`]);
+    } finally {
+      setIsAuditing(false);
+    }
+  };
   const [stories, setStories] = useState<Book[]>([]);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -914,6 +1522,12 @@ export function Admin() {
   const [editStatCheckInStreak, setEditStatCheckInStreak] = useState<number>(0);
   const [editStatLastCheckInDate, setEditStatLastCheckInDate] = useState<string>("");
   const [editStatOwnedStreakTickets, setEditStatOwnedStreakTickets] = useState<number>(0);
+  
+  const [editStatTotalCheckIns, setEditStatTotalCheckIns] = useState<number>(0);
+  const [editStatTotalGachaPulls, setEditStatTotalGachaPulls] = useState<number>(0);
+  const [editStatGachaPity5Star, setEditStatGachaPity5Star] = useState<number>(0);
+  const [editStatGachaPity4Star, setEditStatGachaPity4Star] = useState<number>(0);
+  const [editStatOwnedGachaTickets, setEditStatOwnedGachaTickets] = useState<number>(0);
 
   const openEditUserStats = (u: AdminUser) => {
     setEditingUserStats(u);
@@ -933,6 +1547,11 @@ export function Admin() {
     setEditStatCheckInStreak(u.checkInStreak ?? 0);
     setEditStatLastCheckInDate(u.lastCheckInDate ?? "");
     setEditStatOwnedStreakTickets(u.ownedStreakTickets ?? 0);
+    setEditStatTotalCheckIns(u.totalCheckIns ?? 0);
+    setEditStatTotalGachaPulls(u.totalGachaPulls ?? 0);
+    setEditStatGachaPity5Star(u.gachaPity5Star ?? 0);
+    setEditStatGachaPity4Star(u.gachaPity4Star ?? 0);
+    setEditStatOwnedGachaTickets(u.ownedGachaTickets ?? 0);
   };
 
   const handleSaveUserStats = async () => {
@@ -955,6 +1574,11 @@ export function Admin() {
         checkInStreak: editStatCheckInStreak,
         lastCheckInDate: editStatLastCheckInDate ? editStatLastCheckInDate : null,
         ownedStreakTickets: editStatOwnedStreakTickets,
+        totalCheckIns: editStatTotalCheckIns,
+        totalGachaPulls: editStatTotalGachaPulls,
+        gachaPity5Star: editStatGachaPity5Star,
+        gachaPity4Star: editStatGachaPity4Star,
+        ownedGachaTickets: editStatOwnedGachaTickets,
       });
       alert(`Đã khôi phục và cập nhật chỉ số cho thành viên ${editingUserStats.displayName} thành công!`);
       setEditingUserStats(null);
@@ -1486,6 +2110,11 @@ export function Admin() {
           checkInStreak: data.checkInStreak !== undefined ? data.checkInStreak : 0,
           lastCheckInDate: data.lastCheckInDate !== undefined ? data.lastCheckInDate : "",
           ownedStreakTickets: data.ownedStreakTickets !== undefined ? data.ownedStreakTickets : 0,
+          totalCheckIns: data.totalCheckIns !== undefined ? data.totalCheckIns : 0,
+          totalGachaPulls: data.totalGachaPulls !== undefined ? data.totalGachaPulls : 0,
+          gachaPity5Star: data.gachaPity5Star !== undefined ? data.gachaPity5Star : 0,
+          gachaPity4Star: data.gachaPity4Star !== undefined ? data.gachaPity4Star : 0,
+          ownedGachaTickets: data.ownedGachaTickets !== undefined ? data.ownedGachaTickets : 0,
         });
       });
       setUsers(list);
@@ -5467,6 +6096,15 @@ export function Admin() {
                   </div>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
                     <button
+                      onClick={() => {
+                        setAuditingUser(u);
+                        runSingleUserAudit(u);
+                      }}
+                      className="px-3 py-1.5 bg-[#C29D70] hover:bg-[#b08b5f] text-white border-2 border-[#3E2723] dark:border-[#4E342E] text-xs font-bold rounded-lg transition-all whitespace-nowrap shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex items-center gap-1"
+                    >
+                      🔍 Đối Soát & Khôi Phục
+                    </button>
+                    <button
                       onClick={() => openEditUserStats(u)}
                       className="px-3 py-1.5 bg-[#8D6E63] text-white border-2 border-[#3E2723] dark:border-[#4E342E] text-xs font-bold rounded-lg hover:bg-[#5D4037] transition-all whitespace-nowrap shadow-[1px_1px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex items-center gap-1"
                     >
@@ -6343,6 +6981,222 @@ export function Admin() {
         </div>
       )}
 
+      {auditingUser && (
+        <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center p-4 overflow-y-auto">
+          <div
+            className={`max-w-3xl w-full p-6 rounded-3xl border-2 shadow-[4px_4px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] flex flex-col gap-5 my-8 transition-all relative ${isDark ? "bg-[#211B18] border-[#4E342E] text-[#ECE5DC]" : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]"}`}
+          >
+            <div className="flex justify-between items-center border-b pb-3 border-[#3E2723]/10 dark:border-[#4E342E]/30">
+              <div className="space-y-1">
+                <h2 className="text-xl font-black uppercase tracking-wide text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-2">
+                  <Wrench className="w-6 h-6 text-amber-600" />
+                  Đối Soát Chi Tiết Tài Khoản
+                </h2>
+                <p className="text-xs opacity-75">{auditingUser.displayName} ({auditingUser.email})</p>
+              </div>
+              <button
+                onClick={() => {
+                  setAuditingUser(null);
+                  setAuditReport(null);
+                  setAuditLogs([]);
+                }}
+                className="text-stone-400 hover:text-red-500 font-extrabold text-2xl font-mono leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            {isAuditing && !auditReport && (
+              <div className="flex flex-col items-center justify-center py-12 gap-4">
+                <div className="w-12 h-12 border-4 border-amber-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="text-center space-y-1">
+                  <p className="font-bold">Đang phân tích dữ liệu hoạt động...</p>
+                  <p className="text-xs text-stone-500">Quá trình này có thể mất vài giây để quét mọi ngóc ngách Firestore.</p>
+                </div>
+              </div>
+            )}
+
+            {auditReport && (
+              <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+                {auditReport.isUserAdmin && (
+                  <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/5 text-red-700 dark:text-red-400 flex items-start gap-2.5">
+                    <span className="text-lg">👑</span>
+                    <div className="text-xs space-y-1">
+                      <p className="font-bold uppercase tracking-wider">Tài khoản quản trị viên (Admin)</p>
+                      <p>Hệ thống tự động kích hoạt cơ chế đối soát đặc biệt: Bảo toàn số dư gốc <strong>9.999.999 Choco/GChoco</strong> của Admin và chỉ cộng thêm các khoản tài sản/Choco/GChoco tích lũy thực tế mà Admin đã kiếm được trong quá trình sử dụng hệ thống.</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Grid so sánh chỉ số */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Choco */}
+                  <div className="p-4 rounded-2xl border-2 border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/40">
+                    <h3 className="font-bold text-amber-800 dark:text-amber-500 text-sm mb-3 flex items-center gap-1.5">
+                      🍫 Đối Soát Choco
+                    </h3>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Số dư trong database:</span>
+                        <span className="font-mono font-bold">{auditReport.uChoco.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Tính toán thực tế (Đã trừ tiêu):</span>
+                        <span className="font-mono font-bold text-blue-600 dark:text-blue-400">{auditReport.finalCalculatedChoco.toLocaleString()}</span>
+                      </div>
+                      <div className="border-t border-dashed my-2 border-stone-300 dark:border-stone-700" />
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Tổng Choco kiếm được:</span>
+                        <span className="font-mono text-green-600">+{auditReport.calculatedEarnedChoco.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Tổng Choco đã chi tiêu:</span>
+                        <span className="font-mono text-red-600">-{auditReport.calculatedSpentChoco.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Golden Choco */}
+                  <div className="p-4 rounded-2xl border-2 border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/40">
+                    <h3 className="font-bold text-yellow-600 dark:text-yellow-500 text-sm mb-3 flex items-center gap-1.5">
+                      🌟 Đối Soát Golden Choco
+                    </h3>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Số dư trong database:</span>
+                        <span className="font-mono font-bold">{auditReport.uGChoco.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Tính toán thực tế (Đã trừ tiêu):</span>
+                        <span className="font-mono font-bold text-blue-600 dark:text-blue-400">{auditReport.finalCalculatedGChoco.toLocaleString()}</span>
+                      </div>
+                      <div className="border-t border-dashed my-2 border-stone-300 dark:border-stone-700" />
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Tổng GChoco kiếm được:</span>
+                        <span className="font-mono text-green-600">+{auditReport.calculatedEarnedGChoco.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Tổng GChoco đã chi tiêu:</span>
+                        <span className="font-mono text-red-600">-{auditReport.calculatedSpentGChoco.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Thông tin Gacha & Pity */}
+                <div className="p-4 rounded-2xl border-2 border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/40 space-y-3">
+                  <h3 className="font-bold text-stone-800 dark:text-stone-300 text-sm flex items-center gap-1.5">
+                    🎲 Đối Soát Bảo Hiểm Gacha (Pity)
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Tổng lượt quay (Firestore):</span>
+                        <span className="font-mono font-bold">{auditReport.user.totalGachaPulls || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Tổng lượt quay (Đại lượng tái dựng):</span>
+                        <span className="font-mono font-bold text-amber-600">{auditReport.reconstructedTotalPulls}</span>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5 border-t md:border-t-0 md:border-l border-stone-300 dark:border-stone-700 pt-2 md:pt-0 md:pl-4">
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Pity 5⭐ hiện tại (Firestore / Đối soát):</span>
+                        <span className="font-mono font-bold">
+                          {auditReport.user.gachaPity5Star || 0} / <span className="text-green-600 font-extrabold">{auditReport.calculatedPity5}</span>
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="opacity-75">Pity 4⭐ hiện tại (Firestore / Đối soát):</span>
+                        <span className="font-mono font-bold">
+                          {auditReport.user.gachaPity4Star || 0} / <span className="text-green-600 font-extrabold">{auditReport.calculatedPity4}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hoạt động tích lũy */}
+                <div className="p-4 rounded-2xl border border-stone-200 dark:border-stone-800 text-xs grid grid-cols-2 sm:grid-cols-4 gap-3 bg-stone-100/50 dark:bg-stone-900/10">
+                  <div className="text-center p-2 rounded-xl bg-white dark:bg-stone-900/30">
+                    <p className="opacity-60 text-[10px] uppercase font-black">📅 Điểm danh</p>
+                    <p className="text-lg font-black mt-0.5">{auditReport.checkInsCount} ngày</p>
+                  </div>
+                  <div className="text-center p-2 rounded-xl bg-white dark:bg-stone-900/30">
+                    <p className="opacity-60 text-[10px] uppercase font-black">💬 Bình luận</p>
+                    <p className="text-lg font-black mt-0.5">{auditReport.commentsCount} lượt</p>
+                  </div>
+                  <div className="text-center p-2 rounded-xl bg-white dark:bg-stone-900/30">
+                    <p className="opacity-60 text-[10px] uppercase font-black">☕ Choco Lounge</p>
+                    <p className="text-lg font-black mt-0.5">{auditReport.chatCount} tin</p>
+                  </div>
+                  <div className="text-center p-2 rounded-xl bg-white dark:bg-stone-900/30">
+                    <p className="opacity-60 text-[10px] uppercase font-black">🎟️ Vé Gacha</p>
+                    <p className="text-lg font-black mt-0.5">{auditReport.ticketsFromTxs} vé mua</p>
+                  </div>
+                </div>
+
+                {/* Bù đắp và Khôi phục */}
+                {(auditReport.missingStickers.length > 0 || auditReport.missingAccessories.length > 0 || auditReport.missingUnlockedChaps.length > 0) && (
+                  <div className="p-4 rounded-2xl border-2 border-emerald-600/30 bg-emerald-500/5 space-y-2">
+                    <h4 className="font-bold text-emerald-800 dark:text-emerald-400 text-xs flex items-center gap-1">
+                      <span>🎁</span> Danh sách tài sản khôi phục bổ sung:
+                    </h4>
+                    <ul className="list-disc pl-5 text-[11px] text-emerald-700 dark:text-emerald-300 space-y-1">
+                      {auditReport.missingStickers.length > 0 && (
+                        <li>Nhãn dán đã mua bị thiếu: <strong>{auditReport.missingStickers.length} nhãn dán</strong></li>
+                      )}
+                      {auditReport.missingAccessories.length > 0 && (
+                        <li>Phụ kiện đã mua bị thiếu: <strong>{auditReport.missingAccessories.length} vật phẩm</strong></li>
+                      )}
+                      {auditReport.missingUnlockedChaps.length > 0 && (
+                        <li>Mở khóa chương truyện đã đọc: <strong>{auditReport.missingUnlockedChaps.length} chương</strong></li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Console Logs */}
+                <div className="space-y-1">
+                  <p className="text-xs font-bold opacity-75">Nhật ký tiến trình đối soát chi tiết:</p>
+                  <div className="p-4 rounded-xl bg-stone-900 text-stone-100 font-mono text-[10px] leading-relaxed max-h-40 overflow-y-auto space-y-1">
+                    {auditLogs.map((log, index) => (
+                      <div key={index} className={log.startsWith("❌") ? "text-red-400" : log.startsWith("🎉") ? "text-green-400" : log.startsWith("➡️") ? "text-amber-400" : "text-stone-300"}>
+                        {log}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-2 justify-end pt-3 border-t border-[#3E2723]/10 dark:border-[#4E342E]/30">
+                  <button
+                    onClick={() => {
+                      setAuditingUser(null);
+                      setAuditReport(null);
+                      setAuditLogs([]);
+                    }}
+                    className="px-4 py-2 bg-stone-200 hover:bg-stone-300 dark:bg-stone-800 dark:hover:bg-stone-700 text-[#3E2723] dark:text-[#ECE5DC] font-bold rounded-xl transition-all text-xs"
+                  >
+                    Đóng
+                  </button>
+                  <button
+                    onClick={executeSingleUserRestore}
+                    disabled={!auditReport.changed && auditReport.missingStickers.length === 0 && auditReport.missingAccessories.length === 0}
+                    className={`px-5 py-2 rounded-xl text-xs font-black uppercase tracking-wider text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap ${
+                      (!auditReport.changed && auditReport.missingStickers.length === 0 && auditReport.missingAccessories.length === 0)
+                        ? 'bg-stone-400 dark:bg-stone-700 cursor-not-allowed shadow-none hover:translate-x-0 hover:-translate-y-0'
+                        : 'bg-emerald-600 hover:bg-emerald-700 border-2 border-emerald-800'
+                    }`}
+                  >
+                    {(!auditReport.changed && auditReport.missingStickers.length === 0 && auditReport.missingAccessories.length === 0) ? "Đã Khớp Số Dư" : "Khôi Phục Ngay"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {editingUserStats && (
         <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4 overflow-y-auto">
           <div
@@ -6459,13 +7313,24 @@ export function Admin() {
               </div>
 
               {/* CỘT 3: CHUỖI ĐIỂM DANH & VÉ KHÔI PHỤC */}
-              <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3.5 p-3 rounded-2xl bg-amber-500/5 border border-amber-500/10">
-                <h3 className="sm:col-span-3 text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 border-b pb-1">
+              <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-4 gap-3.5 p-3 rounded-2xl bg-amber-500/5 border border-amber-500/10">
+                <h3 className="sm:col-span-4 text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 border-b pb-1">
                   📅 Chuỗi Điểm Danh & Vé Khôi Phục (Streak)
                 </h3>
                 
                 <div>
-                  <label className="block text-[10px] font-extrabold mb-1 text-amber-600">Chuỗi điểm danh hiện tại</label>
+                  <label className="block text-[10px] font-extrabold mb-1">Tổng lần điểm danh</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatTotalCheckIns}
+                    onChange={(e) => setEditStatTotalCheckIns(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1 text-amber-600">Chuỗi hiện tại</label>
                   <input
                     type="number"
                     min="0"
@@ -6476,7 +7341,7 @@ export function Admin() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-extrabold mb-1">Ngày điểm danh cuối (YYYY-MM-DD)</label>
+                  <label className="block text-[10px] font-extrabold mb-1">Ngày cuối (YYYY-MM-DD)</label>
                   <input
                     type="text"
                     placeholder="Ví dụ: 2026-06-18"
@@ -6490,29 +7355,79 @@ export function Admin() {
                       onClick={() => setEditStatLastCheckInDate(format(subDays(new Date(), 1), 'yyyy-MM-dd'))}
                       className="flex-1 py-1 px-1 text-[9px] font-black bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-all border border-amber-800 shadow-[0_1px_0_0_#5D4037] active:translate-y-0.5 active:shadow-none"
                     >
-                      ↩️ Đặt hôm qua (GỢI Ý)
+                      ↩️ Hôm qua
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditStatLastCheckInDate(format(new Date(), 'yyyy-MM-dd'))}
                       className="flex-1 py-1 px-1 text-[9px] font-black bg-stone-600 hover:bg-stone-700 text-white rounded-lg transition-all border border-stone-800 shadow-[0_1px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none"
                     >
-                      ✅ Đặt hôm nay
+                      ✅ Hôm nay
                     </button>
                   </div>
-                  <p className="text-[9px] text-[#8D6E63] italic mt-1 leading-snug">
-                    * Chọn <strong>Đặt hôm qua</strong> để hôm nay user tự điểm danh tiếp được. Chọn <strong>Đặt hôm nay</strong> nếu muốn tính là đã điểm danh hôm nay rồi.
-                  </p>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-extrabold mb-1 text-[#8D6E63]">Vé khôi phục chuỗi sở hữu</label>
+                  <label className="block text-[10px] font-extrabold mb-1 text-[#8D6E63]">Vé khôi phục chuỗi</label>
                   <input
                     type="number"
                     min="0"
                     value={editStatOwnedStreakTickets}
                     onChange={(e) => setEditStatOwnedStreakTickets(Number(e.target.value))}
                     className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-amber-600 text-[#8D6E63] font-bold"
+                  />
+                </div>
+              </div>
+
+              {/* CỘT 4: GACHA PITY */}
+              <div className="sm:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3.5 p-3 rounded-2xl bg-indigo-500/5 border border-indigo-500/10">
+                <h3 className="sm:col-span-4 text-xs font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-400 border-b pb-1">
+                  🎲 Lịch Sử Gacha & Bảo Hiểm (Pity)
+                </h3>
+                
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1">Tổng lượt quay</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatTotalGachaPulls}
+                    onChange={(e) => setEditStatTotalGachaPulls(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-indigo-600 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1 text-indigo-600">Pity 5⭐ (Tối đa 89)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="89"
+                    value={editStatGachaPity5Star}
+                    onChange={(e) => setEditStatGachaPity5Star(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-indigo-600 text-indigo-600 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1 text-purple-600">Pity 4⭐ (Tối đa 9)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="9"
+                    value={editStatGachaPity4Star}
+                    onChange={(e) => setEditStatGachaPity4Star(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-indigo-600 text-purple-600 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-extrabold mb-1 text-[#8D6E63]">Vé Gacha Sở Hữu</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editStatOwnedGachaTickets}
+                    onChange={(e) => setEditStatOwnedGachaTickets(Number(e.target.value))}
+                    className="w-full px-3 py-1.5 rounded-xl border-2 border-[#3E2723]/30 dark:border-[#4E342E]/70 bg-white dark:bg-[#1E1815] text-[#3E2723] dark:text-[#ECE5DC] focus:outline-none focus:border-indigo-600 font-bold"
                   />
                 </div>
               </div>
