@@ -6041,7 +6041,7 @@ export function Admin() {
               .map((u) => (
                 <div
                   key={u.id}
-                  className="p-4 rounded-2xl border-2 border-[#3E2723]/60 dark:border-[#4E342E]/70 bg-white dark:bg-[#1A1412] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:-translate-y-0.5 duration-200 transition-all"
+                  className="p-4 rounded-2xl border-2 border-[#3E2723]/60 dark:border-[#4E342E]/70 bg-white dark:bg-[#1A1412] flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 hover:-translate-y-0.5 duration-200 transition-all"
                 >
                   <div>
                     <p className="font-bold text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-2 flex-wrap">
@@ -6094,7 +6094,7 @@ export function Admin() {
                       </div>
                     )}
                   </div>
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+                  <div className="flex flex-wrap items-center justify-start lg:justify-end gap-2 w-full lg:w-auto mt-2 md:mt-0">
                     <button
                       onClick={() => {
                         setAuditingUser(u);
