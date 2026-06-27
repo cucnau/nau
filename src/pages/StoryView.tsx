@@ -232,6 +232,7 @@ export function StoryView() {
   } = useStore();
 
   const [story, setStory] = useState<any>(null);
+  const [actualStoryId, setActualStoryId] = useState<string | null>(null);
   const [chapters, setChapters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState<any[]>([]);
@@ -293,7 +294,37 @@ export function StoryView() {
 
   useEffect(() => {
     if (!id) return;
-    const unsubStory = onSnapshot(doc(db, 'stories', id), (snap) => {
+    const resolveId = async () => {
+      try {
+        const docRef = doc(db, 'stories', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setActualStoryId(id);
+          return;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+
+      try {
+        const q = query(collection(db, 'stories'), where('slug', '==', id), limit(1));
+        const qSnap = await getDocs(q);
+        if (!qSnap.empty) {
+          setActualStoryId(qSnap.docs[0].id);
+        } else {
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error(err);
+        setLoading(false);
+      }
+    };
+    resolveId();
+  }, [id]);
+
+  useEffect(() => {
+    if (!actualStoryId) return;
+    const unsubStory = onSnapshot(doc(db, 'stories', actualStoryId), (snap) => {
       if (snap.exists()) setStory({ id: snap.id, ...snap.data() });
     }, (err) => {
       console.error(err);
@@ -301,7 +332,7 @@ export function StoryView() {
 
     const fetchChapters = async () => {
       try {
-        const cSnap = await getDocs(query(collection(db, `stories/${id}/chapters`), orderBy('order', 'asc')));
+        const cSnap = await getDocs(query(collection(db, `stories/${actualStoryId}/chapters`), orderBy('order', 'asc')));
         setChapters(cSnap.docs.map(d => ({ id: d.id, ...d.data() })));
       } catch (err) {
         console.error(err);
@@ -311,11 +342,11 @@ export function StoryView() {
     };
     fetchChapters();
     return () => unsubStory();
-  }, [id]);
+  }, [actualStoryId]);
 
   useEffect(() => {
-    if (!id) return;
-    const qComments = query(collection(db, 'comments'), where('targetId', '==', id));
+    if (!actualStoryId) return;
+    const qComments = query(collection(db, 'comments'), where('targetId', '==', actualStoryId));
     const unsub = onSnapshot(qComments, (snap) => {
        const list = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
        list.sort((a: any, b: any) => {
@@ -326,7 +357,7 @@ export function StoryView() {
        setComments(list);
     });
     return () => unsub();
-  }, [id]);
+  }, [actualStoryId]);
   
   if (loading) return <div className="p-10 text-center">Đang tải truyện...</div>;
   if (!story) return <div className="p-10 text-center">Không tìm thấy truyện</div>;
