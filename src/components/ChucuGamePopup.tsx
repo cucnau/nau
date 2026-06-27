@@ -252,8 +252,9 @@ export function ChucuGamePopup() {
       const newChoco = choco + qty;
       updateUserDoc({
         chucuGameFragments: newFragments,
-        choco: newChoco
-      });
+        choco: newChoco,
+        $chocoDiff: qty
+      }, `Quy đổi mảnh Choco lấy Choco thực`);
       alert(`Đổi thành công ${cost} mảnh lấy ${qty} Choco thực!`);
     } else {
       const maxQty = Math.floor(chucuGameGFragments / 10);
@@ -277,8 +278,9 @@ export function ChucuGamePopup() {
       const newGChoco = goldenChoco + qty;
       updateUserDoc({
         chucuGameGFragments: newFragments,
-        goldenChoco: newGChoco
-      });
+        goldenChoco: newGChoco,
+        $gchocoDiff: qty
+      }, `Quy đổi mảnh GChoco lấy GChoco thực`);
       alert(`Đổi thành công ${cost} mảnh lấy ${qty} Gchoco thực!`);
     }
   };
