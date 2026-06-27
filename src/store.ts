@@ -297,49 +297,70 @@ export const getWeeklyMissions = (): Mission[] => [
   { id: 'w3', type: 'weekly', description: 'Bình luận 10 lần', chocoReward: 20, goldenReward: 1, progress: 0, target: 10, completed: false, claimed: false },
 ];
 
-export const getPermanentMissions = (): Mission[] => {
+export const getPermanentMissions = (state: Partial<UserState> = {}): Mission[] => {
    const res: Mission[] = [];
-   // Điểm danh (30, 60, 90...)
-   for (let i = 1; i <= 20; i++) {
+   const highestTiers: Record<string, number> = {
+       checkin: 20, read: 20, level: 10, chocomatchlvl: 100, comm: 20, gacha: 20, catch: 20, radio: 20, spend: 20
+   };
+
+   if (state.missions && Array.isArray(state.missions)) {
+       state.missions.forEach(m => {
+           if (m.type === 'permanent') {
+               const parts = m.id.split('_');
+               if (parts.length === 3 && parts[0] === 'p') {
+                   const cat = parts[1];
+                   const tier = parseInt(parts[2], 10);
+                   if (!isNaN(tier) && highestTiers[cat] !== undefined) {
+                       highestTiers[cat] = Math.max(highestTiers[cat], tier + 2);
+                   }
+               }
+           }
+       });
+   }
+
+   highestTiers.checkin = Math.max(highestTiers.checkin, Math.ceil(Math.max(state.totalCheckIns || 0, state.checkInStreak || 0) / 30) + 2);
+   highestTiers.read = Math.max(highestTiers.read, Math.ceil((state.totalChaptersRead || 0) / 50) + 2);
+   highestTiers.level = Math.max(highestTiers.level, Math.ceil((state.level || 1) / 10) + 2);
+   highestTiers.chocomatchlvl = Math.max(highestTiers.chocomatchlvl, Math.ceil(Math.max(0, (state.chocoMatchLevel || 1) - 1) / 100) + 2);
+   highestTiers.comm = Math.max(highestTiers.comm, Math.ceil((state.totalCommentsCount || 0) / 50) + 2);
+   highestTiers.gacha = Math.max(highestTiers.gacha, Math.ceil((state.totalGachaPulls || 0) / 50) + 2);
+   highestTiers.catch = Math.max(highestTiers.catch, Math.ceil((state.totalChocoCaught || 0) / 1000) + 2);
+   highestTiers.radio = Math.max(highestTiers.radio, Math.ceil(Math.floor((state.totalRadioSeconds || 0) / 60) / 60) + 2);
+   highestTiers.spend = Math.max(highestTiers.spend, Math.ceil((state.totalSpentChoco || 0) / 100) + 2);
+
+   for (let i = 1; i <= highestTiers.checkin; i++) {
        res.push({ id: `p_checkin_${i}`, type: 'permanent', description: `Điểm danh ${i * 30} ngày`, chocoReward: i * 30, goldenReward: i * 3, progress: 0, target: i * 30, completed: false, claimed: false });
    }
-   // Đọc (50, 100...)
-   for (let i = 1; i <= 20; i++) {
+   for (let i = 1; i <= highestTiers.read; i++) {
        res.push({ id: `p_read_${i}`, type: 'permanent', description: `Đọc ${i * 50} chương truyện`, chocoReward: i * 50, goldenReward: i * 5, progress: 0, target: i * 50, completed: false, claimed: false });
    }
-   // Level (10, 20...)
-   for (let i = 1; i <= 10; i++) {
+   for (let i = 1; i <= highestTiers.level; i++) {
        res.push({ id: `p_level_${i}`, type: 'permanent', description: `Đạt level ${i * 10}`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 10, completed: false, claimed: false });
    }
-   // Choco Match Level (100, 200...)
-   for (let i = 1; i <= 100; i++) {
+   for (let i = 1; i <= highestTiers.chocomatchlvl; i++) {
        res.push({ id: `p_chocomatchlvl_${i}`, type: 'permanent', description: `Vượt qua level ${i * 100} trên Sông Choco`, chocoReward: i * 100, goldenReward: i * 10, progress: 0, target: i * 100, completed: false, claimed: false });
    }
-   // Bình luận (50, 100...)
-   for (let i = 1; i <= 20; i++) {
+   for (let i = 1; i <= highestTiers.comm; i++) {
        res.push({ id: `p_comm_${i}`, type: 'permanent', description: `Bình luận truyện ${i * 50} lần`, chocoReward: i * 50, goldenReward: i * 5, progress: 0, target: i * 50, completed: false, claimed: false });
    }
-   // Gacha (50, 100...)
-   for (let i = 1; i <= 20; i++) {
+   for (let i = 1; i <= highestTiers.gacha; i++) {
        res.push({ id: `p_gacha_${i}`, type: 'permanent', description: `Gacha tổng cộng ${i * 50} lần`, chocoReward: i * 50, goldenReward: i * 5, progress: 0, target: i * 50, completed: false, claimed: false });
    }
-   // Hứng rơi (1000, 2000...)
-   for (let i = 1; i <= 20; i++) {
+   for (let i = 1; i <= highestTiers.catch; i++) {
        res.push({ id: `p_catch_${i}`, type: 'permanent', description: `Hứng chính xác ${i * 1000} viên Choco trong game Hứng Choco`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 1000, completed: false, claimed: false });
    }
-   // Radio (60, 120... mins)
-   for (let i = 1; i <= 20; i++) {
+   for (let i = 1; i <= highestTiers.radio; i++) {
        res.push({ id: `p_radio_${i}`, type: 'permanent', description: `Nghe choco radio tổng cộng ${i * 60} phút`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 60, completed: false, claimed: false });
    }
-   // Tiêu Choco (100, 200...)
-   for (let i = 1; i <= 20; i++) {
+   for (let i = 1; i <= highestTiers.spend; i++) {
        res.push({ id: `p_spend_${i}`, type: 'permanent', description: `Tiêu tổng cộng ${i * 100} Choco`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 100, completed: false, claimed: false });
    }
    return res;
 };
 
-export const reconcileMissions = (loadedMissions: Mission[]): Mission[] => {
-  const defaults = [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()];
+export const reconcileMissions = (loadedMissions: Mission[], state: Partial<UserState> = {}): Mission[] => {
+  const mergedState = { ...state, missions: loadedMissions };
+  const defaults = [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions(mergedState)];
   if (!Array.isArray(loadedMissions) || loadedMissions.length === 0) {
     return defaults;
   }
@@ -668,7 +689,7 @@ export const useStore = create<UserState>()(
             computedCheckIns = Math.max(computedCheckIns, rawStreak);
 
             let rawMissions = data.missions !== undefined ? data.missions : state.missions;
-            let resolvedMissions = reconcileMissions(rawMissions);
+            let resolvedMissions = reconcileMissions(rawMissions, data);
 
             resolvedMissions = resolvedMissions.map(m => {
                if (m.id === 'd1') {
@@ -1160,7 +1181,7 @@ export const useStore = create<UserState>()(
         else if (newStreak >= 46) dailyChoco = 10;
 
         // Update missions
-        const ms = reconcileMissions([...state.missions]);
+        const ms = reconcileMissions([...state.missions], state);
         const dCheck = ms.find(m => m.id === 'd1');
         if (dCheck) { dCheck.progress = 1; dCheck.completed = true; }
         
@@ -2200,7 +2221,7 @@ export const useStore = create<UserState>()(
          const currentUnlocked = state.unlockedAchievements || [];
          
          // Evaluate permanent missions progress dynamically
-         const ms = reconcileMissions([...state.missions]);
+         const ms = reconcileMissions([...state.missions], state);
          let msChanged = false;
          
          ms.filter(m => m.type === 'permanent').forEach(p => {
@@ -2513,7 +2534,7 @@ export const useStore = create<UserState>()(
       merge: (persistedState: any, currentState: UserState) => {
          const merged = { ...currentState, ...persistedState };
          if (persistedState.missions) {
-             merged.missions = reconcileMissions(persistedState.missions);
+             merged.missions = reconcileMissions(persistedState.missions, persistedState);
          }
          return merged as UserState;
       }
