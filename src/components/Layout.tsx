@@ -700,7 +700,7 @@ export function AppLayout() {
         if (cId && cId !== 'undefined') {
           navigate(`/doc/${sId}/${cId}`);
         } else {
-          navigate(`/truyen/${sId}`);
+          navigate(`/truyen/${s.slug || sId}`);
         }
       } else {
         alert("Thông báo này không có mã ID truyện (hoặc truyện đã bị xóa).");
