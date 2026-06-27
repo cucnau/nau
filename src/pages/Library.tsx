@@ -125,7 +125,7 @@ export function Library() {
           {currentList.map((story) => (
             <div 
               key={story.id} 
-              onClick={() => navigate(`/truyen/${story.id}`)}
+              onClick={() => navigate(`/truyen/${story.slug || story.id}`)}
               className="bg-[#FFFDF9] dark:bg-[#211B18] border-2 border-[#3E2723] dark:border-[#4E342E] p-4 rounded-2xl flex gap-4 cursor-pointer shadow-[1.5px_1.5px_0_0_#3E2723] dark:shadow-[1.5px_1.5px_0_0_#0D0907] transition-all hover:-translate-y-0.5 hover:shadow-[1px_1px_0_0_#3E2723] dark:hover:shadow-[1px_1px_0_0_#1A1412]"
             >
               <img 
