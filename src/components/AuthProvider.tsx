@@ -135,6 +135,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               ownedPriorityTickets: state.ownedPriorityTickets || 0,
               ownedMysteryBoxes: state.ownedMysteryBoxes || 0,
               ownedStreakTickets: state.ownedStreakTickets || 0,
+              ownedGachaTickets: state.ownedGachaTickets || 0,
+              gachaPity5Star: state.gachaPity5Star || 0,
+              gachaPity4Star: state.gachaPity4Star || 0,
+              lastClaimedRewardLevel: state.lastClaimedRewardLevel || localLevel || 1,
+              unlockedPassChapters: state.unlockedPassChapters || [],
+              unlockedEarlyAccessChapters: state.unlockedEarlyAccessChapters || [],
               activeStreakProtection: state.activeStreakProtection || false,
               lastFreeStreakRecoveryMonth: state.lastFreeStreakRecoveryMonth || null
             };
