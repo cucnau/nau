@@ -689,6 +689,32 @@ export const useStore = create<UserState>()(
             computedCheckIns = Math.max(computedCheckIns, rawStreak);
 
             let rawMissions = data.missions !== undefined ? data.missions : state.missions;
+            let missionsChanged = false;
+
+            // Bảo vệ và hợp nhất dữ liệu nhiệm vụ cục bộ (localStorage) với Firestore:
+            // Nếu localStorage có tiến độ cao hơn hoặc đã hoàn thành/đã nhận mà Firestore chưa lưu được, ta giữ lại giá trị tối ưu này.
+            if (data.missions !== undefined && Array.isArray(state.missions) && state.missions.length > 0) {
+               const localMap = new Map(state.missions.map(m => [m.id, m]));
+               rawMissions = rawMissions.map((m: any) => {
+                  const local = localMap.get(m.id);
+                  if (local) {
+                     const mergedProgress = Math.max(m.progress || 0, local.progress || 0);
+                     const mergedCompleted = m.completed || local.completed || false;
+                     const mergedClaimed = m.claimed || local.claimed || false;
+                     if (mergedProgress > (m.progress || 0) || mergedCompleted !== m.completed || mergedClaimed !== m.claimed) {
+                        missionsChanged = true;
+                     }
+                     return {
+                        ...m,
+                        progress: mergedProgress,
+                        completed: mergedCompleted,
+                        claimed: mergedClaimed
+                     };
+                  }
+                  return m;
+               });
+            }
+
             let resolvedMissions = reconcileMissions(rawMissions, data);
 
             resolvedMissions = resolvedMissions.map(m => {
@@ -803,6 +829,9 @@ export const useStore = create<UserState>()(
             }
             if (mergedClaimed.length > (data.claimedAchievements?.length || 0)) {
                writeBack.claimedAchievements = mergedClaimed;
+            }
+            if (missionsChanged) {
+               writeBack.missions = resolvedMissions;
             }
             if ((state.level || 1) > (data.level || 1)) {
                writeBack.level = state.level;
@@ -1029,14 +1058,23 @@ export const useStore = create<UserState>()(
                 }
             });
 
-            // Tối ưu hóa dung lượng: Chỉ lưu ID và tiến độ của missions lên Firestore, bỏ qua các text mô tả dài
+            // Tối ưu hóa dung lượng: Chỉ lưu ID và tiến độ của các nhiệm vụ có tiến trình, hoàn thành hoặc đã nhận thưởng (giúp giảm >90% dung lượng mảng missions trên Firestore)
             if (Array.isArray(docUpdates.missions)) {
-                docUpdates.missions = docUpdates.missions.map((m: any) => ({
-                    id: m.id,
-                    progress: m.progress || 0,
-                    completed: m.completed || false,
-                    claimed: m.claimed || false
-                }));
+                docUpdates.missions = docUpdates.missions
+                   .filter((m: any) => m.progress > 0 || m.completed || m.claimed)
+                   .map((m: any) => ({
+                       id: m.id,
+                       progress: m.progress || 0,
+                       completed: m.completed || false,
+                       claimed: m.claimed || false
+                   }));
+            }
+
+            // Tối ưu hóa dung lượng: Giới hạn lịch sử đọc tối đa 200 bộ truyện gần nhất để tránh phình dung lượng tài khoản qua thời gian
+            if (Array.isArray(docUpdates.readHistoryList)) {
+                if (docUpdates.readHistoryList.length > 200) {
+                    docUpdates.readHistoryList = docUpdates.readHistoryList.slice(0, 200);
+                }
             }
 
             // Tự động kiểm tra và phục hồi: nếu avatarUrl hiện tại quá lớn (>300KB Base64),
