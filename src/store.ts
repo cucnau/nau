@@ -2229,6 +2229,7 @@ export const useStore = create<UserState>()(
          const state = get();
          
          const currentUnlocked = state.unlockedAchievements || [];
+         const newUnlocked = new Set(currentUnlocked);
          
          // Evaluate permanent missions progress dynamically
          const ms = reconcileMissions([...state.missions], state);
@@ -2273,175 +2274,51 @@ export const useStore = create<UserState>()(
             }
          }
          
-         // 3. Multi Genre fallback trigger
-         if (!currentUnlocked.includes('multi_genre') && (state.genresRead || []).length >= 5 && (state.readHistoryList || []).length >= 5) {
-             get().unlockAchievement('multi_genre');
-         }
+         const addAch = (id: string) => newUnlocked.add(id);
 
-         // 4. Collector: Library has >= 10 stories
-         if (!currentUnlocked.includes('collector') && (state.savedStories || []).length >= 10) {
-            get().unlockAchievement('collector');
-         }
+         if ((state.genresRead || []).length >= 5 && (state.readHistoryList || []).length >= 5) addAch('multi_genre');
+         if ((state.savedStories || []).length >= 10) addAch('collector');
+         if ((state.level || 1) >= 100) addAch('choco_high_level');
+         if ((state.chocoMatchTilesDestroyed || 0) >= 100000) addAch('choco_destroyer');
+         if ((state.chocoMatchColorBombsCreated || 0) >= 10000) addAch('choco_color_bomb');
+         if ((state.chocoMatchSpecialCombos || 0) >= 10000) addAch('choco_special_combo');
+         if ((state.totalEarnedChoco || 0) >= 10000) addAch('choco_king');
+         if ((state.totalEarnedGChoco || 0) >= 10000) addAch('gchoco_king');
+         if ((state.totalSpentChoco || 0) >= 10000) addAch('big_spender');
+         if ((state.totalGiftedChoco || 0) > 0) addAch('generous_donor');
+         if ((state.checkInStreak || 0) >= 7) addAch('streak_7');
+         if ((state.totalCheckIns || 0) >= 30) addAch('monthly_checkin');
+         if ((state.perfectDailyDates || []).length >= 7) addAch('weekly_missions_perfect');
+         if ((state.sentMessagesCount || 0) >= 5000) addAch('chatty');
+         if ((state.totalCommentsCount || 0) >= 100) addAch('commenter_choco');
+         if ((state.sentMessagesCount || 0) >= 100) addAch('chatty_lounge');
+         if ((state.totalChaptersRead || 0) >= 100) addAch('read_100_chapters');
+         if ((state.ownedStickers || []).length >= 30) addAch('sticker_collector');
+         if ((state.totalChaptersRead || 0) >= 500) addAch('choco_mot_sach');
+         if ((state.totalCommentsCount || 0) >= 500) addAch('choco_tuong_tac');
+         if ((state.chucuInteractions || 0) >= 500) addAch('chucu_friend_500');
+         if ((state.chucuPremiumFeeds || 0) >= 100) addAch('chucu_an_sang');
+         if ((state.chucuLevel || 1) >= 100) addAch('chucu_master_100');
+         if ((state.ownedChucuAccessories || []).length >= 5) addAch('chucu_fashion_5');
+         if ((state.maxConsecutiveChocoCount || 0) >= 20) addAch('choco_catch_no_miss');
+         if ((state.totalChocoCaught || 0) >= 1000) addAch('choco_rain_1000');
+         if ((state.totalChocoCaught || 0) >= 5000) addAch('choco_rain_5000');
+         if ((state.totalChocoCaught || 0) >= 10000) addAch('choco_rain_10000');
+         if ((state.consecutiveGoldClears || 0) >= 5) addAch('gold_choco_perfect');
+         if ((state.consecutiveDodgeClears || 0) >= 5) addAch('dodge_negative_perfect');
+         if ((state.radioNightChillSeconds || 0) >= 1800) addAch('radio_night_chill');
+         if ((state.maxRadioTrackSeconds || 0) >= 3600) addAch('radio_one_track_love');
+         if ((state.heardRadioTracks || []).length >= 10) addAch('radio_universe_explorer');
+         if ((state.radioTrackSwitches || 0) >= 15) addAch('radio_track_switches');
+         if ((state.gachaPity5Star || 0) >= 90) addAch('choco_kientri');
+         if ((state.maxBannerCompletionPct || 0) >= 100) addAch('choco_suutam');
 
-         if (!currentUnlocked.includes('choco_high_level') && (state.level || 1) >= 100) {
-            get().unlockAchievement('choco_high_level');
-         }
-         
-         if (!currentUnlocked.includes('choco_destroyer') && (state.chocoMatchTilesDestroyed || 0) >= 100000) {
-            get().unlockAchievement('choco_destroyer');
-         }
-         
-         if (!currentUnlocked.includes('choco_color_bomb') && (state.chocoMatchColorBombsCreated || 0) >= 10000) {
-            get().unlockAchievement('choco_color_bomb');
-         }
-         
-         if (!currentUnlocked.includes('choco_special_combo') && (state.chocoMatchSpecialCombos || 0) >= 10000) {
-            get().unlockAchievement('choco_special_combo');
-         }
-         
-         // 5. Vua Choco: total earned choco >= 10000
-         if (!currentUnlocked.includes('choco_king') && (state.totalEarnedChoco || 0) >= 10000) {
-            get().unlockAchievement('choco_king');
-         }
-
-          // 6. Bố Choco: total earned gchoco >= 10000
-         if (!currentUnlocked.includes('gchoco_king') && (state.totalEarnedGChoco || 0) >= 10000) {
-            get().unlockAchievement('gchoco_king');
-         }
-
-         // 7. Tiêu Nhiều Choco: total spent choco in store >= 10000
-         if (!currentUnlocked.includes('big_spender') && (state.totalSpentChoco || 0) >= 10000) {
-            get().unlockAchievement('big_spender');
-         }
-
-         if (!currentUnlocked.includes('generous_donor') && (state.totalGiftedChoco || 0) > 0) {
-            get().unlockAchievement('generous_donor');
-         }
-
-         // 8. Streak 7: checkInStreak >= 7
-         if (!currentUnlocked.includes('streak_7') && (state.checkInStreak || 0) >= 7) {
-            get().unlockAchievement('streak_7');
-         }
-
-         // 9. Monthly Checkin: totalCheckIns >= 30
-         if (!currentUnlocked.includes('monthly_checkin') && (state.totalCheckIns || 0) >= 30) {
-            get().unlockAchievement('monthly_checkin');
-         }
-
-         // 10. Perfect missions week: perfectDailyDates.length >= 7
-         if (!currentUnlocked.includes('weekly_missions_perfect') && (state.perfectDailyDates || []).length >= 7) {
-            get().unlockAchievement('weekly_missions_perfect');
-         }
-
-         // 11. Chatty: sentMessagesCount >= 5000
-         if (!currentUnlocked.includes('chatty') && (state.sentMessagesCount || 0) >= 5000) {
-            get().unlockAchievement('chatty');
-         }
-
-         // 12. Bình Luận Viên Choco: totalCommentsCount >= 100
-         if (!currentUnlocked.includes('commenter_choco') && (state.totalCommentsCount || 0) >= 100) {
-            get().unlockAchievement('commenter_choco');
-         }
-
-         // 13. Khách Quen Lounge: sentMessagesCount >= 100
-         if (!currentUnlocked.includes('chatty_lounge') && (state.sentMessagesCount || 0) >= 100) {
-            get().unlockAchievement('chatty_lounge');
-         }
-
-         // 14. Vừa Ăn Choco Vừa Đọc: totalChaptersRead >= 100
-         if (!currentUnlocked.includes('read_100_chapters') && (state.totalChaptersRead || 0) >= 100) {
-            get().unlockAchievement('read_100_chapters');
-         }
-
-         // 15. Choco Thích Thú: ownedStickers.length >= 30
-         if (!currentUnlocked.includes('sticker_collector') && (state.ownedStickers || []).length >= 30) {
-            get().unlockAchievement('sticker_collector');
-         }
-
-         // 16. Choco Mọt Sách: totalChaptersRead >= 500
-         if (!currentUnlocked.includes('choco_mot_sach') && (state.totalChaptersRead || 0) >= 500) {
-            get().unlockAchievement('choco_mot_sach');
-         }
-
-         // 17. Choco Tương Tác: totalCommentsCount >= 500
-         if (!currentUnlocked.includes('choco_tuong_tac') && (state.totalCommentsCount || 0) >= 500) {
-            get().unlockAchievement('choco_tuong_tac');
-         }
-
-         // 18. Bạn Thân Của Chucu: chucuInteractions >= 500
-         if (!currentUnlocked.includes('chucu_friend_500') && (state.chucuInteractions || 0) >= 500) {
-            get().unlockAchievement('chucu_friend_500');
-         }
-
-         // 19. Chucu Ăn Sang: chucuPremiumFeeds >= 100
-         if (!currentUnlocked.includes('chucu_an_sang') && (state.chucuPremiumFeeds || 0) >= 100) {
-            get().unlockAchievement('chucu_an_sang');
-         }
-
-         // 20. Huấn Luyện Viên Chucu: chucuLevel >= 100
-         if (!currentUnlocked.includes('chucu_master_100') && (state.chucuLevel || 1) >= 100) {
-            get().unlockAchievement('chucu_master_100');
-         }
-
-         // 21. Fashionista Chucu: ownedChucuAccessories.length >= 5
-         if (!currentUnlocked.includes('chucu_fashion_5') && (state.ownedChucuAccessories || []).length >= 5) {
-            get().unlockAchievement('chucu_fashion_5');
-         }
-
-         // 22. Hứng Choco Không Trượt Phát Nào: maxConsecutiveChocoCount >= 20
-         if (!currentUnlocked.includes('choco_catch_no_miss') && (state.maxConsecutiveChocoCount || 0) >= 20) {
-            get().unlockAchievement('choco_catch_no_miss');
-         }
-
-         // 23. Mưa Choco Ngột Ngào (Đồng/Bạc/Vàng)
-         if (!currentUnlocked.includes('choco_rain_1000') && (state.totalChocoCaught || 0) >= 1000) {
-            get().unlockAchievement('choco_rain_1000');
-         }
-         if (!currentUnlocked.includes('choco_rain_5000') && (state.totalChocoCaught || 0) >= 5000) {
-            get().unlockAchievement('choco_rain_5000');
-         }
-         if (!currentUnlocked.includes('choco_rain_10000') && (state.totalChocoCaught || 0) >= 10000) {
-            get().unlockAchievement('choco_rain_10000');
-         }
-
-         // 24. Săn Choco Hoàng Kim: consecutiveGoldClears >= 5
-         if (!currentUnlocked.includes('gold_choco_perfect') && (state.consecutiveGoldClears || 0) >= 5) {
-            get().unlockAchievement('gold_choco_perfect');
-         }
-
-         // 25. Choco Né Số Một: consecutiveDodgeClears >= 5
-         if (!currentUnlocked.includes('dodge_negative_perfect') && (state.consecutiveDodgeClears || 0) >= 5) {
-            get().unlockAchievement('dodge_negative_perfect');
-         }
-
-         // 26. Choco Chill Đêm: radioNightChillSeconds >= 1800 (30 mins)
-         if (!currentUnlocked.includes('radio_night_chill') && (state.radioNightChillSeconds || 0) >= 1800) {
-            get().unlockAchievement('radio_night_chill');
-         }
-
-         // 27. Giai Điệu Choco Yêu: maxRadioTrackSeconds >= 3600 (1 hour)
-         if (!currentUnlocked.includes('radio_one_track_love') && (state.maxRadioTrackSeconds || 0) >= 3600) {
-            get().unlockAchievement('radio_one_track_love');
-         }
-
-         // 28. Vũ Trụ Âm Thanh Của Choco: heardRadioTracks.length >= 10
-         if (!currentUnlocked.includes('radio_universe_explorer') && (state.heardRadioTracks || []).length >= 10) {
-            get().unlockAchievement('radio_universe_explorer');
-         }
-
-         // 29. Choco Tìm Kiếm: radioTrackSwitches >= 15
-         if (!currentUnlocked.includes('radio_track_switches') && (state.radioTrackSwitches || 0) >= 15) {
-            get().unlockAchievement('radio_track_switches');
-         }
-
-         // 30. Choco Kiên Trì: gachaPity5Star >= 90
-         if (!currentUnlocked.includes('choco_kientri') && (state.gachaPity5Star || 0) >= 90) {
-            get().unlockAchievement('choco_kientri');
-         }
-
-         // 31. Choco Sưu Tầm: maxBannerCompletionPct >= 100
-         if (!currentUnlocked.includes('choco_suutam') && (state.maxBannerCompletionPct || 0) >= 100) {
-            get().unlockAchievement('choco_suutam');
+         if (newUnlocked.size > currentUnlocked.length) {
+            const finalUnlocked = Array.from(newUnlocked);
+            const allUnlocked = { ...(state.allUsersUnlockedAchievements || {}) };
+            if (state.uid) allUnlocked[state.uid] = finalUnlocked;
+            set({ unlockedAchievements: finalUnlocked, allUsersUnlockedAchievements: allUnlocked });
+            get().updateUserDoc({ unlockedAchievements: finalUnlocked });
          }
       },
 
@@ -2551,7 +2428,6 @@ export const useStore = create<UserState>()(
           allUsersClaimedAchievements,
           allUsersOwnedStickers,
           allUsersOwnedAccessories,
-          allUsersOwnedChucuAccessories,
           firebaseUser,
           isQuotaExceeded,
           ...rest
