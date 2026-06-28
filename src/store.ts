@@ -694,24 +694,32 @@ export const useStore = create<UserState>()(
             // Bảo vệ và hợp nhất dữ liệu nhiệm vụ cục bộ (localStorage) với Firestore:
             // Nếu localStorage có tiến độ cao hơn hoặc đã hoàn thành/đã nhận mà Firestore chưa lưu được, ta giữ lại giá trị tối ưu này.
             if (data.missions !== undefined && Array.isArray(state.missions) && state.missions.length > 0) {
-               const localMap = new Map(state.missions.map(m => [m.id, m]));
-               rawMissions = rawMissions.map((m: any) => {
-                  const local = localMap.get(m.id);
-                  if (local) {
-                     const mergedProgress = Math.max(m.progress || 0, local.progress || 0);
-                     const mergedCompleted = m.completed || local.completed || false;
-                     const mergedClaimed = m.claimed || local.claimed || false;
-                     if (mergedProgress > (m.progress || 0) || mergedCompleted !== m.completed || mergedClaimed !== m.claimed) {
+               const localMap = new Map<string, any>(state.missions.map(m => [m.id, m]));
+               const fireMap = new Map<string, any>((Array.isArray(data.missions) ? data.missions : []).map((m: any) => [m.id, m]));
+               const allIds = Array.from(new Set<string>([...localMap.keys(), ...fireMap.keys()]));
+
+               rawMissions = allIds.map((id: string) => {
+                  const local = localMap.get(id) as any;
+                  const fire = fireMap.get(id) as any;
+
+                  if (local && fire) {
+                     const mergedProgress = Math.max(fire.progress || 0, local.progress || 0);
+                     const mergedCompleted = fire.completed || local.completed || false;
+                     const mergedClaimed = fire.claimed || local.claimed || false;
+                     if (mergedProgress > (fire.progress || 0) || mergedCompleted !== fire.completed || mergedClaimed !== fire.claimed) {
                         missionsChanged = true;
                      }
                      return {
-                        ...m,
+                        ...fire,
                         progress: mergedProgress,
                         completed: mergedCompleted,
                         claimed: mergedClaimed
                      };
+                  } else if (local) {
+                     return local;
+                  } else {
+                     return fire!;
                   }
-                  return m;
                });
             }
 
@@ -837,6 +845,11 @@ export const useStore = create<UserState>()(
                writeBack.level = state.level;
                writeBack.exp = state.exp;
             }
+            if (data.lastClaimedRewardLevel === undefined) {
+               writeBack.lastClaimedRewardLevel = state.lastClaimedRewardLevel || data.level || state.level || 1;
+            } else if (state.lastClaimedRewardLevel > data.lastClaimedRewardLevel) {
+               writeBack.lastClaimedRewardLevel = state.lastClaimedRewardLevel;
+            }
             if (Object.keys(writeBack).length > 0) {
                setTimeout(() => {
                    get().updateUserDoc(writeBack);
@@ -885,7 +898,7 @@ export const useStore = create<UserState>()(
             gachaPity4Star: data.gachaPity4Star !== undefined ? data.gachaPity4Star : state.gachaPity4Star,
             activeStreakProtection: data.activeStreakProtection !== undefined ? data.activeStreakProtection : state.activeStreakProtection,
             lastFreeStreakRecoveryMonth: data.lastFreeStreakRecoveryMonth !== undefined ? data.lastFreeStreakRecoveryMonth : state.lastFreeStreakRecoveryMonth,
-            lastClaimedRewardLevel: data.lastClaimedRewardLevel !== undefined ? data.lastClaimedRewardLevel : state.lastClaimedRewardLevel,
+            lastClaimedRewardLevel: data.lastClaimedRewardLevel !== undefined ? data.lastClaimedRewardLevel : (state.lastClaimedRewardLevel || data.level || state.level || 1),
             savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
             unlockedPassChapters: data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters,
             unlockedEarlyAccessChapters: data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters,
