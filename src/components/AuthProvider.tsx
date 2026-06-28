@@ -155,7 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     progress: m.progress || 0,
                     completed: m.completed || false,
                     claimed: m.claimed || false
-                }));
+                })) as any;
             }
 
             if (Array.isArray(newUser.readHistoryList) && newUser.readHistoryList.length > 200) {
