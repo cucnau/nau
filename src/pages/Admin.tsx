@@ -952,6 +952,24 @@ export function Admin() {
         const txSnap = await getDocs(collection(db, `users/${u.id}/transactions`));
         const txs = txSnap.docs.map(doc => ({ txId: doc.id, ...doc.data() as any }));
         
+        // Tính toán số lượng đã thu hồi trong quá khứ dựa trên các giao dịch spend
+        let alreadyRevokedChoco = 0;
+        let alreadyRevokedGChoco = 0;
+        txs.forEach(t => {
+          if (t.type === 'spend') {
+            const reason = t.reason || "";
+            if (reason.includes("Thu hồi Choco nhận trùng")) {
+              alreadyRevokedChoco += Number(t.amount) || 0;
+            }
+            if (reason.includes("Thu hồi GChoco nhận trùng")) {
+              alreadyRevokedGChoco += Number(t.amount) || 0;
+            }
+          }
+        });
+
+        // Chỉ đối soát các giao dịch chưa bị đánh dấu là đã thu hồi trùng lặp (isDuplicateRevoked !== true)
+        const activeTxs = txs.filter(t => t.isDuplicateRevoked !== true);
+
         // Sắp xếp các giao dịch tăng dần theo thời gian tạo
         const getTxTime = (tx: any) => {
           if (!tx.createdAt) return 0;
@@ -959,11 +977,9 @@ export function Admin() {
           if (tx.createdAt.seconds !== undefined) return tx.createdAt.seconds * 1000;
           return new Date(tx.createdAt).getTime() || 0;
         };
-        const sortedTxs = [...txs].sort((a, b) => getTxTime(a) - getTxTime(b));
+        const sortedTxs = [...activeTxs].sort((a, b) => getTxTime(a) - getTxTime(b));
 
-        const userDuplicates: any[] = [];
-        let userChocoToRevoke = 0;
-        let userGChocoToRevoke = 0;
+        const candidateDuplicates: any[] = [];
 
         // Nhóm 1: Thành tựu (Achievements)
         // Group earn transactions containing "Nhận thưởng thành tựu: "
@@ -989,19 +1005,17 @@ export function Admin() {
               const amt = Number(dupTx.amount) || 0;
               const cur = (dupTx.currency || 'choco').toLowerCase();
               
-              if (cur === 'gchoco') userGChocoToRevoke += amt;
-              else userChocoToRevoke += amt;
-
               const tTime = getTxTime(dupTx);
               const dateStr = tTime ? format(toGMT7Date(tTime), 'yyyy-MM-dd HH:mm:ss') : "Không rõ ngày";
 
-              userDuplicates.push({
+              candidateDuplicates.push({
                 type: 'achievement',
                 detail: `Thành tựu: ${achName}`,
                 amount: amt,
                 currency: cur,
                 createdAtStr: dateStr,
-                txId: dupTx.txId
+                txId: dupTx.txId,
+                timestamp: tTime
               });
             }
           }
@@ -1031,19 +1045,17 @@ export function Admin() {
                 const amt = Number(dupTx.amount) || 0;
                 const cur = (dupTx.currency || 'choco').toLowerCase();
                 
-                if (cur === 'gchoco') userGChocoToRevoke += amt;
-                else userChocoToRevoke += amt;
-
                 const tTime = getTxTime(dupTx);
                 const dateStr = tTime ? format(toGMT7Date(tTime), 'yyyy-MM-dd HH:mm:ss') : "Không rõ ngày";
 
-                userDuplicates.push({
+                candidateDuplicates.push({
                   type: 'mission_id',
                   detail: `Nhiệm vụ vĩnh viễn: ${mId}`,
                   amount: amt,
                   currency: cur,
                   createdAtStr: dateStr,
-                  txId: dupTx.txId
+                  txId: dupTx.txId,
+                  timestamp: tTime
                 });
               }
             } else if (mId.startsWith('d')) {
@@ -1065,19 +1077,17 @@ export function Admin() {
                     const amt = Number(dupTx.amount) || 0;
                     const cur = (dupTx.currency || 'choco').toLowerCase();
                     
-                    if (cur === 'gchoco') userGChocoToRevoke += amt;
-                    else userChocoToRevoke += amt;
-
                     const tTime = getTxTime(dupTx);
                     const fullDateStr = tTime ? format(toGMT7Date(tTime), 'yyyy-MM-dd HH:mm:ss') : dateStr;
 
-                    userDuplicates.push({
+                    candidateDuplicates.push({
                       type: 'mission_id',
                       detail: `Nhiệm vụ ngày trùng trong ngày ${dateStr}: ${mId}`,
                       amount: amt,
                       currency: cur,
                       createdAtStr: fullDateStr,
-                      txId: dupTx.txId
+                      txId: dupTx.txId,
+                      timestamp: tTime
                     });
                   }
                 }
@@ -1101,19 +1111,17 @@ export function Admin() {
                     const amt = Number(dupTx.amount) || 0;
                     const cur = (dupTx.currency || 'choco').toLowerCase();
                     
-                    if (cur === 'gchoco') userGChocoToRevoke += amt;
-                    else userChocoToRevoke += amt;
-
                     const tTime = getTxTime(dupTx);
                     const fullDateStr = tTime ? format(toGMT7Date(tTime), 'yyyy-MM-dd HH:mm:ss') : weekStr;
 
-                    userDuplicates.push({
+                    candidateDuplicates.push({
                       type: 'mission_id',
                       detail: `Nhiệm vụ tuần trùng trong tuần ${weekStr}: ${mId}`,
                       amount: amt,
                       currency: cur,
                       createdAtStr: fullDateStr,
-                      txId: dupTx.txId
+                      txId: dupTx.txId,
+                      timestamp: tTime
                     });
                   }
                 }
@@ -1122,7 +1130,7 @@ export function Admin() {
           }
         });
 
-        // Nhóm 3: Nhiệm vụ cũ (Legacy Missions - lý do chính xác là "Nhận thưởng nhiệm vụ")
+        // Nhóm 3: Nhiệm vụ cũ (Legacy Missions)
         const legacyTxs = sortedTxs.filter(t => t.type === 'earn' && (t.description || t.reason) === "Nhận thưởng nhiệm vụ");
         
         const processedLegacyTxIds = new Set<string>();
@@ -1147,19 +1155,56 @@ export function Admin() {
             if (t1Cur === t2Cur && t1Amt === t2Amt && t1Bal === t2Bal && Math.abs(t1Time - t2Time) <= 5000) {
               processedLegacyTxIds.add(t2.txId);
               
-              if (t2Cur === 'gchoco') userGChocoToRevoke += t2Amt;
-              else userChocoToRevoke += t2Amt;
-
               const dateStr = t2Time ? format(toGMT7Date(t2Time), 'yyyy-MM-dd HH:mm:ss') : "Không rõ ngày";
 
-              userDuplicates.push({
+              candidateDuplicates.push({
                 type: 'mission_legacy',
                 detail: `Nhiệm vụ cũ nhận trùng (ghi song song, cùng số dư sau gd: ${t2Bal})`,
                 amount: t2Amt,
                 currency: t2Cur,
                 createdAtStr: dateStr,
-                txId: t2.txId
+                txId: t2.txId,
+                timestamp: t2Time
               });
+            }
+          }
+        }
+
+        // Đối chiếu các trùng lặp ứng viên với các giao dịch spend đã thu hồi trong lịch sử
+        const sortedCandidates = [...candidateDuplicates].sort((a, b) => a.timestamp - b.timestamp);
+        const userDuplicates: any[] = [];
+        let userChocoToRevoke = 0;
+        let userGChocoToRevoke = 0;
+
+        for (const candidate of sortedCandidates) {
+          const amt = candidate.amount;
+          const isGolden = candidate.currency === 'gchoco';
+
+          if (isGolden) {
+            if (alreadyRevokedGChoco >= amt) {
+              alreadyRevokedGChoco -= amt;
+              // Tự động ghim nhãn isDuplicateRevoked: true trong Firestore để tránh quét lại
+              try {
+                await updateDoc(doc(db, `users/${u.id}/transactions`, candidate.txId), { isDuplicateRevoked: true });
+              } catch (e) {
+                console.error("Lỗi cập nhật isDuplicateRevoked:", e);
+              }
+            } else {
+              userGChocoToRevoke += amt;
+              userDuplicates.push(candidate);
+            }
+          } else {
+            if (alreadyRevokedChoco >= amt) {
+              alreadyRevokedChoco -= amt;
+              // Tự động ghim nhãn isDuplicateRevoked: true trong Firestore để tránh quét lại
+              try {
+                await updateDoc(doc(db, `users/${u.id}/transactions`, candidate.txId), { isDuplicateRevoked: true });
+              } catch (e) {
+                console.error("Lỗi cập nhật isDuplicateRevoked:", e);
+              }
+            } else {
+              userChocoToRevoke += amt;
+              userDuplicates.push(candidate);
             }
           }
         }
@@ -1180,7 +1225,7 @@ export function Admin() {
             duplicates: userDuplicates
           });
 
-          setDuplicateLogs(prev => [...prev, `⚠️ Phát hiện ${userDuplicates.length} nhận trùng cho ${u.displayName || u.email}. Trùng lặp: -${userChocoToRevoke} Choco, -${userGChocoToRevoke} GChoco.`]);
+          setDuplicateLogs(prev => [...prev, `⚠️ Phát hiện ${userDuplicates.length} nhận trùng mới cho ${u.displayName || u.email}. Trùng lặp: -${userChocoToRevoke} Choco, -${userGChocoToRevoke} GChoco.`]);
         }
       }
 
@@ -1271,6 +1316,18 @@ export function Admin() {
         }
 
         await updateDoc(userRef, updates);
+
+        // Đánh dấu thuộc tính isDuplicateRevoked: true cho toàn bộ các giao dịch trùng lặp vừa được thu hồi
+        for (const dup of uInfo.duplicates) {
+          if (dup.txId) {
+            try {
+              await updateDoc(doc(db, `users/${uInfo.userId}/transactions`, dup.txId), { isDuplicateRevoked: true });
+            } catch (err) {
+              console.error(`Lỗi đánh dấu isDuplicateRevoked cho gd ${dup.txId}:`, err);
+            }
+          }
+        }
+
         successfullyRevokedUsers++;
         setDuplicateLogs(prev => [...prev, `🎉 Hoàn tất thu hồi cho ${uInfo.displayName}: Số dư Choco ${currentChoco} ➔ ${nextChoco}, GChoco ${currentGChoco} ➔ ${nextGChoco}`]);
       }
