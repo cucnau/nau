@@ -148,14 +148,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               } catch(e) {}
             }
 
-            // Tối ưu hóa dung lượng missions khi tạo mới user để không dính lỗi 1MB sau này
+            // Tối ưu hóa dung lượng missions khi tạo mới user để không dính lỗi 1MB sau này (chỉ lưu các nhiệm vụ có tiến độ, hoàn thành hoặc đã nhận)
             if (Array.isArray(newUser.missions)) {
-                newUser.missions = newUser.missions.map((m: any) => ({
-                    id: m.id,
-                    progress: m.progress || 0,
-                    completed: m.completed || false,
-                    claimed: m.claimed || false
-                })) as any;
+                newUser.missions = newUser.missions
+                    .filter((m: any) => m.progress > 0 || m.completed || m.claimed)
+                    .map((m: any) => ({
+                        id: m.id,
+                        progress: m.progress || 0,
+                        completed: m.completed || false,
+                        claimed: m.claimed || false
+                    })) as any;
             }
 
             if (Array.isArray(newUser.readHistoryList) && newUser.readHistoryList.length > 200) {
