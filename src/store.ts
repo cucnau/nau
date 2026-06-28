@@ -1658,7 +1658,7 @@ export const useStore = create<UserState>()(
                  totalEarnedGChoco: newTotalEarnedG,
                  missions: ms
               };
-              get().updateUserDoc(updates, "Nhận thưởng nhiệm vụ");
+              get().updateUserDoc(updates, `Nhận thưởng nhiệm vụ: ${m.id} - ${m.description}`);
               
               setTimeout(() => {
                  get()._triggerCountAchievementsCheck();
