@@ -2198,17 +2198,17 @@ export const useStore = create<UserState>()(
             };
 
             // Update News Feed
-            const feedQ = query(collection(db, 'newsFeed'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(500));
+            const feedQ = query(collection(db, 'newsFeed'), where('uid', '==', state.uid), limit(500));
             const feedSnaps = await getDocs(feedQ);
             for (const d of feedSnaps.docs) { batch.update(d.ref, stickerUpdates); writeCount++; await commitBatchIfNeeded(); }
 
             // Update Chat
-            const chatQ = query(collection(db, 'chatMessages'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(500));
+            const chatQ = query(collection(db, 'chatMessages'), where('uid', '==', state.uid), limit(500));
             const chatSnaps = await getDocs(chatQ);
             for (const d of chatSnaps.docs) { batch.update(d.ref, stickerUpdates); writeCount++; await commitBatchIfNeeded(); }
 
             // Update Comments
-            const commQ = query(collection(db, 'comments'), where('uid', '==', state.uid), orderBy('createdAt', 'desc'), limit(500));
+            const commQ = query(collection(db, 'comments'), where('uid', '==', state.uid), limit(500));
             const commSnaps = await getDocs(commQ);
             for (const d of commSnaps.docs) { batch.update(d.ref, stickerUpdates); writeCount++; await commitBatchIfNeeded(); }
             
@@ -2471,14 +2471,6 @@ export const useStore = create<UserState>()(
       name: 'truyen-storage',
       partialize: (state) => {
         const {
-          allUsersMissions,
-          allUsersStoryProgress,
-          allUsersReadHistoryList,
-          allUsersSavedStories,
-          allUsersUnlockedAchievements,
-          allUsersClaimedAchievements,
-          allUsersOwnedStickers,
-          allUsersOwnedAccessories,
           firebaseUser,
           isQuotaExceeded,
           ...rest
