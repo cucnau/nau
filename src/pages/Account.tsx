@@ -157,8 +157,8 @@ export function Account() {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 256;
-        const MAX_HEIGHT = 256;
+        const MAX_WIDTH = 600;
+        const MAX_HEIGHT = 600;
         let width = img.width;
         let height = img.height;
         if (width > height) {
@@ -170,7 +170,7 @@ export function Account() {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
-        setAvatar(canvas.toDataURL('image/jpeg', 0.85));
+        setAvatar(canvas.toDataURL('image/jpeg', 0.9));
       };
       if (dataUrl) img.src = dataUrl;
     };
