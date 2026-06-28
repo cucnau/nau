@@ -65,8 +65,8 @@ export function useRadioTracking() {
       lastState.current = { isPlaying, activeTrackId: currentTrackId };
     });
 
-    // Tick every 5 seconds to minimize writes
-    const TICK_S = 5;
+    // Tick every 60 seconds to minimize writes
+    const TICK_S = 60;
     intervalId = setInterval(() => {
        if (!RadioManager.isPlaying || !lastState.current.activeTrackId) return;
 
