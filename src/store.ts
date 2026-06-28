@@ -8,14 +8,14 @@ import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement, getGM
 import { logTransaction } from './lib/transactions';
 import { addStoryFire } from './lib/storyFire';
 
-export function compressBase64Image(dataUrl: string, maxWidth = 180, maxHeight = 180, quality = 0.85): Promise<string> {
+export function compressBase64Image(dataUrl: string, maxWidth = 600, maxHeight = 600, quality = 0.9): Promise<string> {
    return new Promise((resolve) => {
       if (!dataUrl || !dataUrl.startsWith('data:image/')) {
          resolve(dataUrl);
          return;
       }
-      // If already small (<40KB), no need to compress
-      if (dataUrl.length < 40000) {
+      // If already small (<300KB), no need to compress
+      if (dataUrl.length < 300000) {
          resolve(dataUrl);
          return;
       }
@@ -1029,17 +1029,27 @@ export const useStore = create<UserState>()(
                 }
             });
 
-            // Tự động kiểm tra và phục hồi: nếu avatarUrl hiện tại quá lớn (>80KB Base64),
+            // Tự động kiểm tra và phục hồi: nếu avatarUrl hiện tại quá lớn (>300KB Base64),
             // ta sẽ đè lên bằng một phiên bản nén siêu nhỏ để cứu document khỏi giới hạn 1MB của Firestore.
             const currentAvatarUrl = state.avatarUrl;
-            if (currentAvatarUrl && currentAvatarUrl.startsWith('data:image/') && currentAvatarUrl.length > 80000) {
+            if (currentAvatarUrl && currentAvatarUrl.startsWith('data:image/') && currentAvatarUrl.length > 300000) {
                const compressed = await compressBase64Image(currentAvatarUrl);
                docUpdates.avatarUrl = compressed;
                set({ avatarUrl: compressed });
             }
 
+            if (Array.isArray(docUpdates.missions) && docUpdates.missions.length > 300) {
+                 docUpdates.missions = [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()];
+                 set({ missions: docUpdates.missions });
+                 if (state.uid) {
+                     const allMs = { ...(state.allUsersMissions || {}) };
+                     allMs[state.uid] = docUpdates.missions;
+                     set({ allUsersMissions: allMs });
+                 }
+            }
+
             // Nếu bản thân payload/updates chứa avatarUrl mới siêu lớn, nén ngay lập tức trước khi lưu
-            if (docUpdates.avatarUrl && docUpdates.avatarUrl.startsWith('data:image/') && docUpdates.avatarUrl.length > 80000) {
+            if (docUpdates.avatarUrl && docUpdates.avatarUrl.startsWith('data:image/') && docUpdates.avatarUrl.length > 300000) {
                const compressed = await compressBase64Image(docUpdates.avatarUrl);
                docUpdates.avatarUrl = compressed;
                set({ avatarUrl: compressed });
