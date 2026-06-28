@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useStore } from '../store';
 import { db, handleFirestoreError, OperationType, auth } from '../lib/firebase';
-import { doc, updateDoc, collection, addDoc, setDoc, serverTimestamp, query, orderBy, onSnapshot, where, deleteDoc, limit } from 'firebase/firestore';
+import { doc, updateDoc, collection, addDoc, setDoc, serverTimestamp, query, orderBy, onSnapshot, where, deleteDoc, limit, getDocs } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST } from '../types/achievements';
 import { Gift } from 'lucide-react';
 import { UserAvatar } from '../components/UserAvatar';
@@ -104,12 +104,59 @@ export function Account() {
     if (!uid) return;
     const q = query(collection(db, `users/${uid}/transactions`), orderBy('createdAt', 'desc'), limit(50));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const arr = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setTransactions(arr);
+       const arr = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+       setTransactions(arr);
     }, (error) => {
-      handleFirestoreError(error, OperationType.GET, `users/${uid}/transactions`);
+       handleFirestoreError(error, OperationType.GET, `users/${uid}/transactions`);
     });
     return () => unsubscribe();
+  }, [uid]);
+
+  const [stickerMetadata, setStickerMetadata] = useState<Record<string, { stars: number; source: 'gacha' | 'store' }>>({});
+
+  useEffect(() => {
+    if (!uid) return;
+    
+    const fetchStickers = async () => {
+      try {
+        const metadataMap: Record<string, { stars: number; source: 'gacha' | 'store' }> = {};
+        
+        // 1. Fetch store stickers
+        const storeSnap = await getDocs(collection(db, "store_stickers"));
+        storeSnap.docs.forEach(doc => {
+          const data = doc.data();
+          if (data.url) {
+            metadataMap[data.url] = { stars: 0, source: 'store' };
+          }
+        });
+
+        // 2. Fetch gacha banners
+        const bannersSnap = await getDocs(collection(db, "gacha_banners"));
+        bannersSnap.docs.forEach(doc => {
+          const banner = doc.data();
+          if (banner.pool5Star) {
+            banner.pool5Star.forEach((item: any) => {
+              if (item.image) {
+                metadataMap[item.image] = { stars: 5, source: 'gacha' };
+              }
+            });
+          }
+          if (banner.pool4Star) {
+            banner.pool4Star.forEach((item: any) => {
+              if (item.image) {
+                metadataMap[item.image] = { stars: 4, source: 'gacha' };
+              }
+            });
+          }
+        });
+
+        setStickerMetadata(metadataMap);
+      } catch (err) {
+        console.error("Lỗi khi tải sticker metadata:", err);
+      }
+    };
+
+    fetchStickers();
   }, [uid]);
 
   // Tự động đồng bộ các bài viết cũ của user sang newsFeed toàn cục bằng cách so khớp ID
@@ -245,6 +292,29 @@ export function Account() {
     }
   };
 
+  const getStickerBorderClass = (url: string, isEquipped: boolean) => {
+    const meta = stickerMetadata[url];
+    let borderClass = 'border-stone-200 dark:border-stone-800'; // Default fallback
+    
+    if (meta) {
+      if (meta.stars === 5) {
+        borderClass = 'border-amber-400 dark:border-amber-500 border-2 shadow-[0_0_8px_rgba(245,158,11,0.25)]';
+      } else if (meta.stars === 4) {
+        borderClass = 'border-purple-400 dark:border-purple-500 border-2 shadow-[0_0_8px_rgba(168,85,247,0.25)]';
+      } else if (meta.source === 'store') {
+        borderClass = 'border-blue-400 dark:border-blue-500 border-2 shadow-[0_0_8px_rgba(59,130,246,0.25)]';
+      }
+    } else {
+      // Fallback: Default to blue border (store/gift box) if we don't have it in the loaded metadata yet
+      borderClass = 'border-blue-400 dark:border-blue-500 border-2 shadow-[0_0_8px_rgba(59,130,246,0.15)]';
+    }
+
+    if (isEquipped) {
+      return `${borderClass} ring-2 ring-offset-2 ring-[#8D6E63] dark:ring-offset-[#1A1412]`;
+    }
+    return `${borderClass} hover:scale-105`;
+  };
+
   if (!isLoggedIn) {
     return <div className="p-8 text-center">Vui lòng đăng nhập để xem hồ sơ.</div>;
   }
@@ -332,7 +402,7 @@ export function Account() {
                           <div 
                             key={url} 
                             onClick={() => equipSticker(activeStickerTab, url)}
-                            className={`w-14 h-14 cursor-pointer relative p-1 transition-all rounded-xl border flex items-center justify-center ${isEquipped ? 'ring-2 ring-offset-2 ring-[#8D6E63] dark:ring-offset-[#1A1412] bg-white dark:bg-[#1C1310] border-transparent' : 'hover:scale-105 bg-white dark:bg-[#1C1310] border-stone-200 dark:border-stone-800 shadow-sm'}`}
+                            className={`w-14 h-14 cursor-pointer relative p-1 transition-all rounded-xl border flex items-center justify-center ${getStickerBorderClass(url, isEquipped)}`}
                            >
                              <img src={url} alt="Sticker preview" className="w-10 h-10 object-contain pointer-events-none" />
                           </div>
@@ -687,7 +757,7 @@ export function Account() {
             </h2>
             <div className="flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-2">
                {transactions.length === 0 ? (
-                  <p className="text-stone-400 italic text-sm text-center py-8 font-serif">Chưa có giao dịch nào được ghi nhận.</p>
+                  <p className="text-stone-400 italic text-sm text-center py-8 font-sans">Chưa có giao dịch nào được ghi nhận.</p>
                ) : (
                   transactions.map(t => (
                      <div key={t.id} className="flex justify-between items-center p-4 bg-white dark:bg-[#1A1412] border-[2px] border-[#3E2723] rounded-2xl hover:bg-[#FDF6EC]/55 hover:shadow-[1.5px_1.5px_0_0_#3E2723] hover:-translate-y-0.5 transition-all mb-2">
