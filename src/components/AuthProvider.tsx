@@ -138,6 +138,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               activeStreakProtection: state.activeStreakProtection || false,
               lastFreeStreakRecoveryMonth: state.lastFreeStreakRecoveryMonth || null
             };
+            if (newUser.avatarUrl && newUser.avatarUrl.startsWith('data:image/') && newUser.avatarUrl.length > 300000) {
+              try {
+                const { compressBase64Image } = await import('../store');
+                const compressed = await compressBase64Image(newUser.avatarUrl);
+                if (compressed && compressed.length < newUser.avatarUrl.length) {
+                   newUser.avatarUrl = compressed;
+                }
+              } catch(e) {}
+            }
+
+            if (Array.isArray(newUser.missions) && newUser.missions.length > 300) {
+               newUser.missions = [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()];
+            }
+            if (Array.isArray(newUser.readHistoryList) && newUser.readHistoryList.length > 200) {
+               newUser.readHistoryList = newUser.readHistoryList.slice(0, 200);
+            }
+            
             try {
               await setDoc(userRef, newUser);
               // Replace serverTimestamp with Date.now() for local state
@@ -181,7 +198,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (k in data) fieldsToDelete[k] = deleteField();
             });
 
-            if (data.avatarUrl && data.avatarUrl.startsWith('data:image/') && data.avatarUrl.length > 80000) {
+            if (data.avatarUrl && data.avatarUrl.startsWith('data:image/') && data.avatarUrl.length > 300000) {
               try {
                 const { compressBase64Image } = await import('../store');
                 const compressed = await compressBase64Image(data.avatarUrl);
