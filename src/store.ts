@@ -1029,6 +1029,16 @@ export const useStore = create<UserState>()(
                 }
             });
 
+            // Tối ưu hóa dung lượng: Chỉ lưu ID và tiến độ của missions lên Firestore, bỏ qua các text mô tả dài
+            if (Array.isArray(docUpdates.missions)) {
+                docUpdates.missions = docUpdates.missions.map((m: any) => ({
+                    id: m.id,
+                    progress: m.progress || 0,
+                    completed: m.completed || false,
+                    claimed: m.claimed || false
+                }));
+            }
+
             // Tự động kiểm tra và phục hồi: nếu avatarUrl hiện tại quá lớn (>300KB Base64),
             // ta sẽ đè lên bằng một phiên bản nén siêu nhỏ để cứu document khỏi giới hạn 1MB của Firestore.
             const currentAvatarUrl = state.avatarUrl;
