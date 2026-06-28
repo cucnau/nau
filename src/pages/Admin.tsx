@@ -148,6 +148,34 @@ export function Admin() {
   const [restorationLogs, setRestorationLogs] = useState<string[]>([]);
   const [isRestoring, setIsRestoring] = useState(false);
 
+  // States for duplicate scanner and revoker
+  const [duplicateLogs, setDuplicateLogs] = useState<string[]>([]);
+  const [isScanningDuplicates, setIsScanningDuplicates] = useState(false);
+  const [isRevokingDuplicates, setIsRevokingDuplicates] = useState(false);
+  const [duplicateReport, setDuplicateReport] = useState<{
+    totalScanned: number;
+    totalDuplicatesFound: number;
+    totalChocoToRevoke: number;
+    totalGChocoToRevoke: number;
+    usersWithDuplicates: Array<{
+      userId: string;
+      displayName: string;
+      email: string;
+      currentChoco: number;
+      currentGChoco: number;
+      chocoToRevoke: number;
+      gchocoToRevoke: number;
+      duplicates: Array<{
+        type: 'achievement' | 'mission_id' | 'mission_legacy';
+        detail: string;
+        amount: number;
+        currency: 'choco' | 'gchoco';
+        createdAtStr: string;
+        txId: string;
+      }>;
+    }>;
+  } | null>(null);
+
   // States for targeted single-user audit module
   const [auditingUser, setAuditingUser] = useState<any | null>(null);
   const [auditReport, setAuditReport] = useState<any | null>(null);
@@ -884,6 +912,384 @@ export function Admin() {
       setRestorationLogs(prev => [...prev, `❌ Thất bại: ${err.message || err}`]);
     } finally {
       setIsRestoring(false);
+    }
+  };
+
+  const runDuplicateScan = async () => {
+    setIsScanningDuplicates(true);
+    setDuplicateReport(null);
+    setDuplicateLogs(["Bắt đầu quét lịch sử giao dịch để tìm nhận trùng nhiệm vụ và thành tựu..."]);
+    try {
+      const usersSnap = await getDocs(collection(db, "users"));
+      const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
+      setDuplicateLogs(prev => [...prev, `Tìm thấy ${users.length} thành viên.`]);
+
+      let totalDuplicatesFound = 0;
+      let totalChocoToRevoke = 0;
+      let totalGChocoToRevoke = 0;
+      const usersWithDuplicates: any[] = [];
+
+      // Helper to parse date to GMT+7 Date object
+      const toGMT7Date = (ms: number): Date => {
+         const d = new Date(ms);
+         const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+         return new Date(utc + (3600000 * 7));
+      };
+
+      // Helper to compute Weekly ID of a date
+      const getWeeklyIdOfDate = (gmt7: Date): string => {
+         const d = new Date(gmt7.getTime());
+         d.setHours(0, 0, 0, 0);
+         d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+         const yearStart = new Date(d.getFullYear(), 0, 1);
+         const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+         return `${d.getFullYear()}-W${weekNo}`;
+      };
+
+      for (const u of users) {
+        setDuplicateLogs(prev => [...prev, `⏳ Đang quét người dùng: ${u.displayName || u.email || u.id}...`]);
+        
+        const txSnap = await getDocs(collection(db, `users/${u.id}/transactions`));
+        const txs = txSnap.docs.map(doc => ({ txId: doc.id, ...doc.data() as any }));
+        
+        // Sắp xếp các giao dịch tăng dần theo thời gian tạo
+        const getTxTime = (tx: any) => {
+          if (!tx.createdAt) return 0;
+          if (typeof tx.createdAt.toMillis === 'function') return tx.createdAt.toMillis();
+          if (tx.createdAt.seconds !== undefined) return tx.createdAt.seconds * 1000;
+          return new Date(tx.createdAt).getTime() || 0;
+        };
+        const sortedTxs = [...txs].sort((a, b) => getTxTime(a) - getTxTime(b));
+
+        const userDuplicates: any[] = [];
+        let userChocoToRevoke = 0;
+        let userGChocoToRevoke = 0;
+
+        // Nhóm 1: Thành tựu (Achievements)
+        // Group earn transactions containing "Nhận thưởng thành tựu: "
+        const achMap = new Map<string, any[]>();
+        sortedTxs.forEach(t => {
+          if (t.type === 'earn') {
+            const desc = t.description || t.reason || "";
+            const match = desc.match(/Nhận thưởng thành tựu:\s*(.+)/);
+            if (match) {
+              const achName = match[1].trim();
+              if (!achMap.has(achName)) achMap.set(achName, []);
+              achMap.get(achName)!.push(t);
+            }
+          }
+        });
+
+        achMap.forEach((txList, achName) => {
+          if (txList.length > 1) {
+            // Chỉ giữ lại giao dịch đầu tiên (mốc thời gian sớm nhất)
+            // Tất cả giao dịch sau là trùng lặp
+            for (let i = 1; i < txList.length; i++) {
+              const dupTx = txList[i];
+              const amt = Number(dupTx.amount) || 0;
+              const cur = (dupTx.currency || 'choco').toLowerCase();
+              
+              if (cur === 'gchoco') userGChocoToRevoke += amt;
+              else userChocoToRevoke += amt;
+
+              const tTime = getTxTime(dupTx);
+              const dateStr = tTime ? format(toGMT7Date(tTime), 'yyyy-MM-dd HH:mm:ss') : "Không rõ ngày";
+
+              userDuplicates.push({
+                type: 'achievement',
+                detail: `Thành tựu: ${achName}`,
+                amount: amt,
+                currency: cur,
+                createdAtStr: dateStr,
+                txId: dupTx.txId
+              });
+            }
+          }
+        });
+
+        // Nhóm 2: Nhiệm vụ có ID (Missions with ID)
+        // Group earn transactions containing "Nhận thưởng nhiệm vụ: "
+        const missionIdMap = new Map<string, any[]>();
+        sortedTxs.forEach(t => {
+          if (t.type === 'earn') {
+            const desc = t.description || t.reason || "";
+            const match = desc.match(/Nhận thưởng nhiệm vụ:\s*([a-zA-Z0-9_\-]+)/);
+            if (match) {
+              const mId = match[1].trim();
+              if (!missionIdMap.has(mId)) missionIdMap.set(mId, []);
+              missionIdMap.get(mId)!.push(t);
+            }
+          }
+        });
+
+        missionIdMap.forEach((txList, mId) => {
+          if (txList.length > 1) {
+            if (mId.startsWith('p_')) {
+              // Nhiệm vụ vĩnh viễn (Permanent): chỉ nhận 1 lần duy nhất trong đời
+              for (let i = 1; i < txList.length; i++) {
+                const dupTx = txList[i];
+                const amt = Number(dupTx.amount) || 0;
+                const cur = (dupTx.currency || 'choco').toLowerCase();
+                
+                if (cur === 'gchoco') userGChocoToRevoke += amt;
+                else userChocoToRevoke += amt;
+
+                const tTime = getTxTime(dupTx);
+                const dateStr = tTime ? format(toGMT7Date(tTime), 'yyyy-MM-dd HH:mm:ss') : "Không rõ ngày";
+
+                userDuplicates.push({
+                  type: 'mission_id',
+                  detail: `Nhiệm vụ vĩnh viễn: ${mId}`,
+                  amount: amt,
+                  currency: cur,
+                  createdAtStr: dateStr,
+                  txId: dupTx.txId
+                });
+              }
+            } else if (mId.startsWith('d')) {
+              // Nhiệm vụ hàng ngày (Daily): chỉ được nhận tối đa 1 lần/ngày
+              const dailyGroups = new Map<string, any[]>();
+              txList.forEach(tx => {
+                const tTime = getTxTime(tx);
+                if (tTime) {
+                  const dateStr = format(toGMT7Date(tTime), 'yyyy-MM-dd');
+                  if (!dailyGroups.has(dateStr)) dailyGroups.set(dateStr, []);
+                  dailyGroups.get(dateStr)!.push(tx);
+                }
+              });
+
+              dailyGroups.forEach((txsInDay, dateStr) => {
+                if (txsInDay.length > 1) {
+                  for (let i = 1; i < txsInDay.length; i++) {
+                    const dupTx = txsInDay[i];
+                    const amt = Number(dupTx.amount) || 0;
+                    const cur = (dupTx.currency || 'choco').toLowerCase();
+                    
+                    if (cur === 'gchoco') userGChocoToRevoke += amt;
+                    else userChocoToRevoke += amt;
+
+                    const tTime = getTxTime(dupTx);
+                    const fullDateStr = tTime ? format(toGMT7Date(tTime), 'yyyy-MM-dd HH:mm:ss') : dateStr;
+
+                    userDuplicates.push({
+                      type: 'mission_id',
+                      detail: `Nhiệm vụ ngày trùng trong ngày ${dateStr}: ${mId}`,
+                      amount: amt,
+                      currency: cur,
+                      createdAtStr: fullDateStr,
+                      txId: dupTx.txId
+                    });
+                  }
+                }
+              });
+            } else if (mId.startsWith('w')) {
+              // Nhiệm vụ tuần (Weekly): chỉ được nhận tối đa 1 lần/tuần
+              const weeklyGroups = new Map<string, any[]>();
+              txList.forEach(tx => {
+                const tTime = getTxTime(tx);
+                if (tTime) {
+                  const weekStr = getWeeklyIdOfDate(toGMT7Date(tTime));
+                  if (!weeklyGroups.has(weekStr)) weeklyGroups.set(weekStr, []);
+                  weeklyGroups.get(weekStr)!.push(tx);
+                }
+              });
+
+              weeklyGroups.forEach((txsInWeek, weekStr) => {
+                if (txsInWeek.length > 1) {
+                  for (let i = 1; i < txsInWeek.length; i++) {
+                    const dupTx = txsInWeek[i];
+                    const amt = Number(dupTx.amount) || 0;
+                    const cur = (dupTx.currency || 'choco').toLowerCase();
+                    
+                    if (cur === 'gchoco') userGChocoToRevoke += amt;
+                    else userChocoToRevoke += amt;
+
+                    const tTime = getTxTime(dupTx);
+                    const fullDateStr = tTime ? format(toGMT7Date(tTime), 'yyyy-MM-dd HH:mm:ss') : weekStr;
+
+                    userDuplicates.push({
+                      type: 'mission_id',
+                      detail: `Nhiệm vụ tuần trùng trong tuần ${weekStr}: ${mId}`,
+                      amount: amt,
+                      currency: cur,
+                      createdAtStr: fullDateStr,
+                      txId: dupTx.txId
+                    });
+                  }
+                }
+              });
+            }
+          }
+        });
+
+        // Nhóm 3: Nhiệm vụ cũ (Legacy Missions - lý do chính xác là "Nhận thưởng nhiệm vụ")
+        const legacyTxs = sortedTxs.filter(t => t.type === 'earn' && (t.description || t.reason) === "Nhận thưởng nhiệm vụ");
+        
+        const processedLegacyTxIds = new Set<string>();
+        for (let i = 0; i < legacyTxs.length; i++) {
+          const t1 = legacyTxs[i];
+          if (processedLegacyTxIds.has(t1.txId)) continue;
+          
+          const t1Time = getTxTime(t1);
+          const t1Amt = Number(t1.amount) || 0;
+          const t1Cur = (t1.currency || 'choco').toLowerCase();
+          const t1Bal = t1.balanceAfter;
+
+          for (let j = i + 1; j < legacyTxs.length; j++) {
+            const t2 = legacyTxs[j];
+            if (processedLegacyTxIds.has(t2.txId)) continue;
+
+            const t2Time = getTxTime(t2);
+            const t2Amt = Number(t2.amount) || 0;
+            const t2Cur = (t2.currency || 'choco').toLowerCase();
+            const t2Bal = t2.balanceAfter;
+
+            if (t1Cur === t2Cur && t1Amt === t2Amt && t1Bal === t2Bal && Math.abs(t1Time - t2Time) <= 5000) {
+              processedLegacyTxIds.add(t2.txId);
+              
+              if (t2Cur === 'gchoco') userGChocoToRevoke += t2Amt;
+              else userChocoToRevoke += t2Amt;
+
+              const dateStr = t2Time ? format(toGMT7Date(t2Time), 'yyyy-MM-dd HH:mm:ss') : "Không rõ ngày";
+
+              userDuplicates.push({
+                type: 'mission_legacy',
+                detail: `Nhiệm vụ cũ nhận trùng (ghi song song, cùng số dư sau gd: ${t2Bal})`,
+                amount: t2Amt,
+                currency: t2Cur,
+                createdAtStr: dateStr,
+                txId: t2.txId
+              });
+            }
+          }
+        }
+
+        if (userDuplicates.length > 0) {
+          totalDuplicatesFound += userDuplicates.length;
+          totalChocoToRevoke += userChocoToRevoke;
+          totalGChocoToRevoke += userGChocoToRevoke;
+
+          usersWithDuplicates.push({
+            userId: u.id,
+            displayName: u.displayName || 'Không có tên',
+            email: u.email || 'Không có email',
+            currentChoco: u.choco || 0,
+            currentGChoco: u.goldenChoco || 0,
+            chocoToRevoke: userChocoToRevoke,
+            gchocoToRevoke: userGChocoToRevoke,
+            duplicates: userDuplicates
+          });
+
+          setDuplicateLogs(prev => [...prev, `⚠️ Phát hiện ${userDuplicates.length} nhận trùng cho ${u.displayName || u.email}. Trùng lặp: -${userChocoToRevoke} Choco, -${userGChocoToRevoke} GChoco.`]);
+        }
+      }
+
+      setDuplicateReport({
+        totalScanned: users.length,
+        totalDuplicatesFound,
+        totalChocoToRevoke,
+        totalGChocoToRevoke,
+        usersWithDuplicates
+      });
+
+      setDuplicateLogs(prev => [
+        ...prev, 
+        `--------------------------------------------------------------------------------`,
+        `🎉 Hoàn tất TRUY QUÉT trùng lặp!`,
+        `📊 Tổng số thành viên quét: ${users.length}`,
+        `📊 Số lượng lượt nhận trùng: ${totalDuplicatesFound}`,
+        `🍫 Tổng số Choco cần thu hồi: ${totalChocoToRevoke}`,
+        `🌟 Tổng số GChoco cần thu hồi: ${totalGChocoToRevoke}`,
+        `➡️ Nhấp "THỰC THI THU HỒI" để hoàn tất khấu trừ trong cơ sở dữ liệu.`
+      ]);
+
+    } catch (e: any) {
+      console.error("Lỗi khi quét trùng lặp: ", e);
+      setDuplicateLogs(prev => [...prev, `❌ Thao tác thất bại: ${e.message || e}`]);
+    } finally {
+      setIsScanningDuplicates(false);
+    }
+  };
+
+  const runDuplicateRevoke = async () => {
+    if (!duplicateReport || duplicateReport.usersWithDuplicates.length === 0) return;
+    setIsRevokingDuplicates(true);
+    setDuplicateLogs(prev => [...prev, `--------------------------------------------------------------------------------`, `🚀 Bắt đầu thực thi THU HỒI tài sản nhận trùng lặp trong Firestore...`]);
+    
+    try {
+      let successfullyRevokedUsers = 0;
+
+      for (const uInfo of duplicateReport.usersWithDuplicates) {
+        setDuplicateLogs(prev => [...prev, `⏳ Đang xử lý tài khoản: ${uInfo.displayName} (${uInfo.email})...`]);
+        
+        const userRef = doc(db, "users", uInfo.userId);
+        const userDoc = await getDoc(userRef);
+        
+        if (!userDoc.exists()) {
+          setDuplicateLogs(prev => [...prev, `❌ Không tìm thấy tài liệu người dùng ${uInfo.userId} trong Firestore.`]);
+          continue;
+        }
+
+        const actualUserData = userDoc.data() as any;
+        const currentChoco = actualUserData.choco || 0;
+        const currentGChoco = actualUserData.goldenChoco || 0;
+        const totalEarnedChoco = actualUserData.totalEarnedChoco || 0;
+        const totalEarnedGChoco = actualUserData.totalEarnedGChoco || 0;
+
+        const nextChoco = Math.max(0, currentChoco - uInfo.chocoToRevoke);
+        const nextGChoco = Math.max(0, currentGChoco - uInfo.gchocoToRevoke);
+        const nextTotalEarnedChoco = Math.max(0, totalEarnedChoco - uInfo.chocoToRevoke);
+        const nextTotalEarnedGChoco = Math.max(0, totalEarnedGChoco - uInfo.gchocoToRevoke);
+
+        const updates: any = {
+          choco: nextChoco,
+          goldenChoco: nextGChoco,
+          totalEarnedChoco: nextTotalEarnedChoco,
+          totalEarnedGChoco: nextTotalEarnedGChoco
+        };
+
+        if (uInfo.chocoToRevoke > 0) {
+          await addDoc(collection(db, `users/${uInfo.userId}/transactions`), {
+            amount: uInfo.chocoToRevoke,
+            currency: 'choco',
+            type: 'spend',
+            reason: `Thu hồi Choco nhận trùng (${uInfo.duplicates.filter(d => d.currency === 'choco').length} lần trùng lặp)`,
+            balanceAfter: nextChoco,
+            createdAt: serverTimestamp()
+          });
+        }
+
+        if (uInfo.gchocoToRevoke > 0) {
+          await addDoc(collection(db, `users/${uInfo.userId}/transactions`), {
+            amount: uInfo.gchocoToRevoke,
+            currency: 'gchoco',
+            type: 'spend',
+            reason: `Thu hồi GChoco nhận trùng (${uInfo.duplicates.filter(d => d.currency === 'gchoco').length} lần trùng lặp)`,
+            balanceAfter: nextGChoco,
+            createdAt: serverTimestamp()
+          });
+        }
+
+        await updateDoc(userRef, updates);
+        successfullyRevokedUsers++;
+        setDuplicateLogs(prev => [...prev, `🎉 Hoàn tất thu hồi cho ${uInfo.displayName}: Số dư Choco ${currentChoco} ➔ ${nextChoco}, GChoco ${currentGChoco} ➔ ${nextGChoco}`]);
+      }
+
+      setDuplicateLogs(prev => [
+        ...prev, 
+        `--------------------------------------------------------------------------------`,
+        `🎉 HOÀN THÀNH TIẾN TRÌNH THU HỒI TRÙNG LẶP!`,
+        `📊 Đã xử lý thành công: ${successfullyRevokedUsers} tài khoản`,
+        `✅ Hệ thống đã khấu trừ tổng cộng -${duplicateReport.totalChocoToRevoke} Choco và -${duplicateReport.totalGChocoToRevoke} GChoco.`
+      ]);
+
+      setDuplicateReport(null);
+
+    } catch (err: any) {
+      console.error("Lỗi khi thu hồi: ", err);
+      setDuplicateLogs(prev => [...prev, `❌ Lỗi tiến trình thu hồi: ${err.message || err}`]);
+    } finally {
+      setIsRevokingDuplicates(false);
     }
   };
 
@@ -3929,6 +4335,110 @@ export function Admin() {
                       {log}
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl border-2 flex flex-col gap-6 bg-[#FDF6EC] dark:bg-[#1A1412] border-[#3E2723]/10 dark:border-[#4E342E]/30 transition-all">
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-2">
+                <ShieldAlert className="w-6 h-6 text-[#8D6E63] dark:text-[#A1887F]" />
+                Truy quét & Thu hồi Nhiệm vụ & Thành tựu Trùng lặp
+              </h3>
+              <p className="text-[#5D4037] dark:text-[#A1887F] text-sm">
+                Tính năng này sẽ rà soát kỹ lưỡng lịch sử nhận thưởng nhiệm vụ và thành tựu của toàn bộ người dùng để tìm ra những lượt nhận trùng (do lỗi mạng hoặc spam nhấp đúp). Sau khi quét, bạn có thể thực hiện thu hồi chính xác số lượng Choco và GChoco dư thừa.
+              </p>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={runDuplicateScan}
+                  disabled={isScanningDuplicates || isRevokingDuplicates}
+                  className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap ${isScanningDuplicates ? 'bg-stone-500 cursor-not-allowed border-2 border-stone-800' : 'bg-[#8D6E63] hover:bg-[#7D5E53] border-2 border-[#3E2723]'}`}
+                >
+                  {isScanningDuplicates ? "Đang quét trùng lặp..." : "Quét Nhận Trùng Lặp"}
+                </button>
+
+                {duplicateReport && duplicateReport.totalDuplicatesFound > 0 && (
+                  <button
+                    onClick={() => {
+                      setConfirmDialog({
+                        text: `Bạn có chắc chắn muốn THU HỒI tổng cộng -${duplicateReport.totalChocoToRevoke} Choco và -${duplicateReport.totalGChocoToRevoke} GChoco của ${duplicateReport.usersWithDuplicates.length} người dùng nhận trùng không? Lịch sử giao dịch spend sẽ được ghi nhận tự động.`,
+                        action: runDuplicateRevoke
+                      });
+                    }}
+                    disabled={isRevokingDuplicates}
+                    className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap ${isRevokingDuplicates ? 'bg-stone-500 cursor-not-allowed border-2 border-stone-800' : 'bg-red-600 hover:bg-red-700 border-2 border-red-900'}`}
+                  >
+                    {isRevokingDuplicates ? "Đang thực thi thu hồi..." : "Thực Thi Thu Hồi"}
+                  </button>
+                )}
+              </div>
+
+              {duplicateLogs.length > 0 && (
+                <div className="p-4 rounded-xl bg-stone-900 text-stone-100 font-mono text-xs max-h-60 overflow-y-auto space-y-1">
+                  {duplicateLogs.map((log, index) => (
+                    <div key={index} className={log.startsWith("❌") ? "text-red-400" : log.startsWith("🎉") ? "text-green-400" : log.startsWith("⚠️") ? "text-amber-400" : "text-stone-300"}>
+                      {log}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {duplicateReport && (
+                <div className={`p-4 rounded-xl border-2 ${isDark ? 'bg-[#2D221C] border-[#4E342E]' : 'bg-amber-50/50 border-[#8D6E63]/20'} space-y-4`}>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <div className="p-3 bg-stone-100 dark:bg-stone-800/50 rounded-lg">
+                      <div className="text-xs font-bold text-stone-500 uppercase">Thành viên quét</div>
+                      <div className="text-xl font-black text-stone-800 dark:text-stone-200">{duplicateReport.totalScanned}</div>
+                    </div>
+                    <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+                      <div className="text-xs font-bold text-amber-600 uppercase">Lượt nhận trùng</div>
+                      <div className="text-xl font-black text-amber-700 dark:text-amber-300">{duplicateReport.totalDuplicatesFound}</div>
+                    </div>
+                    <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                      <div className="text-xs font-bold text-red-500 uppercase">Thu hồi Choco</div>
+                      <div className="text-xl font-black text-red-600 dark:text-red-400">-{duplicateReport.totalChocoToRevoke}</div>
+                    </div>
+                    <div className="p-3 bg-amber-200 dark:bg-yellow-900/30 rounded-lg">
+                      <div className="text-xs font-bold text-yellow-700 uppercase">Thu hồi GChoco</div>
+                      <div className="text-xl font-black text-yellow-600 dark:text-yellow-400">-{duplicateReport.totalGChocoToRevoke}</div>
+                    </div>
+                  </div>
+
+                  {duplicateReport.usersWithDuplicates.length > 0 ? (
+                    <div className="space-y-3">
+                      <div className="text-sm font-bold text-[#3E2723] dark:text-[#ECE5DC]">Danh sách người dùng có trùng lặp:</div>
+                      <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                        {duplicateReport.usersWithDuplicates.map((user, uidx) => (
+                          <div key={uidx} className="p-3 rounded-lg bg-white dark:bg-[#1f1714] border border-stone-200 dark:border-[#3E2D25] space-y-2 text-xs">
+                            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 dark:border-stone-800 pb-1.5">
+                              <span className="font-extrabold text-stone-800 dark:text-stone-200">
+                                {user.displayName} ({user.email})
+                              </span>
+                              <span className="font-black text-red-600 dark:text-red-400">
+                                Thu hồi: -{user.chocoToRevoke} 🍫 / -{user.gchocoToRevoke} 🌟
+                              </span>
+                            </div>
+                            <div className="space-y-1 text-stone-500 dark:text-stone-400 pl-2 border-l-2 border-stone-300">
+                              {user.duplicates.map((dup, didx) => (
+                                <div key={didx} className="flex justify-between">
+                                  <span>• {dup.detail} ({dup.createdAtStr})</span>
+                                  <span className="font-bold text-stone-700 dark:text-stone-300">+{dup.amount} {dup.currency === 'gchoco' ? 'GChoco' : 'Choco'}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-xs font-medium text-stone-500 dark:text-stone-400">
+                      ✨ Không phát hiện bất kỳ giao dịch nhận trùng lặp nào. Hệ thống hoạt động an toàn tuyệt đối!
+                    </div>
+                  )}
                 </div>
               )}
             </div>
