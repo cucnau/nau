@@ -148,9 +148,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               } catch(e) {}
             }
 
-            if (Array.isArray(newUser.missions) && newUser.missions.length > 300) {
-               newUser.missions = [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()];
-            }
             if (Array.isArray(newUser.readHistoryList) && newUser.readHistoryList.length > 200) {
                newUser.readHistoryList = newUser.readHistoryList.slice(0, 200);
             }
