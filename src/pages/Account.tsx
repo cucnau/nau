@@ -150,6 +150,19 @@ export function Account() {
           }
         });
 
+        // 3. Fetch flat gacha items directly for robust support
+        try {
+          const gachaItemsSnap = await getDocs(collection(db, "gacha_items"));
+          gachaItemsSnap.docs.forEach(doc => {
+            const item = doc.data();
+            if (item.image) {
+              metadataMap[item.image] = { stars: item.rarity || 0, source: 'gacha' };
+            }
+          });
+        } catch (e) {
+          console.warn("Could not fetch gacha_items for metadata:", e);
+        }
+
         setStickerMetadata(metadataMap);
       } catch (err) {
         console.error("Lỗi khi tải sticker metadata:", err);
