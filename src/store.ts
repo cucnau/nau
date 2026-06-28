@@ -1038,16 +1038,6 @@ export const useStore = create<UserState>()(
                set({ avatarUrl: compressed });
             }
 
-            if (Array.isArray(docUpdates.missions) && docUpdates.missions.length > 300) {
-                 docUpdates.missions = [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()];
-                 set({ missions: docUpdates.missions });
-                 if (state.uid) {
-                     const allMs = { ...(state.allUsersMissions || {}) };
-                     allMs[state.uid] = docUpdates.missions;
-                     set({ allUsersMissions: allMs });
-                 }
-            }
-
             // Nếu bản thân payload/updates chứa avatarUrl mới siêu lớn, nén ngay lập tức trước khi lưu
             if (docUpdates.avatarUrl && docUpdates.avatarUrl.startsWith('data:image/') && docUpdates.avatarUrl.length > 300000) {
                const compressed = await compressBase64Image(docUpdates.avatarUrl);
