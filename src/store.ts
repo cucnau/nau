@@ -311,22 +311,22 @@ export const getPermanentMissions = (state: Partial<UserState> = {}): Mission[] 
                    const cat = parts[1];
                    const tier = parseInt(parts[2], 10);
                    if (!isNaN(tier) && highestTiers[cat] !== undefined) {
-                       highestTiers[cat] = Math.max(highestTiers[cat], tier + 2);
+                       highestTiers[cat] = Math.max(highestTiers[cat], m.completed ? tier + 2 : tier);
                    }
                }
            }
        });
    }
 
-   highestTiers.checkin = Math.max(highestTiers.checkin, Math.ceil(Math.max(state.totalCheckIns || 0, state.checkInStreak || 0) / 30) + 2);
-   highestTiers.read = Math.max(highestTiers.read, Math.ceil((state.totalChaptersRead || 0) / 50) + 2);
-   highestTiers.level = Math.max(highestTiers.level, Math.ceil((state.level || 1) / 10) + 2);
-   highestTiers.chocomatchlvl = Math.max(highestTiers.chocomatchlvl, Math.ceil(Math.max(0, (state.chocoMatchLevel || 1) - 1) / 100) + 2);
-   highestTiers.comm = Math.max(highestTiers.comm, Math.ceil((state.totalCommentsCount || 0) / 50) + 2);
-   highestTiers.gacha = Math.max(highestTiers.gacha, Math.ceil((state.totalGachaPulls || 0) / 50) + 2);
-   highestTiers.catch = Math.max(highestTiers.catch, Math.ceil((state.totalChocoCaught || 0) / 1000) + 2);
-   highestTiers.radio = Math.max(highestTiers.radio, Math.ceil(Math.floor((state.totalRadioSeconds || 0) / 60) / 60) + 2);
-   highestTiers.spend = Math.max(highestTiers.spend, Math.ceil((state.totalSpentChoco || 0) / 100) + 2);
+   highestTiers.checkin = Math.min(200, Math.max(highestTiers.checkin, Math.ceil(Math.max(state.totalCheckIns || 0, state.checkInStreak || 0) / 30) + 2));
+   highestTiers.read = Math.min(200, Math.max(highestTiers.read, Math.ceil((state.totalChaptersRead || 0) / 50) + 2));
+   highestTiers.level = Math.min(200, Math.max(highestTiers.level, Math.ceil((state.level || 1) / 10) + 2));
+   highestTiers.chocomatchlvl = Math.min(200, Math.max(highestTiers.chocomatchlvl, Math.ceil(Math.max(0, (state.chocoMatchLevel || 1) - 1) / 100) + 2));
+   highestTiers.comm = Math.min(200, Math.max(highestTiers.comm, Math.ceil((state.totalCommentsCount || 0) / 50) + 2));
+   highestTiers.gacha = Math.min(200, Math.max(highestTiers.gacha, Math.ceil((state.totalGachaPulls || 0) / 50) + 2));
+   highestTiers.catch = Math.min(200, Math.max(highestTiers.catch, Math.ceil((state.totalChocoCaught || 0) / 1000) + 2));
+   highestTiers.radio = Math.min(200, Math.max(highestTiers.radio, Math.ceil(Math.floor((state.totalRadioSeconds || 0) / 60) / 60) + 2));
+   highestTiers.spend = Math.min(200, Math.max(highestTiers.spend, Math.ceil((state.totalSpentChoco || 0) / 100) + 2));
 
    for (let i = 1; i <= highestTiers.checkin; i++) {
        res.push({ id: `p_checkin_${i}`, type: 'permanent', description: `Điểm danh ${i * 30} ngày`, chocoReward: i * 30, goldenReward: i * 3, progress: 0, target: i * 30, completed: false, claimed: false });
@@ -2531,6 +2531,23 @@ export const useStore = create<UserState>()(
     }),
     {
       name: 'truyen-storage',
+      partialize: (state) => {
+        const {
+          allUsersMissions,
+          allUsersStoryProgress,
+          allUsersReadHistoryList,
+          allUsersSavedStories,
+          allUsersUnlockedAchievements,
+          allUsersClaimedAchievements,
+          allUsersOwnedStickers,
+          allUsersOwnedAccessories,
+          allUsersOwnedChucuAccessories,
+          firebaseUser,
+          isQuotaExceeded,
+          ...rest
+        } = state;
+        return rest as any;
+      },
       merge: (persistedState: any, currentState: UserState) => {
          const merged = { ...currentState, ...persistedState };
          if (persistedState.missions) {
