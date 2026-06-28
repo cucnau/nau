@@ -87,7 +87,7 @@ export function Inventory() {
         </div>
 
         {!hasAnyItem && (
-            <div className="text-center text-stone-500 italic py-10 opacity-75 border-2 border-dashed border-[#3E2723] rounded-2xl bg-[#FFFDF9] dark:bg-black/20 font-serif">
+            <div className="text-center text-stone-500 italic py-10 opacity-75 border-2 border-dashed border-[#3E2723] rounded-2xl bg-[#FFFDF9] dark:bg-black/20 font-sans">
                 Bạn chưa sở hữu vật phẩm nào trong túi đồ.
             </div>
         )}
