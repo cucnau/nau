@@ -148,6 +148,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               } catch(e) {}
             }
 
+            // Tối ưu hóa dung lượng missions khi tạo mới user để không dính lỗi 1MB sau này
+            if (Array.isArray(newUser.missions)) {
+                newUser.missions = newUser.missions.map((m: any) => ({
+                    id: m.id,
+                    progress: m.progress || 0,
+                    completed: m.completed || false,
+                    claimed: m.claimed || false
+                }));
+            }
+
             if (Array.isArray(newUser.readHistoryList) && newUser.readHistoryList.length > 200) {
                newUser.readHistoryList = newUser.readHistoryList.slice(0, 200);
             }
