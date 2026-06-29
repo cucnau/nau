@@ -41,8 +41,11 @@ import {
   Radio,
   Music,
   Dices,
+  Lock,
+  Unlock,
 } from "lucide-react";
 import { ACHIEVEMENTS_LIST } from "../types/achievements";
+import { FEATURES_LIST } from "../types/features";
 
 const getGMT7Date = (): Date => {
   try {
@@ -162,6 +165,8 @@ export function Admin() {
     | "chucu_accessories"
     | "radio"
     | "gacha"
+    | "system"
+    | "features"
   >("stories");
 
   // Custom Confirmation Dialog
@@ -169,6 +174,35 @@ export function Admin() {
     text: string;
     action: () => void;
   } | null>(null);
+
+  // States for feature levels configuration
+  const { featureLevels } = useStore();
+  const [localFeatureLevels, setLocalFeatureLevels] = useState<Record<string, number>>({});
+  const [savingFeatures, setSavingFeatures] = useState(false);
+
+  useEffect(() => {
+    if (featureLevels) {
+      const initial: Record<string, number> = {};
+      FEATURES_LIST.forEach((f) => {
+        initial[f.id] = featureLevels[f.id] !== undefined ? Number(featureLevels[f.id]) : f.defaultLevel;
+      });
+      setLocalFeatureLevels(initial);
+    }
+  }, [featureLevels]);
+
+  const handleSaveFeatureLevels = async () => {
+    setSavingFeatures(true);
+    try {
+      const { setDoc, doc } = await import("firebase/firestore");
+      await setDoc(doc(db, "settings", "feature_levels"), localFeatureLevels, { merge: true });
+      alert("Đã lưu cấu hình cấp độ tính năng thành công!");
+    } catch (err) {
+      console.error("Lỗi khi lưu cấp độ tính năng:", err);
+      alert("Lỗi: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setSavingFeatures(false);
+    }
+  };
 
   const [restorationLogs, setRestorationLogs] = useState<string[]>([]);
   const [isRestoring, setIsRestoring] = useState(false);
@@ -4413,6 +4447,13 @@ export function Admin() {
           >
             <Wrench className="w-5 h-5" />
           </button>
+          <button
+            onClick={() => setActiveTab("features")}
+            title="Cấp độ Tính năng"
+            className={`w-10 h-10 rounded-xl font-bold transition-all flex items-center justify-center hover:scale-110 active:scale-95 border-2 ${activeTab === "features" ? "bg-[#E6D4BF] dark:bg-[#C29D70] text-[#3E2723] dark:text-[#181311] border-[#3E2723] dark:border-[#4E342E] shadow-sm" : "border-transparent text-[#8D6E63] hover:bg-[#D7CCC8]/30 dark:text-[#A1887F]"}`}
+          >
+            <Lock className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
@@ -4433,8 +4474,129 @@ export function Admin() {
           {activeTab === "radio" && "📻 Quản lý Choco Radio"}
           {activeTab === "gacha" && "🎲 Quản lý Gacha"}
           {activeTab === "system" && "🛠️ Quản lý Hệ thống"}
+          {activeTab === "features" && "🔒 Cấp độ Tính năng"}
         </span>
       </div>
+
+      {activeTab === "features" && (
+        <div className={`p-6 sm:p-8 rounded-[32px] border-4 shadow-[4px_4px_0_0_#3E2723] dark:shadow-[4px_4px_0_0_#0D0907] flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-500 ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}>
+          <div className="flex items-center justify-between border-b-2 border-[#3E2723]/10 pb-4 flex-wrap gap-4">
+            <div className="flex items-center gap-3">
+              <Lock className="w-8 h-8 text-[#8D6E63] dark:text-[#A1887F]" />
+              <div>
+                <h2 className="text-2xl font-black uppercase text-[#3E2723] dark:text-[#ECE5DC] tracking-tighter">
+                  Cấp độ Tính năng
+                </h2>
+                <p className="text-sm font-medium text-[#8D6E63] dark:text-[#A1887F]">
+                  Giới hạn cấp độ (Level) tối thiểu để người dùng được phép sử dụng các tính năng trên website
+                </p>
+              </div>
+            </div>
+            
+            <button
+              onClick={handleSaveFeatureLevels}
+              disabled={savingFeatures}
+              className={`px-6 py-3 rounded-2xl font-black uppercase tracking-wider text-sm flex items-center gap-2 border-[3px] border-[#3E2723] shadow-[3px_3px_0_0_#3E2723] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all ${
+                isDark 
+                  ? "bg-[#C29D70] hover:bg-[#B38F62] text-[#181311]" 
+                  : "bg-[#E6D4BF] hover:bg-[#D4C0A8] text-[#3E2723]"
+              }`}
+            >
+              <Save className="w-4 h-4" />
+              {savingFeatures ? "Đang lưu..." : "Lưu Thay Đổi"}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {FEATURES_LIST.map((feat) => {
+              const currentVal = localFeatureLevels[feat.id] !== undefined ? localFeatureLevels[feat.id] : feat.defaultLevel;
+              return (
+                <div
+                  key={feat.id}
+                  className={`p-4 rounded-2xl border-2 flex items-start gap-4 transition-all ${
+                    isDark 
+                      ? "bg-[#2B2320] border-[#3E2D25] hover:border-[#4E342E]" 
+                      : "bg-[#FFFDF9] border-[#F1E5D8] hover:border-[#D7CCC8]"
+                  }`}
+                >
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 ${
+                    isDark 
+                      ? "bg-[#3C2E27]/40 border-[#5D4037]/30 text-[#A1887F]" 
+                      : "bg-[#F5E6D3] border-[#D7CCC8] text-[#8D6E63]"
+                  }`}>
+                    {currentVal > 1 ? <Lock className="w-6 h-6" /> : <Unlock className="w-6 h-6" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-[#3E2723] dark:text-[#ECE5DC] text-base truncate">
+                      {feat.name}
+                    </h3>
+                    <p className="text-xs text-[#8D6E63] dark:text-[#A1887F] line-clamp-2 mt-0.5 leading-relaxed">
+                      {feat.description}
+                    </p>
+                    <div className="mt-3 flex items-center gap-3">
+                      <span className="text-xs font-bold text-[#8D6E63] dark:text-[#A1887F]">
+                        Yêu cầu Level:
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLocalFeatureLevels(prev => ({
+                              ...prev,
+                              [feat.id]: Math.max(1, currentVal - 1)
+                            }));
+                          }}
+                          className={`w-8 h-8 rounded-lg font-black border-2 flex items-center justify-center transition-all active:scale-95 ${
+                            isDark 
+                              ? "bg-[#251E1B] border-[#4E342E] text-[#ECE5DC] hover:bg-[#312622]" 
+                              : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] hover:bg-[#E6D8C9]"
+                          }`}
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          max="999"
+                          value={currentVal}
+                          onChange={(e) => {
+                            const val = Math.max(1, parseInt(e.target.value) || 1);
+                            setLocalFeatureLevels(prev => ({
+                              ...prev,
+                              [feat.id]: val
+                            }));
+                          }}
+                          className={`w-14 h-8 text-center font-bold text-sm rounded-lg border-2 focus:outline-none focus:ring-0 ${
+                            isDark 
+                              ? "bg-[#251E1B] border-[#4E342E] text-[#ECE5DC]" 
+                              : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]"
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLocalFeatureLevels(prev => ({
+                              ...prev,
+                              [feat.id]: currentVal + 1
+                            }));
+                          }}
+                          className={`w-8 h-8 rounded-lg font-black border-2 flex items-center justify-center transition-all active:scale-95 ${
+                            isDark 
+                              ? "bg-[#251E1B] border-[#4E342E] text-[#ECE5DC] hover:bg-[#312622]" 
+                              : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] hover:bg-[#E6D8C9]"
+                          }`}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {activeTab === "system" && (
         <div className={`p-6 sm:p-8 rounded-[32px] border-4 shadow-[4px_4px_0_0_#3E2723] dark:shadow-[4px_4px_0_0_#0D0907] flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-2 duration-500 ${isDark ? "bg-[#211B18] border-[#4E342E]" : "bg-[#FFFDF9] border-[#3E2723]"}`}>
