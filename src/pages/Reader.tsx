@@ -6,6 +6,7 @@ import { UserAvatar } from '../components/UserAvatar';
 import { cn } from '../components/Layout';
 import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare, Clock, Pause, CheckCircle, ExternalLink } from 'lucide-react';
 import { db, checkIfQuotaError } from '../lib/firebase';
+import { getStoryByIdOrSlug, getStoryChapters } from '../lib/storyLoader';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, doc, getDoc, updateDoc, increment, limit } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { getWeeklyId, getGMT7Date } from '../types/achievements';
@@ -428,11 +429,12 @@ export function Reader() {
     if (!storyId) return;
     const fetchData = async () => {
       try {
-        const snap = await getDoc(doc(db, 'stories', storyId));
-        if (snap.exists()) setStory({ id: snap.id, ...snap.data() });
-        
-        const cSnap = await getDocs(query(collection(db, `stories/${storyId}/chapters`), orderBy('order', 'asc')));
-        setChapters(cSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        const foundStory = await getStoryByIdOrSlug(storyId);
+        if (foundStory) {
+          setStory(foundStory);
+          const foundChapters = await getStoryChapters(foundStory.id);
+          setChapters(foundChapters);
+        }
       } catch (err) {
         console.error(err);
       } finally {
