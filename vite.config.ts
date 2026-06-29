@@ -13,13 +13,26 @@ export default defineConfig(() => {
         name: 'save-stories-json-api',
         configureServer(server) {
           server.middlewares.use((req, res, next) => {
-            if (req.url === '/api/save-stories-json' && req.method === 'POST') {
+            const isMatch = req.url && req.url.includes('save-stories-json') && req.method === 'POST';
+            
+            // Debug logging to a file to assist troubleshooting
+            try {
+              fs.appendFileSync(
+                path.join(process.cwd(), 'debug_requests.log'),
+                `[${new Date().toISOString()}] URL: ${req.url}, Method: ${req.method}, isMatch: ${isMatch}\n`
+              );
+            } catch (e) {}
+
+            if (isMatch) {
               let body = '';
               req.on('data', chunk => {
                 body += chunk;
               });
               req.on('end', () => {
                 try {
+                  if (!body) {
+                    throw new Error('Empty request body received by Vite dev server.');
+                  }
                   const { stories, chapters } = JSON.parse(body);
                   if (!stories || !chapters) {
                     res.statusCode = 400;
