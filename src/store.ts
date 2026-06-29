@@ -1861,7 +1861,13 @@ export const useStore = create<UserState>()(
          if ((state.ownedChucuAccessories || []).includes(url)) return;
          const newOwned = [...(state.ownedChucuAccessories || []), url];
          set({ ownedChucuAccessories: newOwned });
-         get().updateUserDoc({ ownedChucuAccessories: newOwned });
+         
+         addDoc(collection(db, 'users', state.uid, 'owned_chucu_accessories'), {
+            url,
+            acquiredAt: Date.now()
+         }).catch(err => {
+            console.error("Lỗi khi lưu phụ kiện chucu sở hữu vào subcollection:", err);
+         });
          
          setTimeout(() => {
             get()._triggerCountAchievementsCheck();
