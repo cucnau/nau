@@ -1,13 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
+import { useFeatureRestriction } from '../types/features';
 import { Bookmark, History, BookOpen, Star, Sparkles, ChevronRight, AlertCircle, Library as LibraryIcon } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 
 export function Library() {
   const navigate = useNavigate();
-  const { savedStories, readHistoryList, isLoggedIn } = useStore();
+  const { savedStories, readHistoryList, isLoggedIn, setLockedFeatureId } = useStore();
+  const { isFeatureLocked } = useFeatureRestriction();
+
+  useEffect(() => {
+    if (isFeatureLocked('library')) {
+      setLockedFeatureId('library');
+      navigate('/');
+    }
+  }, [isFeatureLocked, navigate, setLockedFeatureId]);
+
   const [activeTab, setActiveTab] = useState<'saved' | 'history'>('saved');
   const [savedDocs, setSavedDocs] = useState<any[]>([]);
   const [historyDocs, setHistoryDocs] = useState<any[]>([]);
