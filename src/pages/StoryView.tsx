@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
+import { useFeatureRestriction } from '../types/features';
 import { BookOpen, Users, Lock, Unlock, Zap, ChevronRight, Bookmark, Gift, Heart, Sparkles, Send, MessageSquare, ExternalLink } from 'lucide-react';
 import { cn } from '../components/Layout';
 import React, { useEffect, useState } from 'react';
@@ -228,8 +229,18 @@ export function StoryView() {
     avatarUrl,
     unlockedPassChapters,
     unlockedEarlyAccessChapters,
-    getTitleColor
+    getTitleColor,
+    setLockedFeatureId
   } = useStore();
+
+  const { isFeatureLocked } = useFeatureRestriction();
+
+  useEffect(() => {
+    if (isFeatureLocked('reading')) {
+      setLockedFeatureId('reading');
+      navigate('/');
+    }
+  }, [isFeatureLocked, navigate, setLockedFeatureId]);
 
   const [story, setStory] = useState<any>(null);
   const [actualStoryId, setActualStoryId] = useState<string | null>(null);
