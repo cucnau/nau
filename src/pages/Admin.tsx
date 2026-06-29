@@ -2182,13 +2182,14 @@ export function Admin() {
 
       if (isEnabled && storedToken && storedRepo) {
         setJsonSyncStatus("📤 [GitHub AutoSync] Đang commit trực tiếp lên GitHub...");
-        const fileUrl = `https://api.github.com/repos/${storedRepo}/contents/public/data/stories_data.json?ref=${storedBranch}`;
+        const fileUrl = `https://api.github.com/repos/${storedRepo}/contents/public/data/stories_data.json?ref=${storedBranch}&t=${Date.now()}`;
         let sha = "";
         try {
           const shaRes = await fetch(fileUrl, {
             headers: {
               "Authorization": `token ${storedToken}`,
-              "Accept": "application/vnd.github.v3+json"
+              "Accept": "application/vnd.github.v3+json",
+              "Cache-Control": "no-cache"
             }
           });
           if (shaRes.ok) {
@@ -6886,8 +6887,9 @@ export function Admin() {
 
                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                  <div className="flex flex-col gap-1">
-                   <label className="font-extrabold text-[#5D4037] dark:text-[#C29D70]">
-                     Personal Access Token (PAT)
+                   <label className="font-extrabold text-[#5D4037] dark:text-[#C29D70] flex items-center justify-between">
+                     <span>Personal Access Token (PAT)</span>
+                     <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline">Cách lấy Token?</a>
                    </label>
                    <input
                      type="password"
@@ -6896,6 +6898,7 @@ export function Admin() {
                      onChange={(e) => setGhToken(e.target.value)}
                      className="bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] border-2 border-stone-300 dark:border-stone-700 rounded-xl px-3 py-2 outline-none focus:border-[#8D6E63] font-mono text-xs"
                    />
+                   <p className="text-[10px] text-stone-500 dark:text-stone-400">Chọn quyền <strong>repo</strong> khi tạo Token.</p>
                  </div>
 
                  <div className="flex flex-col gap-1">
