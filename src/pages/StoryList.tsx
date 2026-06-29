@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Search, List, ChevronRight } from 'lucide-react';
-import { db } from '../lib/firebase';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { getAllStories } from '../lib/storyLoader';
 
 export function StoryList() {
   const navigate = useNavigate();
@@ -16,9 +15,7 @@ export function StoryList() {
     const fetchStories = async () => {
       setLoading(true);
       try {
-        const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
-        const snap = await getDocs(q);
-        const fetchedStories = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }) as any);
+        const fetchedStories = await getAllStories();
         setStories(fetchedStories);
 
         // Extract unique genres
