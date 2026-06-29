@@ -225,6 +225,10 @@ interface UserState {
   setCustomTitleColors: (colors: Record<string, string>) => void;
   setAchievementColors: (colors: Record<string, string>) => void;
   getTitleColor: (title: string | null) => string | undefined;
+  featureLevels: Record<string, number>;
+  setFeatureLevels: (levels: Record<string, number>) => void;
+  lockedFeatureId: string | null;
+  setLockedFeatureId: (id: string | null) => void;
   
   isStoreOpen: boolean;
   isMissionsOpen: boolean;
@@ -511,6 +515,10 @@ export const useStore = create<UserState>()(
       achTitleColors: {},
       setCustomTitleColors: (colors) => set({ customTitleColors: colors }),
       setAchievementColors: (colors) => set({ achTitleColors: colors }),
+      featureLevels: {},
+      setFeatureLevels: (levels) => set({ featureLevels: levels }),
+      lockedFeatureId: null,
+      setLockedFeatureId: (id) => set({ lockedFeatureId: id }),
       getTitleColor: (title) => {
          if (!title) return undefined;
          const state = get();
