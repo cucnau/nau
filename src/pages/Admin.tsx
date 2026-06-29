@@ -42,7 +42,32 @@ import {
   Music,
   Dices,
 } from "lucide-react";
-import { ACHIEVEMENTS_LIST, getGMT7Date } from "../types/achievements";
+import { ACHIEVEMENTS_LIST } from "../types/achievements";
+
+const getGMT7Date = (): Date => {
+  try {
+    const options = { timeZone: 'Asia/Ho_Chi_Minh', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false } as const;
+    const formatter = new Intl.DateTimeFormat('en-US', options);
+    const parts = formatter.formatToParts(new Date());
+    
+    const year = parts.find(p => p.type === 'year')?.value;
+    const month = parts.find(p => p.type === 'month')?.value;
+    const day = parts.find(p => p.type === 'day')?.value;
+    const hour = parts.find(p => p.type === 'hour')?.value;
+    const minute = parts.find(p => p.type === 'minute')?.value;
+    const second = parts.find(p => p.type === 'second')?.value;
+    
+    if (year && month && day && hour && minute && second) {
+      return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), Number(second));
+    }
+  } catch (e) {
+    console.error('Error in robust getGMT7Date, falling back:', e);
+  }
+  const d = new Date();
+  const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+  return new Date(utc + (3600000 * 7));
+};
+
 
 interface Book {
   id: string;
@@ -225,8 +250,8 @@ export function Admin() {
             stickerRarities.set(item.image, Number(item.rarity));
           }
         });
-      } catch (err) {
-        console.warn("Không thể tải bổ sung danh sách gacha_items:", err);
+      } catch (gachaItemsErr) {
+        console.warn("Không thể tải bổ sung danh sách gacha_items:", gachaItemsErr);
       }
 
       // Tải các vật phẩm trong cửa hàng để truy quét giá trị tài sản đang sở hữu
@@ -331,7 +356,16 @@ export function Admin() {
         sortedTxs.forEach(t => {
           if (t.isDuplicateRevoked) return;
           const desc = t.description || t.reason || "";
-          const isRevocation = desc.includes("Thu hồi") || desc.includes("thu hồi") || desc.includes("Khấu trừ") || desc.includes("khấu trừ") || desc.includes("Revoke") || desc.includes("revoke");
+          const isRevocation = 
+            desc.includes("Thu hồi") || desc.includes("thu hồi") || 
+            desc.includes("Khấu trừ") || desc.includes("khấu trừ") || 
+            desc.includes("Revoke") || desc.includes("revoke") ||
+            desc.includes("Admin") || desc.includes("admin") ||
+            desc.includes("Cập nhật") || desc.includes("cập nhật") ||
+            desc.includes("Điều chỉnh") || desc.includes("điều chỉnh") ||
+            desc.includes("Trừ") || desc.includes("trừ") ||
+            desc.includes("Bị trừ") || desc.includes("bị trừ") ||
+            desc.includes("Phạt") || desc.includes("phạt");
           if (isRevocation) return;
 
           const amt = Number(t.amount) || 0;
@@ -1446,8 +1480,8 @@ export function Admin() {
             stickerRarities.set(item.image, Number(item.rarity));
           }
         });
-      } catch (err) {
-        console.warn("Không thể tải bổ sung danh sách gacha_items trong đối soát:", err);
+      } catch (auditGachaItemsErr) {
+        console.warn("Không thể tải bổ sung danh sách gacha_items trong đối soát:", auditGachaItemsErr);
       }
 
       // Tải giá trong cửa hàng
@@ -1545,7 +1579,16 @@ export function Admin() {
       sortedTxs.forEach(t => {
         if (t.isDuplicateRevoked) return;
         const desc = t.description || t.reason || "";
-        const isRevocation = desc.includes("Thu hồi") || desc.includes("thu hồi") || desc.includes("Khấu trừ") || desc.includes("khấu trừ") || desc.includes("Revoke") || desc.includes("revoke");
+        const isRevocation = 
+          desc.includes("Thu hồi") || desc.includes("thu hồi") || 
+          desc.includes("Khấu trừ") || desc.includes("khấu trừ") || 
+          desc.includes("Revoke") || desc.includes("revoke") ||
+          desc.includes("Admin") || desc.includes("admin") ||
+          desc.includes("Cập nhật") || desc.includes("cập nhật") ||
+          desc.includes("Điều chỉnh") || desc.includes("điều chỉnh") ||
+          desc.includes("Trừ") || desc.includes("trừ") ||
+          desc.includes("Bị trừ") || desc.includes("bị trừ") ||
+          desc.includes("Phạt") || desc.includes("phạt");
         if (isRevocation) return;
 
         const amt = Number(t.amount) || 0;
