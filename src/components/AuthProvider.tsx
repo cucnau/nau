@@ -489,10 +489,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error fetching maintenance settings:', err);
     });
 
+    // 4. Subscribe to feature levels
+    const unsubFeatureLevels = onSnapshot(doc(db, 'settings', 'feature_levels'), (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const levels: Record<string, number> = {};
+        Object.entries(data).forEach(([key, val]) => {
+          levels[key] = Number(val);
+        });
+        useStore.getState().setFeatureLevels(levels);
+      } else {
+        useStore.getState().setFeatureLevels({});
+      }
+    }, (err) => {
+      console.error('Error fetching feature levels settings:', err);
+    });
+
     return () => {
       unsubCustoms();
       unsubAchColors();
       unsubMaintenance();
+      unsubFeatureLevels();
     };
   }, []);
 
