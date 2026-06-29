@@ -2172,8 +2172,17 @@ export function Admin() {
           setJsonSyncStatus("🟢 Đồng bộ thành công 100%! Toàn bộ truyện đã được chuyển sang dạng tĩnh!");
           alert("Tuyệt vời! Đồng bộ thành công trực tiếp lên máy chủ. Độc giả sẽ được đọc từ file JSON tĩnh này 100%!");
         } else {
-          const errData = await res.json();
-          throw new Error(errData.error || "Lỗi lưu file lên máy chủ");
+          let errorMessage = "Lỗi lưu file lên máy chủ";
+          try {
+            const errData = await res.json();
+            errorMessage = errData.error || errorMessage;
+          } catch {
+            try {
+              const text = await res.text();
+              errorMessage = text.substring(0, 100) || errorMessage;
+            } catch {}
+          }
+          throw new Error(errorMessage);
         }
       }
     } catch (err: any) {
