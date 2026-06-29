@@ -330,8 +330,11 @@ export function Admin() {
 
         sortedTxs.forEach(t => {
           if (t.isDuplicateRevoked) return;
-          const amt = Number(t.amount) || 0;
           const desc = t.description || t.reason || "";
+          const isRevocation = desc.includes("Thu hồi") || desc.includes("thu hồi") || desc.includes("Khấu trừ") || desc.includes("khấu trừ") || desc.includes("Revoke") || desc.includes("revoke");
+          if (isRevocation) return;
+
+          const amt = Number(t.amount) || 0;
           const isSpecialEarn = desc.includes("Admin") || desc.includes("Tặng") || desc.includes("Quà") || desc.includes("gift") || desc.includes("Bù") || desc.includes("Khôi phục");
           
           if (t.currency === 'choco') {
@@ -580,77 +583,8 @@ export function Admin() {
           remainingExp = u.exp || 0;
         }
 
-        // Evaluate achievements
         const mergedUnlocked = new Set<string>(Array.isArray(u.unlockedAchievements) ? u.unlockedAchievements : []);
         const mergedClaimed = new Set<string>(Array.isArray(u.claimedAchievements) ? u.claimedAchievements : []);
-        
-        // Reading category
-        if (totalChaptersRead >= 1) mergedUnlocked.add('first_chapter');
-        if (totalChaptersRead >= 3) {
-          mergedUnlocked.add('midnight_read');
-          mergedUnlocked.add('early_morning_read');
-        }
-        if (totalChaptersRead >= 100) mergedUnlocked.add('read_100_chapters');
-        if (totalChaptersRead >= 500) mergedUnlocked.add('choco_mot_sach');
-        const genresRead = Array.isArray(u.genresRead) ? u.genresRead : [];
-        if (genresRead.length >= 5 || totalChaptersRead >= 10) mergedUnlocked.add('multi_genre');
-        const savedStories = Array.isArray(u.savedStories) ? u.savedStories : [];
-        if (savedStories.length >= 10) mergedUnlocked.add('collector');
-
-        // Community category
-        if (actualFeedCount >= 1) mergedUnlocked.add('blogger_choco_new');
-        if (totalComments >= 100 || u.totalCommentsCount >= 100) mergedUnlocked.add('commenter_choco');
-        if (totalComments >= 500 || u.totalCommentsCount >= 500) mergedUnlocked.add('choco_tuong_tac');
-        if (actualChatCount >= 100 || u.sentMessagesCount >= 100) mergedUnlocked.add('chatty_lounge');
-        if (actualChatCount >= 5000 || u.sentMessagesCount >= 5000) mergedUnlocked.add('chatty');
-        const totalGiftedChoco = Number(u.totalGiftedChoco) || 0;
-        if (totalGiftedChoco > 0) mergedUnlocked.add('generous_donor');
-
-        // Activity category
-        if (calculatedStreak >= 7 || u.checkInStreak >= 7) mergedUnlocked.add('streak_7');
-        if (totalCheckIns >= 30 || u.totalCheckIns >= 30) mergedUnlocked.add('monthly_checkin');
-        const perfectDailyDates = Array.isArray(u.perfectDailyDates) ? u.perfectDailyDates : [];
-        if (perfectDailyDates.length >= 7) mergedUnlocked.add('weekly_missions_perfect');
-
-        // Economy & Gacha category
-        if (stickersSnap.size >= 30) mergedUnlocked.add('sticker_collector');
-        if (calculatedSpentChoco >= 10000 || u.totalSpentChoco >= 10000) mergedUnlocked.add('big_spender');
-        if (calculatedPity5 >= 90 || totalPulls >= 90 || u.totalGachaPulls >= 90) mergedUnlocked.add('choco_kientri');
-        if (u.maxBannerCompletionPct >= 100) mergedUnlocked.add('choco_suutam');
-        
-        // Gaming category
-        if (u.chucuInteractions >= 500) mergedUnlocked.add('chucu_friend_500');
-        if (u.chucuPremiumFeeds >= 100) mergedUnlocked.add('chucu_an_sang');
-        if (u.chucuLevel >= 100) mergedUnlocked.add('chucu_master_100');
-        const ownedChucuAccessories = Array.isArray(u.ownedChucuAccessories) ? u.ownedChucuAccessories : [];
-        if (ownedChucuAccessories.length >= 5) mergedUnlocked.add('chucu_fashion_5');
-        if (u.maxConsecutiveChocoCount >= 20) mergedUnlocked.add('choco_catch_no_miss');
-        const totalChocoCaught = Number(u.totalChocoCaught) || 0;
-        if (totalChocoCaught >= 1000) mergedUnlocked.add('choco_rain_1000');
-        if (totalChocoCaught >= 5000) mergedUnlocked.add('choco_rain_5000');
-        if (totalChocoCaught >= 10000) mergedUnlocked.add('choco_rain_10000');
-        if (u.consecutiveGoldClears >= 5) mergedUnlocked.add('gold_choco_perfect');
-        if (u.consecutiveDodgeClears >= 5) mergedUnlocked.add('dodge_negative_perfect');
-        if (u.chocoMatchTilesDestroyed >= 100000) mergedUnlocked.add('choco_destroyer');
-        if (u.chocoMatchColorBombsCreated >= 10000) mergedUnlocked.add('choco_color_bomb');
-        if (u.chocoMatchSpecialCombos >= 10000) mergedUnlocked.add('choco_special_combo');
-
-        // Radio category
-        if (u.radioNightChillSeconds >= 1800) mergedUnlocked.add('radio_night_chill');
-        if (u.maxRadioTrackSeconds >= 3600) mergedUnlocked.add('radio_one_track_love');
-        const heardRadioTracks = Array.isArray(u.heardRadioTracks) ? u.heardRadioTracks : [];
-        if (heardRadioTracks.length >= 10) mergedUnlocked.add('radio_universe_explorer');
-        if (u.radioTrackSwitches >= 15) mergedUnlocked.add('radio_track_switches');
-
-        // Legend category
-        if (calculatedLevel >= 100 || u.level >= 100) mergedUnlocked.add('choco_high_level');
-        if (calculatedEarnedChoco >= 10000 || u.totalEarnedChoco >= 10000) mergedUnlocked.add('choco_king');
-        if (calculatedEarnedGChoco >= 10000 || u.totalEarnedGChoco >= 10000) mergedUnlocked.add('gchoco_king');
-
-        restoredAchievements.forEach(id => {
-          mergedUnlocked.add(id);
-          mergedClaimed.add(id);
-        });
 
         // Determine sticker and accessory gaps
         const missingStickerUrlsToRestore = [...txBoughtStickerUrls].filter(url => !currentStickerUrls.has(url));
@@ -759,6 +693,75 @@ export function Admin() {
             calculatedPity4 = totalPulls % 10;
           }
         }
+
+        // Evaluate achievements
+        // Reading category
+        if (totalChaptersRead >= 1) mergedUnlocked.add('first_chapter');
+        if (totalChaptersRead >= 3) {
+          mergedUnlocked.add('midnight_read');
+          mergedUnlocked.add('early_morning_read');
+        }
+        if (totalChaptersRead >= 100) mergedUnlocked.add('read_100_chapters');
+        if (totalChaptersRead >= 500) mergedUnlocked.add('choco_mot_sach');
+        const genresRead = Array.isArray(u.genresRead) ? u.genresRead : [];
+        if (genresRead.length >= 5 || totalChaptersRead >= 10) mergedUnlocked.add('multi_genre');
+        const savedStories = Array.isArray(u.savedStories) ? u.savedStories : [];
+        if (savedStories.length >= 10) mergedUnlocked.add('collector');
+
+        // Community category
+        if (actualFeedCount >= 1) mergedUnlocked.add('blogger_choco_new');
+        if (totalComments >= 100 || u.totalCommentsCount >= 100) mergedUnlocked.add('commenter_choco');
+        if (totalComments >= 500 || u.totalCommentsCount >= 500) mergedUnlocked.add('choco_tuong_tac');
+        if (actualChatCount >= 100 || u.sentMessagesCount >= 100) mergedUnlocked.add('chatty_lounge');
+        if (actualChatCount >= 5000 || u.sentMessagesCount >= 5000) mergedUnlocked.add('chatty');
+        const totalGiftedChoco = Number(u.totalGiftedChoco) || 0;
+        if (totalGiftedChoco > 0) mergedUnlocked.add('generous_donor');
+
+        // Activity category
+        if (calculatedStreak >= 7 || u.checkInStreak >= 7) mergedUnlocked.add('streak_7');
+        if (totalCheckIns >= 30 || u.totalCheckIns >= 30) mergedUnlocked.add('monthly_checkin');
+        const perfectDailyDates = Array.isArray(u.perfectDailyDates) ? u.perfectDailyDates : [];
+        if (perfectDailyDates.length >= 7) mergedUnlocked.add('weekly_missions_perfect');
+
+        // Economy & Gacha category
+        if (stickersSnap.size >= 30) mergedUnlocked.add('sticker_collector');
+        if (calculatedSpentChoco >= 10000 || u.totalSpentChoco >= 10000) mergedUnlocked.add('big_spender');
+        if (calculatedPity5 >= 90 || totalPulls >= 90 || u.totalGachaPulls >= 90) mergedUnlocked.add('choco_kientri');
+        if (u.maxBannerCompletionPct >= 100) mergedUnlocked.add('choco_suutam');
+        
+        // Gaming category
+        if (u.chucuInteractions >= 500) mergedUnlocked.add('chucu_friend_500');
+        if (u.chucuPremiumFeeds >= 100) mergedUnlocked.add('chucu_an_sang');
+        if (u.chucuLevel >= 100) mergedUnlocked.add('chucu_master_100');
+        const ownedChucuAccessories = Array.isArray(u.ownedChucuAccessories) ? u.ownedChucuAccessories : [];
+        if (ownedChucuAccessories.length >= 5) mergedUnlocked.add('chucu_fashion_5');
+        if (u.maxConsecutiveChocoCount >= 20) mergedUnlocked.add('choco_catch_no_miss');
+        const totalChocoCaught = Number(u.totalChocoCaught) || 0;
+        if (totalChocoCaught >= 1000) mergedUnlocked.add('choco_rain_1000');
+        if (totalChocoCaught >= 5000) mergedUnlocked.add('choco_rain_5000');
+        if (totalChocoCaught >= 10000) mergedUnlocked.add('choco_rain_10000');
+        if (u.consecutiveGoldClears >= 5) mergedUnlocked.add('gold_choco_perfect');
+        if (u.consecutiveDodgeClears >= 5) mergedUnlocked.add('dodge_negative_perfect');
+        if (u.chocoMatchTilesDestroyed >= 100000) mergedUnlocked.add('choco_destroyer');
+        if (u.chocoMatchColorBombsCreated >= 10000) mergedUnlocked.add('choco_color_bomb');
+        if (u.chocoMatchSpecialCombos >= 10000) mergedUnlocked.add('choco_special_combo');
+
+        // Radio category
+        if (u.radioNightChillSeconds >= 1800) mergedUnlocked.add('radio_night_chill');
+        if (u.maxRadioTrackSeconds >= 3600) mergedUnlocked.add('radio_one_track_love');
+        const heardRadioTracks = Array.isArray(u.heardRadioTracks) ? u.heardRadioTracks : [];
+        if (heardRadioTracks.length >= 10) mergedUnlocked.add('radio_universe_explorer');
+        if (u.radioTrackSwitches >= 15) mergedUnlocked.add('radio_track_switches');
+
+        // Legend category
+        if (calculatedLevel >= 100 || u.level >= 100) mergedUnlocked.add('choco_high_level');
+        if (calculatedEarnedChoco >= 10000 || u.totalEarnedChoco >= 10000) mergedUnlocked.add('choco_king');
+        if (calculatedEarnedGChoco >= 10000 || u.totalEarnedGChoco >= 10000) mergedUnlocked.add('gchoco_king');
+
+        restoredAchievements.forEach(id => {
+          mergedUnlocked.add(id);
+          mergedClaimed.add(id);
+        });
 
         // Compute claimed achievements rewards
         const claimedAchievementsList = Array.from(mergedClaimed);
@@ -1540,8 +1543,12 @@ export function Admin() {
       let commentsCount = 0;
 
       sortedTxs.forEach(t => {
-        const amt = Number(t.amount) || 0;
+        if (t.isDuplicateRevoked) return;
         const desc = t.description || t.reason || "";
+        const isRevocation = desc.includes("Thu hồi") || desc.includes("thu hồi") || desc.includes("Khấu trừ") || desc.includes("khấu trừ") || desc.includes("Revoke") || desc.includes("revoke");
+        if (isRevocation) return;
+
+        const amt = Number(t.amount) || 0;
         const isSpecialEarn = desc.includes("Admin") || desc.includes("Tặng") || desc.includes("Quà") || desc.includes("gift") || desc.includes("Bù") || desc.includes("Khôi phục");
         
         if (t.currency === 'choco') {
@@ -1875,6 +1882,30 @@ export function Admin() {
       }
       if (finalCalculatedGChoco !== uGChoco) {
         updates.goldenChoco = finalCalculatedGChoco;
+        changed = true;
+      }
+      if (calculatedEarnedChoco !== (u.totalEarnedChoco || 0)) {
+        updates.totalEarnedChoco = isUserAdmin ? (9999999 + calculatedEarnedChoco) : Math.min(calculatedEarnedChoco, maxVerifiableChocoEarned);
+        changed = true;
+      }
+      if (calculatedEarnedGChoco !== (u.totalEarnedGChoco || 0)) {
+        updates.totalEarnedGChoco = isUserAdmin ? (9999999 + calculatedEarnedGChoco) : Math.min(calculatedEarnedGChoco, maxVerifiableGChocoEarned);
+        changed = true;
+      }
+      if (calculatedSpentChoco !== (u.totalSpentChoco || 0)) {
+        updates.totalSpentChoco = calculatedSpentChoco;
+        changed = true;
+      }
+      if (finalCheckInsCount !== (u.totalCheckIns || 0)) {
+        updates.totalCheckIns = finalCheckInsCount;
+        changed = true;
+      }
+      if (actualCommentsCount !== (u.totalCommentsCount || 0)) {
+        updates.totalCommentsCount = actualCommentsCount;
+        changed = true;
+      }
+      if (actualChatCount !== (u.sentMessagesCount || 0)) {
+        updates.sentMessagesCount = actualChatCount;
         changed = true;
       }
       if (reconstructedTotalPulls !== (u.totalGachaPulls || 0)) {
