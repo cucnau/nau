@@ -15,6 +15,8 @@ export interface Story {
   externalUrl?: string;
   createdAt?: any;
   updatedAt?: any;
+  _useLiveChapters?: boolean;
+  _staticChapterCount?: number;
 }
 
 export interface Chapter {
@@ -88,19 +90,54 @@ export function isStaticMode(): boolean {
  */
 export async function getAllStories(): Promise<Story[]> {
   const useStatic = await initializeStoryLoader();
-  if (useStatic && cachedJsonData) {
-    return cachedJsonData.stories;
-  }
-
-  // Fallback to Firestore
+  
+  // 1. Fetch live stories from Firestore to see if there are any new ones
+  let liveStories: Story[] = [];
   try {
     const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
-    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Story);
+    liveStories = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Story);
   } catch (err) {
-    console.error('[StoryLoader] Error fetching stories from Firestore:', err);
+    console.warn('[StoryLoader] Failed to fetch live stories from Firestore. Using static JSON if available.', err);
+    if (useStatic && cachedJsonData) {
+      return cachedJsonData.stories;
+    }
     throw err;
   }
+
+  // 2. If no static JSON is loaded, just return live stories
+  if (!useStatic || !cachedJsonData) {
+    return liveStories;
+  }
+
+  // 3. Merge static and live stories so that new/updated stories appear instantly
+  const staticStoriesMap = new Map<string, Story>();
+  cachedJsonData.stories.forEach(s => staticStoriesMap.set(s.id, s));
+
+  const mergedStories = liveStories.map(liveStory => {
+    const staticStory = staticStoriesMap.get(liveStory.id);
+    if (staticStory) {
+      const staticChaps = cachedJsonData?.chapters[liveStory.id] || [];
+      const liveCount = liveStory.chapterCount || 0;
+      const staticCount = staticChaps.length;
+      
+      return {
+        ...staticStory,
+        ...liveStory, // Merge latest metadata
+        _useLiveChapters: liveCount > staticCount || !cachedJsonData?.chapters[liveStory.id],
+        _staticChapterCount: staticCount
+      };
+    } else {
+      // Brand new story!
+      return {
+        ...liveStory,
+        _useLiveChapters: true,
+        _staticChapterCount: 0
+      };
+    }
+  });
+
+  return mergedStories;
 }
 
 /**
@@ -108,32 +145,44 @@ export async function getAllStories(): Promise<Story[]> {
  */
 export async function getStoryByIdOrSlug(idOrSlug: string): Promise<Story | null> {
   const useStatic = await initializeStoryLoader();
-  if (useStatic && cachedJsonData) {
-    const story = cachedJsonData.stories.find(s => s.id === idOrSlug || s.slug === idOrSlug);
-    return story || null;
-  }
-
-  // Fallback to Firestore
+  
+  // Try live first to ensure we always have the freshest metadata (viewCount, chapterCount)
+  let liveStory: Story | null = null;
   try {
-    // Try by ID first
     const docRef = doc(db, 'stories', idOrSlug);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() } as Story;
+      liveStory = { id: docSnap.id, ...docSnap.data() } as Story;
+    } else {
+      const q = query(collection(db, 'stories'), where('slug', '==', idOrSlug));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        liveStory = { id: snap.docs[0].id, ...snap.docs[0].data() } as Story;
+      }
     }
-
-    // Try by Slug
-    const q = query(collection(db, 'stories'), where('slug', '==', idOrSlug));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      return { id: snap.docs[0].id, ...snap.docs[0].data() } as Story;
-    }
-
-    return null;
   } catch (err) {
-    console.error(`[StoryLoader] Error fetching story (${idOrSlug}) from Firestore:`, err);
-    throw err;
+    console.warn(`[StoryLoader] Failed to fetch live story (${idOrSlug}). Trying static JSON...`, err);
   }
+
+  if (useStatic && cachedJsonData) {
+    const staticStory = cachedJsonData.stories.find(s => s.id === idOrSlug || s.slug === idOrSlug);
+    if (staticStory) {
+      if (liveStory) {
+        const staticChaps = cachedJsonData.chapters[staticStory.id] || [];
+        const liveCount = liveStory.chapterCount || 0;
+        const staticCount = staticChaps.length;
+        return {
+          ...staticStory,
+          ...liveStory,
+          _useLiveChapters: liveCount > staticCount || !cachedJsonData.chapters[staticStory.id],
+          _staticChapterCount: staticCount
+        };
+      }
+      return staticStory;
+    }
+  }
+
+  return liveStory;
 }
 
 /**
@@ -141,18 +190,49 @@ export async function getStoryByIdOrSlug(idOrSlug: string): Promise<Story | null
  */
 export async function getStoryChapters(storyId: string): Promise<Chapter[]> {
   const useStatic = await initializeStoryLoader();
+  
+  let useLiveChapters = true;
+  let staticChapters: Chapter[] = [];
+
   if (useStatic && cachedJsonData) {
-    const list = cachedJsonData.chapters[storyId] || [];
-    // Sort ascending by order
-    return [...list].sort((a, b) => a.order - b.order);
+    staticChapters = cachedJsonData.chapters[storyId] || [];
+    const staticStory = cachedJsonData.stories.find(s => s.id === storyId);
+    
+    if (staticStory) {
+      try {
+        const docRef = doc(db, 'stories', storyId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const liveStory = docSnap.data();
+          const liveCount = liveStory.chapterCount || 0;
+          const staticCount = staticChapters.length;
+          
+          if (liveCount <= staticCount) {
+            useLiveChapters = false;
+          }
+        } else {
+          useLiveChapters = false;
+        }
+      } catch (err) {
+        console.warn(`[StoryLoader] Failed to check live chapter count for story ${storyId}. Using static chapters.`, err);
+        useLiveChapters = false;
+      }
+    }
   }
 
-  // Fallback to Firestore
+  if (!useLiveChapters && staticChapters.length > 0) {
+    return [...staticChapters].sort((a, b) => a.order - b.order);
+  }
+
+  // Fallback to Firestore (for brand-new chapters or stories)
   try {
     const cSnap = await getDocs(query(collection(db, `stories/${storyId}/chapters`), orderBy('order', 'asc')));
     return cSnap.docs.map(d => ({ id: d.id, ...d.data() }) as Chapter);
   } catch (err) {
     console.error(`[StoryLoader] Error fetching chapters for story ${storyId} from Firestore:`, err);
+    if (staticChapters.length > 0) {
+      return [...staticChapters].sort((a, b) => a.order - b.order);
+    }
     throw err;
   }
 }
@@ -162,13 +242,19 @@ export async function getStoryChapters(storyId: string): Promise<Chapter[]> {
  */
 export async function getChapterDoc(storyId: string, chapterId: string): Promise<Chapter | null> {
   const useStatic = await initializeStoryLoader();
+  
+  let staticChapter: Chapter | null = null;
   if (useStatic && cachedJsonData) {
     const storyChapters = cachedJsonData.chapters[storyId] || [];
-    const chapter = storyChapters.find(c => c.id === chapterId);
-    return chapter || null;
+    staticChapter = storyChapters.find(c => c.id === chapterId) || null;
   }
 
-  // Fallback to Firestore
+  // If found in static JSON, return it directly to save Firebase quota
+  if (staticChapter) {
+    return staticChapter;
+  }
+
+  // Fallback to Firestore (for newly created chapters that aren't in static JSON)
   try {
     const docSnap = await getDoc(doc(db, `stories/${storyId}/chapters`, chapterId));
     if (docSnap.exists()) {
