@@ -6,6 +6,7 @@ import { cn } from '../components/Layout';
 import React, { useEffect, useState } from 'react';
 import { db, checkIfQuotaError } from '../lib/firebase';
 import { addStoryFire } from '../lib/storyFire';
+import { getStoryByIdOrSlug, getStoryChapters } from '../lib/storyLoader';
 import { doc, getDoc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, limit } from 'firebase/firestore';
 import { UserAvatar } from '../components/UserAvatar';
 
@@ -305,55 +306,26 @@ export function StoryView() {
 
   useEffect(() => {
     if (!id) return;
-    const resolveId = async () => {
+    const fetchStoryData = async () => {
+      setLoading(true);
       try {
-        const docRef = doc(db, 'stories', id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setActualStoryId(id);
-          return;
-        }
-      } catch (err) {
-        console.error(err);
-      }
-
-      try {
-        const q = query(collection(db, 'stories'), where('slug', '==', id), limit(1));
-        const qSnap = await getDocs(q);
-        if (!qSnap.empty) {
-          setActualStoryId(qSnap.docs[0].id);
+        const foundStory = await getStoryByIdOrSlug(id);
+        if (foundStory) {
+          setStory(foundStory);
+          setActualStoryId(foundStory.id);
+          const foundChapters = await getStoryChapters(foundStory.id);
+          setChapters(foundChapters);
         } else {
-          setLoading(false);
+          setStory(null);
         }
       } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-    };
-    resolveId();
-  }, [id]);
-
-  useEffect(() => {
-    if (!actualStoryId) return;
-    const unsubStory = onSnapshot(doc(db, 'stories', actualStoryId), (snap) => {
-      if (snap.exists()) setStory({ id: snap.id, ...snap.data() });
-    }, (err) => {
-      console.error(err);
-    });
-
-    const fetchChapters = async () => {
-      try {
-        const cSnap = await getDocs(query(collection(db, `stories/${actualStoryId}/chapters`), orderBy('order', 'asc')));
-        setChapters(cSnap.docs.map(d => ({ id: d.id, ...d.data() })));
-      } catch (err) {
-        console.error(err);
+        console.error('Error loading story:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchChapters();
-    return () => unsubStory();
-  }, [actualStoryId]);
+    fetchStoryData();
+  }, [id]);
 
   useEffect(() => {
     if (!actualStoryId) return;
