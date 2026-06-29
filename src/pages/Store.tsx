@@ -237,9 +237,27 @@ export function Store() {
           orderBy("createdAt", "desc"),
         );
         const snap = await getDocs(q);
-        setStoreStickers(
-          snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
-        );
+        const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+        // Resolve "item-" URLs from gacha_items
+        const gachaQ = query(collection(db, "gacha_items"));
+        const gachaSnap = await getDocs(gachaQ);
+        const gachaMap: Record<string, string> = {};
+        gachaSnap.docs.forEach((d) => {
+          const item = d.data();
+          if (item.id && item.image) {
+            gachaMap[item.id] = item.image;
+          }
+        });
+
+        const resolvedData = data.map((st: any) => {
+          if (st.url && st.url.startsWith("item-") && gachaMap[st.url]) {
+            return { ...st, url: gachaMap[st.url] };
+          }
+          return st;
+        });
+
+        setStoreStickers(resolvedData);
       } catch (err) {
         console.error("Lỗi khi tải danh sách sticker:", err);
       }
@@ -251,9 +269,26 @@ export function Store() {
           orderBy("createdAt", "desc"),
         );
         const snap = await getDocs(q);
-        setStoreAccessories(
-          snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
-        );
+        const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+        const gachaQ = query(collection(db, "gacha_items"));
+        const gachaSnap = await getDocs(gachaQ);
+        const gachaMap: Record<string, string> = {};
+        gachaSnap.docs.forEach((d) => {
+          const item = d.data();
+          if (item.id && item.image) {
+            gachaMap[item.id] = item.image;
+          }
+        });
+
+        const resolvedData = data.map((st: any) => {
+          if (st.url && st.url.startsWith("item-") && gachaMap[st.url]) {
+            return { ...st, url: gachaMap[st.url] };
+          }
+          return st;
+        });
+
+        setStoreAccessories(resolvedData);
       } catch (err) {
         console.error("Lỗi khi tải danh sách phụ kiện:", err);
       }
@@ -267,12 +302,29 @@ export function Store() {
         const snap = await getDocs(q);
         const fbAccessories = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         
+        const gachaQ = query(collection(db, "gacha_items"));
+        const gachaSnap = await getDocs(gachaQ);
+        const gachaMap: Record<string, string> = {};
+        gachaSnap.docs.forEach((d) => {
+          const item = d.data();
+          if (item.id && item.image) {
+            gachaMap[item.id] = item.image;
+          }
+        });
+
+        const resolvedFbAccessories = fbAccessories.map((st: any) => {
+          if (st.url && st.url.startsWith("item-") && gachaMap[st.url]) {
+            return { ...st, url: gachaMap[st.url] };
+          }
+          return st;
+        });
+
         // Merge with preset ones, filtering out duplicates by url/id
-        const fbUrls = fbAccessories.map((a: any) => a.url);
+        const fbUrls = resolvedFbAccessories.map((a: any) => a.url);
         const missingPresets = PRESET_SHOP_ACCESSORIES.filter(p => !fbUrls.includes(p.url));
         
         const combined = [
-          ...fbAccessories,
+          ...resolvedFbAccessories,
           ...missingPresets
         ];
 
