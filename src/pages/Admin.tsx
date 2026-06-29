@@ -2186,7 +2186,7 @@ export function Admin() {
         const branch = storedBranch.trim();
         const token = storedToken.trim();
         
-        const fileUrl = `https://api.github.com/repos/${repo}/contents/public/data/stories_data.json?ref=${branch}`;
+        const fileUrl = `https://api.github.com/repos/${repo}/contents/public/data/stories_data.json?ref=${branch}&t=${Date.now()}`;
         let sha = "";
         try {
           const shaRes = await fetch(fileUrl, {
@@ -2194,7 +2194,9 @@ export function Admin() {
             cache: "no-store",
             headers: {
               "Authorization": `Bearer ${token}`,
-              "Accept": "application/vnd.github.v3+json"
+              "Accept": "application/vnd.github.v3+json",
+              "Pragma": "no-cache",
+              "Cache-Control": "no-cache"
             }
           });
           if (shaRes.ok) {
