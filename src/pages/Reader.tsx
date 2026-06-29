@@ -1,6 +1,7 @@
 import { useState, useEffect, FormEvent, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../store';
+import { useFeatureRestriction } from '../types/features';
 import { UserAvatar } from '../components/UserAvatar';
 import { cn } from '../components/Layout';
 import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare, Clock, Pause, CheckCircle, ExternalLink } from 'lucide-react';
@@ -317,8 +318,18 @@ export function Reader() {
   const { 
     markStoryRead, isLoggedIn, addCommentProgress, uid, displayName, avatarUrl, 
     unlockedPassChapters, unlockedEarlyAccessChapters, consumePassTicket, consumePriorityTicket,
-    ownedPassTickets, ownedPriorityTickets, setStoreOpen, getTitleColor, theme
+    ownedPassTickets, ownedPriorityTickets, setStoreOpen, getTitleColor, theme,
+    setLockedFeatureId
   } = useStore();
+
+  const { isFeatureLocked } = useFeatureRestriction();
+
+  useEffect(() => {
+    if (isFeatureLocked('reading')) {
+      setLockedFeatureId('reading');
+      navigate('/');
+    }
+  }, [isFeatureLocked, navigate, setLockedFeatureId]);
   
   const [showSettings, setShowSettings] = useState(false);
   const [fontSize, setFontSize] = useState(18);
