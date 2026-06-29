@@ -75,7 +75,7 @@ async function startServer() {
   });
 
   // API to save stories & chapters statically to JSON files (prevents Firebase Firestore quota excess)
-  app.post('/api/save-stories-json', (req, res) => {
+  app.post(['/api/save-stories-json', '/api/save-stories-json/'], (req, res) => {
     try {
       const { stories, chapters } = req.body;
       if (!stories || !chapters) {
