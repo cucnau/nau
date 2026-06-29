@@ -43,6 +43,9 @@ import {
   Dices,
   Lock,
   Unlock,
+  Database,
+  RefreshCw,
+  Download,
 } from "lucide-react";
 import { ACHIEVEMENTS_LIST } from "../types/achievements";
 import { FEATURES_LIST } from "../types/features";
@@ -2098,6 +2101,89 @@ export function Admin() {
   const [editingStory, setEditingStory] = useState<Book | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
+
+  // JSON Static Sync State
+  const [jsonSyncing, setJsonSyncing] = useState(false);
+  const [jsonSyncStatus, setJsonSyncStatus] = useState("");
+  const [isJsonStaticMode, setIsJsonStaticMode] = useState(false);
+
+  useEffect(() => {
+    const checkMode = async () => {
+      try {
+        const { initializeStoryLoader } = await import("../lib/storyLoader");
+        const isStatic = await initializeStoryLoader();
+        setIsJsonStaticMode(isStatic);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    checkMode();
+  }, []);
+
+  const handleSyncStoriesToJson = async (isDownloadOnly = false) => {
+    setJsonSyncing(true);
+    setJsonSyncStatus("Đang đọc dữ liệu từ Firestore...");
+    try {
+      // 1. Fetch all stories
+      const storiesSnap = await getDocs(collection(db, "stories"));
+      const storiesList = storiesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+      const chaptersMap: Record<string, any[]> = {};
+
+      // 2. Fetch chapters for each story
+      for (let i = 0; i < storiesList.length; i++) {
+        const s = storiesList[i];
+        setJsonSyncStatus(`Đang tải chương [${i + 1}/${storiesList.length}] - ${s.title}...`);
+        const chapSnap = await getDocs(query(collection(db, "stories", s.id, "chapters"), orderBy("order", "asc")));
+        chaptersMap[s.id] = chapSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+
+      const fullData = {
+        stories: storiesList,
+        chapters: chaptersMap
+      };
+
+      if (isDownloadOnly) {
+        // Trigger browser download
+        setJsonSyncStatus("Đang chuẩn bị file tải về...");
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullData, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", "stories_data.json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        setJsonSyncStatus("Đã tải file stories_data.json thành công!");
+      } else {
+        // Sync directly to server
+        setJsonSyncStatus("Đang gửi và đồng bộ lên Máy chủ...");
+        const res = await fetch('/api/save-stories-json', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(fullData)
+        });
+
+        if (res.ok) {
+          const { refreshStoryLoader } = await import("../lib/storyLoader");
+          const isStatic = await refreshStoryLoader();
+          setIsJsonStaticMode(isStatic);
+          setJsonSyncStatus("🟢 Đồng bộ thành công 100%! Toàn bộ truyện đã được chuyển sang dạng tĩnh!");
+          alert("Tuyệt vời! Đồng bộ thành công trực tiếp lên máy chủ. Độc giả sẽ được đọc từ file JSON tĩnh này 100%!");
+        } else {
+          const errData = await res.json();
+          throw new Error(errData.error || "Lỗi lưu file lên máy chủ");
+        }
+      }
+    } catch (err: any) {
+      console.error(err);
+      setJsonSyncStatus(`❌ Lỗi: ${err.message || "Không thể đồng bộ"}`);
+      alert(`Đồng bộ thất bại: ${err.message || "Chưa rõ nguyên nhân"}`);
+    } finally {
+      setJsonSyncing(false);
+    }
+  };
 
   // Chapter Management
   const [managingStoryChapters, setManagingStoryChapters] = useState<
@@ -6589,6 +6675,67 @@ export function Admin() {
 
       {activeTab === "stories" && (
         <>
+          {/* Tối ưu hóa Firestore Quota & Đồng bộ JSON */}
+          <div className="bg-[#FFFDF9] dark:bg-[#1E1613] p-6 rounded-3xl border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[2px_2px_0_0_#3E2723] dark:shadow-[1px_1px_0_0_#0D0907] flex flex-col gap-4 text-[#3E2723] dark:text-[#ECE5DC] mb-6">
+            <div className="flex items-center gap-2.5 border-b border-[#3E2723]/10 pb-3">
+              <Database className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <h2 className="text-lg font-black uppercase tracking-wide">
+                Đồng Bộ JSON Tĩnh (Tối Ưu Firebase Quota)
+              </h2>
+            </div>
+
+            <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
+              Để tránh website bị <strong>hết giới hạn (Quota) của Firebase</strong> khi có quá nhiều người đọc, hệ thống đã hỗ trợ chế độ đọc truyện từ file tĩnh. Khi bạn thêm hoặc sửa truyện/chương, hãy nhấn nút đồng bộ bên dưới để hệ thống cập nhật file tĩnh này.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#FDF6EC] dark:bg-[#2C221D] p-4 rounded-2xl border-2 border-[#D7CCC8]/60 dark:border-[#5D4037]">
+              <div>
+                <p className="text-xs font-bold text-[#8D6E63] dark:text-amber-400 uppercase tracking-wider mb-1">
+                  Trạng thái hệ thống:
+                </p>
+                {isJsonStaticMode ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    ĐỌC TỪ FILE JSON TĨNH (Tốc độ tối đa, 0% Quota!)
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900">
+                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                    ĐỌC TRỰC TIẾP TỪ FIRESTORE (Chưa có file tĩnh)
+                  </span>
+                )}
+              </div>
+
+              <div className="flex gap-2 w-full sm:w-auto self-stretch sm:self-center justify-end">
+                <button
+                  type="button"
+                  disabled={jsonSyncing}
+                  onClick={() => handleSyncStoriesToJson(false)}
+                  className="bg-[#8D6E63] hover:bg-[#5D4037] disabled:bg-stone-300 disabled:text-stone-400 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex-1 sm:flex-none"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${jsonSyncing ? "animate-spin" : ""}`} />
+                  {jsonSyncing ? "Đang đồng bộ..." : "Đồng bộ lên Máy chủ"}
+                </button>
+
+                <button
+                  type="button"
+                  disabled={jsonSyncing}
+                  onClick={() => handleSyncStoriesToJson(true)}
+                  className="bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-stone-50 border-2 border-[#3E2723] px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex-1 sm:flex-none"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Tải file dự phòng
+                </button>
+              </div>
+            </div>
+
+            {jsonSyncStatus && (
+              <div className="text-xs font-bold text-[#8D6E63] dark:text-amber-400 bg-stone-100/50 dark:bg-stone-900/40 p-3 rounded-xl border border-dashed border-[#3E2723]/10 dark:border-stone-800 animate-fade-in font-mono">
+                {jsonSyncStatus}
+              </div>
+            )}
+          </div>
+
           {editingStory ? (
             <form
               onSubmit={handleUpdate}
