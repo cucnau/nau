@@ -13,6 +13,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let unsubUserDoc: (() => void) | null = null;
     let unsubSubStickers: (() => void) | null = null;
     let unsubSubAccessories: (() => void) | null = null;
+    let unsubSubChucuAccessories: (() => void) | null = null;
 
     // Handle redirect result to catch any login errors on redirect-back (e.g. unauthorized-domain)
     getRedirectResult(auth).catch((error: any) => {
@@ -42,6 +43,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (unsubSubAccessories) {
         unsubSubAccessories();
         unsubSubAccessories = null;
+      }
+      if (unsubSubChucuAccessories) {
+        unsubSubChucuAccessories();
+        unsubSubChucuAccessories = null;
       }
 
       if (user) {
@@ -270,6 +275,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             } else if ('ownedAccessories' in data) {
               fieldsToDelete.ownedAccessories = deleteField();
             }
+
+            // Tiến hành di chuyển dữ liệu ownedChucuAccessories từ trường sang subcollection
+            if (Array.isArray(data.ownedChucuAccessories) && data.ownedChucuAccessories.length > 0) {
+              console.log('Phát hiện ownedChucuAccessories cũ ở document gốc. Đang di chuyển sang subcollection...');
+              const pChucu = data.ownedChucuAccessories.map(async (url: string) => {
+                if (!url) return;
+                try {
+                  const q = query(collection(db, 'users', user.uid, 'owned_chucu_accessories'), where('url', '==', url));
+                  const hold = await getDocs(q);
+                  if (hold.empty) {
+                    await addDoc(collection(db, 'users', user.uid, 'owned_chucu_accessories'), {
+                      url,
+                      acquiredAt: Date.now()
+                    });
+                  }
+                } catch (e) {
+                  console.error('Lỗi khi migrate phụ kiện chucu:', e);
+                }
+              });
+              await Promise.all(pChucu);
+              fieldsToDelete.ownedChucuAccessories = deleteField();
+            } else if ('ownedChucuAccessories' in data) {
+              fieldsToDelete.ownedChucuAccessories = deleteField();
+            }
             
             if (Object.keys(fieldsToDelete).length > 0) {
               console.log('Phát hiện trường obsolete lớn hoặc đã migrate xong, tiến hành dọn dẹp:', Object.keys(fieldsToDelete));
@@ -301,6 +330,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (latestData) {
                 delete latestData.ownedStickers;
                 delete latestData.ownedAccessories;
+                delete latestData.ownedChucuAccessories;
               }
               
               // Validate and heal equipped legacy stickers starting with "item-"
@@ -420,6 +450,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               console.error('Error listening to user owned_accessories updates:', err);
           });
 
+          unsubSubChucuAccessories = onSnapshot(collection(db, 'users', user.uid, 'owned_chucu_accessories'), (snap) => {
+             const urls = snap.docs.map(d => d.data().url).filter(Boolean);
+             const uniqueUrls = Array.from(new Set(urls));
+             useStore.setState({ ownedChucuAccessories: uniqueUrls });
+          }, (err) => {
+              console.error('Error listening to user owned_chucu_accessories updates:', err);
+          });
+
         } catch (e) {
              console.error('Error fetching/processing user doc', e);
              if ((e as any)?.code === 'resource-exhausted') {
@@ -442,6 +480,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (unsubUserDoc) unsubUserDoc();
       if (unsubSubStickers) unsubSubStickers();
       if (unsubSubAccessories) unsubSubAccessories();
+      if (unsubSubChucuAccessories) unsubSubChucuAccessories();
     };
   }, [login, logout, setFirebaseUser, syncFromFirebase]);
 
