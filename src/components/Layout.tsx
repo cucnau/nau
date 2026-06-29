@@ -12,7 +12,7 @@ import clsx from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { signInWithPopup, signInWithRedirect, GoogleAuthProvider, signOut } from 'firebase/auth';
 import { auth, db } from '../lib/firebase';
-import { getDocs, collection, query, where, orderBy, onSnapshot, updateDoc, doc, writeBatch, limit } from 'firebase/firestore';
+import { getDocs, collection, query, where, orderBy, onSnapshot, updateDoc, doc, getDoc, writeBatch, limit } from 'firebase/firestore';
 import { ACHIEVEMENTS_LIST, getWeeklyId, getPreviousWeeklyId, ACHIEVEMENT_CATEGORIES } from '../types/achievements';
 import { Store } from '../pages/Store';
 import { Missions } from '../pages/Missions';
@@ -23,6 +23,8 @@ import { ChucuGamePopup } from './ChucuGamePopup';
 import { ChocoMatchPopup } from './ChocoMatchPopup';
 import { ChocoRadioPopup } from './ChocoRadioPopup';
 import GachaPopup from './GachaPopup';
+import { FeatureLockModal } from './FeatureLockModal';
+import { useFeatureRestriction } from '../types/features';
 
 export function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -77,8 +79,9 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
     isLoggedIn, email, missions, level, lastClaimedRewardLevel,
     setStoreOpen, setMissionsOpen, setAchievementsOpen,
     setChucuGameOpen, setChocoRadioOpen, setChocoMatchOpen,
-    firebaseUser, showChucu, setShowChucu, logout
+    firebaseUser, showChucu, setShowChucu, logout, setLockedFeatureId
   } = useStore();
+  const { isFeatureLocked } = useFeatureRestriction();
 
   if (!isOpen) return null;
 
@@ -169,35 +172,71 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
 
              {/* Thư Viện */}
              <button 
-                onClick={() => { onClose(); navigate('/thu-vien'); }}
+                onClick={() => {
+                   if (isFeatureLocked('library')) {
+                      setLockedFeatureId('library');
+                   } else {
+                      onClose();
+                      navigate('/thu-vien');
+                   }
+                }}
                 className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 group"
              >
                 <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
                    <Library className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-black leading-normal uppercase tracking-tight">Thư Viện</span>
+                 {isFeatureLocked('library') && (
+                    <div className="absolute top-2 right-2 bg-amber-600 dark:bg-amber-700 text-white p-1 rounded-full border border-white dark:border-stone-800 shadow">
+                       <Lock className="w-2.5 h-2.5" />
+                    </div>
+                 )}
              </button>
 
              {/* Cửa Hàng */}
              <button 
-                onClick={() => { onClose(); setStoreOpen(true); }}
+                onClick={() => {
+                   if (isFeatureLocked('shop')) {
+                      setLockedFeatureId('shop');
+                   } else {
+                      onClose();
+                      setStoreOpen(true);
+                   }
+                }}
                 className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 group"
              >
                 <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
                    <ShoppingBag className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-black leading-normal uppercase tracking-tight">Cửa Hàng</span>
+                 {isFeatureLocked('shop') && (
+                    <div className="absolute top-2 right-2 bg-amber-600 dark:bg-amber-700 text-white p-1 rounded-full border border-white dark:border-stone-800 shadow">
+                       <Lock className="w-2.5 h-2.5" />
+                    </div>
+                 )}
              </button>
 
              {/* Nhiệm Vụ */}
              <button 
-                onClick={() => { onClose(); setMissionsOpen(true); }}
+                onClick={() => {
+                   if (isFeatureLocked('missions')) {
+                      setLockedFeatureId('missions');
+                   } else {
+                      onClose();
+                      setMissionsOpen(true);
+                   }
+                }}
                 className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 relative group"
              >
                 <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
                    <ClipboardList className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-black leading-normal uppercase tracking-tight">Nhiệm Vụ</span>
+                 {isFeatureLocked('missions') && (
+                    <div className="absolute top-2 right-2 bg-amber-600 dark:bg-amber-700 text-white p-1 rounded-full border border-white dark:border-stone-800 shadow">
+                       <Lock className="w-2.5 h-2.5" />
+                    </div>
+                 )}
                 {claimableMissions > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8D6E63] opacity-75"></span>
@@ -208,46 +247,94 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
 
              {/* Thành Tựu */}
              <button 
-                onClick={() => { onClose(); setAchievementsOpen(true); }}
+                onClick={() => {
+                   if (isFeatureLocked('achievements')) {
+                      setLockedFeatureId('achievements');
+                   } else {
+                      onClose();
+                      setAchievementsOpen(true);
+                   }
+                }}
                 className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 group"
              >
                 <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
                    <Trophy className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-black leading-normal uppercase tracking-tight">Thành Tựu</span>
+                 {isFeatureLocked('achievements') && (
+                    <div className="absolute top-2 right-2 bg-amber-600 dark:bg-amber-700 text-white p-1 rounded-full border border-white dark:border-stone-800 shadow">
+                       <Lock className="w-2.5 h-2.5" />
+                    </div>
+                 )}
               </button>
 
              {/* Hứng Choco */}
              <button 
-                onClick={() => { onClose(); setChucuGameOpen(true); }}
+                onClick={() => {
+                   if (isFeatureLocked('chucu_catch')) {
+                      setLockedFeatureId('chucu_catch');
+                   } else {
+                      onClose();
+                      setChucuGameOpen(true);
+                   }
+                }}
                 className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 group cursor-pointer"
              >
                 <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
                    <ShoppingBasket className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-black leading-normal uppercase tracking-tight">Hứng Choco</span>
+                 {isFeatureLocked('chucu_catch') && (
+                    <div className="absolute top-2 right-2 bg-amber-600 dark:bg-amber-700 text-white p-1 rounded-full border border-white dark:border-stone-800 shadow">
+                       <Lock className="w-2.5 h-2.5" />
+                    </div>
+                 )}
              </button>
 
              {/* Choco Radio */}
              <button 
-                onClick={() => { onClose(); setChocoRadioOpen(true); }}
+                onClick={() => {
+                   if (isFeatureLocked('choco_radio')) {
+                      setLockedFeatureId('choco_radio');
+                   } else {
+                      onClose();
+                      setChocoRadioOpen(true);
+                   }
+                }}
                 className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 group cursor-pointer"
              >
                 <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
                    <Radio className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-black leading-normal uppercase tracking-tight">Choco Radio</span>
+                 {isFeatureLocked('choco_radio') && (
+                    <div className="absolute top-2 right-2 bg-amber-600 dark:bg-amber-700 text-white p-1 rounded-full border border-white dark:border-stone-800 shadow">
+                       <Lock className="w-2.5 h-2.5" />
+                    </div>
+                 )}
              </button>
 
              {/* Ghép Choco */}
              <button 
-                onClick={() => { onClose(); setChocoMatchOpen(true); }}
+                onClick={() => {
+                   if (isFeatureLocked('choco_match')) {
+                      setLockedFeatureId('choco_match');
+                   } else {
+                      onClose();
+                      setChocoMatchOpen(true);
+                   }
+                }}
                 className="bg-[#FFFDF9] hover:bg-[#E6D8C9] text-[#3E2723] dark:bg-[#251E1B] dark:hover:bg-[#312622] dark:text-[#ECE5DC] border-[3px] border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] active:translate-y-1 active:shadow-none transition-all p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-2 group cursor-pointer"
              >
                 <div className="w-10 h-10 rounded-xl bg-[#F5E6D3] dark:bg-[#3C2E27]/40 flex items-center justify-center group-hover:scale-105 transition-transform border-[2px] border-[#D7CCC8] dark:border-[#5D4037]/30">
                    <Candy className="w-5 h-5 text-[#8D6E63]" />
                 </div>
                 <span className="text-xs font-black leading-normal uppercase tracking-tight">Ghép Choco</span>
+                 {isFeatureLocked('choco_match') && (
+                    <div className="absolute top-2 right-2 bg-amber-600 dark:bg-amber-700 text-white p-1 rounded-full border border-white dark:border-stone-800 shadow">
+                       <Lock className="w-2.5 h-2.5" />
+                    </div>
+                 )}
              </button>
 
               {/* Tài Khoản */}
@@ -677,6 +764,8 @@ export function AppLayout() {
       let sId = notif.storyId;
       let cId = notif.chapterId;
 
+      let storySlug = undefined;
+
       if (!sId || sId === 'undefined') {
         if (notif.storyTitle) {
           const storiesRef = collection(db, 'stories');
@@ -684,6 +773,7 @@ export function AppLayout() {
           const snap = await getDocs(qStories);
           if (!snap.empty) {
             sId = snap.docs[0].id;
+            storySlug = snap.docs[0].data().slug;
             if ((!cId || cId === 'undefined') && notif.chapterTitle) {
               const chaptersRef = collection(db, `stories/${sId}/chapters`);
               const qChaps = query(chaptersRef, where('title', '==', notif.chapterTitle), limit(1));
@@ -694,13 +784,23 @@ export function AppLayout() {
             }
           }
         }
+      } else {
+        // If sId is present, we might still want to fetch the slug to make the link prettier
+        try {
+          const storyDoc = await getDoc(doc(db, 'stories', sId));
+          if (storyDoc.exists()) {
+             storySlug = storyDoc.data().slug;
+          }
+        } catch (e) {
+          console.error(e);
+        }
       }
 
       if (sId && sId !== 'undefined') {
         if (cId && cId !== 'undefined') {
           navigate(`/doc/${sId}/${cId}`);
         } else {
-          navigate(`/truyen/${s.slug || sId}`);
+          navigate(`/truyen/${storySlug || sId}`);
         }
       } else {
         alert("Thông báo này không có mã ID truyện (hoặc truyện đã bị xóa).");
@@ -963,6 +1063,8 @@ export function AppLayout() {
       <AnimatePresence>
         {isGachaOpen && <GachaPopup />}
       </AnimatePresence>
+
+      <FeatureLockModal />
 
       {/* Modal Cửa hàng */}
       {isStoreOpen && (
