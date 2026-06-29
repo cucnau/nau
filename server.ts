@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { WebSocketServer, WebSocket } from 'ws';
 
@@ -70,6 +71,42 @@ async function startServer() {
     // but ideally sever is truth. Let's let the client manage choco for now)
     state.users[uid] = { uid, displayName, choco, goldenChoco, checkInStreak, lastCheckInDate };
     res.json({ success: true });
+  });
+
+  // API to save stories & chapters statically to JSON files (prevents Firebase Firestore quota excess)
+  app.post('/api/save-stories-json', (req, res) => {
+    try {
+      const { stories, chapters } = req.body;
+      if (!stories || !chapters) {
+        return res.status(400).json({ error: 'Missing stories or chapters' });
+      }
+
+      const payload = JSON.stringify({ stories, chapters }, null, 2);
+
+      // 1. Write to public/data/stories_data.json (for persistence & development source)
+      const publicDataDir = path.join(process.cwd(), 'public', 'data');
+      if (!fs.existsSync(publicDataDir)) {
+        fs.mkdirSync(publicDataDir, { recursive: true });
+      }
+      const publicFilePath = path.join(publicDataDir, 'stories_data.json');
+      fs.writeFileSync(publicFilePath, payload, 'utf8');
+
+      // 2. Also write to dist/data/stories_data.json if in production or dist directory exists
+      const distDataDir = path.join(process.cwd(), 'dist', 'data');
+      if (fs.existsSync(path.join(process.cwd(), 'dist'))) {
+        if (!fs.existsSync(distDataDir)) {
+          fs.mkdirSync(distDataDir, { recursive: true });
+        }
+        const distFilePath = path.join(distDataDir, 'stories_data.json');
+        fs.writeFileSync(distFilePath, payload, 'utf8');
+      }
+
+      console.log(`🎉 [Server] Automatically synced ${stories.length} stories and chapters to static JSON!`);
+      res.json({ success: true, message: 'Successfully saved stories & chapters statically!' });
+    } catch (err: any) {
+      console.error('Error saving stories static JSON:', err);
+      res.status(500).json({ error: err.message || 'Internal server error' });
+    }
   });
 
   // Vite middleware for development
