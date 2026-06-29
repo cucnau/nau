@@ -245,7 +245,7 @@ export function Admin() {
   const [isAuditing, setIsAuditing] = useState(false);
   const [auditLogs, setAuditLogs] = useState<string[]>([]);
 
-  const runChocoRestoration = async () => {
+  const runRestoration = async (mode: "choco" | "achievements" | "stickers") => {
     setIsRestoring(true);
     setRestorationLogs(["Bắt đầu tiến trình TRUY QUÉT TOÀN DIỆN và ĐỐI SOÁT khôi phục dữ liệu cho tất cả thành viên..."]);
     try {
@@ -350,6 +350,9 @@ export function Admin() {
         const accessoriesSnap = await getDocs(collection(db, `users/${u.id}/owned_accessories`));
         const currentAccessoryUrls = new Set(accessoriesSnap.docs.map(doc => doc.data().url).filter(Boolean));
 
+        const chucuAccessoriesSnap = await getDocs(collection(db, `users/${u.id}/owned_chucu_accessories`));
+        const currentChucuAccessoryUrls = new Set(chucuAccessoriesSnap.docs.map(doc => doc.data().url).filter(Boolean));
+
         // Quét thêm "mọi ngóc ngách": bình luận, tin nhắn chat, bài viết từ DB thực tế
         const commentsSnap = await getDocs(query(collection(db, "comments"), where("uid", "==", u.id)));
         const actualCommentsCount = commentsSnap.size;
@@ -381,6 +384,7 @@ export function Admin() {
         
         const txBoughtStickerUrls = new Set<string>();
         const txBoughtAccessoryUrls = new Set<string>();
+        const txBoughtChucuAccessoryUrls = new Set<string>();
         const txUnlockedChapters = new Set<string>();
         const txUnlockedEarlyAccessChapters = new Set<string>();
         const restoredAchievements = new Set<string>();
@@ -463,6 +467,8 @@ export function Admin() {
               const cleanedUrl = url.trim();
               if (cleanedUrl.includes("sticker") || cleanedUrl.includes("gacha") || cleanedUrl.includes("nhan_dan")) {
                 txBoughtStickerUrls.add(cleanedUrl);
+              } else if (cleanedUrl.includes("chucu")) {
+                txBoughtChucuAccessoryUrls.add(cleanedUrl);
               } else if (cleanedUrl.includes("accessory") || cleanedUrl.includes("phu_kien") || cleanedUrl.includes("pet")) {
                 txBoughtAccessoryUrls.add(cleanedUrl);
               }
@@ -661,6 +667,7 @@ export function Admin() {
         // Determine sticker and accessory gaps
         const missingStickerUrlsToRestore = [...txBoughtStickerUrls].filter(url => !currentStickerUrls.has(url));
         const missingAccessoryUrlsToRestore = [...txBoughtAccessoryUrls].filter(url => !currentAccessoryUrls.has(url));
+        const missingChucuAccessoryUrlsToRestore = [...txBoughtChucuAccessoryUrls].filter(url => !currentChucuAccessoryUrls.has(url));
 
         // Tái dựng số lượng Vé Gacha đã sử dụng từ lịch sử giao dịch mua vé
         let ticketsFromTxs = 0;
@@ -880,92 +887,97 @@ export function Admin() {
         const updates: any = {};
         let changed = false;
 
-        if (finalCalculatedChoco !== uChoco) {
-          updates.choco = finalCalculatedChoco;
-          changed = true;
-        }
-        if (finalCalculatedGChoco !== uGChoco) {
-          updates.goldenChoco = finalCalculatedGChoco;
-          changed = true;
-        }
-        if (calculatedEarnedChoco !== (u.totalEarnedChoco || 0)) {
-          updates.totalEarnedChoco = isUserAdmin ? (9999999 + calculatedEarnedChoco) : Math.min(calculatedEarnedChoco, maxVerifiableChocoEarned);
-          changed = true;
-        }
-        if (calculatedEarnedGChoco !== (u.totalEarnedGChoco || 0)) {
-          updates.totalEarnedGChoco = isUserAdmin ? (9999999 + calculatedEarnedGChoco) : Math.min(calculatedEarnedGChoco, maxVerifiableGChocoEarned);
-          changed = true;
-        }
-        if (calculatedSpentChoco !== (u.totalSpentChoco || 0)) {
-          updates.totalSpentChoco = calculatedSpentChoco;
-          changed = true;
-        }
-        if (calculatedStreak !== (u.checkInStreak || 0)) {
-          updates.checkInStreak = calculatedStreak;
-          changed = true;
-        }
-        if (totalCheckIns !== (u.totalCheckIns || 0)) {
-          updates.totalCheckIns = totalCheckIns;
-          changed = true;
-        }
-        if (calculatedLevel !== (u.level || 1)) {
-          updates.level = calculatedLevel;
-          changed = true;
-        }
-        if (remainingExp !== (u.exp || 0)) {
-          updates.exp = remainingExp;
-          changed = true;
+        if (mode === "choco") {
+          if (finalCalculatedChoco !== uChoco) {
+            updates.choco = finalCalculatedChoco;
+            changed = true;
+          }
+          if (finalCalculatedGChoco !== uGChoco) {
+            updates.goldenChoco = finalCalculatedGChoco;
+            changed = true;
+          }
+          if (calculatedEarnedChoco !== (u.totalEarnedChoco || 0)) {
+            updates.totalEarnedChoco = isUserAdmin ? (9999999 + calculatedEarnedChoco) : Math.min(calculatedEarnedChoco, maxVerifiableChocoEarned);
+            changed = true;
+          }
+          if (calculatedEarnedGChoco !== (u.totalEarnedGChoco || 0)) {
+            updates.totalEarnedGChoco = isUserAdmin ? (9999999 + calculatedEarnedGChoco) : Math.min(calculatedEarnedGChoco, maxVerifiableGChocoEarned);
+            changed = true;
+          }
+          if (calculatedSpentChoco !== (u.totalSpentChoco || 0)) {
+            updates.totalSpentChoco = calculatedSpentChoco;
+            changed = true;
+          }
         }
 
-        if (reconstructedTotalPulls !== (u.totalGachaPulls || 0)) {
-          updates.totalGachaPulls = reconstructedTotalPulls;
-          changed = true;
+        if (mode === "achievements") {
+          if (calculatedStreak !== (u.checkInStreak || 0)) {
+            updates.checkInStreak = calculatedStreak;
+            changed = true;
+          }
+          if (totalCheckIns !== (u.totalCheckIns || 0)) {
+            updates.totalCheckIns = totalCheckIns;
+            changed = true;
+          }
+          if (calculatedLevel !== (u.level || 1)) {
+            updates.level = calculatedLevel;
+            changed = true;
         }
-        if (calculatedPity5 !== (u.gachaPity5Star || 0)) {
-          updates.gachaPity5Star = calculatedPity5;
-          changed = true;
-        }
-        if (calculatedPity4 !== (u.gachaPity4Star || 0)) {
-          updates.gachaPity4Star = calculatedPity4;
-          changed = true;
-        }
-        if (actualCommentsCount !== (u.totalCommentsCount || 0)) {
-          updates.totalCommentsCount = actualCommentsCount;
-          changed = true;
-        }
-        if (actualChatCount !== (u.sentMessagesCount || 0)) {
-          updates.sentMessagesCount = actualChatCount;
-          changed = true;
-        }
+          if (remainingExp !== (u.exp || 0)) {
+            updates.exp = remainingExp;
+            changed = true;
+          }
 
-        // Story/Pass chapters
-        const uUnlockedChaps = Array.isArray(u.unlockedPassChapters) ? u.unlockedPassChapters : [];
-        const missingUnlockedChaps = [...txUnlockedChapters].filter(id => !uUnlockedChaps.includes(id));
-        if (missingUnlockedChaps.length > 0) {
-          updates.unlockedPassChapters = Array.from(new Set([...uUnlockedChaps, ...missingUnlockedChaps]));
-          changed = true;
-        }
+          if (reconstructedTotalPulls !== (u.totalGachaPulls || 0)) {
+            updates.totalGachaPulls = reconstructedTotalPulls;
+            changed = true;
+          }
+          if (calculatedPity5 !== (u.gachaPity5Star || 0)) {
+            updates.gachaPity5Star = calculatedPity5;
+            changed = true;
+          }
+          if (calculatedPity4 !== (u.gachaPity4Star || 0)) {
+            updates.gachaPity4Star = calculatedPity4;
+            changed = true;
+          }
+          if (actualCommentsCount !== (u.totalCommentsCount || 0)) {
+            updates.totalCommentsCount = actualCommentsCount;
+            changed = true;
+          }
+          if (actualChatCount !== (u.sentMessagesCount || 0)) {
+            updates.sentMessagesCount = actualChatCount;
+            changed = true;
+          }
 
-        const uUnlockedEarlyChaps = Array.isArray(u.unlockedEarlyAccessChapters) ? u.unlockedEarlyAccessChapters : [];
-        const missingEarlyChaps = [...txUnlockedEarlyAccessChapters].filter(id => !uUnlockedEarlyChaps.includes(id));
-        if (missingEarlyChaps.length > 0) {
-          updates.unlockedEarlyAccessChapters = Array.from(new Set([...uUnlockedEarlyChaps, ...missingEarlyChaps]));
-          changed = true;
-        }
+          // Story/Pass chapters
+          const uUnlockedChaps = Array.isArray(u.unlockedPassChapters) ? u.unlockedPassChapters : [];
+          const missingUnlockedChaps = [...txUnlockedChapters].filter(id => !uUnlockedChaps.includes(id));
+          if (missingUnlockedChaps.length > 0) {
+            updates.unlockedPassChapters = Array.from(new Set([...uUnlockedChaps, ...missingUnlockedChaps]));
+            changed = true;
+          }
 
-        // Achievements state
-        const currentUnlockedList = Array.from(mergedUnlocked);
-        const currentClaimedList = Array.from(mergedClaimed);
-        
-        const existingUnlocked = Array.isArray(u.unlockedAchievements) ? u.unlockedAchievements : [];
-        if (currentUnlockedList.length !== existingUnlocked.length || currentUnlockedList.some(id => !existingUnlocked.includes(id))) {
-          updates.unlockedAchievements = currentUnlockedList;
-          changed = true;
-        }
-        const existingClaimed = Array.isArray(u.claimedAchievements) ? u.claimedAchievements : [];
-        if (currentClaimedList.length !== existingClaimed.length || currentClaimedList.some(id => !existingClaimed.includes(id))) {
-          updates.claimedAchievements = currentClaimedList;
-          changed = true;
+          const uUnlockedEarlyChaps = Array.isArray(u.unlockedEarlyAccessChapters) ? u.unlockedEarlyAccessChapters : [];
+          const missingEarlyChaps = [...txUnlockedEarlyAccessChapters].filter(id => !uUnlockedEarlyChaps.includes(id));
+          if (missingEarlyChaps.length > 0) {
+            updates.unlockedEarlyAccessChapters = Array.from(new Set([...uUnlockedEarlyChaps, ...missingEarlyChaps]));
+            changed = true;
+          }
+
+          // Achievements state
+          const currentUnlockedList = Array.from(mergedUnlocked);
+          const currentClaimedList = Array.from(mergedClaimed);
+          
+          const existingUnlocked = Array.isArray(u.unlockedAchievements) ? u.unlockedAchievements : [];
+          if (currentUnlockedList.length !== existingUnlocked.length || currentUnlockedList.some(id => !existingUnlocked.includes(id))) {
+            updates.unlockedAchievements = currentUnlockedList;
+            changed = true;
+          }
+          const existingClaimed = Array.isArray(u.claimedAchievements) ? u.claimedAchievements : [];
+          if (currentClaimedList.length !== existingClaimed.length || currentClaimedList.some(id => !existingClaimed.includes(id))) {
+            updates.claimedAchievements = currentClaimedList;
+            changed = true;
+          }
         }
 
         setRestorationLogs(prev => [
@@ -998,24 +1010,36 @@ export function Admin() {
           await updateDoc(doc(db, "users", u.id), updates);
         }
 
-        // Re-add missing subcollection items
-        for (const sUrl of missingStickerUrlsToRestore) {
-          await addDoc(collection(db, "users", u.id, "owned_stickers"), {
-            url: sUrl,
-            createdAt: serverTimestamp()
-          });
-          setRestorationLogs(prev => [...prev, `   🎉 Đã khôi phục Nhãn dán: ${sUrl}`]);
+        if (mode === "stickers") {
+          // Re-add missing subcollection items
+          for (const sUrl of missingStickerUrlsToRestore) {
+            await addDoc(collection(db, "users", u.id, "owned_stickers"), {
+              url: sUrl,
+              createdAt: serverTimestamp()
+            });
+            setRestorationLogs(prev => [...prev, `   🎉 Đã khôi phục Nhãn dán: ${sUrl}`]);
+          }
+
+          for (const aUrl of missingAccessoryUrlsToRestore) {
+            await addDoc(collection(db, "users", u.id, "owned_accessories"), {
+              url: aUrl,
+              createdAt: serverTimestamp()
+            });
+            setRestorationLogs(prev => [...prev, `   🎉 Đã khôi phục Phụ kiện: ${aUrl}`]);
+          }
+
+          for (const cUrl of missingChucuAccessoryUrlsToRestore) {
+            await addDoc(collection(db, "users", u.id, "owned_chucu_accessories"), {
+              url: cUrl,
+              createdAt: serverTimestamp()
+            });
+            setRestorationLogs(prev => [...prev, `   🎉 Đã khôi phục Phụ kiện Chucu: ${cUrl}`]);
+          }
         }
 
-        for (const aUrl of missingAccessoryUrlsToRestore) {
-          await addDoc(collection(db, "users", u.id, "owned_accessories"), {
-            url: aUrl,
-            createdAt: serverTimestamp()
-          });
-          setRestorationLogs(prev => [...prev, `   🎉 Đã khôi phục Phụ kiện: ${aUrl}`]);
-        }
+        const isMissingStickersOrAccessories = (missingStickerUrlsToRestore.length > 0 || missingAccessoryUrlsToRestore.length > 0 || missingChucuAccessoryUrlsToRestore.length > 0);
 
-        if (changed || missingStickerUrlsToRestore.length > 0 || missingAccessoryUrlsToRestore.length > 0) {
+        if (changed || (mode === "stickers" && isMissingStickersOrAccessories)) {
           restoredCount++;
           let logStr = `➡️ 🎉 ĐÃ KHÔI PHỤC TOÀN DIỆN THÀNH CÔNG: `;
           if (updates.choco !== undefined) logStr += `${updates.choco.toLocaleString()} Choco, `;
@@ -1024,8 +1048,9 @@ export function Admin() {
           if (updates.checkInStreak !== undefined) logStr += `Chuỗi ${updates.checkInStreak} ngày, `;
           if (updates.totalGachaPulls !== undefined) logStr += `Gacha ${updates.totalGachaPulls} lượt, `;
           if (updates.gachaPity5Star !== undefined) logStr += `Pity 5⭐: ${updates.gachaPity5Star}/90, `;
-          if (missingStickerUrlsToRestore.length > 0) logStr += `Thêm ${missingStickerUrlsToRestore.length} Nhãn dán, `;
-          if (missingAccessoryUrlsToRestore.length > 0) logStr += `Thêm ${missingAccessoryUrlsToRestore.length} Phụ kiện, `;
+          if (mode === "stickers" && missingStickerUrlsToRestore.length > 0) logStr += `Thêm ${missingStickerUrlsToRestore.length} Nhãn dán, `;
+          if (mode === "stickers" && missingAccessoryUrlsToRestore.length > 0) logStr += `Thêm ${missingAccessoryUrlsToRestore.length} Phụ kiện, `;
+          if (mode === "stickers" && missingChucuAccessoryUrlsToRestore.length > 0) logStr += `Thêm ${missingChucuAccessoryUrlsToRestore.length} Phụ kiện Chucu, `;
           if (missingUnlockedChaps.length > 0) logStr += `Bù ${missingUnlockedChaps.length} chương truyện, `;
           setRestorationLogs(prev => [...prev, logStr.replace(/,\s*$/, "")]);
         } else {
@@ -4896,26 +4921,52 @@ export function Admin() {
             <div className="space-y-2">
               <h3 className="text-xl font-bold text-[#3E2723] dark:text-[#ECE5DC] flex items-center gap-2">
                 <Award className="w-6 h-6 text-[#8D6E63] dark:text-[#A1887F]" />
-                Truy quét & Khôi phục Lịch sử Choco / Thành Tựu
+                Truy quét & Khôi phục Dữ liệu
               </h3>
               <p className="text-[#5D4037] dark:text-[#A1887F] text-sm">
-                Công cụ này sẽ tự động duyệt toàn bộ tài khoản người dùng, phân tích chi tiết lịch sử giao dịch (transactions) trong Firestore để tính toán lại chính xác số lượng Choco, Golden Choco, và tự động khôi phục các thành tựu (claimed/unlocked achievements) đã đạt được cho người dùng nếu bị lỗi reset.
+                Công cụ này sẽ tự động duyệt toàn bộ tài khoản người dùng, phân tích chi tiết lịch sử giao dịch (transactions) trong Firestore để khôi phục số liệu chính xác theo ba nhóm.
               </p>
             </div>
             
             <div className="flex flex-col gap-4">
-              <button
-                onClick={() => {
-                  setConfirmDialog({
-                    text: "Bạn có chắc chắn muốn chạy tiến trình TRUY QUÉT và KHÔI PHỤC Choco / Thành tựu cho tất cả người dùng không?",
-                    action: runChocoRestoration
-                  });
-                }}
-                disabled={isRestoring}
-                className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap self-start ${isRestoring ? 'bg-stone-500 cursor-not-allowed border-2 border-stone-800' : 'bg-[#C29D70] hover:bg-[#b08b5f] border-2 border-[#3E2723]'}`}
-              >
-                {isRestoring ? "Đang truy quét và khôi phục..." : "Chạy Tiến Trình Khôi Phục"}
-              </button>
+              <div className="flex flex-col md:flex-row gap-3">
+                <button
+                  onClick={() => {
+                    setConfirmDialog({
+                      text: "Bạn có chắc chắn muốn chạy tiến trình TRUY QUÉT và KHÔI PHỤC Choco/GChoco không?",
+                      action: () => runRestoration("choco")
+                    });
+                  }}
+                  disabled={isRestoring}
+                  className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap ${isRestoring ? 'bg-stone-500 cursor-not-allowed border-2 border-stone-800' : 'bg-[#C29D70] hover:bg-[#b08b5f] border-2 border-[#3E2723]'}`}
+                >
+                  {isRestoring ? "Đang chạy..." : "Khôi Phục Choco/GChoco"}
+                </button>
+                <button
+                  onClick={() => {
+                    setConfirmDialog({
+                      text: "Bạn có chắc chắn muốn chạy tiến trình TRUY QUÉT và KHÔI PHỤC Thành tựu/Nhiệm vụ không?",
+                      action: () => runRestoration("achievements")
+                    });
+                  }}
+                  disabled={isRestoring}
+                  className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap ${isRestoring ? 'bg-stone-500 cursor-not-allowed border-2 border-stone-800' : 'bg-[#7E57C2] hover:bg-[#673AB7] border-2 border-[#311B92]'}`}
+                >
+                  {isRestoring ? "Đang chạy..." : "Khôi Phục Thành Tựu"}
+                </button>
+                <button
+                  onClick={() => {
+                    setConfirmDialog({
+                      text: "Bạn có chắc chắn muốn chạy tiến trình TRUY QUÉT và KHÔI PHỤC Nhãn dán/Phụ kiện không?",
+                      action: () => runRestoration("stickers")
+                    });
+                  }}
+                  disabled={isRestoring}
+                  className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap ${isRestoring ? 'bg-stone-500 cursor-not-allowed border-2 border-stone-800' : 'bg-[#009688] hover:bg-[#00796B] border-2 border-[#004D40]'}`}
+                >
+                  {isRestoring ? "Đang chạy..." : "Khôi Phục Nhãn dán/Phụ kiện"}
+                </button>
+              </div>
 
               {restorationLogs.length > 0 && (
                 <div className="p-4 rounded-xl bg-stone-900 text-stone-100 font-mono text-xs max-h-60 overflow-y-auto space-y-1">
