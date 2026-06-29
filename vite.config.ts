@@ -1,11 +1,71 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(), 
+      tailwindcss(),
+      {
+        name: 'save-stories-json-api',
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            if (req.url === '/api/save-stories-json' && req.method === 'POST') {
+              let body = '';
+              req.on('data', chunk => {
+                body += chunk;
+              });
+              req.on('end', () => {
+                try {
+                  const { stories, chapters } = JSON.parse(body);
+                  if (!stories || !chapters) {
+                    res.statusCode = 400;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify({ error: 'Missing stories or chapters' }));
+                    return;
+                  }
+
+                  const payload = JSON.stringify({ stories, chapters }, null, 2);
+
+                  // 1. Write to public/data/stories_data.json
+                  const publicDataDir = path.join(process.cwd(), 'public', 'data');
+                  if (!fs.existsSync(publicDataDir)) {
+                    fs.mkdirSync(publicDataDir, { recursive: true });
+                  }
+                  const publicFilePath = path.join(publicDataDir, 'stories_data.json');
+                  fs.writeFileSync(publicFilePath, payload, 'utf8');
+
+                  // 2. Also write to dist/data/stories_data.json if dist directory exists
+                  const distDataDir = path.join(process.cwd(), 'dist', 'data');
+                  if (fs.existsSync(path.join(process.cwd(), 'dist'))) {
+                    if (!fs.existsSync(distDataDir)) {
+                      fs.mkdirSync(distDataDir, { recursive: true });
+                    }
+                    const distFilePath = path.join(distDataDir, 'stories_data.json');
+                    fs.writeFileSync(distFilePath, payload, 'utf8');
+                  }
+
+                  console.log(`🎉 [Vite Plugin] Automatically synced ${stories.length} stories to static JSON!`);
+                  res.statusCode = 200;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify({ success: true, message: 'Successfully saved stories & chapters statically!' }));
+                } catch (err: any) {
+                  console.error('Error saving stories static JSON in Vite plugin:', err);
+                  res.statusCode = 500;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify({ error: err.message || 'Internal server error' }));
+                }
+              });
+            } else {
+              next();
+            }
+          });
+        }
+      }
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
