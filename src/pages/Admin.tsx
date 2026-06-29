@@ -2182,31 +2182,43 @@ export function Admin() {
 
       if (isEnabled && storedToken && storedRepo) {
         setJsonSyncStatus("📤 [GitHub AutoSync] Đang commit trực tiếp lên GitHub...");
-        const fileUrl = `https://api.github.com/repos/${storedRepo}/contents/public/data/stories_data.json?ref=${storedBranch}&t=${Date.now()}`;
+        const repo = storedRepo.trim();
+        const branch = storedBranch.trim();
+        const token = storedToken.trim();
+        
+        const fileUrl = `https://api.github.com/repos/${repo}/contents/public/data/stories_data.json?ref=${branch}`;
         let sha = "";
         try {
           const shaRes = await fetch(fileUrl, {
+            method: "GET",
+            cache: "no-store",
             headers: {
-              "Authorization": `token ${storedToken}`,
-              "Accept": "application/vnd.github.v3+json",
-              "Cache-Control": "no-cache"
+              "Authorization": `Bearer ${token}`,
+              "Accept": "application/vnd.github.v3+json"
             }
           });
           if (shaRes.ok) {
             const fileData = await shaRes.json();
             sha = fileData.sha;
+          } else if (shaRes.status === 404) {
+            console.log("[AutoSync] File not found on GitHub, creating new one...");
+          } else {
+            const errData = await shaRes.text();
+            throw new Error(`HTTP ${shaRes.status} - ${errData}`);
           }
-        } catch (shaErr) {
-          console.warn("[AutoSync] File SHA not found on GitHub:", shaErr);
+        } catch (shaErr: any) {
+          console.error("[AutoSync] Failed to fetch SHA:", shaErr);
+          setJsonSyncStatus(`❌ [GitHub AutoSync] Lỗi đọc file: ${shaErr.message}`);
+          return;
         }
 
-        const putUrl = `https://api.github.com/repos/${storedRepo}/contents/public/data/stories_data.json`;
+        const putUrl = `https://api.github.com/repos/${repo}/contents/public/data/stories_data.json`;
         const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(fullData, null, 2))));
         
         const commitRes = await fetch(putUrl, {
           method: "PUT",
           headers: {
-            "Authorization": `token ${storedToken}`,
+            "Authorization": `Bearer ${token}`,
             "Accept": "application/vnd.github.v3+json",
             "Content-Type": "application/json"
           },
@@ -2214,7 +2226,7 @@ export function Admin() {
             message: `auto(data): update stories_data.json from Admin Panel [skip ci]`,
             content: contentBase64,
             sha: sha || undefined,
-            branch: storedBranch
+            branch: branch
           })
         });
 
