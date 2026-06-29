@@ -46,6 +46,7 @@ import {
   Database,
   RefreshCw,
   Download,
+  Github,
 } from "lucide-react";
 import { ACHIEVEMENTS_LIST } from "../types/achievements";
 import { FEATURES_LIST } from "../types/features";
@@ -2107,6 +2108,130 @@ export function Admin() {
   const [jsonSyncStatus, setJsonSyncStatus] = useState("");
   const [isJsonStaticMode, setIsJsonStaticMode] = useState(false);
 
+  // GitHub Integration for Automatic Vercel deployment
+  const [ghToken, setGhToken] = useState(() => localStorage.getItem("GH_PAT_TOKEN") || "");
+  const [ghRepo, setGhRepo] = useState(() => localStorage.getItem("GH_REPO_NAME") || "");
+  const [ghBranch, setGhBranch] = useState(() => localStorage.getItem("GH_BRANCH") || "main");
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(() => localStorage.getItem("GH_AUTO_SYNC") === "true");
+
+  useEffect(() => {
+    localStorage.setItem("GH_PAT_TOKEN", ghToken);
+  }, [ghToken]);
+
+  useEffect(() => {
+    localStorage.setItem("GH_REPO_NAME", ghRepo);
+  }, [ghRepo]);
+
+  useEffect(() => {
+    localStorage.setItem("GH_BRANCH", ghBranch);
+  }, [ghBranch]);
+
+  useEffect(() => {
+    localStorage.setItem("GH_AUTO_SYNC", String(autoSyncEnabled));
+  }, [autoSyncEnabled]);
+
+  const triggerAutoSync = async () => {
+    try {
+      console.log("[AutoSync] Triggering automatic sync of stories to JSON...");
+      setJsonSyncStatus("🔄 [Tự động] Đang chuẩn bị đồng bộ...");
+      
+      const storiesSnap = await getDocs(collection(db, "stories"));
+      const storiesList = storiesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
+
+      const chaptersMap: Record<string, any[]> = {};
+
+      for (let i = 0; i < storiesList.length; i++) {
+        const s = storiesList[i];
+        const chapSnap = await getDocs(query(collection(db, "stories", s.id, "chapters"), orderBy("order", "asc")));
+        chaptersMap[s.id] = chapSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+
+      const fullData = {
+        stories: storiesList,
+        chapters: chaptersMap
+      };
+
+      // 1. Update local JSON on server (succeeds locally / in AI Studio, fails gracefully on Vercel)
+      try {
+        const res = await fetch('/api/save-stories-json', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(fullData)
+        });
+
+        if (res.ok) {
+          console.log("[AutoSync] Local JSON updated successfully!");
+          const { refreshStoryLoader } = await import("../lib/storyLoader");
+          const isStatic = await refreshStoryLoader();
+          setIsJsonStaticMode(isStatic);
+          setJsonSyncStatus("🟢 [Tự động] Đã lưu thành công file JSON tĩnh cục bộ.");
+        } else {
+          console.log("[AutoSync] Local JSON not saved (Server read-only/Vercel environment).");
+        }
+      } catch (localErr) {
+        console.log("[AutoSync] Local save failed (expected in Serverless/Vercel):", localErr);
+      }
+
+      // 2. Commit directly to GitHub if configured
+      const storedToken = localStorage.getItem("GH_PAT_TOKEN") || "";
+      const storedRepo = localStorage.getItem("GH_REPO_NAME") || "";
+      const storedBranch = localStorage.getItem("GH_BRANCH") || "main";
+      const isEnabled = localStorage.getItem("GH_AUTO_SYNC") === "true";
+
+      if (isEnabled && storedToken && storedRepo) {
+        setJsonSyncStatus("📤 [GitHub AutoSync] Đang commit trực tiếp lên GitHub...");
+        const fileUrl = `https://api.github.com/repos/${storedRepo}/contents/public/data/stories_data.json?ref=${storedBranch}`;
+        let sha = "";
+        try {
+          const shaRes = await fetch(fileUrl, {
+            headers: {
+              "Authorization": `token ${storedToken}`,
+              "Accept": "application/vnd.github.v3+json"
+            }
+          });
+          if (shaRes.ok) {
+            const fileData = await shaRes.json();
+            sha = fileData.sha;
+          }
+        } catch (shaErr) {
+          console.warn("[AutoSync] File SHA not found on GitHub:", shaErr);
+        }
+
+        const putUrl = `https://api.github.com/repos/${storedRepo}/contents/public/data/stories_data.json`;
+        const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(fullData, null, 2))));
+        
+        const commitRes = await fetch(putUrl, {
+          method: "PUT",
+          headers: {
+            "Authorization": `token ${storedToken}`,
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: `auto(data): update stories_data.json from Admin Panel [skip ci]`,
+            content: contentBase64,
+            sha: sha || undefined,
+            branch: storedBranch
+          })
+        });
+
+        if (commitRes.ok) {
+          console.log("[AutoSync] Successfully committed updated JSON directly to GitHub!");
+          setJsonSyncStatus("🟢 [GitHub AutoSync] Đã tự động lưu lên GitHub thành công! Vercel sẽ cập nhật sau 1-2 phút.");
+        } else {
+          const errText = await commitRes.text();
+          console.error("[AutoSync] GitHub commit failed:", errText);
+          setJsonSyncStatus(`❌ [GitHub AutoSync] Lỗi: ${errText.substring(0, 100)}`);
+        }
+      }
+    } catch (err: any) {
+      console.error("[AutoSync] Global error in background auto sync:", err);
+      setJsonSyncStatus(`❌ [Tự động] Thất bại: ${err.message || err}`);
+    }
+  };
+
   useEffect(() => {
     const checkMode = async () => {
       try {
@@ -2126,7 +2251,7 @@ export function Admin() {
     try {
       // 1. Fetch all stories
       const storiesSnap = await getDocs(collection(db, "stories"));
-      const storiesList = storiesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const storiesList = storiesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as any[];
 
       const chaptersMap: Record<string, any[]> = {};
 
@@ -3304,6 +3429,10 @@ export function Admin() {
       setCompleted(false);
       setExternalUrl("");
       if (fileInputRef.current) fileInputRef.current.value = "";
+      
+      // Auto-sync after creating story
+      await fetchStories();
+      triggerAutoSync();
     } catch (err: any) {
       console.error(err);
       if (err?.code === "resource-exhausted") {
@@ -3342,7 +3471,8 @@ export function Admin() {
       });
       setEditingStory(null);
       if (editFileInputRef.current) editFileInputRef.current.value = "";
-      fetchStories();
+      await fetchStories();
+      triggerAutoSync();
     } catch (err) {
       console.error(err);
     }
@@ -3363,7 +3493,8 @@ export function Admin() {
             batch.delete(d.ref);
           });
           await batch.commit();
-          fetchStories();
+          await fetchStories();
+          triggerAutoSync();
         } catch (err) {
           console.error(err);
         }
@@ -3428,7 +3559,8 @@ export function Admin() {
           await batch.commit();
           alert("Cập nhật thành công!");
           setSelectedChapterIds([]);
-          fetchChaptersForAdmin(managingStoryChapters);
+          await fetchChaptersForAdmin(managingStoryChapters);
+          triggerAutoSync();
         } catch (err: any) {
           console.error(err);
           alert("Có lỗi xảy ra khi cập nhật hàng loạt: " + (err.message || err));
@@ -3547,8 +3679,9 @@ export function Admin() {
       setEditingChapter(null);
       setCTitle("");
       setCContent("");
-      fetchChaptersForAdmin(managingStoryChapters);
-      fetchStories();
+      await fetchChaptersForAdmin(managingStoryChapters);
+      await fetchStories();
+      triggerAutoSync();
     } catch (err: any) {
       console.error(err);
       if (err?.code === "resource-exhausted") {
@@ -3573,8 +3706,9 @@ export function Admin() {
               chapterCount: Math.max(0, currentCount - 1),
             });
           }
-          fetchChaptersForAdmin(storyId);
-          fetchStories();
+          await fetchChaptersForAdmin(storyId);
+          await fetchStories();
+          triggerAutoSync();
         } catch (err) {
           console.error(err);
         }
@@ -6698,51 +6832,142 @@ export function Admin() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-[#FDF6EC] dark:bg-[#2C221D] p-4 rounded-2xl border-2 border-[#D7CCC8]/60 dark:border-[#5D4037]">
-              <div>
-                <p className="text-xs font-bold text-[#8D6E63] dark:text-amber-400 uppercase tracking-wider mb-1">
-                  Trạng thái hệ thống:
-                </p>
-                {isJsonStaticMode ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900">
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    ĐỌC TỪ FILE JSON TĨNH (Tốc độ tối đa, 0% Quota!)
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900">
-                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                    ĐỌC TRỰC TIẾP TỪ FIRESTORE (Chưa có file tĩnh)
-                  </span>
-                )}
-              </div>
+               <div>
+                 <p className="text-xs font-bold text-[#8D6E63] dark:text-amber-400 uppercase tracking-wider mb-1">
+                   Trạng thái hệ thống:
+                 </p>
+                 {isJsonStaticMode ? (
+                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900">
+                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                     ĐỌC TỪ FILE JSON TĨNH (Tốc độ tối đa, 0% Quota!)
+                   </span>
+                 ) : (
+                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900">
+                     <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                     ĐỌC TRỰC TIẾP TỪ FIRESTORE (Chưa có file tĩnh)
+                   </span>
+                 )}
+               </div>
 
-              <div className="flex gap-2 w-full sm:w-auto self-stretch sm:self-center justify-end">
-                <button
-                  type="button"
-                  disabled={jsonSyncing}
-                  onClick={() => handleSyncStoriesToJson(false)}
-                  className="bg-[#8D6E63] hover:bg-[#5D4037] disabled:bg-stone-300 disabled:text-stone-400 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex-1 sm:flex-none"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${jsonSyncing ? "animate-spin" : ""}`} />
-                  {jsonSyncing ? "Đang đồng bộ..." : "Đồng bộ lên Máy chủ"}
-                </button>
+               <div className="flex gap-2 w-full sm:w-auto self-stretch sm:self-center justify-end">
+                 <button
+                   type="button"
+                   disabled={jsonSyncing}
+                   onClick={() => handleSyncStoriesToJson(false)}
+                   className="bg-[#8D6E63] hover:bg-[#5D4037] disabled:bg-stone-300 disabled:text-stone-400 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer border-2 border-[#3E2723] shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex-1 sm:flex-none"
+                   title="Nút này chỉ dùng ở Local/Máy chủ riêng. Trên Vercel sẽ báo lỗi lưu file do Vercel cấm ghi ổ cứng."
+                 >
+                   <RefreshCw className={`w-3.5 h-3.5 ${jsonSyncing ? "animate-spin" : ""}`} />
+                   {jsonSyncing ? "Đang đồng bộ..." : "Đồng bộ lên Máy chủ"}
+                 </button>
 
-                <button
-                  type="button"
-                  disabled={jsonSyncing}
-                  onClick={() => handleSyncStoriesToJson(true)}
-                  className="bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-stone-50 border-2 border-[#3E2723] px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex-1 sm:flex-none"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Tải file dự phòng
-                </button>
-              </div>
-            </div>
+                 <button
+                   type="button"
+                   disabled={jsonSyncing}
+                   onClick={() => handleSyncStoriesToJson(true)}
+                   className="bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-stone-50 border-2 border-[#3E2723] px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-[0_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none transition-all flex-1 sm:flex-none"
+                 >
+                   <Download className="w-3.5 h-3.5" />
+                   Tải file dự phòng
+                 </button>
+               </div>
+             </div>
 
-            {jsonSyncStatus && (
-              <div className="text-xs font-bold text-[#8D6E63] dark:text-amber-400 bg-stone-100/50 dark:bg-stone-900/40 p-3 rounded-xl border border-dashed border-[#3E2723]/10 dark:border-stone-800 animate-fade-in font-mono">
-                {jsonSyncStatus}
-              </div>
-            )}
+             {/* GitHub Auto-Commit Configuration Panel */}
+             <div className="bg-stone-50 dark:bg-stone-900/30 border-2 border-[#D7CCC8]/60 dark:border-stone-800 p-5 rounded-2xl flex flex-col gap-4 text-xs mb-4">
+               <div className="flex items-center gap-2 text-[#3E2723] dark:text-[#ECE5DC] font-black uppercase tracking-wide">
+                 <Github className="w-4 h-4 text-[#8D6E63]" />
+                 <span>Tự động lưu & Đẩy thẳng lên GitHub (Bypass Vercel Read-Only)</span>
+               </div>
+               
+               <p className="text-stone-500 dark:text-stone-400 leading-relaxed font-medium">
+                 Cấu hình này giúp bạn <strong>tự động cập nhật file JSON trực tiếp trên repository GitHub của bạn</strong> mỗi khi bạn Thêm/Sửa/Xóa truyện hoặc chương từ màn hình Admin này. Vercel sau đó sẽ tự động build lại phiên bản mới với file JSON cập nhật nhất!
+               </p>
+
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                 <div className="flex flex-col gap-1">
+                   <label className="font-extrabold text-[#5D4037] dark:text-[#C29D70]">
+                     Personal Access Token (PAT)
+                   </label>
+                   <input
+                     type="password"
+                     placeholder="ghp_xxxxxxxxxxxx"
+                     value={ghToken}
+                     onChange={(e) => setGhToken(e.target.value)}
+                     className="bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] border-2 border-stone-300 dark:border-stone-700 rounded-xl px-3 py-2 outline-none focus:border-[#8D6E63] font-mono text-xs"
+                   />
+                 </div>
+
+                 <div className="flex flex-col gap-1">
+                   <label className="font-extrabold text-[#5D4037] dark:text-[#C29D70]">
+                     Tên Repo trên GitHub
+                   </label>
+                   <input
+                     type="text"
+                     placeholder="username/tên_repo"
+                     value={ghRepo}
+                     onChange={(e) => setGhRepo(e.target.value)}
+                     className="bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] border-2 border-stone-300 dark:border-stone-700 rounded-xl px-3 py-2 outline-none focus:border-[#8D6E63] font-mono text-xs"
+                   />
+                 </div>
+
+                 <div className="flex flex-col gap-1">
+                   <label className="font-extrabold text-[#5D4037] dark:text-[#C29D70]">
+                     Nhánh (Branch)
+                   </label>
+                   <input
+                     type="text"
+                     placeholder="main"
+                     value={ghBranch}
+                     onChange={(e) => setGhBranch(e.target.value)}
+                     className="bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC] border-2 border-stone-300 dark:border-stone-700 rounded-xl px-3 py-2 outline-none focus:border-[#8D6E63] font-mono text-xs"
+                   />
+                 </div>
+               </div>
+
+               <div className="flex items-center gap-2 mt-1">
+                 <input
+                   type="checkbox"
+                   id="enable_github_autosync"
+                   checked={autoSyncEnabled}
+                   onChange={(e) => setAutoSyncEnabled(e.target.checked)}
+                   className="w-4 h-4 rounded border-stone-300 text-[#8D6E63] focus:ring-[#8D6E63] cursor-pointer"
+                 />
+                 <label htmlFor="enable_github_autosync" className="font-extrabold text-[#3E2723] dark:text-[#ECE5DC] cursor-pointer selection:bg-transparent">
+                   Kích hoạt Tự Động Đồng Bộ lên GitHub khi Thay Đổi Truyện & Chương
+                 </label>
+               </div>
+             </div>
+
+             {/* Vercel Smart Hybrid Explanation Banner */}
+             <div className="bg-blue-50 dark:bg-blue-950/20 border-2 border-blue-100 dark:border-blue-900/60 p-4 rounded-2xl flex flex-col gap-1.5 text-xs">
+               <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400 font-extrabold uppercase tracking-wide">
+                 <span className="text-sm">💡</span> Hướng dẫn chạy trên Vercel / GitHub
+               </div>
+               <p className="text-[#5D4037] dark:text-[#ECE5DC]/80 leading-relaxed font-bold">
+                 Vì **Vercel** là hosting chỉ đọc (không cho ghi đè file ổ cứng trực tiếp), nút <span className="text-[#8D6E63] font-black">"Đồng bộ lên Máy chủ"</span> sẽ báo lỗi lưu file. **Bạn KHÔNG cần bấm nút này nữa!**
+               </p>
+               <p className="text-stone-500 dark:text-stone-400 leading-relaxed font-semibold">
+                 Hệ thống đã được lập trình tự động chạy chế độ <strong className="text-blue-700 dark:text-blue-400">Chết độ Kết hợp Thông minh (Smart Hybrid)</strong>: Toàn bộ các truyện & chương mới bạn thêm từ Admin sẽ được lưu vào **Firebase Firestore** và tự động hiển thị cho độc giả ngay lập tức. Độc giả đọc truyện cũ vẫn được lấy từ file tĩnh để tiết kiệm 100% quota!
+               </p>
+               <div className="mt-1 flex flex-wrap gap-2">
+                 <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 rounded-md font-bold text-[10px]">
+                   100% Tự động
+                 </span>
+                 <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-300 rounded-md font-bold text-[10px]">
+                   Không cần tải/up file
+                 </span>
+                 <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 rounded-md font-bold text-[10px]">
+                   Tiết kiệm Quota tối đa
+                 </span>
+               </div>
+             </div>
+
+             {jsonSyncStatus && (
+               <div className="text-xs font-bold text-[#8D6E63] dark:text-amber-400 bg-stone-100/50 dark:bg-stone-900/40 p-3 rounded-xl border border-dashed border-[#3E2723]/10 dark:border-stone-800 animate-fade-in font-mono">
+                 {jsonSyncStatus}
+               </div>
+             )}
           </div>
 
           {editingStory ? (
