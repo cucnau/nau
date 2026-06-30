@@ -370,34 +370,56 @@ export function Admin() {
       let restoredCount = 0;
 
       for (const u of users) {
+        let missingUnlockedChaps: string[] = [];
         setRestorationLogs(prev => [
           ...prev, 
           `--------------------------------------------------------------------------------`, 
           `🔍 Đang phân tích & đối soát toàn diện: ${u.displayName || u.email || u.id}...`
         ]);
         
-        // 1. Fetch subcollections và các hoạt động thực tế từ mọi ngóc ngách
+        // 1. Fetch subcollections và các hoạt động thực tế tùy theo chế độ truy quét (Để đảm bảo tính riêng biệt tuyệt đối)
         const txSnap = await getDocs(collection(db, `users/${u.id}/transactions`));
         const txs = txSnap.docs.map(doc => doc.data());
         
-        const stickersSnap = await getDocs(collection(db, `users/${u.id}/owned_stickers`));
-        const currentStickerUrls = new Set(stickersSnap.docs.map(doc => doc.data().url).filter(Boolean));
+        let stickersSnap: any = { docs: [], size: 0 };
+        let currentStickerUrls = new Set<string>();
+        if (mode === "stickers" || mode === "achievements") {
+          stickersSnap = await getDocs(collection(db, `users/${u.id}/owned_stickers`));
+          currentStickerUrls = new Set(stickersSnap.docs.map((doc: any) => doc.data().url).filter(Boolean));
+        }
         
-        const accessoriesSnap = await getDocs(collection(db, `users/${u.id}/owned_accessories`));
-        const currentAccessoryUrls = new Set(accessoriesSnap.docs.map(doc => doc.data().url).filter(Boolean));
+        let accessoriesSnap: any = { docs: [], size: 0 };
+        let currentAccessoryUrls = new Set<string>();
+        if (mode === "stickers") {
+          accessoriesSnap = await getDocs(collection(db, `users/${u.id}/owned_accessories`));
+          currentAccessoryUrls = new Set(accessoriesSnap.docs.map((doc: any) => doc.data().url).filter(Boolean));
+        }
 
-        const chucuAccessoriesSnap = await getDocs(collection(db, `users/${u.id}/owned_chucu_accessories`));
-        const currentChucuAccessoryUrls = new Set(chucuAccessoriesSnap.docs.map(doc => doc.data().url).filter(Boolean));
+        let chucuAccessoriesSnap: any = { docs: [], size: 0 };
+        let currentChucuAccessoryUrls = new Set<string>();
+        if (mode === "stickers") {
+          chucuAccessoriesSnap = await getDocs(collection(db, `users/${u.id}/owned_chucu_accessories`));
+          currentChucuAccessoryUrls = new Set(chucuAccessoriesSnap.docs.map((doc: any) => doc.data().url).filter(Boolean));
+        }
 
-        // Quét thêm "mọi ngóc ngách": bình luận, tin nhắn chat, bài viết từ DB thực tế
-        const commentsSnap = await getDocs(query(collection(db, "comments"), where("uid", "==", u.id)));
-        const actualCommentsCount = commentsSnap.size;
+        // Quét thêm "mọi ngóc ngách": bình luận, tin nhắn chat, bài viết từ DB thực tế chỉ khi truy quét Thành tựu
+        let actualCommentsCount = 0;
+        if (mode === "achievements") {
+          const commentsSnap = await getDocs(query(collection(db, "comments"), where("uid", "==", u.id)));
+          actualCommentsCount = commentsSnap.size;
+        }
 
-        const chatSnap = await getDocs(query(collection(db, "chatMessages"), where("uid", "==", u.id)));
-        const actualChatCount = chatSnap.size;
+        let actualChatCount = 0;
+        if (mode === "achievements") {
+          const chatSnap = await getDocs(query(collection(db, "chatMessages"), where("uid", "==", u.id)));
+          actualChatCount = chatSnap.size;
+        }
 
-        const feedSnap = await getDocs(query(collection(db, "newsFeed"), where("uid", "==", u.id)));
-        const actualFeedCount = feedSnap.size;
+        let actualFeedCount = 0;
+        if (mode === "achievements") {
+          const feedSnap = await getDocs(query(collection(db, "newsFeed"), where("uid", "==", u.id)));
+          actualFeedCount = feedSnap.size;
+        }
         
         // Sort transactions ascending by timestamp
         const getTxTime = (tx: any) => {
@@ -511,25 +533,32 @@ export function Admin() {
             });
           }
 
-          // Also try to detect from "Mua <Tên vật phẩm>" format
-          if (desc.startsWith("Mua ")) {
-            const itemName = desc.substring(4).trim().toLowerCase();
-            
-            const matchedStickerUrl = storeStickersByName.get(itemName);
-            if (matchedStickerUrl) {
-              txBoughtStickerUrls.add(matchedStickerUrl);
+          // Also try to detect from "Mua <Tên vật phẩm>" format or general description mentions
+          const descLower = desc.toLowerCase();
+          
+          storeStickersByName.forEach((url, name) => {
+            if (descLower.includes(name) || (name.startsWith("sticker ") && descLower.includes(name.substring(8))) || descLower.includes("mua " + name)) {
+              txBoughtStickerUrls.add(url);
             }
+          });
 
-            const matchedAccessoryUrl = storeAccessoriesByName.get(itemName);
-            if (matchedAccessoryUrl) {
-              txBoughtAccessoryUrls.add(matchedAccessoryUrl);
+          storeAccessoriesByName.forEach((url, name) => {
+            if (descLower.includes(name) || (name.startsWith("phụ kiện ") && descLower.includes(name.substring(9))) || descLower.includes("mua " + name)) {
+              txBoughtAccessoryUrls.add(url);
             }
+          });
 
-            const matchedChucuUrl = storeChucuAccessoriesByName.get(itemName) || presetChucuAccessoriesByName.get(itemName);
-            if (matchedChucuUrl) {
-              txBoughtChucuAccessoryUrls.add(matchedChucuUrl);
+          storeChucuAccessoriesByName.forEach((key, name) => {
+            if (descLower.includes(name) || descLower.includes("mua " + name)) {
+              txBoughtChucuAccessoryUrls.add(key);
             }
-          }
+          });
+
+          presetChucuAccessoriesByName.forEach((key, name) => {
+            if (descLower.includes(name) || descLower.includes("mua " + name)) {
+              txBoughtChucuAccessoryUrls.add(key);
+            }
+          });
 
           // Parse explicit chapters
           if (desc.includes("Mở khóa chương") || desc.includes("Mở khóa sớm")) {
@@ -1007,7 +1036,7 @@ export function Admin() {
 
           // Story/Pass chapters
           const uUnlockedChaps = Array.isArray(u.unlockedPassChapters) ? u.unlockedPassChapters : [];
-          const missingUnlockedChaps = [...txUnlockedChapters].filter(id => !uUnlockedChaps.includes(id));
+          missingUnlockedChaps = [...txUnlockedChapters].filter(id => !uUnlockedChaps.includes(id));
           if (missingUnlockedChaps.length > 0) {
             updates.unlockedPassChapters = Array.from(new Set([...uUnlockedChaps, ...missingUnlockedChaps]));
             changed = true;
@@ -1036,31 +1065,41 @@ export function Admin() {
           }
         }
 
-        setRestorationLogs(prev => [
-          ...prev,
-          `📊 Báo cáo đối soát & kiểm định thực tế:`,
-          `   - Số dư DB hiện tại: ${uChoco.toLocaleString()} Choco / ${uGChoco.toLocaleString()} GChoco`,
-          isUserAdmin 
-            ? `   - Quyền hạn Admin: Tự động khôi phục số dư gốc mặc định cộng tích lũy (${(9999999 + calculatedEarnedChoco - calculatedSpentChoco).toLocaleString()} Choco / ${(9999999 + calculatedEarnedGChoco - calculatedSpentGChoco).toLocaleString()} GChoco) (Gốc 9,999,999 + Kiếm thêm: ${calculatedEarnedChoco.toLocaleString()} Choco / ${calculatedEarnedGChoco.toLocaleString()} GChoco)` 
-            : `   - Số dư sau tái dựng (Từ GD): ${originalCalculatedChoco.toLocaleString()} Choco / ${originalCalculatedGChoco.toLocaleString()} GChoco`,
-          isUserAdmin 
-            ? `   - Hạn mức thực tế tối đa (Minh chứng): Không giới hạn (Tài khoản Admin)` 
-            : `   - Hạn mức thực tế tối đa (Minh chứng): ≤ ${maxVerifiableChocoEarned.toLocaleString()} Choco / ≤ ${maxVerifiableGChocoEarned.toLocaleString()} GChoco`,
-          `   - Trị giá tài sản sở hữu thực tế: ${spentChocoFromAssets.toLocaleString()} Choco / ${spentGChocoFromAssets.toLocaleString()} GChoco`,
-          isUserAdmin
+        const reportLogs: string[] = [];
+        reportLogs.push(`📊 Báo cáo đối soát & kiểm định thực tế (${mode.toUpperCase()}):`);
+
+        if (mode === "choco") {
+          reportLogs.push(`   - Số dư DB hiện tại: ${uChoco.toLocaleString()} Choco / ${uGChoco.toLocaleString()} GChoco`);
+          if (isUserAdmin) {
+            reportLogs.push(`   - Quyền hạn Admin: Tự động khôi phục số dư gốc mặc định cộng tích lũy (${(9999999 + calculatedEarnedChoco - calculatedSpentChoco).toLocaleString()} Choco / ${(9999999 + calculatedEarnedGChoco - calculatedSpentGChoco).toLocaleString()} GChoco) (Gốc 9,999,999 + Kiếm thêm: ${calculatedEarnedChoco.toLocaleString()} Choco / ${calculatedEarnedGChoco.toLocaleString()} GChoco)`);
+          } else {
+            reportLogs.push(`   - Số dư sau tái dựng (Từ GD): ${originalCalculatedChoco.toLocaleString()} Choco / ${originalCalculatedGChoco.toLocaleString()} GChoco`);
+            reportLogs.push(`   - Hạn mức thực tế tối đa (Minh chứng): ≤ ${maxVerifiableChocoEarned.toLocaleString()} Choco / ≤ ${maxVerifiableGChocoEarned.toLocaleString()} GChoco`);
+            reportLogs.push(`   - Trị giá tài sản sở hữu thực tế: ${spentChocoFromAssets.toLocaleString()} Choco / ${spentGChocoFromAssets.toLocaleString()} GChoco`);
+            reportLogs.push(`   - Tổng tài sản tích lũy tối đa: ${(uChoco + spentChocoFromAssets).toLocaleString()} Choco / ${(uGChoco + spentGChocoFromAssets).toLocaleString()} GChoco`);
+          }
+          reportLogs.push(isUserAdmin
             ? `   ✅ ĐỐI SOÁT HỢP LỆ: Tài khoản Admin có đặc quyền vô hạn.`
             : (chocoCapped || gchocoCapped
                 ? `   ⚠️ PHÁT HIỆN LỆCH BẤT THƯỜNG: Số dư tái dựng vượt quá minh chứng hoạt động thực tế! Đã áp trần bảo vệ thành công.`
-                : `   ✅ ĐỐI SOÁT HỢP LỆ: Số dư sau tái dựng khớp hoàn toàn trong giới hạn thực tế cho phép.`),
-          `   - Điểm danh ghi nhận: ${checkInDates.size} ngày. Chuỗi liên tục: ${calculatedStreak} ngày.`,
-          `   - Hoạt động cộng đồng: Bình luận thực tế: ${actualCommentsCount} lượt, Tin nhắn Chat: ${actualChatCount} dòng, Bài viết Feed: ${actualFeedCount} bài.`,
-          `   - Giao dịch minigame: ChocoMatch: ${playCountChocoMatch} lượt, Chucu: ${playCountChucuGame} lượt.`,
-          `   - Vé Gacha: Đã sở hữu/mua ${ticketsFromTxs} vé. Tổng lượt gacha: ${reconstructedTotalPulls} lượt.`,
-          `   - Bảo hiểm Gacha (Pity): 5⭐: ${calculatedPity5}/90, 4⭐: ${calculatedPity4}/10`,
-          `   - Đẳng cấp: Cấp ${calculatedLevel} (EXP tích lũy ước tính: ${totalEstimatedExp.toLocaleString()})`,
-          `   - Nhãn dán: Có trong túi: ${stickersSnap.size} / Phát hiện trong GD: ${txBoughtStickerUrls.size}`,
-          `   - Phụ kiện: Có trong túi: ${accessoriesSnap.size} / Phát hiện trong GD: ${txBoughtAccessoryUrls.size}`
-        ]);
+                : `   ✅ ĐỐI SOÁT HỢP LỆ: Số dư sau tái dựng khớp hoàn toàn trong giới hạn thực tế cho phép.`));
+        } else if (mode === "achievements") {
+          reportLogs.push(`   - Đẳng cấp hiện tại: Cấp ${u.level || 1} (EXP: ${u.exp || 0})`);
+          reportLogs.push(`   - Đẳng cấp tái dựng: Cấp ${calculatedLevel} (EXP tích lũy ước tính: ${totalEstimatedExp.toLocaleString()})`);
+          reportLogs.push(`   - Điểm danh tích lũy: ${checkInDates.size} ngày (Chuỗi hiện tại: ${calculatedStreak} ngày)`);
+          reportLogs.push(`   - Tương tác xã hội: Bình luận: ${actualCommentsCount} lượt, Tin nhắn: ${actualChatCount} dòng, Bài đăng: ${actualFeedCount} bài.`);
+          reportLogs.push(`   - Vé Gacha: Đã sở hữu/mua ${ticketsFromTxs} vé. Tổng lượt gacha: ${reconstructedTotalPulls} lượt.`);
+          reportLogs.push(`   - Bảo hiểm Gacha (Pity): 5⭐: ${calculatedPity5}/90, 4⭐: ${calculatedPity4}/10`);
+        } else if (mode === "stickers") {
+          reportLogs.push(`   - Sticker: Có trong túi: ${stickersSnap.size} / Phát hiện trong GD: ${txBoughtStickerUrls.size}`);
+          reportLogs.push(`   - Phụ kiện: Có trong túi: ${accessoriesSnap.size} / Phát hiện trong GD: ${txBoughtAccessoryUrls.size}`);
+          reportLogs.push(`   - Phụ kiện Chucu: Có trong túi: ${chucuAccessoriesSnap.size} / Phát hiện trong GD: ${txBoughtChucuAccessoryUrls.size}`);
+          reportLogs.push(`   - Số Sticker thiếu cần bù: ${missingStickerUrlsToRestore.length}`);
+          reportLogs.push(`   - Số Phụ kiện thiếu cần bù: ${missingAccessoryUrlsToRestore.length}`);
+          reportLogs.push(`   - Số Phụ kiện Chucu thiếu cần bù: ${missingChucuAccessoryUrlsToRestore.length}`);
+        }
+
+        setRestorationLogs(prev => [...prev, ...reportLogs]);
 
         if (changed) {
           await updateDoc(doc(db, "users", u.id), updates);
@@ -1073,7 +1112,7 @@ export function Admin() {
               url: sUrl,
               createdAt: serverTimestamp()
             });
-            setRestorationLogs(prev => [...prev, `   🎉 Đã khôi phục Nhãn dán: ${sUrl}`]);
+            setRestorationLogs(prev => [...prev, `   🎉 Đã khôi phục Sticker: ${sUrl}`]);
           }
 
           for (const aUrl of missingAccessoryUrlsToRestore) {
@@ -1104,7 +1143,7 @@ export function Admin() {
           if (updates.checkInStreak !== undefined) logStr += `Chuỗi ${updates.checkInStreak} ngày, `;
           if (updates.totalGachaPulls !== undefined) logStr += `Gacha ${updates.totalGachaPulls} lượt, `;
           if (updates.gachaPity5Star !== undefined) logStr += `Pity 5⭐: ${updates.gachaPity5Star}/90, `;
-          if (mode === "stickers" && missingStickerUrlsToRestore.length > 0) logStr += `Thêm ${missingStickerUrlsToRestore.length} Nhãn dán, `;
+          if (mode === "stickers" && missingStickerUrlsToRestore.length > 0) logStr += `Thêm ${missingStickerUrlsToRestore.length} Sticker, `;
           if (mode === "stickers" && missingAccessoryUrlsToRestore.length > 0) logStr += `Thêm ${missingAccessoryUrlsToRestore.length} Phụ kiện, `;
           if (mode === "stickers" && missingChucuAccessoryUrlsToRestore.length > 0) logStr += `Thêm ${missingChucuAccessoryUrlsToRestore.length} Phụ kiện Chucu, `;
           if (missingUnlockedChaps.length > 0) logStr += `Bù ${missingUnlockedChaps.length} chương truyện, `;
@@ -1649,7 +1688,7 @@ export function Admin() {
 
       const stickersSnap = await getDocs(collection(db, `users/${u.id}/owned_stickers`));
       const currentStickerUrls = new Set(stickersSnap.docs.map(doc => doc.data().url).filter(Boolean));
-      setAuditLogs(prev => [...prev, `➡️ Đang sở hữu ${stickersSnap.size} Nhãn dán.`]);
+      setAuditLogs(prev => [...prev, `➡️ Đang sở hữu ${stickersSnap.size} Sticker.`]);
 
       const accessoriesSnap = await getDocs(collection(db, `users/${u.id}/owned_accessories`));
       const currentAccessoryUrls = new Set(accessoriesSnap.docs.map(doc => doc.data().url).filter(Boolean));
@@ -2152,7 +2191,7 @@ export function Admin() {
           url: sUrl,
           createdAt: serverTimestamp()
         });
-        setAuditLogs(prev => [...prev, `   🎉 Đã khôi phục Nhãn dán: ${sUrl}`]);
+        setAuditLogs(prev => [...prev, `   🎉 Đã khôi phục Sticker: ${sUrl}`]);
       }
 
       for (const aUrl of missingAccessories) {
@@ -2275,9 +2314,7 @@ export function Admin() {
             cache: "no-store",
             headers: {
               "Authorization": `Bearer ${token}`,
-              "Accept": "application/vnd.github.v3+json",
-              "Pragma": "no-cache",
-              "Cache-Control": "no-cache"
+              "Accept": "application/vnd.github.v3+json"
             }
           });
           if (shaRes.ok) {
@@ -5025,7 +5062,7 @@ export function Admin() {
                 <button
                   onClick={() => {
                     setConfirmDialog({
-                      text: "Bạn có chắc chắn muốn chạy tiến trình TRUY QUÉT và KHÔI PHỤC Nhãn dán/Phụ kiện không?",
+                      text: "Bạn có chắc chắn muốn chạy tiến trình TRUY QUÉT và KHÔI PHỤC Sticker/Phụ kiện không?",
                       action: () => runRestoration("stickers")
                     });
                   }}
@@ -5038,7 +5075,7 @@ export function Admin() {
                         : "bg-[#009688] hover:bg-[#00796B] border-2 border-[#004D40]"
                   }`}
                 >
-                  {restoringMode === "stickers" ? "Đang chạy..." : "Khôi Phục Nhãn dán/Phụ kiện"}
+                  {restoringMode === "stickers" ? "Đang chạy..." : "Khôi Phục Sticker/Phụ kiện"}
                 </button>
               </div>
 
@@ -8527,7 +8564,7 @@ export function Admin() {
                     </h4>
                     <ul className="list-disc pl-5 text-[11px] text-emerald-700 dark:text-emerald-300 space-y-1">
                       {auditReport.missingStickers.length > 0 && (
-                        <li>Nhãn dán đã mua bị thiếu: <strong>{auditReport.missingStickers.length} nhãn dán</strong></li>
+                        <li>Sticker đã mua bị thiếu: <strong>{auditReport.missingStickers.length} sticker</strong></li>
                       )}
                       {auditReport.missingAccessories.length > 0 && (
                         <li>Phụ kiện đã mua bị thiếu: <strong>{auditReport.missingAccessories.length} vật phẩm</strong></li>
