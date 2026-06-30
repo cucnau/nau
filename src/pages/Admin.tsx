@@ -209,7 +209,8 @@ export function Admin() {
   };
 
   const [restorationLogs, setRestorationLogs] = useState<string[]>([]);
-  const [isRestoring, setIsRestoring] = useState(false);
+  const [restoringMode, setRestoringMode] = useState<"choco" | "achievements" | "stickers" | null>(null);
+  const isRestoring = restoringMode !== null;
 
   // States for duplicate scanner and revoker
   const [duplicateLogs, setDuplicateLogs] = useState<string[]>([]);
@@ -246,7 +247,7 @@ export function Admin() {
   const [auditLogs, setAuditLogs] = useState<string[]>([]);
 
   const runRestoration = async (mode: "choco" | "achievements" | "stickers") => {
-    setIsRestoring(true);
+    setRestoringMode(mode);
     setRestorationLogs(["Bắt đầu tiến trình TRUY QUÉT TOÀN DIỆN và ĐỐI SOÁT khôi phục dữ liệu cho tất cả thành viên..."]);
     try {
       const usersSnap = await getDocs(collection(db, "users"));
@@ -330,6 +331,41 @@ export function Admin() {
           });
         }
       });
+
+      const storeStickersByName = new Map<string, string>();
+      storeStickersSnap.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.name && data.url) {
+          storeStickersByName.set(data.name.trim().toLowerCase(), data.url);
+        }
+      });
+
+      const storeAccessoriesByName = new Map<string, string>();
+      storeAccessoriesSnap.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.name && data.url) {
+          storeAccessoriesByName.set(data.name.trim().toLowerCase(), data.url);
+        }
+      });
+
+      const storeChucuAccessoriesByName = new Map<string, string>();
+      storeChucuAccessoriesSnap.docs.forEach(doc => {
+        const data = doc.data();
+        const key = data.url || data.id;
+        if (data.name && key) {
+          storeChucuAccessoriesByName.set(data.name.trim().toLowerCase(), key);
+        }
+      });
+
+      const presetChucuAccessoriesByName = new Map<string, string>([
+        ["vương miện hoàng gia", "chucu_acc_crown"],
+        ["kính râm cool ngầu", "chucu_acc_sunglasses"],
+        ["hào quang thiên thần", "chucu_acc_halo"],
+        ["nơ đỏ quý phái", "chucu_acc_ribbon"],
+        ["mũ noel ấm áp", "chucu_acc_santa"],
+        ["mũ đầu bếp nhí", "chucu_acc_chef"],
+        ["tai mèo tinh nghịch", "chucu_acc_cat_ears"]
+      ]);
 
       let restoredCount = 0;
 
@@ -473,6 +509,26 @@ export function Admin() {
                 txBoughtAccessoryUrls.add(cleanedUrl);
               }
             });
+          }
+
+          // Also try to detect from "Mua <Tên vật phẩm>" format
+          if (desc.startsWith("Mua ")) {
+            const itemName = desc.substring(4).trim().toLowerCase();
+            
+            const matchedStickerUrl = storeStickersByName.get(itemName);
+            if (matchedStickerUrl) {
+              txBoughtStickerUrls.add(matchedStickerUrl);
+            }
+
+            const matchedAccessoryUrl = storeAccessoriesByName.get(itemName);
+            if (matchedAccessoryUrl) {
+              txBoughtAccessoryUrls.add(matchedAccessoryUrl);
+            }
+
+            const matchedChucuUrl = storeChucuAccessoriesByName.get(itemName) || presetChucuAccessoriesByName.get(itemName);
+            if (matchedChucuUrl) {
+              txBoughtChucuAccessoryUrls.add(matchedChucuUrl);
+            }
           }
 
           // Parse explicit chapters
@@ -1063,7 +1119,7 @@ export function Admin() {
       console.error(err);
       setRestorationLogs(prev => [...prev, `❌ Thất bại: ${err.message || err}`]);
     } finally {
-      setIsRestoring(false);
+      setRestoringMode(null);
     }
   };
 
@@ -4929,7 +4985,7 @@ export function Admin() {
             </div>
             
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col md:flex-row gap-3">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-stretch sm:items-center">
                 <button
                   onClick={() => {
                     setConfirmDialog({
@@ -4938,9 +4994,15 @@ export function Admin() {
                     });
                   }}
                   disabled={isRestoring}
-                  className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap ${isRestoring ? 'bg-stone-500 cursor-not-allowed border-2 border-stone-800' : 'bg-[#C29D70] hover:bg-[#b08b5f] border-2 border-[#3E2723]'}`}
+                  className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap w-full sm:w-auto ${
+                    restoringMode === "choco" 
+                      ? "bg-stone-500 cursor-not-allowed border-2 border-stone-800" 
+                      : isRestoring 
+                        ? "opacity-40 cursor-not-allowed bg-[#C29D70] border-2 border-[#3E2723]" 
+                        : "bg-[#C29D70] hover:bg-[#b08b5f] border-2 border-[#3E2723]"
+                  }`}
                 >
-                  {isRestoring ? "Đang chạy..." : "Khôi Phục Choco/GChoco"}
+                  {restoringMode === "choco" ? "Đang chạy..." : "Khôi Phục Choco/GChoco"}
                 </button>
                 <button
                   onClick={() => {
@@ -4950,9 +5012,15 @@ export function Admin() {
                     });
                   }}
                   disabled={isRestoring}
-                  className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap ${isRestoring ? 'bg-stone-500 cursor-not-allowed border-2 border-stone-800' : 'bg-[#7E57C2] hover:bg-[#673AB7] border-2 border-[#311B92]'}`}
+                  className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap w-full sm:w-auto ${
+                    restoringMode === "achievements" 
+                      ? "bg-stone-500 cursor-not-allowed border-2 border-stone-800" 
+                      : isRestoring 
+                        ? "opacity-40 cursor-not-allowed bg-[#7E57C2] border-2 border-[#311B92]" 
+                        : "bg-[#7E57C2] hover:bg-[#673AB7] border-2 border-[#311B92]"
+                  }`}
                 >
-                  {isRestoring ? "Đang chạy..." : "Khôi Phục Thành Tựu"}
+                  {restoringMode === "achievements" ? "Đang chạy..." : "Khôi Phục Thành Tựu"}
                 </button>
                 <button
                   onClick={() => {
@@ -4962,9 +5030,15 @@ export function Admin() {
                     });
                   }}
                   disabled={isRestoring}
-                  className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap ${isRestoring ? 'bg-stone-500 cursor-not-allowed border-2 border-stone-800' : 'bg-[#009688] hover:bg-[#00796B] border-2 border-[#004D40]'}`}
+                  className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white shadow-[2px_2px_0_0_#3E2723] dark:shadow-[2px_2px_0_0_#0D0907] transition-all hover:translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 active:shadow-none whitespace-nowrap w-full sm:w-auto ${
+                    restoringMode === "stickers" 
+                      ? "bg-stone-500 cursor-not-allowed border-2 border-stone-800" 
+                      : isRestoring 
+                        ? "opacity-40 cursor-not-allowed bg-[#009688] border-2 border-[#004D40]" 
+                        : "bg-[#009688] hover:bg-[#00796B] border-2 border-[#004D40]"
+                  }`}
                 >
-                  {isRestoring ? "Đang chạy..." : "Khôi Phục Nhãn dán/Phụ kiện"}
+                  {restoringMode === "stickers" ? "Đang chạy..." : "Khôi Phục Nhãn dán/Phụ kiện"}
                 </button>
               </div>
 
