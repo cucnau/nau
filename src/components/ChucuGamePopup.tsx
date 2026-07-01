@@ -117,7 +117,7 @@ export function ChucuGamePopup() {
     chucuGameBonusPoints, addChucuGameBonusPoints,
     chucuGamePlaysToday, chucuGameLastPlayDate, finishChucuGame,
     chucuSatiety, updateChucuStats,
-    choco, goldenChoco, ownedMysteryBoxes, ownedStreakTickets,
+    choco, goldenChoco, ownedMysteryBoxes, ownedStreakTickets, ownedPassTickets, ownedPriorityTickets,
     isLoggedIn, uid, updateUserDoc, theme,
     _checkResetMissions
   } = useStore();
@@ -285,37 +285,12 @@ export function ChucuGamePopup() {
     }
   };
 
-  const handleExchangePoints = (reward: 'mystery' | 'streak_ticket' | 'gacha_ticket') => {
+  const handleExchangePoints = (reward: 'streak_ticket' | 'gacha_ticket' | 'priority_ticket' | 'pass_ticket') => {
     if (!isLoggedIn) {
       alert("Bạn cần đăng nhập để đổi quà!");
       return;
     }
-    if (reward === 'mystery') {
-      const maxQty = Math.floor(chucuGameBonusPoints / 1200);
-      if (maxQty <= 0) {
-        alert("Bạn chưa đủ 1200 điểm thưởng để đổi Hộp Sticker Bí Ẩn!");
-        return;
-      }
-      const input = prompt(`Nhập số lượng Hộp Sticker Bí Ẩn muốn đổi (1200 điểm = 1 Hộp). Tối đa bạn đổi được ${maxQty} Hộp:`, "1");
-      if (input === null) return;
-      const qty = parseInt(input, 10);
-      if (isNaN(qty) || qty <= 0) {
-        alert("Số lượng đổi không hợp lệ!");
-        return;
-      }
-      const cost = qty * 1200;
-      if (chucuGameBonusPoints < cost) {
-        alert(`Bạn không có đủ điểm thưởng (Cần ${cost} điểm, hiện có ${chucuGameBonusPoints} điểm)!`);
-        return;
-      }
-      const newPoints = chucuGameBonusPoints - cost;
-      const newBoxes = (ownedMysteryBoxes || 0) + qty;
-      updateUserDoc({
-        chucuGameBonusPoints: newPoints,
-        ownedMysteryBoxes: newBoxes
-      });
-      alert(`Đổi thành công ${cost} điểm lấy ${qty} Hộp Sticker Bí Ẩn!`);
-    } else if (reward === 'streak_ticket') {
+    if (reward === 'streak_ticket') {
       const maxQty = Math.floor(chucuGameBonusPoints / 800);
       if (maxQty <= 0) {
         alert("Bạn chưa đủ 800 điểm thưởng để đổi Vé Giữ Chuỗi!");
@@ -341,19 +316,19 @@ export function ChucuGamePopup() {
       });
       alert(`Đổi thành công ${cost} điểm lấy ${qty} Vé Giữ Chuỗi!`);
     } else if (reward === 'gacha_ticket') {
-      const maxQty = Math.floor(chucuGameBonusPoints / 1500);
+      const maxQty = Math.floor(chucuGameBonusPoints / 960);
       if (maxQty <= 0) {
-        alert("Bạn chưa đủ 1500 điểm thưởng để đổi Vé Gacha!");
+        alert("Bạn chưa đủ 960 điểm thưởng để đổi Vé Gacha Banner Thường!");
         return;
       }
-      const input = prompt(`Nhập số lượng Vé Gacha muốn đổi (1500 điểm = 1 Vé). Tối đa bạn đổi được ${maxQty} Vé:`, "1");
+      const input = prompt(`Nhập số lượng Vé Gacha Banner Thường muốn đổi (960 điểm = 1 Vé). Tối đa bạn đổi được ${maxQty} Vé:`, "1");
       if (input === null) return;
       const qty = parseInt(input, 10);
       if (isNaN(qty) || qty <= 0) {
         alert("Số lượng đổi không hợp lệ!");
         return;
       }
-      const cost = qty * 1500;
+      const cost = qty * 960;
       if (chucuGameBonusPoints < cost) {
         alert(`Bạn không có đủ điểm thưởng (Cần ${cost} điểm, hiện có ${chucuGameBonusPoints} điểm)!`);
         return;
@@ -364,7 +339,57 @@ export function ChucuGamePopup() {
         chucuGameBonusPoints: newPoints,
         ownedGachaTickets: newTickets
       });
-      alert(`Đổi thành công ${cost} điểm lấy ${qty} Vé Gacha!`);
+      alert(`Đổi thành công ${cost} điểm lấy ${qty} Vé Gacha Banner Thường!`);
+    } else if (reward === 'priority_ticket') {
+      const maxQty = Math.floor(chucuGameBonusPoints / 1440);
+      if (maxQty <= 0) {
+        alert("Bạn chưa đủ 1440 điểm thưởng để đổi Vé Ưu Tiên!");
+        return;
+      }
+      const input = prompt(`Nhập số lượng Vé Ưu Tiên muốn đổi (1440 điểm = 1 Vé). Tối đa bạn đổi được ${maxQty} Vé:`, "1");
+      if (input === null) return;
+      const qty = parseInt(input, 10);
+      if (isNaN(qty) || qty <= 0) {
+        alert("Số lượng đổi không hợp lệ!");
+        return;
+      }
+      const cost = qty * 1440;
+      if (chucuGameBonusPoints < cost) {
+        alert(`Bạn không có đủ điểm thưởng (Cần ${cost} điểm, hiện có ${chucuGameBonusPoints} điểm)!`);
+        return;
+      }
+      const newPoints = chucuGameBonusPoints - cost;
+      const newTickets = (ownedPriorityTickets || 0) + qty;
+      updateUserDoc({
+        chucuGameBonusPoints: newPoints,
+        ownedPriorityTickets: newTickets
+      });
+      alert(`Đổi thành công ${cost} điểm lấy ${qty} Vé Ưu Tiên!`);
+    } else if (reward === 'pass_ticket') {
+      const maxQty = Math.floor(chucuGameBonusPoints / 2400);
+      if (maxQty <= 0) {
+        alert("Bạn chưa đủ 2400 điểm thưởng để đổi Vé Pass Truyện!");
+        return;
+      }
+      const input = prompt(`Nhập số lượng Vé Pass Truyện muốn đổi (2400 điểm = 1 Vé). Tối đa bạn đổi được ${maxQty} Vé:`, "1");
+      if (input === null) return;
+      const qty = parseInt(input, 10);
+      if (isNaN(qty) || qty <= 0) {
+        alert("Số lượng đổi không hợp lệ!");
+        return;
+      }
+      const cost = qty * 2400;
+      if (chucuGameBonusPoints < cost) {
+        alert(`Bạn không có đủ điểm thưởng (Cần ${cost} điểm, hiện có ${chucuGameBonusPoints} điểm)!`);
+        return;
+      }
+      const newPoints = chucuGameBonusPoints - cost;
+      const newTickets = (ownedPassTickets || 0) + qty;
+      updateUserDoc({
+        chucuGameBonusPoints: newPoints,
+        ownedPassTickets: newTickets
+      });
+      alert(`Đổi thành công ${cost} điểm lấy ${qty} Vé Pass Truyện!`);
     }
   };
 
@@ -1518,25 +1543,6 @@ export function ChucuGamePopup() {
                     </button>
                   </div>
 
-                  {/* Exchange Box */}
-                  <div className="bg-white dark:bg-[#1E1815] p-3 rounded-2xl border-2 border-[#3E2723]/10 dark:border-stone-800 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
-                        <Trophy className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Hộp Sticker Bí Ẩn</h4>
-                        <p className="text-[10px] text-stone-500">Để mở sticker chưa có trong cửa hàng • <b>1200 điểm</b></p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleExchangePoints('mystery')}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase rounded-lg transition-colors cursor-pointer"
-                    >
-                      Đổi
-                    </button>
-                  </div>
-
                   {/* Exchange Gacha Ticket */}
                   <div className="bg-white dark:bg-[#1E1815] p-3 rounded-2xl border-2 border-[#3E2723]/10 dark:border-stone-800 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
@@ -1544,12 +1550,50 @@ export function ChucuGamePopup() {
                         <Sparkles className="w-5 h-5 text-pink-500" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Vé Gacha</h4>
-                        <p className="text-[10px] text-stone-500">Dùng để quay Banner Gacha nhận quà khủng • <b>1500 điểm</b></p>
+                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Vé Gacha Banner Thường</h4>
+                        <p className="text-[10px] text-stone-500">Dùng để quay Banner Gacha Thường nhận quà • <b>960 điểm</b></p>
                       </div>
                     </div>
                     <button
                       onClick={() => handleExchangePoints('gacha_ticket')}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase rounded-lg transition-colors cursor-pointer"
+                    >
+                      Đổi
+                    </button>
+                  </div>
+
+                  {/* Exchange Priority Ticket */}
+                  <div className="bg-white dark:bg-[#1E1815] p-3 rounded-2xl border-2 border-[#3E2723]/10 dark:border-stone-800 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                        <Zap className="w-5 h-5 text-amber-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Vé Ưu Tiên</h4>
+                        <p className="text-[10px] text-stone-500">Đọc sớm nhất các chương truyện vừa đăng tải • <b>1440 điểm</b></p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleExchangePoints('priority_ticket')}
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase rounded-lg transition-colors cursor-pointer"
+                    >
+                      Đổi
+                    </button>
+                  </div>
+
+                  {/* Exchange Story Pass Ticket */}
+                  <div className="bg-white dark:bg-[#1E1815] p-3 rounded-2xl border-2 border-[#3E2723]/10 dark:border-stone-800 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                        <BookOpen className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-[#3E2723] dark:text-[#ECE5DC]">1 Vé Pass Truyện</h4>
+                        <p className="text-[10px] text-stone-500">Mở khóa chương truyện bị đặt mật khẩu • <b>2400 điểm</b></p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleExchangePoints('pass_ticket')}
                       className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase rounded-lg transition-colors cursor-pointer"
                     >
                       Đổi
