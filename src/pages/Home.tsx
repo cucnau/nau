@@ -328,7 +328,7 @@ export function Home() {
                             />
                            <div className="flex-1 min-w-0">
                               <div className="text-xs font-bold truncate flex items-center gap-1" style={{ color: getTitleColor(u.activeTitle) || (theme === 'dark' ? '#ECE5DC' : '#3E2723') }}>
-                                 {u.displayName}
+                                 {u.displayName || 'Người dùng ẩn danh'}
                                  {isMe && <span className="text-[9px] text-[#5D4037] dark:text-[#ECE5DC] shrink-0">(Bạn)</span>}
                               </div>
                               <div className="text-[10px] text-[#8D6E63] font-extrabold flex items-center gap-0.5">
@@ -363,7 +363,7 @@ export function Home() {
                            />
                           <div className="flex-1 min-w-0">
                              <div className="text-xs font-bold truncate flex items-center gap-1" style={{ color: getTitleColor(u.activeTitle) || (theme === 'dark' ? '#ECE5DC' : '#3E2723') }}>
-                                <span>Top {i + 1}: {u.displayName}</span>
+                                <span>Top {i + 1}: {u.displayName || 'Người dùng ẩn danh'}</span>
                                 {isMe && <span className="text-[9px] text-[#5D4037] dark:text-[#ECE5DC] shrink-0">(Bạn)</span>}
                              </div>
                              <div className="text-[10px] text-[#A1887F] dark:text-stone-400 font-semibold">{u.choco?.toLocaleString()} Choco</div>
@@ -398,7 +398,7 @@ export function Home() {
                            />
                           <div className="flex-1 min-w-0">
                              <div className="text-xs font-bold truncate flex items-center gap-1" style={{ color: getTitleColor(u.activeTitle) || (theme === 'dark' ? '#ECE5DC' : '#3E2723') }}>
-                                <span>Top {i + 1}: {u.displayName}</span>
+                                <span>Top {i + 1}: {u.displayName || 'Người dùng ẩn danh'}</span>
                                 {isMe && <span className="text-[9px] text-[#5D4037] dark:text-[#ECE5DC] shrink-0">(Bạn)</span>}
                              </div>
                              <div className="text-[10px] text-[#8D6E63] dark:text-stone-400 font-extrabold">
