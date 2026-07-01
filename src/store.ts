@@ -2596,6 +2596,14 @@ export const useStore = create<UserState>()(
         const {
           firebaseUser,
           isQuotaExceeded,
+          allUsersUnlockedAchievements,
+          allUsersClaimedAchievements,
+          allUsersMissions,
+          allUsersStoryProgress,
+          allUsersReadHistoryList,
+          allUsersSavedStories,
+          allUsersOwnedStickers,
+          allUsersOwnedAccessories,
           ...rest
         } = state;
         return rest as any;
