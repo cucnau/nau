@@ -324,15 +324,15 @@ export const getPermanentMissions = (state: Partial<UserState> = {}): Mission[] 
        });
    }
 
-   highestTiers.checkin = Math.min(200, Math.max(highestTiers.checkin, Math.ceil(Math.max(state.totalCheckIns || 0, state.checkInStreak || 0) / 30) + 2));
-   highestTiers.read = Math.min(200, Math.max(highestTiers.read, Math.ceil((state.totalChaptersRead || 0) / 50) + 2));
-   highestTiers.level = Math.min(200, Math.max(highestTiers.level, Math.ceil((state.level || 1) / 10) + 2));
-   highestTiers.chocomatchlvl = Math.min(200, Math.max(highestTiers.chocomatchlvl, Math.ceil(Math.max(0, (state.chocoMatchLevel || 1) - 1) / 100) + 2));
-   highestTiers.comm = Math.min(200, Math.max(highestTiers.comm, Math.ceil((state.totalCommentsCount || 0) / 50) + 2));
-   highestTiers.gacha = Math.min(200, Math.max(highestTiers.gacha, Math.ceil((state.totalGachaPulls || 0) / 50) + 2));
-   highestTiers.catch = Math.min(200, Math.max(highestTiers.catch, Math.ceil((state.totalChocoCaught || 0) / 1000) + 2));
-   highestTiers.radio = Math.min(200, Math.max(highestTiers.radio, Math.ceil(Math.floor((state.totalRadioSeconds || 0) / 60) / 60) + 2));
-   highestTiers.spend = Math.min(200, Math.max(highestTiers.spend, Math.ceil((state.totalSpentChoco || 0) / 100) + 2));
+   highestTiers.checkin = Math.min(10000, Math.max(highestTiers.checkin, Math.ceil(Math.max(state.totalCheckIns || 0, state.checkInStreak || 0) / 30) + 2));
+   highestTiers.read = Math.min(10000, Math.max(highestTiers.read, Math.ceil((state.totalChaptersRead || 0) / 50) + 2));
+   highestTiers.level = Math.min(10000, Math.max(highestTiers.level, Math.ceil((state.level || 1) / 10) + 2));
+   highestTiers.chocomatchlvl = Math.min(10000, Math.max(highestTiers.chocomatchlvl, Math.ceil(Math.max(0, (state.chocoMatchLevel || 1) - 1) / 100) + 2));
+   highestTiers.comm = Math.min(10000, Math.max(highestTiers.comm, Math.ceil((state.totalCommentsCount || 0) / 50) + 2));
+   highestTiers.gacha = Math.min(10000, Math.max(highestTiers.gacha, Math.ceil((state.totalGachaPulls || 0) / 50) + 2));
+   highestTiers.catch = Math.min(10000, Math.max(highestTiers.catch, Math.ceil((state.totalChocoCaught || 0) / 1000) + 2));
+   highestTiers.radio = Math.min(10000, Math.max(highestTiers.radio, Math.ceil(Math.floor((state.totalRadioSeconds || 0) / 60) / 60) + 2));
+   highestTiers.spend = Math.min(10000, Math.max(highestTiers.spend, Math.ceil((state.totalSpentChoco || 0) / 100) + 2));
 
    for (let i = 1; i <= highestTiers.checkin; i++) {
        res.push({ id: `p_checkin_${i}`, type: 'permanent', description: `Điểm danh ${i * 30} ngày`, chocoReward: i * 30, goldenReward: i * 3, progress: 0, target: i * 30, completed: false, claimed: false });
