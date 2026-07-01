@@ -85,6 +85,7 @@ interface UserState {
   ownedMysteryBoxes: number;
   ownedStreakTickets?: number;
   ownedGachaTickets?: number;
+  ownedGachaTicketsLimited?: number;
   gachaPity5Star?: number;
   gachaPity4Star?: number;
   activeStreakProtection?: boolean;
@@ -274,6 +275,7 @@ interface UserState {
   setAccessoryPosition: (pos: { x: number; y: number; scale: number; rotate: number }) => void;
   
   claimMission: (id: string) => void;
+  claimAllMissions: () => void;
   updateUserDoc: (updates: any, transactionReason?: string) => Promise<void>;
   useMysteryBox: () => Promise<any | null>;
 
@@ -520,6 +522,7 @@ export const useStore = create<UserState>()(
       ownedMysteryBoxes: 0,
       ownedStreakTickets: 0,
       ownedGachaTickets: 0,
+      ownedGachaTicketsLimited: 0,
       gachaPity5Star: 0,
       gachaPity4Star: 0,
       activeStreakProtection: false,
@@ -648,6 +651,7 @@ export const useStore = create<UserState>()(
         ownedMysteryBoxes: 0,
         ownedStreakTickets: 0,
         ownedGachaTickets: 0,
+        ownedGachaTicketsLimited: 0,
         gachaPity5Star: 0,
         gachaPity4Star: 0,
         activeStreakProtection: false,
@@ -991,6 +995,7 @@ export const useStore = create<UserState>()(
             ownedMysteryBoxes: isPendingOrFlushing('ownedMysteryBoxes') ? state.ownedMysteryBoxes : (data.ownedMysteryBoxes !== undefined ? data.ownedMysteryBoxes : state.ownedMysteryBoxes),
             ownedStreakTickets: isPendingOrFlushing('ownedStreakTickets') ? state.ownedStreakTickets : (data.ownedStreakTickets !== undefined ? data.ownedStreakTickets : state.ownedStreakTickets),
             ownedGachaTickets: isPendingOrFlushing('ownedGachaTickets') ? state.ownedGachaTickets : (data.ownedGachaTickets !== undefined ? data.ownedGachaTickets : state.ownedGachaTickets),
+            ownedGachaTicketsLimited: isPendingOrFlushing('ownedGachaTicketsLimited') ? state.ownedGachaTicketsLimited : (data.ownedGachaTicketsLimited !== undefined ? data.ownedGachaTicketsLimited : state.ownedGachaTicketsLimited),
             gachaPity5Star: isPendingOrFlushing('gachaPity5Star') ? state.gachaPity5Star : (data.gachaPity5Star !== undefined ? data.gachaPity5Star : state.gachaPity5Star),
             gachaPity4Star: isPendingOrFlushing('gachaPity4Star') ? state.gachaPity4Star : (data.gachaPity4Star !== undefined ? data.gachaPity4Star : state.gachaPity4Star),
             activeStreakProtection: isPendingOrFlushing('activeStreakProtection') ? state.activeStreakProtection : (data.activeStreakProtection !== undefined ? data.activeStreakProtection : state.activeStreakProtection),
@@ -1715,6 +1720,62 @@ export const useStore = create<UserState>()(
                  missions: ms
               };
               get().updateUserDoc(updates, `Nhận thưởng nhiệm vụ: ${m.id} - ${m.description}`);
+              
+              setTimeout(() => {
+                 get()._triggerCountAchievementsCheck();
+              }, 50);
+          }
+      },
+      
+      claimAllMissions: () => {
+          const state = get();
+          const ms = state.missions.map(m => ({ ...m }));
+          let totalChocoAdded = 0;
+          let totalGoldenAdded = 0;
+          let claimedAny = false;
+          const claimedDescriptions: string[] = [];
+
+          for (const m of ms) {
+              if (m.completed && !m.claimed) {
+                  m.claimed = true;
+                  totalChocoAdded += m.chocoReward;
+                  totalGoldenAdded += m.goldenReward;
+                  claimedAny = true;
+                  claimedDescriptions.push(m.description);
+              }
+          }
+
+          if (claimedAny) {
+              const newChoco = state.choco + totalChocoAdded;
+              const newGolden = state.goldenChoco + totalGoldenAdded;
+              const newTotalEarnedC = (state.totalEarnedChoco || 0) + totalChocoAdded;
+              const newTotalEarnedG = (state.totalEarnedGChoco || 0) + totalGoldenAdded;
+              
+              const uid = state.uid;
+              const allMs = { ...(state.allUsersMissions || {}) };
+              if (uid) {
+                 allMs[uid] = ms;
+              }
+
+              set({ 
+                 missions: ms, 
+                 choco: newChoco, 
+                 goldenChoco: newGolden,
+                 totalEarnedChoco: newTotalEarnedC,
+                 totalEarnedGChoco: newTotalEarnedG,
+                 allUsersMissions: allMs
+              });
+              
+              const updates: any = {
+                 choco: newChoco,
+                 $chocoDiff: totalChocoAdded,
+                 goldenChoco: newGolden,
+                 $gchocoDiff: totalGoldenAdded,
+                 totalEarnedChoco: newTotalEarnedC,
+                 totalEarnedGChoco: newTotalEarnedG,
+                 missions: ms
+              };
+              get().updateUserDoc(updates, `Nhận tất cả thưởng nhiệm vụ: ${claimedDescriptions.join(', ')}`);
               
               setTimeout(() => {
                  get()._triggerCountAchievementsCheck();
