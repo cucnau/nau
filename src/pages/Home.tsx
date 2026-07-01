@@ -36,19 +36,19 @@ export function Home() {
       setStories(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
-    const qUsers = query(collection(db, 'users'), orderBy('choco', 'desc'), limit(15));
+    const qUsers = query(collection(db, 'users'), orderBy('choco', 'desc'), limit(50));
     const unsubUsers = onSnapshot(qUsers, (snap) => {
       const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((u: any) => u.email?.toLowerCase() !== 'cucnau01@gmail.com');
       setTopUsers(users.slice(0, 4));
     });
 
-    const qActiveUsers = query(collection(db, 'users'), orderBy('activePoints', 'desc'), limit(15));
+    const qActiveUsers = query(collection(db, 'users'), orderBy('activePoints', 'desc'), limit(50));
     const unsubActiveUsers = onSnapshot(qActiveUsers, (snap) => {
       const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((u: any) => u.email?.toLowerCase() !== 'cucnau01@gmail.com');
       setTopActiveUsers(users.slice(0, 4));
     });
 
-    const qChucuGameUsers = query(collection(db, 'users'), orderBy('chucuGameMaxScore', 'desc'), limit(15));
+    const qChucuGameUsers = query(collection(db, 'users'), orderBy('chucuGameMaxScore', 'desc'), limit(50));
     const unsubChucuGameUsers = onSnapshot(qChucuGameUsers, (snap) => {
       const users = snap.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((u: any) => u.email?.toLowerCase() !== 'cucnau01@gmail.com');
       setTopChucuGameUsers(users.slice(0, 4));
