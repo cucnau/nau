@@ -374,7 +374,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           unsubSubStickers = onSnapshot(collection(db, 'users', user.uid, 'owned_stickers'), (snap) => {
              const docsData = snap.docs.map(d => ({ docId: d.id, url: d.data().url })).filter(d => Boolean(d.url));
              const initialUrls = docsData.map(d => d.url);
-             useStore.setState({ ownedStickers: Array.from(new Set(initialUrls)) });
+             const uniqueUrls = Array.from(new Set(initialUrls));
+             
+             const currentState = useStore.getState();
+             const updatedAllStickers = { ...currentState.allUsersOwnedStickers };
+             updatedAllStickers[user.uid] = uniqueUrls;
+             
+             useStore.setState({ 
+                ownedStickers: uniqueUrls,
+                allUsersOwnedStickers: updatedAllStickers
+             });
 
              (async () => {
                 let changed = false;
@@ -435,7 +444,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   }
                 }
                 if (changed) {
-                  useStore.setState({ ownedStickers: Array.from(new Set(finalUrls)) });
+                  const finalUniqueUrls = Array.from(new Set(finalUrls));
+                  const stateNow = useStore.getState();
+                  const updatedAllStickersNow = { ...stateNow.allUsersOwnedStickers };
+                  updatedAllStickersNow[user.uid] = finalUniqueUrls;
+                  useStore.setState({ 
+                     ownedStickers: finalUniqueUrls,
+                     allUsersOwnedStickers: updatedAllStickersNow
+                  });
                 }
              })();
           }, (err) => {
@@ -445,7 +461,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           unsubSubAccessories = onSnapshot(collection(db, 'users', user.uid, 'owned_accessories'), (snap) => {
              const urls = snap.docs.map(d => d.data().url).filter(Boolean);
              const uniqueUrls = Array.from(new Set(urls));
-             useStore.setState({ ownedAccessories: uniqueUrls });
+             
+             const currentState = useStore.getState();
+             const updatedAllAccessories = { ...currentState.allUsersOwnedAccessories };
+             updatedAllAccessories[user.uid] = uniqueUrls;
+             
+             useStore.setState({ 
+                ownedAccessories: uniqueUrls,
+                allUsersOwnedAccessories: updatedAllAccessories
+             });
           }, (err) => {
               console.error('Error listening to user owned_accessories updates:', err);
           });
