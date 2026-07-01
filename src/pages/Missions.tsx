@@ -4,7 +4,7 @@ import { Target, CheckCircle, Gift } from 'lucide-react';
 import { cn } from '../components/Layout';
 
 export function Missions() {
-  const { missions, claimMission, isLoggedIn, checkInStreak, syncUserDataStatsFromDB } = useStore();
+  const { missions, claimMission, claimAllMissions, isLoggedIn, checkInStreak, syncUserDataStatsFromDB } = useStore();
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -13,6 +13,9 @@ export function Missions() {
       useStore.getState()._triggerCountAchievementsCheck();
     }
   }, [isLoggedIn, syncUserDataStatsFromDB]);
+
+  const claimableMissions = missions.filter(m => m.completed && !m.claimed);
+  const hasClaimable = claimableMissions.length > 0;
 
   const renderMissionGroup = (title: string, type: string) => {
      let items = missions.filter(m => m.type === type);
@@ -110,6 +113,15 @@ export function Missions() {
            <div>
                <h1 className="text-2xl font-bold mb-2 uppercase tracking-tighter">Nhiệm Vụ & Điểm Danh</h1>
                <p className="opacity-80 italic">Hoàn thành nhiệm vụ để nhận điểm Choco và mua vật phẩm.</p>
+                {isLoggedIn && hasClaimable && (
+                    <button 
+                       onClick={() => claimAllMissions()}
+                       className="bg-[#D4AF37] hover:bg-[#FFE066] text-[#3E2723] font-bold px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow-[0_3px_0_0_#A08020] active:translate-y-1 active:shadow-none transition-all flex items-center gap-2 cursor-pointer mt-3 animate-fade-in"
+                    >
+                       <Gift className="w-4 h-4 animate-bounce text-[#3E2723]" />
+                       Nhận tất cả ({claimableMissions.length})
+                    </button>
+                )}
            </div>
            {isLoggedIn ? (
                <div className="bg-[#2D1B19] text-[#FDF6EC] border border-[#5D4037] px-8 py-4 rounded-2xl flex flex-col items-center shadow-inner">
