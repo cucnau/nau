@@ -13,7 +13,7 @@ export function cn(...classes: (string | undefined | null | false)[]) {
 export default function GachaPopup() {
   const { 
      isGachaOpen, setGachaOpen, 
-     choco, goldenChoco, ownedGachaTickets = 0, 
+     choco, goldenChoco, ownedGachaTickets = 0, ownedGachaTicketsLimited = 0,
      spendChoco, spendGoldenChoco,
      updateUserDoc, gachaPity5Star = 0, gachaPity4Star = 0, 
      addOwnedSticker, addGachaFragments, gachaFragments = 0,
@@ -21,7 +21,7 @@ export default function GachaPopup() {
      theme, email, firebaseUser
   } = useStore();
   const isDark = theme === "dark";
-  const [pendingExchange, setPendingExchange] = useState<{ times: number; neededTickets: number; currency: 'golden' | 'choco'; cost: number } | null>(null);
+  const [pendingExchange, setPendingExchange] = useState<{ times: number; neededTickets: number; currency: 'golden' | 'choco'; cost: number; type: 'normal' | 'limited' } | null>(null);
   
   // Custom limited banner loaded from DB
   const [banners, setBanners] = useState<GachaBanner[]>([]);
@@ -352,7 +352,8 @@ export default function GachaPopup() {
   };
 
   const executePulls = async (times: number, ticketsToUse?: number) => {
-    const currentTickets = ticketsToUse !== undefined ? ticketsToUse : ownedGachaTickets;
+    const isLimited = activeBanner.type === 'limited';
+    const currentTickets = ticketsToUse !== undefined ? ticketsToUse : (isLimited ? ownedGachaTicketsLimited : ownedGachaTickets);
     
     if (currentTickets < times) {
        const neededTickets = times - currentTickets;
@@ -364,21 +365,24 @@ export default function GachaPopup() {
            times,
            neededTickets,
            currency: 'golden',
-           cost: neededGChoco
+           cost: neededGChoco,
+           type: isLimited ? 'limited' : 'normal'
          });
        } else if ((choco || 0) >= neededChoco) {
          setPendingExchange({
            times,
            neededTickets,
            currency: 'choco',
-           cost: neededChoco
+           cost: neededChoco,
+           type: isLimited ? 'limited' : 'normal'
          });
        } else {
          setPendingExchange({
            times,
            neededTickets,
            currency: 'none',
-           cost: 0
+           cost: 0,
+           type: isLimited ? 'limited' : 'normal'
          });
        }
        return;
@@ -436,11 +440,16 @@ export default function GachaPopup() {
     const singlePullCount = useStore.getState().gachaSinglePullCount || 0;
     const totalPulls = useStore.getState().totalGachaPulls || 0;
     const updates: any = {
-       ownedGachaTickets: currentTickets - times,
        gachaPity5Star: currentPity5,
        gachaPity4Star: currentPity4,
        totalGachaPulls: totalPulls + times
     };
+    
+    if (isLimited) {
+       updates.ownedGachaTicketsLimited = currentTickets - times;
+    } else {
+       updates.ownedGachaTickets = currentTickets - times;
+    }
     
     if (times === 1) {
        updates.gachaSinglePullCount = singlePullCount + 1;
@@ -559,14 +568,32 @@ export default function GachaPopup() {
                 </span>
                 <span className={cn("text-[8px] sm:text-[10px] font-bold text-amber-500", isDark ? "text-amber-400" : "text-amber-700")}>Gchoco</span>
               </div>
-              <div className={cn(
-                "flex items-center gap-1 sm:gap-2 backdrop-blur px-2.5 sm:px-3.5 py-1.5 rounded-full border shadow-md lg:shadow-[0_0_15px_rgba(236,72,153,0.15)]",
-                isDark 
-                  ? "bg-pink-500/20 border-pink-500/30 text-white" 
-                  : "bg-pink-500/10 border-pink-500/20 text-[#C2185B]"
-              )}>
+              {/* Vé Gacha Thường */}
+              <div 
+                className={cn(
+                  "flex items-center gap-1 sm:gap-1.5 backdrop-blur px-2 sm:px-3 py-1.5 rounded-full border shadow-md lg:shadow-[0_0_15px_rgba(236,72,153,0.15)]",
+                  isDark 
+                    ? "bg-pink-500/20 border-pink-500/30 text-white" 
+                    : "bg-pink-500/10 border-pink-500/20 text-[#C2185B]"
+                )}
+                title="Vé Gacha Thường"
+              >
                 <Sparkles className="w-3 h-3 text-pink-500 animate-pulse" />
-                <span className="font-bold text-[10px] sm:text-xs tracking-wide">{ownedGachaTickets || 0}</span>
+                <span className="font-bold text-[10px] sm:text-xs tracking-wide">{ownedGachaTickets || 0} <span className="text-[8px] opacity-75">Thường</span></span>
+              </div>
+
+              {/* Vé Gacha Giới Hạn */}
+              <div 
+                className={cn(
+                  "flex items-center gap-1 sm:gap-1.5 backdrop-blur px-2 sm:px-3 py-1.5 rounded-full border shadow-md lg:shadow-[0_0_15px_rgba(20,184,166,0.15)]",
+                  isDark 
+                    ? "bg-teal-500/20 border-teal-500/30 text-white" 
+                    : "bg-teal-500/10 border-teal-500/20 text-[#0F766E]"
+                )}
+                title="Vé Gacha Giới Hạn"
+              >
+                <Sparkles className="w-3 h-3 text-teal-400 animate-pulse" />
+                <span className="font-bold text-[10px] sm:text-xs tracking-wide">{ownedGachaTicketsLimited || 0} <span className="text-[8px] opacity-75">Hạn Giờ</span></span>
               </div>
             </div>
 
@@ -681,8 +708,8 @@ export default function GachaPopup() {
                 >
                   <span className={cn("text-xs sm:text-sm font-black uppercase tracking-wider", isDark ? "text-[#E6D4BF]" : "text-[#3E2723]")}>Gacha 1 Lần</span>
                   <div className={cn("flex items-center gap-1 mt-0.5 text-[10px] sm:text-xs font-bold", isDark ? "text-stone-400" : "text-[#5D4037]")}>
-                     <Sparkles className="w-3.5 h-3.5 text-pink-500 animate-pulse" />
-                     <span>x1</span>
+                     <Sparkles className={cn("w-3.5 h-3.5 animate-pulse", activeBanner.type === 'limited' ? "text-teal-500" : "text-pink-500")} />
+                     <span>x1 {activeBanner.type === 'limited' ? 'Vé Hạn Giờ' : 'Vé Thường'}</span>
                   </div>
                 </button>
                 <button 
@@ -697,8 +724,8 @@ export default function GachaPopup() {
                 >
                   <span className={cn("text-xs sm:text-sm font-black uppercase tracking-wider", isDark ? "text-[#FFD54F]" : "text-[#3E2723]")}>Gacha 10 Lần</span>
                   <div className="flex items-center gap-1.5 mt-0.5 text-[10px] sm:text-xs font-bold">
-                     <Sparkles className={cn("w-3.5 h-3.5 animate-pulse", isDark ? "text-amber-400" : "text-pink-600")} />
-                     <span className={isDark ? "text-amber-300" : "text-[#5D4037]"}>x10</span>
+                     <Sparkles className={cn("w-3.5 h-3.5 animate-pulse", activeBanner.type === 'limited' ? "text-teal-400" : isDark ? "text-amber-400" : "text-pink-600")} />
+                     <span className={isDark ? "text-amber-300" : "text-[#5D4037]"}>x10 {activeBanner.type === 'limited' ? 'Vé Hạn Giờ' : 'Vé Thường'}</span>
                   </div>
                 </button>
               </div>
@@ -1201,7 +1228,7 @@ export default function GachaPopup() {
             </div>
             
             <p className={cn("text-xs leading-relaxed mb-5", isDark ? "text-stone-300" : "text-[#5D4037]")}>
-              Bạn đang thiếu <strong className="text-pink-500 font-extrabold">{pendingExchange.neededTickets} Vé Gacha</strong> để thực hiện quay {pendingExchange.times} lần. 
+              Bạn đang thiếu <strong className="text-pink-500 font-extrabold">{pendingExchange.neededTickets} {pendingExchange.type === 'limited' ? 'Vé Giới Hạn' : 'Vé Thường'}</strong> để thực hiện quay {pendingExchange.times} lần. 
               {pendingExchange.currency !== 'none' ? (
                 <>
                   {" "}Hệ thống đề xuất quy đổi bằng{' '}
@@ -1238,7 +1265,7 @@ export default function GachaPopup() {
                   <span className="text-xs font-black text-rose-500">Không đủ số dư</span>
                 )}
                 <span className="text-[10px] text-green-500 font-extrabold">
-                  +{pendingExchange.neededTickets} Vé Gacha
+                  +{pendingExchange.neededTickets} {pendingExchange.type === 'limited' ? 'Vé Giới Hạn' : 'Vé Thường'}
                 </span>
               </div>
             </div>
@@ -1258,22 +1285,31 @@ export default function GachaPopup() {
               {pendingExchange.currency !== 'none' && (
                 <button
                   onClick={async () => {
-                    const { times, neededTickets, currency, cost } = pendingExchange;
+                    const { times, neededTickets, currency, cost, type } = pendingExchange;
                     setPendingExchange(null);
                     
+                    const ticketLabel = type === 'limited' ? 'Vé Gacha Banner Giới Hạn' : 'Vé Gacha Banner Thường';
                     let success = false;
                     if (currency === 'golden') {
-                      success = spendGoldenChoco(cost, `Quy đổi ${neededTickets} Vé Gacha`);
+                      success = spendGoldenChoco(cost, `Quy đổi ${neededTickets} ${ticketLabel}`);
                     } else if (currency === 'choco') {
-                      success = spendChoco(cost, `Quy đổi ${neededTickets} Vé Gacha`);
+                      success = spendChoco(cost, `Quy đổi ${neededTickets} ${ticketLabel}`);
                     }
                     
                     if (success) {
-                      const newTicketBalance = (ownedGachaTickets || 0) + neededTickets;
-                      await updateUserDoc({
-                        ownedGachaTickets: newTicketBalance
-                      });
-                      executePulls(times, newTicketBalance);
+                      if (type === 'limited') {
+                        const newTicketBalance = (ownedGachaTicketsLimited || 0) + neededTickets;
+                        await updateUserDoc({
+                          ownedGachaTicketsLimited: newTicketBalance
+                        });
+                        executePulls(times, newTicketBalance);
+                      } else {
+                        const newTicketBalance = (ownedGachaTickets || 0) + neededTickets;
+                        await updateUserDoc({
+                          ownedGachaTickets: newTicketBalance
+                        });
+                        executePulls(times, newTicketBalance);
+                      }
                     }
                   }}
                   className={cn(
