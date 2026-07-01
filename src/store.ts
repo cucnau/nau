@@ -383,6 +383,95 @@ export const reconcileMissions = (loadedMissions: Mission[], state: Partial<User
   });
 };
 
+let pendingUserUpdates: Record<string, any> = {};
+let flushingUserUpdates: Record<string, any> = {};
+let pendingUserUpdatesTimeout: any = null;
+let isFlushing = false;
+
+export const isPendingOrFlushing = (key: string) => {
+   return (key in pendingUserUpdates) || (key in flushingUserUpdates);
+};
+
+const flushPendingUserUpdates = async (uid: string) => {
+   if (isFlushing) {
+      if (pendingUserUpdatesTimeout) {
+         clearTimeout(pendingUserUpdatesTimeout);
+      }
+      pendingUserUpdatesTimeout = setTimeout(() => {
+         flushPendingUserUpdates(uid);
+      }, 50);
+      return;
+   }
+
+   if (Object.keys(pendingUserUpdates).length === 0) return;
+   
+   isFlushing = true;
+   flushingUserUpdates = { ...pendingUserUpdates };
+   const docUpdates = { ...pendingUserUpdates };
+   pendingUserUpdates = {};
+   pendingUserUpdatesTimeout = null;
+
+   delete docUpdates.$chocoDiff;
+   delete docUpdates.$gchocoDiff;
+   
+   // Hard delete obsolete fields permanently if they were accidentally requested in update
+   const obsolete = ['allUsersUnlockedAchievements', 'allUsersClaimedAchievements', 'allUsersMissions', 'allUsersStoryProgress', 'allUsersReadHistoryList', 'allUsersSavedStories', 'allUsersOwnedStickers', 'allUsersOwnedAccessories'];
+   obsolete.forEach(k => {
+       if (k in docUpdates) {
+          docUpdates[k] = deleteField();
+       }
+   });
+
+   // Tối ưu hóa dung lượng: Chỉ lưu ID và tiến độ của các nhiệm vụ có tiến trình, hoàn thành hoặc đã nhận thưởng (giúp giảm >90% dung lượng mảng missions trên Firestore)
+   if (Array.isArray(docUpdates.missions)) {
+       docUpdates.missions = docUpdates.missions
+          .filter((m: any) => m.progress > 0 || m.completed || m.claimed)
+          .map((m: any) => ({
+              id: m.id,
+              progress: m.progress || 0,
+              completed: m.completed || false,
+              claimed: m.claimed || false
+          }));
+   }
+
+   // Tối ưu hóa dung lượng: Giới hạn lịch sử đọc tối đa 200 bộ truyện gần nhất để tránh phình dung lượng tài khoản qua thời gian
+   if (Array.isArray(docUpdates.readHistoryList)) {
+       if (docUpdates.readHistoryList.length > 200) {
+           docUpdates.readHistoryList = docUpdates.readHistoryList.slice(0, 200);
+       }
+   }
+
+   const state = useStore.getState();
+
+   // Tự động kiểm tra và phục hồi: nếu avatarUrl hiện tại quá lớn (>300KB Base64),
+   // ta sẽ đè lên bằng một phiên bản nén siêu nhỏ để cứu document khỏi giới hạn 1MB của Firestore.
+   const currentAvatarUrl = state.avatarUrl;
+   if (currentAvatarUrl && currentAvatarUrl.startsWith('data:image/') && currentAvatarUrl.length > 300000) {
+      const compressed = await compressBase64Image(currentAvatarUrl);
+      docUpdates.avatarUrl = compressed;
+      useStore.setState({ avatarUrl: compressed });
+   }
+
+   // Nếu bản thân payload/updates chứa avatarUrl mới siêu lớn, nén ngay lập tức trước khi lưu
+   if (docUpdates.avatarUrl && docUpdates.avatarUrl.startsWith('data:image/') && docUpdates.avatarUrl.length > 300000) {
+      const compressed = await compressBase64Image(docUpdates.avatarUrl);
+      docUpdates.avatarUrl = compressed;
+      useStore.setState({ avatarUrl: compressed });
+   }
+
+   try {
+      await updateDoc(doc(db, 'users', uid), docUpdates);
+   } catch (err) {
+      console.error('Lỗi khi update user doc:', err);
+      if (checkIfQuotaError(err)) {
+         useStore.setState({ isQuotaExceeded: true });
+      }
+   } finally {
+      isFlushing = false;
+      flushingUserUpdates = {};
+   }
+};
+
 export const useStore = create<UserState>()(
   persist(
     (set, get) => ({
@@ -874,86 +963,86 @@ export const useStore = create<UserState>()(
             allUsersOwnedStickers: newAllStickers,
             allUsersOwnedAccessories: newAllAccessories,
             isFirebaseSynced: true,
-            choco: typeof data.choco === 'number' ? data.choco : (typeof state.choco === 'number' ? state.choco : 0),
-            goldenChoco: typeof data.goldenChoco === 'number' ? data.goldenChoco : (typeof state.goldenChoco === 'number' ? state.goldenChoco : 0),
-            level: Math.max(data.level !== undefined ? data.level : 1, state.level || 1),
-            exp: data.exp !== undefined ? ((state.level && data.level && data.level < state.level) ? state.exp : data.exp) : state.exp,
-            checkInStreak: data.checkInStreak !== undefined ? data.checkInStreak : state.checkInStreak,
-            lastCheckInDate: data.lastCheckInDate !== undefined ? data.lastCheckInDate : state.lastCheckInDate,
-            lastDailyResetDate: data.lastDailyResetDate !== undefined ? data.lastDailyResetDate : state.lastDailyResetDate,
-            lastWeeklyResetId: data.lastWeeklyResetId !== undefined ? data.lastWeeklyResetId : state.lastWeeklyResetId,
-            displayName: data.displayName !== undefined ? data.displayName : state.displayName,
-            email: data.email !== undefined ? data.email : state.email,
-            avatarUrl: data.avatarUrl !== undefined ? data.avatarUrl : state.avatarUrl,
-            equippedStickerComment: data.equippedStickerComment !== undefined ? data.equippedStickerComment : (data.equippedStickerAvatar !== undefined ? data.equippedStickerAvatar : state.equippedStickerComment),
-            stickerPositionComment: data.stickerPositionComment !== undefined ? data.stickerPositionComment : (data.stickerPositionAvatar !== undefined ? data.stickerPositionAvatar : state.stickerPositionComment),
-            equippedStickerChat: data.equippedStickerChat !== undefined ? data.equippedStickerChat : state.equippedStickerChat,
-            equippedStickerPost: data.equippedStickerPost !== undefined ? data.equippedStickerPost : state.equippedStickerPost,
-            stickerPositionPost: data.stickerPositionPost !== undefined ? data.stickerPositionPost : state.stickerPositionPost,
-            ownedStickers: data.ownedStickers !== undefined ? data.ownedStickers : state.ownedStickers,
-            equippedAccessory: data.equippedAccessory !== undefined ? data.equippedAccessory : state.equippedAccessory,
-            accessoryPosition: data.accessoryPosition !== undefined ? data.accessoryPosition : state.accessoryPosition,
-            ownedAccessories: data.ownedAccessories !== undefined ? data.ownedAccessories : state.ownedAccessories,
-            ownedChucuAccessories: data.ownedChucuAccessories !== undefined ? data.ownedChucuAccessories : state.ownedChucuAccessories,
-            equippedChucuAccessory: data.equippedChucuAccessory !== undefined ? data.equippedChucuAccessory : state.equippedChucuAccessory,
-            showChucu: data.showChucu !== undefined ? data.showChucu : true,
-            ownedPassTickets: data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets,
-            ownedPriorityTickets: data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets,
-            ownedMysteryBoxes: data.ownedMysteryBoxes !== undefined ? data.ownedMysteryBoxes : state.ownedMysteryBoxes,
-            ownedStreakTickets: data.ownedStreakTickets !== undefined ? data.ownedStreakTickets : state.ownedStreakTickets,
-            ownedGachaTickets: data.ownedGachaTickets !== undefined ? data.ownedGachaTickets : state.ownedGachaTickets,
-            gachaPity5Star: data.gachaPity5Star !== undefined ? data.gachaPity5Star : state.gachaPity5Star,
-            gachaPity4Star: data.gachaPity4Star !== undefined ? data.gachaPity4Star : state.gachaPity4Star,
-            activeStreakProtection: data.activeStreakProtection !== undefined ? data.activeStreakProtection : state.activeStreakProtection,
-            lastFreeStreakRecoveryMonth: data.lastFreeStreakRecoveryMonth !== undefined ? data.lastFreeStreakRecoveryMonth : state.lastFreeStreakRecoveryMonth,
-            lastClaimedRewardLevel: data.lastClaimedRewardLevel !== undefined ? data.lastClaimedRewardLevel : (state.lastClaimedRewardLevel || data.level || state.level || 1),
-            savedStories: data.savedStories !== undefined ? data.savedStories : state.savedStories,
-            unlockedPassChapters: data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters,
-            unlockedEarlyAccessChapters: data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters,
-            missions: resolvedMissions,
-            storyProgress: data.storyProgress !== undefined ? data.storyProgress : state.storyProgress,
-            readHistoryList: data.readHistoryList !== undefined ? data.readHistoryList : state.readHistoryList,
-            chucuLevel: data.chucuLevel !== undefined ? data.chucuLevel : state.chucuLevel,
-            chucuExp: data.chucuExp !== undefined ? data.chucuExp : state.chucuExp,
-            chucuSatiety: data.chucuSatiety !== undefined ? data.chucuSatiety : state.chucuSatiety,
-            chucuHappiness: data.chucuHappiness !== undefined ? data.chucuHappiness : state.chucuHappiness,
-            chucuInteractions: data.chucuInteractions !== undefined ? data.chucuInteractions : state.chucuInteractions,
-            chucuPremiumFeeds: data.chucuPremiumFeeds !== undefined ? data.chucuPremiumFeeds : state.chucuPremiumFeeds,
-            chucuLastTime: data.chucuLastTime !== undefined ? data.chucuLastTime : state.chucuLastTime,
+            choco: isPendingOrFlushing('choco') ? state.choco : (typeof data.choco === 'number' ? data.choco : (typeof state.choco === 'number' ? state.choco : 0)),
+            goldenChoco: isPendingOrFlushing('goldenChoco') ? state.goldenChoco : (typeof data.goldenChoco === 'number' ? data.goldenChoco : (typeof state.goldenChoco === 'number' ? state.goldenChoco : 0)),
+            level: isPendingOrFlushing('level') ? state.level : Math.max(data.level !== undefined ? data.level : 1, state.level || 1),
+            exp: isPendingOrFlushing('exp') ? state.exp : (data.exp !== undefined ? ((state.level && data.level && data.level < state.level) ? state.exp : data.exp) : state.exp),
+            checkInStreak: isPendingOrFlushing('checkInStreak') ? state.checkInStreak : (data.checkInStreak !== undefined ? data.checkInStreak : state.checkInStreak),
+            lastCheckInDate: isPendingOrFlushing('lastCheckInDate') ? state.lastCheckInDate : (data.lastCheckInDate !== undefined ? data.lastCheckInDate : state.lastCheckInDate),
+            lastDailyResetDate: isPendingOrFlushing('lastDailyResetDate') ? state.lastDailyResetDate : (data.lastDailyResetDate !== undefined ? data.lastDailyResetDate : state.lastDailyResetDate),
+            lastWeeklyResetId: isPendingOrFlushing('lastWeeklyResetId') ? state.lastWeeklyResetId : (data.lastWeeklyResetId !== undefined ? data.lastWeeklyResetId : state.lastWeeklyResetId),
+            displayName: isPendingOrFlushing('displayName') ? state.displayName : (data.displayName !== undefined ? data.displayName : state.displayName),
+            email: isPendingOrFlushing('email') ? state.email : (data.email !== undefined ? data.email : state.email),
+            avatarUrl: isPendingOrFlushing('avatarUrl') ? state.avatarUrl : (data.avatarUrl !== undefined ? data.avatarUrl : state.avatarUrl),
+            equippedStickerComment: isPendingOrFlushing('equippedStickerComment') ? state.equippedStickerComment : (data.equippedStickerComment !== undefined ? data.equippedStickerComment : (data.equippedStickerAvatar !== undefined ? data.equippedStickerAvatar : state.equippedStickerComment)),
+            stickerPositionComment: isPendingOrFlushing('stickerPositionComment') ? state.stickerPositionComment : (data.stickerPositionComment !== undefined ? data.stickerPositionComment : (data.stickerPositionAvatar !== undefined ? data.stickerPositionAvatar : state.stickerPositionComment)),
+            equippedStickerChat: isPendingOrFlushing('equippedStickerChat') ? state.equippedStickerChat : (data.equippedStickerChat !== undefined ? data.equippedStickerChat : state.equippedStickerChat),
+            equippedStickerPost: isPendingOrFlushing('equippedStickerPost') ? state.equippedStickerPost : (data.equippedStickerPost !== undefined ? data.equippedStickerPost : state.equippedStickerPost),
+            stickerPositionPost: isPendingOrFlushing('stickerPositionPost') ? state.stickerPositionPost : (data.stickerPositionPost !== undefined ? data.stickerPositionPost : state.stickerPositionPost),
+            ownedStickers: isPendingOrFlushing('ownedStickers') ? state.ownedStickers : (data.ownedStickers !== undefined ? data.ownedStickers : state.ownedStickers),
+            equippedAccessory: isPendingOrFlushing('equippedAccessory') ? state.equippedAccessory : (data.equippedAccessory !== undefined ? data.equippedAccessory : state.equippedAccessory),
+            accessoryPosition: isPendingOrFlushing('accessoryPosition') ? state.accessoryPosition : (data.accessoryPosition !== undefined ? data.accessoryPosition : state.accessoryPosition),
+            ownedAccessories: isPendingOrFlushing('ownedAccessories') ? state.ownedAccessories : (data.ownedAccessories !== undefined ? data.ownedAccessories : state.ownedAccessories),
+            ownedChucuAccessories: isPendingOrFlushing('ownedChucuAccessories') ? state.ownedChucuAccessories : (data.ownedChucuAccessories !== undefined ? data.ownedChucuAccessories : state.ownedChucuAccessories),
+            equippedChucuAccessory: isPendingOrFlushing('equippedChucuAccessory') ? state.equippedChucuAccessory : (data.equippedChucuAccessory !== undefined ? data.equippedChucuAccessory : state.equippedChucuAccessory),
+            showChucu: isPendingOrFlushing('showChucu') ? state.showChucu : (data.showChucu !== undefined ? data.showChucu : true),
+            ownedPassTickets: isPendingOrFlushing('ownedPassTickets') ? state.ownedPassTickets : (data.ownedPassTickets !== undefined ? data.ownedPassTickets : state.ownedPassTickets),
+            ownedPriorityTickets: isPendingOrFlushing('ownedPriorityTickets') ? state.ownedPriorityTickets : (data.ownedPriorityTickets !== undefined ? data.ownedPriorityTickets : state.ownedPriorityTickets),
+            ownedMysteryBoxes: isPendingOrFlushing('ownedMysteryBoxes') ? state.ownedMysteryBoxes : (data.ownedMysteryBoxes !== undefined ? data.ownedMysteryBoxes : state.ownedMysteryBoxes),
+            ownedStreakTickets: isPendingOrFlushing('ownedStreakTickets') ? state.ownedStreakTickets : (data.ownedStreakTickets !== undefined ? data.ownedStreakTickets : state.ownedStreakTickets),
+            ownedGachaTickets: isPendingOrFlushing('ownedGachaTickets') ? state.ownedGachaTickets : (data.ownedGachaTickets !== undefined ? data.ownedGachaTickets : state.ownedGachaTickets),
+            gachaPity5Star: isPendingOrFlushing('gachaPity5Star') ? state.gachaPity5Star : (data.gachaPity5Star !== undefined ? data.gachaPity5Star : state.gachaPity5Star),
+            gachaPity4Star: isPendingOrFlushing('gachaPity4Star') ? state.gachaPity4Star : (data.gachaPity4Star !== undefined ? data.gachaPity4Star : state.gachaPity4Star),
+            activeStreakProtection: isPendingOrFlushing('activeStreakProtection') ? state.activeStreakProtection : (data.activeStreakProtection !== undefined ? data.activeStreakProtection : state.activeStreakProtection),
+            lastFreeStreakRecoveryMonth: isPendingOrFlushing('lastFreeStreakRecoveryMonth') ? state.lastFreeStreakRecoveryMonth : (data.lastFreeStreakRecoveryMonth !== undefined ? data.lastFreeStreakRecoveryMonth : state.lastFreeStreakRecoveryMonth),
+            lastClaimedRewardLevel: isPendingOrFlushing('lastClaimedRewardLevel') ? state.lastClaimedRewardLevel : (data.lastClaimedRewardLevel !== undefined ? data.lastClaimedRewardLevel : (state.lastClaimedRewardLevel || data.level || state.level || 1)),
+            savedStories: isPendingOrFlushing('savedStories') ? state.savedStories : (data.savedStories !== undefined ? data.savedStories : state.savedStories),
+            unlockedPassChapters: isPendingOrFlushing('unlockedPassChapters') ? state.unlockedPassChapters : (data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters),
+            unlockedEarlyAccessChapters: isPendingOrFlushing('unlockedEarlyAccessChapters') ? state.unlockedEarlyAccessChapters : (data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters),
+            missions: isPendingOrFlushing('missions') ? state.missions : resolvedMissions,
+            storyProgress: isPendingOrFlushing('storyProgress') ? state.storyProgress : (data.storyProgress !== undefined ? data.storyProgress : state.storyProgress),
+            readHistoryList: isPendingOrFlushing('readHistoryList') ? state.readHistoryList : (data.readHistoryList !== undefined ? data.readHistoryList : state.readHistoryList),
+            chucuLevel: isPendingOrFlushing('chucuLevel') ? state.chucuLevel : (data.chucuLevel !== undefined ? data.chucuLevel : state.chucuLevel),
+            chucuExp: isPendingOrFlushing('chucuExp') ? state.chucuExp : (data.chucuExp !== undefined ? data.chucuExp : state.chucuExp),
+            chucuSatiety: isPendingOrFlushing('chucuSatiety') ? state.chucuSatiety : (data.chucuSatiety !== undefined ? data.chucuSatiety : state.chucuSatiety),
+            chucuHappiness: isPendingOrFlushing('chucuHappiness') ? state.chucuHappiness : (data.chucuHappiness !== undefined ? data.chucuHappiness : state.chucuHappiness),
+            chucuInteractions: isPendingOrFlushing('chucuInteractions') ? state.chucuInteractions : (data.chucuInteractions !== undefined ? data.chucuInteractions : state.chucuInteractions),
+            chucuPremiumFeeds: isPendingOrFlushing('chucuPremiumFeeds') ? state.chucuPremiumFeeds : (data.chucuPremiumFeeds !== undefined ? data.chucuPremiumFeeds : state.chucuPremiumFeeds),
+            chucuLastTime: isPendingOrFlushing('chucuLastTime') ? state.chucuLastTime : (data.chucuLastTime !== undefined ? data.chucuLastTime : state.chucuLastTime),
 
-            chucuGameFragments: data.chucuGameFragments !== undefined ? data.chucuGameFragments : state.chucuGameFragments,
-            chucuGameGFragments: data.chucuGameGFragments !== undefined ? data.chucuGameGFragments : state.chucuGameGFragments,
-            gachaFragments: data.gachaFragments !== undefined ? data.gachaFragments : state.gachaFragments,
-            chucuGameBonusPoints: data.chucuGameBonusPoints !== undefined ? data.chucuGameBonusPoints : state.chucuGameBonusPoints,
-            chucuGameMaxScore: data.chucuGameMaxScore !== undefined ? data.chucuGameMaxScore : (state.chucuGameMaxScore || 0),
-            chucuGamePlaysToday: data.chucuGamePlaysToday !== undefined ? data.chucuGamePlaysToday : state.chucuGamePlaysToday,
-            chucuGameLastPlayDate: data.chucuGameLastPlayDate !== undefined ? data.chucuGameLastPlayDate : state.chucuGameLastPlayDate,
+            chucuGameFragments: isPendingOrFlushing('chucuGameFragments') ? state.chucuGameFragments : (data.chucuGameFragments !== undefined ? data.chucuGameFragments : state.chucuGameFragments),
+            chucuGameGFragments: isPendingOrFlushing('chucuGameGFragments') ? state.chucuGameGFragments : (data.chucuGameGFragments !== undefined ? data.chucuGameGFragments : state.chucuGameGFragments),
+            gachaFragments: isPendingOrFlushing('gachaFragments') ? state.gachaFragments : (data.gachaFragments !== undefined ? data.gachaFragments : state.gachaFragments),
+            chucuGameBonusPoints: isPendingOrFlushing('chucuGameBonusPoints') ? state.chucuGameBonusPoints : (data.chucuGameBonusPoints !== undefined ? data.chucuGameBonusPoints : state.chucuGameBonusPoints),
+            chucuGameMaxScore: isPendingOrFlushing('chucuGameMaxScore') ? state.chucuGameMaxScore : (data.chucuGameMaxScore !== undefined ? data.chucuGameMaxScore : (state.chucuGameMaxScore || 0)),
+            chucuGamePlaysToday: isPendingOrFlushing('chucuGamePlaysToday') ? state.chucuGamePlaysToday : (data.chucuGamePlaysToday !== undefined ? data.chucuGamePlaysToday : state.chucuGamePlaysToday),
+            chucuGameLastPlayDate: isPendingOrFlushing('chucuGameLastPlayDate') ? state.chucuGameLastPlayDate : (data.chucuGameLastPlayDate !== undefined ? data.chucuGameLastPlayDate : state.chucuGameLastPlayDate),
 
-            chocoMatchLevel: data.chocoMatchLevel !== undefined ? data.chocoMatchLevel : state.chocoMatchLevel,
-            chocoMatchWinStreak: data.chocoMatchWinStreak !== undefined ? data.chocoMatchWinStreak : (state.chocoMatchWinStreak || 0),
-            chocoMatchHearts: data.chocoMatchHearts !== undefined ? data.chocoMatchHearts : state.chocoMatchHearts,
-            chocoMatchLastHeartTick: data.chocoMatchLastHeartTick !== undefined ? data.chocoMatchLastHeartTick : state.chocoMatchLastHeartTick,
+            chocoMatchLevel: isPendingOrFlushing('chocoMatchLevel') ? state.chocoMatchLevel : (data.chocoMatchLevel !== undefined ? data.chocoMatchLevel : state.chocoMatchLevel),
+            chocoMatchWinStreak: isPendingOrFlushing('chocoMatchWinStreak') ? state.chocoMatchWinStreak : (data.chocoMatchWinStreak !== undefined ? data.chocoMatchWinStreak : (state.chocoMatchWinStreak || 0)),
+            chocoMatchHearts: isPendingOrFlushing('chocoMatchHearts') ? state.chocoMatchHearts : (data.chocoMatchHearts !== undefined ? data.chocoMatchHearts : state.chocoMatchHearts),
+            chocoMatchLastHeartTick: isPendingOrFlushing('chocoMatchLastHeartTick') ? state.chocoMatchLastHeartTick : (data.chocoMatchLastHeartTick !== undefined ? data.chocoMatchLastHeartTick : state.chocoMatchLastHeartTick),
 
-            unlockedAchievements: mergedUnlocked,
-            claimedAchievements: mergedClaimed,
-            totalEarnedChoco: data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco,
-            totalEarnedGChoco: data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco,
-            totalSpentChoco: totalSpentChocoFallback,
-            totalGiftedChoco: data.totalGiftedChoco !== undefined ? data.totalGiftedChoco : (state.totalGiftedChoco || 0),
-            totalCheckIns: computedCheckIns !== undefined ? computedCheckIns : state.totalCheckIns,
-            perfectDailyDates: data.perfectDailyDates !== undefined ? data.perfectDailyDates : state.perfectDailyDates,
-            sentMessagesCount: data.sentMessagesCount !== undefined ? data.sentMessagesCount : state.sentMessagesCount,
-            totalChaptersRead: computedChapters,
-            totalCommentsCount: data.totalCommentsCount !== undefined ? data.totalCommentsCount : state.totalCommentsCount,
-            totalGachaPulls: totalGachaPullsFallback,
-            totalRadioSeconds: totalRadioSecondsFallback,
-            genresRead: data.genresRead !== undefined ? data.genresRead : state.genresRead,
-            activePoints: data.activePoints !== undefined ? data.activePoints : state.activePoints,
-            maxConsecutiveChocoCount: data.maxConsecutiveChocoCount !== undefined ? data.maxConsecutiveChocoCount : (state.maxConsecutiveChocoCount || 0),
-            totalChocoCaught: totalChocoCaughtFallback,
-            consecutiveGoldClears: data.consecutiveGoldClears !== undefined ? data.consecutiveGoldClears : (state.consecutiveGoldClears || 0),
-            consecutiveDodgeClears: data.consecutiveDodgeClears !== undefined ? data.consecutiveDodgeClears : (state.consecutiveDodgeClears || 0),
-            radioNightChillSeconds: data.radioNightChillSeconds !== undefined ? data.radioNightChillSeconds : (state.radioNightChillSeconds || 0),
+            unlockedAchievements: isPendingOrFlushing('unlockedAchievements') ? state.unlockedAchievements : mergedUnlocked,
+            claimedAchievements: isPendingOrFlushing('claimedAchievements') ? state.claimedAchievements : mergedClaimed,
+            totalEarnedChoco: isPendingOrFlushing('totalEarnedChoco') ? state.totalEarnedChoco : (data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco),
+            totalEarnedGChoco: isPendingOrFlushing('totalEarnedGChoco') ? state.totalEarnedGChoco : (data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco),
+            totalSpentChoco: isPendingOrFlushing('totalSpentChoco') ? state.totalSpentChoco : totalSpentChocoFallback,
+            totalGiftedChoco: isPendingOrFlushing('totalGiftedChoco') ? state.totalGiftedChoco : (data.totalGiftedChoco !== undefined ? data.totalGiftedChoco : (state.totalGiftedChoco || 0)),
+            totalCheckIns: isPendingOrFlushing('totalCheckIns') ? state.totalCheckIns : (computedCheckIns !== undefined ? computedCheckIns : state.totalCheckIns),
+            perfectDailyDates: isPendingOrFlushing('perfectDailyDates') ? state.perfectDailyDates : (data.perfectDailyDates !== undefined ? data.perfectDailyDates : state.perfectDailyDates),
+            sentMessagesCount: isPendingOrFlushing('sentMessagesCount') ? state.sentMessagesCount : (data.sentMessagesCount !== undefined ? data.sentMessagesCount : state.sentMessagesCount),
+            totalChaptersRead: isPendingOrFlushing('totalChaptersRead') ? state.totalChaptersRead : computedChapters,
+            totalCommentsCount: isPendingOrFlushing('totalCommentsCount') ? state.totalCommentsCount : (data.totalCommentsCount !== undefined ? data.totalCommentsCount : state.totalCommentsCount),
+            totalGachaPulls: isPendingOrFlushing('totalGachaPulls') ? state.totalGachaPulls : totalGachaPullsFallback,
+            totalRadioSeconds: isPendingOrFlushing('totalRadioSeconds') ? state.totalRadioSeconds : totalRadioSecondsFallback,
+            genresRead: isPendingOrFlushing('genresRead') ? state.genresRead : (data.genresRead !== undefined ? data.genresRead : state.genresRead),
+            activePoints: isPendingOrFlushing('activePoints') ? state.activePoints : (data.activePoints !== undefined ? data.activePoints : state.activePoints),
+            maxConsecutiveChocoCount: isPendingOrFlushing('maxConsecutiveChocoCount') ? state.maxConsecutiveChocoCount : (data.maxConsecutiveChocoCount !== undefined ? data.maxConsecutiveChocoCount : (state.maxConsecutiveChocoCount || 0)),
+            totalChocoCaught: isPendingOrFlushing('totalChocoCaught') ? state.totalChocoCaught : totalChocoCaughtFallback,
+            consecutiveGoldClears: isPendingOrFlushing('consecutiveGoldClears') ? state.consecutiveGoldClears : (data.consecutiveGoldClears !== undefined ? data.consecutiveGoldClears : (state.consecutiveGoldClears || 0)),
+            consecutiveDodgeClears: isPendingOrFlushing('consecutiveDodgeClears') ? state.consecutiveDodgeClears : (data.consecutiveDodgeClears !== undefined ? data.consecutiveDodgeClears : (state.consecutiveDodgeClears || 0)),
+            radioNightChillSeconds: isPendingOrFlushing('radioNightChillSeconds') ? state.radioNightChillSeconds : (data.radioNightChillSeconds !== undefined ? data.radioNightChillSeconds : (state.radioNightChillSeconds || 0)),
             radioTrackSeconds: data.radioTrackSeconds !== undefined ? data.radioTrackSeconds : (state.radioTrackSeconds || 0),
             maxRadioTrackSeconds: data.maxRadioTrackSeconds !== undefined ? data.maxRadioTrackSeconds : (state.maxRadioTrackSeconds || 0),
             heardRadioTracks: data.heardRadioTracks !== undefined ? data.heardRadioTracks : (state.heardRadioTracks || []),
@@ -1066,61 +1155,20 @@ export const useStore = create<UserState>()(
             }
          }
 
-         try {
-            const docUpdates: any = { ...updates };
-            delete docUpdates.$chocoDiff;
-            delete docUpdates.$gchocoDiff;
-            
-            // Hard delete obsolete fields permanently if they were accidentally requested in update
-            const obsolete = ['allUsersUnlockedAchievements', 'allUsersClaimedAchievements', 'allUsersMissions', 'allUsersStoryProgress', 'allUsersReadHistoryList', 'allUsersSavedStories', 'allUsersOwnedStickers', 'allUsersOwnedAccessories'];
-            obsolete.forEach(k => {
-                if (k in docUpdates) {
-                   docUpdates[k] = deleteField();
-                }
-            });
+         // Queue the updates to be flushed together
+         const updatesCopy = { ...updates };
+         delete updatesCopy.$chocoDiff;
+         delete updatesCopy.$gchocoDiff;
 
-            // Tối ưu hóa dung lượng: Chỉ lưu ID và tiến độ của các nhiệm vụ có tiến trình, hoàn thành hoặc đã nhận thưởng (giúp giảm >90% dung lượng mảng missions trên Firestore)
-            if (Array.isArray(docUpdates.missions)) {
-                docUpdates.missions = docUpdates.missions
-                   .filter((m: any) => m.progress > 0 || m.completed || m.claimed)
-                   .map((m: any) => ({
-                       id: m.id,
-                       progress: m.progress || 0,
-                       completed: m.completed || false,
-                       claimed: m.claimed || false
-                   }));
-            }
+         pendingUserUpdates = { ...pendingUserUpdates, ...updatesCopy };
 
-            // Tối ưu hóa dung lượng: Giới hạn lịch sử đọc tối đa 200 bộ truyện gần nhất để tránh phình dung lượng tài khoản qua thời gian
-            if (Array.isArray(docUpdates.readHistoryList)) {
-                if (docUpdates.readHistoryList.length > 200) {
-                    docUpdates.readHistoryList = docUpdates.readHistoryList.slice(0, 200);
-                }
-            }
-
-            // Tự động kiểm tra và phục hồi: nếu avatarUrl hiện tại quá lớn (>300KB Base64),
-            // ta sẽ đè lên bằng một phiên bản nén siêu nhỏ để cứu document khỏi giới hạn 1MB của Firestore.
-            const currentAvatarUrl = state.avatarUrl;
-            if (currentAvatarUrl && currentAvatarUrl.startsWith('data:image/') && currentAvatarUrl.length > 300000) {
-               const compressed = await compressBase64Image(currentAvatarUrl);
-               docUpdates.avatarUrl = compressed;
-               set({ avatarUrl: compressed });
-            }
-
-            // Nếu bản thân payload/updates chứa avatarUrl mới siêu lớn, nén ngay lập tức trước khi lưu
-            if (docUpdates.avatarUrl && docUpdates.avatarUrl.startsWith('data:image/') && docUpdates.avatarUrl.length > 300000) {
-               const compressed = await compressBase64Image(docUpdates.avatarUrl);
-               docUpdates.avatarUrl = compressed;
-               set({ avatarUrl: compressed });
-            }
-
-            await updateDoc(doc(db, 'users', uid), docUpdates);
-         } catch (err) {
-            console.error('Lỗi khi update user doc:', err);
-            if (checkIfQuotaError(err)) {
-               set({ isQuotaExceeded: true });
-            }
+         if (pendingUserUpdatesTimeout) {
+            clearTimeout(pendingUserUpdatesTimeout);
          }
+
+         pendingUserUpdatesTimeout = setTimeout(() => {
+            flushPendingUserUpdates(uid);
+         }, 50);
       },
       
       useMysteryBox: async () => {
