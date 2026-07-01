@@ -494,7 +494,7 @@ export function Store() {
   const handleBuyItem = (
     name: string,
     price: number,
-    type: "choco" | "golden",
+    type: "choco" | "golden" | string,
     effect?: () => void,
   ) => {
     if (!isLoggedIn) {
@@ -502,16 +502,18 @@ export function Store() {
       return;
     }
 
-    if (type === "choco") {
-      if (spendChoco(price, `Mua ${name}`)) {
-        if (effect) effect();
-        alert(`Đã mua ${name}!`);
-      } else alert(`Không đủ Choco (Cần ${price})`);
-    } else {
-      if (spendGoldenChoco(price, `Mua ${name}`)) {
+    const normalizedType = String(type).trim().toLowerCase();
+
+    if (normalizedType === "golden") {
+      if (spendGoldenChoco(Number(price), `Mua ${name}`)) {
         if (effect) effect();
         alert(`Đã mua ${name}!`);
       } else alert(`Không đủ Gchoco (Cần ${price})`);
+    } else {
+      if (spendChoco(Number(price), `Mua ${name}`)) {
+        if (effect) effect();
+        alert(`Đã mua ${name}!`);
+      } else alert(`Không đủ Choco (Cần ${price})`);
     }
   };
 
@@ -528,7 +530,7 @@ export function Store() {
 
     handleBuyItem(sticker.name, sticker.price, sticker.type, () => {
       addOwnedSticker(sticker.url);
-      equipSticker(sticker.type as any, sticker.url);
+      equipSticker('comment', sticker.url);
       alert(`Bạn đã mua và tự động trang bị ${sticker.name}!`);
     });
   };
