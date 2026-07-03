@@ -24,11 +24,9 @@ async function run() {
     txs.push({ id: doc.id, ...doc.data() });
   });
 
-  console.log('Transactions with amount >= 10000:');
+  console.log('All Transactions:');
   txs.forEach((t) => {
-    if (t.amount >= 10000) {
-      console.log(`- [${t.currency}] ${t.type} ${t.amount} choco. Reason: "${t.reason}". BalanceAfter: ${t.balanceAfter}`);
-    }
+    console.log(`- [${t.currency}] ${t.type} ${t.amount} choco. Reason: "${t.reason}". BalanceAfter: ${t.balanceAfter}`);
   });
 
   process.exit(0);
