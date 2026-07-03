@@ -844,6 +844,9 @@ export const useStore = create<UserState>()(
             let resolvedMissions = reconcileMissions(rawMissions, data);
 
             resolvedMissions = resolvedMissions.map(m => {
+               if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && m.id.startsWith('p_spend_')) {
+                  return { ...m, progress: 50, completed: false, claimed: false };
+               }
                if (m.id === 'd1') {
                   const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
                   const isCheckedInToday = (data.lastCheckInDate || state.lastCheckInDate) === todayStr;
@@ -891,15 +894,27 @@ export const useStore = create<UserState>()(
             totalRadioSecondsFallback = Math.max(totalRadioSecondsFallback, prevNightChill + prevMaxTrack);
 
             // Bù đắp tiêu Choco = số Choco đã tiêu + (số GChoco đã tiêu * 3)
-            const getEarnedTotalC = Math.max(data.totalEarnedChoco || 0, state.totalEarnedChoco || 0);
+            let getEarnedTotalC = Math.max(data.totalEarnedChoco || 0, state.totalEarnedChoco || 0);
+            if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && getEarnedTotalC > 900000) {
+                getEarnedTotalC = Math.max(19950, getEarnedTotalC - 978661);
+            }
             const getCurrentC = data.choco !== undefined ? data.choco : (state.choco || 0);
-            const getEarnedTotalG = Math.max(data.totalEarnedGChoco || 0, state.totalEarnedGChoco || 0);
+            let getEarnedTotalG = Math.max(data.totalEarnedGChoco || 0, state.totalEarnedGChoco || 0);
+            if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && getEarnedTotalG > 90000) {
+                getEarnedTotalG = Math.max(17, getEarnedTotalG - 100000);
+            }
             const getCurrentG = data.goldenChoco !== undefined ? data.goldenChoco : (state.goldenChoco || 0);
             let totalSpentChocoFallback = Math.max(data.totalSpentChoco || 0, state.totalSpentChoco || 0);
+            if (data.email?.toLowerCase() === 'cucnau01@gmail.com') {
+                totalSpentChocoFallback = 50;
+            }
             const spentGChocoApprox = Math.max(0, getEarnedTotalG - getCurrentG);
             const spentChocoApprox = Math.max(0, getEarnedTotalC - getCurrentC);
             if (totalSpentChocoFallback < spentChocoApprox + (spentGChocoApprox * 3)) {
                 totalSpentChocoFallback = Math.max(totalSpentChocoFallback, spentChocoApprox + (spentGChocoApprox * 3));
+            }
+            if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && totalSpentChocoFallback > 100) {
+                totalSpentChocoFallback = 50;
             }
 
             // Bù đắp Hứng Choco (nếu trước kia chưa lưu totalChocoCaught)
@@ -978,11 +993,17 @@ export const useStore = create<UserState>()(
             let claimedTiersChanged = false;
             const finalClaimedPermanentTiers = { ...(data.claimedPermanentTiers || {}) };
             categories.forEach(cat => {
-                const calculatedTier = resolvedClaimedPermanentTiers[cat] || 0;
+                let calculatedTier = resolvedClaimedPermanentTiers[cat] || 0;
                 const dbTier = data.claimedPermanentTiers?.[cat] || 0;
-                if (calculatedTier > dbTier) {
-                   finalClaimedPermanentTiers[cat] = calculatedTier;
-                   claimedTiersChanged = true;
+                if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && cat === 'spend') {
+                    calculatedTier = 0;
+                    if (calculatedTier !== dbTier) {
+                        finalClaimedPermanentTiers[cat] = calculatedTier;
+                        claimedTiersChanged = true;
+                    }
+                } else if (calculatedTier > dbTier) {
+                    finalClaimedPermanentTiers[cat] = calculatedTier;
+                    claimedTiersChanged = true;
                 }
             });
 
@@ -996,6 +1017,13 @@ export const useStore = create<UserState>()(
                ...(Array.isArray(state.claimedAchievements) ? state.claimedAchievements : [])
             ]));
 
+            if (data.email?.toLowerCase() === 'cucnau01@gmail.com') {
+               const hasCompletedSpend = (data.missions || []).some((m: any) => m.id.startsWith('p_spend_') && (m.completed || m.progress !== 50));
+               if (hasCompletedSpend) {
+                  missionsChanged = true;
+               }
+            }
+
             const writeBack: any = {};
             if (totalGachaPullsFallback > (data.totalGachaPulls || 0)) {
                writeBack.totalGachaPulls = totalGachaPullsFallback;
@@ -1003,7 +1031,19 @@ export const useStore = create<UserState>()(
             if (totalRadioSecondsFallback > (data.totalRadioSeconds || 0)) {
                writeBack.totalRadioSeconds = totalRadioSecondsFallback;
             }
-            if (totalSpentChocoFallback > (data.totalSpentChoco || 0)) {
+            if (data.email?.toLowerCase() === 'cucnau01@gmail.com') {
+               if (totalSpentChocoFallback !== (data.totalSpentChoco || 0)) {
+                  writeBack.totalSpentChoco = totalSpentChocoFallback;
+               }
+               const finalEarnedC = Math.max(19950, (data.totalEarnedChoco || 0) > 900000 ? (data.totalEarnedChoco || 0) - 978661 : (data.totalEarnedChoco || 0));
+               const finalEarnedG = Math.max(17, (data.totalEarnedGChoco || 0) > 90000 ? (data.totalEarnedGChoco || 0) - 100000 : (data.totalEarnedGChoco || 0));
+               if (finalEarnedC !== (data.totalEarnedChoco || 0)) {
+                  writeBack.totalEarnedChoco = finalEarnedC;
+               }
+               if (finalEarnedG !== (data.totalEarnedGChoco || 0)) {
+                  writeBack.totalEarnedGChoco = finalEarnedG;
+               }
+            } else if (totalSpentChocoFallback > (data.totalSpentChoco || 0)) {
                writeBack.totalSpentChoco = totalSpentChocoFallback;
             }
             if (totalChocoCaughtFallback > (data.totalChocoCaught || 0)) {
@@ -1110,8 +1150,20 @@ export const useStore = create<UserState>()(
 
             unlockedAchievements: isPendingOrFlushing('unlockedAchievements') ? state.unlockedAchievements : mergedUnlocked,
             claimedAchievements: isPendingOrFlushing('claimedAchievements') ? state.claimedAchievements : mergedClaimed,
-            totalEarnedChoco: isPendingOrFlushing('totalEarnedChoco') ? state.totalEarnedChoco : (data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco),
-            totalEarnedGChoco: isPendingOrFlushing('totalEarnedGChoco') ? state.totalEarnedGChoco : (data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco),
+            totalEarnedChoco: isPendingOrFlushing('totalEarnedChoco') ? state.totalEarnedChoco : (() => {
+                const val = (data.totalEarnedChoco !== undefined ? data.totalEarnedChoco : state.totalEarnedChoco);
+                if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && val > 900000) {
+                    return Math.max(19950, val - 978661);
+                }
+                return val;
+            })(),
+            totalEarnedGChoco: isPendingOrFlushing('totalEarnedGChoco') ? state.totalEarnedGChoco : (() => {
+                const val = (data.totalEarnedGChoco !== undefined ? data.totalEarnedGChoco : state.totalEarnedGChoco);
+                if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && val > 90000) {
+                    return Math.max(17, val - 100000);
+                }
+                return val;
+            })(),
             totalSpentChoco: isPendingOrFlushing('totalSpentChoco') ? state.totalSpentChoco : totalSpentChocoFallback,
             totalGiftedChoco: isPendingOrFlushing('totalGiftedChoco') ? state.totalGiftedChoco : (data.totalGiftedChoco !== undefined ? data.totalGiftedChoco : (state.totalGiftedChoco || 0)),
             totalCheckIns: isPendingOrFlushing('totalCheckIns') ? state.totalCheckIns : (computedCheckIns !== undefined ? computedCheckIns : state.totalCheckIns),
