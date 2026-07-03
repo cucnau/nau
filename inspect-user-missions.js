@@ -21,19 +21,19 @@ async function run() {
 
   snapshot.forEach(doc => {
     const data = doc.data();
+    console.log("Email:", data.email);
+    console.log("Choco:", data.choco);
+    console.log("Golden Choco:", data.goldenChoco);
+    console.log("Total Earned Choco:", data.totalEarnedChoco);
+    console.log("Total Spent Choco:", data.totalSpentChoco);
+    console.log("Claimed Permanent Tiers:", data.claimedPermanentTiers);
+    console.log("Unlocked Achievements Count:", data.unlockedAchievements?.length || 0);
+    console.log("Unlocked Achievements:", data.unlockedAchievements);
+    console.log("Claimed Achievements:", data.claimedAchievements);
+    
     const dbMissions = data.missions || [];
-    
-    const pSpends = dbMissions.filter(m => m.id.startsWith('p_spend_'));
-    console.log(`Total p_spend missions in DB: ${pSpends.length}`);
-    
-    // Sort them by tier number
-    pSpends.sort((a, b) => {
-      const numA = parseInt(a.id.split('_')[2], 10);
-      const numB = parseInt(b.id.split('_')[2], 10);
-      return numA - numB;
-    });
-
-    pSpends.forEach(m => {
+    console.log(`Total missions in DB: ${dbMissions.length}`);
+    dbMissions.forEach(m => {
       console.log(`- ID: ${m.id}, completed: ${m.completed}, claimed: ${m.claimed}, progress: ${m.progress}`);
     });
   });
