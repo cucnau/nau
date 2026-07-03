@@ -484,6 +484,28 @@ export const getWeeklyId = (): string => {
   return `${d.getFullYear()}-W${weekNo}`;
 };
 
+export const getWeeklyIdOfDateString = (dateStr: string): string => {
+  try {
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      const day = parseInt(parts[2], 10);
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+        const d = new Date(year, month - 1, day, 12, 0, 0);
+        d.setHours(0, 0, 0, 0);
+        d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+        const yearStart = new Date(d.getFullYear(), 0, 1);
+        const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+        return `${d.getFullYear()}-W${weekNo}`;
+      }
+    }
+  } catch (e) {
+    console.error('Error in getWeeklyIdOfDateString:', e);
+  }
+  return '';
+};
+
 export const getPreviousWeeklyId = (): string => {
   const d = getGMT7Date();
   d.setDate(d.getDate() - 7);
