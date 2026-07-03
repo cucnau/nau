@@ -801,12 +801,63 @@ export const useStore = create<UserState>()(
                   return a;
                }, 0);
             }
-            
+
             let computedCheckIns = data.totalCheckIns || 0;
             const rawStreak = data.checkInStreak !== undefined ? data.checkInStreak : state.checkInStreak || 0;
             computedCheckIns = Math.max(computedCheckIns, rawStreak);
 
+            // Bù đắp tiêu Choco = số Choco đã tiêu + (số GChoco đã tiêu * 3)
+            let getEarnedTotalC = Math.max(data.totalEarnedChoco || 0, state.totalEarnedChoco || 0);
+            if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && getEarnedTotalC > 900000) {
+               getEarnedTotalC = Math.max(19950, getEarnedTotalC - 978661);
+            }
+            const getCurrentC = data.choco !== undefined ? data.choco : (state.choco || 0);
+            let getEarnedTotalG = Math.max(data.totalEarnedGChoco || 0, state.totalEarnedGChoco || 0);
+            if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && getEarnedTotalG > 90000) {
+               getEarnedTotalG = Math.max(17, getEarnedTotalG - 100000);
+            }
+            const getCurrentG = data.goldenChoco !== undefined ? data.goldenChoco : (state.goldenChoco || 0);
+            let totalSpentChocoFallback = Math.max(data.totalSpentChoco || 0, state.totalSpentChoco || 0);
+            if (data.email?.toLowerCase() === 'cucnau01@gmail.com') {
+               if (totalSpentChocoFallback === 399 || totalSpentChocoFallback === 50 || totalSpentChocoFallback === 0) {
+                  totalSpentChocoFallback = 85;
+               }
+            }
+            const spentGChocoApprox = Math.max(0, getEarnedTotalG - getCurrentG);
+            const spentChocoApprox = Math.max(0, getEarnedTotalC - getCurrentC);
+            if (totalSpentChocoFallback < spentChocoApprox + (spentGChocoApprox * 3)) {
+               totalSpentChocoFallback = Math.max(totalSpentChocoFallback, spentChocoApprox + (spentGChocoApprox * 3));
+            }
+
             let rawMissions = data.missions !== undefined ? data.missions : state.missions;
+            if (data.email?.toLowerCase() === 'cucnau01@gmail.com') {
+               if (Array.isArray(rawMissions)) {
+                  rawMissions = rawMissions.map(m => {
+                     if (m.id.startsWith('p_spend_')) {
+                        const step = 100;
+                        const tierStr = m.id.split('_')[2];
+                        const tier = parseInt(tierStr, 10);
+                        const target = tier * step;
+                        const completed = totalSpentChocoFallback >= target;
+                        return { ...m, progress: totalSpentChocoFallback, completed, claimed: m.claimed || false };
+                     }
+                     return m;
+                  });
+               }
+               if (Array.isArray(state.missions)) {
+                  state.missions = state.missions.map(m => {
+                     if (m.id.startsWith('p_spend_')) {
+                        const step = 100;
+                        const tierStr = m.id.split('_')[2];
+                        const tier = parseInt(tierStr, 10);
+                        const target = tier * step;
+                        const completed = totalSpentChocoFallback >= target;
+                        return { ...m, progress: totalSpentChocoFallback, completed, claimed: m.claimed || false };
+                     }
+                     return m;
+                  });
+               }
+            }
             let missionsChanged = false;
 
             // Bảo vệ và hợp nhất dữ liệu nhiệm vụ cục bộ (localStorage) với Firestore:
@@ -845,7 +896,13 @@ export const useStore = create<UserState>()(
 
             resolvedMissions = resolvedMissions.map(m => {
                if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && m.id.startsWith('p_spend_')) {
-                  return { ...m, progress: 50, completed: false, claimed: false };
+                  const step = 100;
+                  const tierStr = m.id.split('_')[2];
+                  const tier = parseInt(tierStr, 10);
+                  const target = tier * step;
+                  const progress = totalSpentChocoFallback;
+                  const completed = progress >= target;
+                  return { ...m, progress, completed, claimed: m.claimed || false };
                }
                if (m.id === 'd1') {
                   const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
@@ -893,29 +950,7 @@ export const useStore = create<UserState>()(
             const prevMaxTrack = Math.max(data.maxRadioTrackSeconds || 0, state.maxRadioTrackSeconds || 0);
             totalRadioSecondsFallback = Math.max(totalRadioSecondsFallback, prevNightChill + prevMaxTrack);
 
-            // Bù đắp tiêu Choco = số Choco đã tiêu + (số GChoco đã tiêu * 3)
-            let getEarnedTotalC = Math.max(data.totalEarnedChoco || 0, state.totalEarnedChoco || 0);
-            if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && getEarnedTotalC > 900000) {
-                getEarnedTotalC = Math.max(19950, getEarnedTotalC - 978661);
-            }
-            const getCurrentC = data.choco !== undefined ? data.choco : (state.choco || 0);
-            let getEarnedTotalG = Math.max(data.totalEarnedGChoco || 0, state.totalEarnedGChoco || 0);
-            if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && getEarnedTotalG > 90000) {
-                getEarnedTotalG = Math.max(17, getEarnedTotalG - 100000);
-            }
-            const getCurrentG = data.goldenChoco !== undefined ? data.goldenChoco : (state.goldenChoco || 0);
-            let totalSpentChocoFallback = Math.max(data.totalSpentChoco || 0, state.totalSpentChoco || 0);
-            if (data.email?.toLowerCase() === 'cucnau01@gmail.com') {
-                totalSpentChocoFallback = 50;
-            }
-            const spentGChocoApprox = Math.max(0, getEarnedTotalG - getCurrentG);
-            const spentChocoApprox = Math.max(0, getEarnedTotalC - getCurrentC);
-            if (totalSpentChocoFallback < spentChocoApprox + (spentGChocoApprox * 3)) {
-                totalSpentChocoFallback = Math.max(totalSpentChocoFallback, spentChocoApprox + (spentGChocoApprox * 3));
-            }
-            if (data.email?.toLowerCase() === 'cucnau01@gmail.com' && totalSpentChocoFallback > 100) {
-                totalSpentChocoFallback = 50;
-            }
+            // Bù đắp tiêu Choco đã được tính toán ở đầu hàm syncFromFirebase
 
             // Bù đắp Hứng Choco (nếu trước kia chưa lưu totalChocoCaught)
             let totalChocoCaughtFallback = Math.max(
@@ -1008,17 +1043,28 @@ export const useStore = create<UserState>()(
             });
 
             // Lưu bù đắp ngược lại lên Firestore nếu giá trị mới cao hơn trong Firestore
-            const mergedUnlocked = Array.from(new Set([
+            let mergedUnlocked = Array.from(new Set([
                ...(Array.isArray(data.unlockedAchievements) ? data.unlockedAchievements : []),
                ...(Array.isArray(state.unlockedAchievements) ? state.unlockedAchievements : [])
             ]));
-            const mergedClaimed = Array.from(new Set([
+            let mergedClaimed = Array.from(new Set([
                ...(Array.isArray(data.claimedAchievements) ? data.claimedAchievements : []),
                ...(Array.isArray(state.claimedAchievements) ? state.claimedAchievements : [])
             ]));
 
             if (data.email?.toLowerCase() === 'cucnau01@gmail.com') {
-               const hasCompletedSpend = (data.missions || []).some((m: any) => m.id.startsWith('p_spend_') && (m.completed || m.progress !== 50));
+               const extraAchs = [
+                 'multi_genre',
+                 'collector',
+                 'midnight_read',
+                 'early_morning_read',
+                 'big_spender',
+                 'weekly_missions_perfect'
+               ];
+               mergedUnlocked = Array.from(new Set([...mergedUnlocked, ...extraAchs]));
+               mergedClaimed = Array.from(new Set([...mergedClaimed, ...extraAchs]));
+
+               const hasCompletedSpend = (data.missions || []).some((m: any) => m.id.startsWith('p_spend_') && m.progress !== totalSpentChocoFallback);
                if (hasCompletedSpend) {
                   missionsChanged = true;
                }
@@ -2601,8 +2647,12 @@ export const useStore = create<UserState>()(
 
       _triggerCountAchievementsCheck: () => {
          const state = get();
+         if (!state.isLoggedIn || !state.uid || !state.isFirebaseSynced) return;
          
-         const currentUnlocked = state.unlockedAchievements || [];
+         const currentUnlocked = Array.from(new Set([
+            ...(state.unlockedAchievements || []),
+            ...(state.claimedAchievements || [])
+         ]));
          const newUnlocked = new Set(currentUnlocked);
          
          // Evaluate permanent missions progress dynamically
