@@ -4,7 +4,7 @@ import { format, differenceInDays } from 'date-fns';
 import { User as FirebaseUser } from 'firebase/auth';
 import { db, checkIfQuotaError } from './lib/firebase';
 import { doc, updateDoc, getDocs, collection, query, where, orderBy, limit, writeBatch, addDoc, deleteField } from 'firebase/firestore';
-import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement, getGMT7Date } from './types/achievements';
+import { getWeeklyId, getPreviousWeeklyId, ACHIEVEMENTS_LIST, Achievement, getGMT7Date, getWeeklyIdOfDateString } from './types/achievements';
 import { logTransaction } from './lib/transactions';
 import { addStoryFire } from './lib/storyFire';
 
@@ -818,11 +818,7 @@ export const useStore = create<UserState>()(
             }
             const getCurrentG = data.goldenChoco !== undefined ? data.goldenChoco : (state.goldenChoco || 0);
             let totalSpentChocoFallback = Math.max(data.totalSpentChoco || 0, state.totalSpentChoco || 0);
-            if (data.email?.toLowerCase() === 'cucnau01@gmail.com') {
-               if (totalSpentChocoFallback === 399 || totalSpentChocoFallback === 50 || totalSpentChocoFallback === 0) {
-                  totalSpentChocoFallback = 85;
-               }
-            }
+            
             const spentGChocoApprox = Math.max(0, getEarnedTotalG - getCurrentG);
             const spentChocoApprox = Math.max(0, getEarnedTotalC - getCurrentC);
             if (totalSpentChocoFallback < spentChocoApprox + (spentGChocoApprox * 3)) {
@@ -2804,7 +2800,20 @@ export const useStore = create<UserState>()(
          }
 
          // 2. Check Weekly Reset (00:00 Sunday -> Monday)
-         if (!state.lastWeeklyResetId || state.lastWeeklyResetId !== currentWeekId) {
+         let isWeeklyResetNeeded = false;
+         if (state.lastWeeklyResetId) {
+            isWeeklyResetNeeded = state.lastWeeklyResetId !== currentWeekId;
+         } else if (state.lastDailyResetDate) {
+            // Fallback: If lastWeeklyResetId is empty/null, use the week ID of lastDailyResetDate
+            // to deduce if we are still in the same week, preventing accidental resets.
+            const estimatedWeekId = getWeeklyIdOfDateString(state.lastDailyResetDate);
+            isWeeklyResetNeeded = estimatedWeekId && estimatedWeekId !== currentWeekId;
+         } else {
+            // Both empty -> New account, do not reset weekly missions
+            isWeeklyResetNeeded = false;
+         }
+
+         if (isWeeklyResetNeeded) {
             console.log('Weekly reset triggered, resetting weekly missions');
             nextMissions = nextMissions.map(m => {
                if (m.type === 'weekly') {
@@ -2812,6 +2821,10 @@ export const useStore = create<UserState>()(
                }
                return m;
             });
+            nextWeeklyResetId = currentWeekId;
+            changed = true;
+         } else if (!state.lastWeeklyResetId) {
+            // Silently save the current week ID to Firestore without resetting the missions
             nextWeeklyResetId = currentWeekId;
             changed = true;
          }
