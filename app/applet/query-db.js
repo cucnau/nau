@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc } from "firebase/firestore";
 import fs from "fs";
 
 const configPath = "firebase-applet-config.json";
@@ -14,12 +14,19 @@ const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 
 async function run() {
   const usersRef = collection(db, 'users');
-  const q = query(usersRef, orderBy('chucuGameMaxScore', 'desc'), limit(10));
-  const snap = await getDocs(q);
-  console.log("TOP CHUCU GAME USERS:");
+  const snap = await getDocs(usersRef);
+  
+  console.log("ALL REGISTERED USERS IN DATABASE:");
   snap.forEach(doc => {
     const data = doc.data();
-    console.log(`ID: ${doc.id}, Name: ${data.displayName}, Email: ${data.email}, Score: ${data.chucuGameMaxScore}`);
+    console.log(`Email: ${data.email} | Name: ${data.displayName} | Score: ${data.chucuGameMaxScore} | Choco: ${data.choco}`);
+    if (data.email?.toLowerCase() === 'cucnau01@gmail.com') {
+      console.log("--- ADMIN DETAIL ---");
+      console.log(`UID: ${doc.id}`);
+      console.log(`totalChaptersRead: ${data.totalChaptersRead}`);
+      console.log(`storyProgress:`, JSON.stringify(data.storyProgress));
+      console.log(`missions count: ${data.missions?.length || 0}`);
+    }
   });
   
   process.exit(0);
