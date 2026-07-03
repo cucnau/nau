@@ -106,6 +106,7 @@ interface UserState {
   unlockedPassChapters: string[]; // chapterIds
   unlockedEarlyAccessChapters: string[]; // chapterIds
   firebaseUser: FirebaseUser | null;
+  claimedPermanentTiers?: Record<string, number>;
   
   isQuotaExceeded: boolean;
   setQuotaExceeded: (exceeded: boolean) => void;
@@ -305,60 +306,59 @@ export const getWeeklyMissions = (): Mission[] => [
 
 export const getPermanentMissions = (state: Partial<UserState> = {}): Mission[] => {
    const res: Mission[] = [];
-   const highestTiers: Record<string, number> = {
-       checkin: 20, read: 20, level: 10, chocomatchlvl: 100, comm: 20, gacha: 20, catch: 20, radio: 20, spend: 20
-   };
+   const claimedTiers: Record<string, number> = { ...(state?.claimedPermanentTiers || {}) };
 
-   if (state.missions && Array.isArray(state.missions)) {
+   if (state?.missions && Array.isArray(state.missions)) {
        state.missions.forEach(m => {
-           if (m.type === 'permanent') {
+           if (m.type === 'permanent' && m.claimed) {
                const parts = m.id.split('_');
                if (parts.length === 3 && parts[0] === 'p') {
                    const cat = parts[1];
                    const tier = parseInt(parts[2], 10);
-                   if (!isNaN(tier) && highestTiers[cat] !== undefined) {
-                       highestTiers[cat] = Math.max(highestTiers[cat], m.completed ? tier + 2 : tier);
+                   if (!isNaN(tier)) {
+                       claimedTiers[cat] = Math.max(claimedTiers[cat] || 0, tier);
                    }
                }
            }
        });
    }
 
-   highestTiers.checkin = Math.min(10000, Math.max(highestTiers.checkin, Math.ceil(Math.max(state.totalCheckIns || 0, state.checkInStreak || 0) / 30) + 2));
-   highestTiers.read = Math.min(10000, Math.max(highestTiers.read, Math.ceil((state.totalChaptersRead || 0) / 50) + 2));
-   highestTiers.level = Math.min(10000, Math.max(highestTiers.level, Math.ceil((state.level || 1) / 10) + 2));
-   highestTiers.chocomatchlvl = Math.min(10000, Math.max(highestTiers.chocomatchlvl, Math.ceil(Math.max(0, (state.chocoMatchLevel || 1) - 1) / 100) + 2));
-   highestTiers.comm = Math.min(10000, Math.max(highestTiers.comm, Math.ceil((state.totalCommentsCount || 0) / 50) + 2));
-   highestTiers.gacha = Math.min(10000, Math.max(highestTiers.gacha, Math.ceil((state.totalGachaPulls || 0) / 50) + 2));
-   highestTiers.catch = Math.min(10000, Math.max(highestTiers.catch, Math.ceil((state.totalChocoCaught || 0) / 1000) + 2));
-   highestTiers.radio = Math.min(10000, Math.max(highestTiers.radio, Math.ceil(Math.floor((state.totalRadioSeconds || 0) / 60) / 60) + 2));
-   highestTiers.spend = Math.min(10000, Math.max(highestTiers.spend, Math.ceil((state.totalSpentChoco || 0) / 100) + 2));
+   const checkinStart = (claimedTiers.checkin || 0) + 1;
+   const readStart = (claimedTiers.read || 0) + 1;
+   const levelStart = (claimedTiers.level || 0) + 1;
+   const chocomatchlvlStart = (claimedTiers.chocomatchlvl || 0) + 1;
+   const commStart = (claimedTiers.comm || 0) + 1;
+   const gachaStart = (claimedTiers.gacha || 0) + 1;
+   const catchStart = (claimedTiers.catch || 0) + 1;
+   const radioStart = (claimedTiers.radio || 0) + 1;
+   const spendStart = (claimedTiers.spend || 0) + 1;
 
-   for (let i = 1; i <= highestTiers.checkin; i++) {
+   // Generate next 10 upcoming tiers for each category to provide limitless infinite progression
+   for (let i = checkinStart; i < checkinStart + 10; i++) {
        res.push({ id: `p_checkin_${i}`, type: 'permanent', description: `Điểm danh ${i * 30} ngày`, chocoReward: i * 30, goldenReward: i * 3, progress: 0, target: i * 30, completed: false, claimed: false });
    }
-   for (let i = 1; i <= highestTiers.read; i++) {
+   for (let i = readStart; i < readStart + 10; i++) {
        res.push({ id: `p_read_${i}`, type: 'permanent', description: `Đọc ${i * 50} chương truyện`, chocoReward: i * 50, goldenReward: i * 5, progress: 0, target: i * 50, completed: false, claimed: false });
    }
-   for (let i = 1; i <= highestTiers.level; i++) {
+   for (let i = levelStart; i < levelStart + 10; i++) {
        res.push({ id: `p_level_${i}`, type: 'permanent', description: `Đạt level ${i * 10}`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 10, completed: false, claimed: false });
    }
-   for (let i = 1; i <= highestTiers.chocomatchlvl; i++) {
+   for (let i = chocomatchlvlStart; i < chocomatchlvlStart + 10; i++) {
        res.push({ id: `p_chocomatchlvl_${i}`, type: 'permanent', description: `Vượt qua level ${i * 100} trên Sông Choco`, chocoReward: i * 100, goldenReward: i * 10, progress: 0, target: i * 100, completed: false, claimed: false });
    }
-   for (let i = 1; i <= highestTiers.comm; i++) {
+   for (let i = commStart; i < commStart + 10; i++) {
        res.push({ id: `p_comm_${i}`, type: 'permanent', description: `Bình luận truyện ${i * 50} lần`, chocoReward: i * 50, goldenReward: i * 5, progress: 0, target: i * 50, completed: false, claimed: false });
    }
-   for (let i = 1; i <= highestTiers.gacha; i++) {
+   for (let i = gachaStart; i < gachaStart + 10; i++) {
        res.push({ id: `p_gacha_${i}`, type: 'permanent', description: `Gacha tổng cộng ${i * 50} lần`, chocoReward: i * 50, goldenReward: i * 5, progress: 0, target: i * 50, completed: false, claimed: false });
    }
-   for (let i = 1; i <= highestTiers.catch; i++) {
+   for (let i = catchStart; i < catchStart + 10; i++) {
        res.push({ id: `p_catch_${i}`, type: 'permanent', description: `Hứng chính xác ${i * 1000} viên Choco trong game Hứng Choco`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 1000, completed: false, claimed: false });
    }
-   for (let i = 1; i <= highestTiers.radio; i++) {
+   for (let i = radioStart; i < radioStart + 10; i++) {
        res.push({ id: `p_radio_${i}`, type: 'permanent', description: `Nghe choco radio tổng cộng ${i * 60} phút`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 60, completed: false, claimed: false });
    }
-   for (let i = 1; i <= highestTiers.spend; i++) {
+   for (let i = spendStart; i < spendStart + 10; i++) {
        res.push({ id: `p_spend_${i}`, type: 'permanent', description: `Tiêu tổng cộng ${i * 100} Choco`, chocoReward: i * 10, goldenReward: i * 1, progress: 0, target: i * 100, completed: false, claimed: false });
    }
    return res;
@@ -427,7 +427,11 @@ const flushPendingUserUpdates = async (uid: string) => {
    // Tối ưu hóa dung lượng: Chỉ lưu ID và tiến độ của các nhiệm vụ có tiến trình, hoàn thành hoặc đã nhận thưởng (giúp giảm >90% dung lượng mảng missions trên Firestore)
    if (Array.isArray(docUpdates.missions)) {
        docUpdates.missions = docUpdates.missions
-          .filter((m: any) => m.progress > 0 || m.completed || m.claimed)
+          .filter((m: any) => {
+              const isPermanentClaimed = (m.type === 'permanent' || m.id.startsWith('p_')) && m.claimed;
+              if (isPermanentClaimed) return false;
+              return m.progress > 0 || m.completed || m.claimed;
+          })
           .map((m: any) => ({
               id: m.id,
               progress: m.progress || 0,
@@ -780,9 +784,22 @@ export const useStore = create<UserState>()(
              if (data.ownedAccessories !== undefined) newAllAccessories[uid] = data.ownedAccessories;
 
             let computedChapters = data.totalChaptersRead;
-            if (computedChapters === undefined || computedChapters === 0) {
+            if (computedChapters === undefined || computedChapters === 0 || computedChapters > 100000) {
                const prog = data.storyProgress || state.storyProgress || {};
-               computedChapters = Object.values(prog).reduce((a: any, b: any) => a + (Array.isArray(b) ? b.length : (typeof b === 'number' ? b : 0)), 0);
+               const cleanProg: Record<string, any> = {};
+               Object.entries(prog).forEach(([key, val]) => {
+                  if (key !== 'lastReadTime' && key !== 'updatedAt' && key !== 'lastUpdated' && key !== 'timestamp' && key.length > 5) {
+                     cleanProg[key] = val;
+                  }
+               });
+               computedChapters = Object.values(cleanProg).reduce((a: any, b: any) => {
+                  if (Array.isArray(b)) {
+                     return a + b.length;
+                  } else if (typeof b === 'number' && b < 10000) {
+                     return a + b;
+                  }
+                  return a;
+               }, 0);
             }
             
             let computedCheckIns = data.totalCheckIns || 0;
@@ -1005,6 +1022,7 @@ export const useStore = create<UserState>()(
             unlockedPassChapters: isPendingOrFlushing('unlockedPassChapters') ? state.unlockedPassChapters : (data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters),
             unlockedEarlyAccessChapters: isPendingOrFlushing('unlockedEarlyAccessChapters') ? state.unlockedEarlyAccessChapters : (data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters),
             missions: isPendingOrFlushing('missions') ? state.missions : resolvedMissions,
+            claimedPermanentTiers: isPendingOrFlushing('claimedPermanentTiers') ? state.claimedPermanentTiers : (data.claimedPermanentTiers !== undefined ? data.claimedPermanentTiers : state.claimedPermanentTiers),
             storyProgress: isPendingOrFlushing('storyProgress') ? state.storyProgress : (data.storyProgress !== undefined ? data.storyProgress : state.storyProgress),
             readHistoryList: isPendingOrFlushing('readHistoryList') ? state.readHistoryList : (data.readHistoryList !== undefined ? data.readHistoryList : state.readHistoryList),
             chucuLevel: isPendingOrFlushing('chucuLevel') ? state.chucuLevel : (data.chucuLevel !== undefined ? data.chucuLevel : state.chucuLevel),
@@ -1423,7 +1441,7 @@ export const useStore = create<UserState>()(
         const prevProgress = state.storyProgress[storyId];
         let currentArray: number[] = [];
         if (typeof prevProgress === 'number') {
-           if (prevProgress > 0) {
+           if (prevProgress > 0 && prevProgress < 10000) {
               currentArray = Array.from({length: prevProgress}, (_, i) => i + 1);
            }
         } else if (Array.isArray(prevProgress)) {
@@ -1690,6 +1708,20 @@ export const useStore = create<UserState>()(
           const m = ms.find(x => x.id === id);
           if (m && m.completed && !m.claimed) {
               m.claimed = true;
+              
+              // If it's a permanent mission, update the claimedPermanentTiers!
+              const newClaimedPermanentTiers = { ...(state.claimedPermanentTiers || {}) };
+              if (m.type === 'permanent') {
+                  const parts = m.id.split('_');
+                  if (parts.length === 3 && parts[0] === 'p') {
+                      const cat = parts[1];
+                      const tier = parseInt(parts[2], 10);
+                      if (!isNaN(tier)) {
+                          newClaimedPermanentTiers[cat] = Math.max(newClaimedPermanentTiers[cat] || 0, tier);
+                      }
+                  }
+              }
+
               const newChoco = state.choco + m.chocoReward;
               const newGolden = state.goldenChoco + m.goldenReward;
               const newTotalEarnedC = (state.totalEarnedChoco || 0) + m.chocoReward;
@@ -1707,7 +1739,8 @@ export const useStore = create<UserState>()(
                  goldenChoco: newGolden,
                  totalEarnedChoco: newTotalEarnedC,
                  totalEarnedGChoco: newTotalEarnedG,
-                 allUsersMissions: allMs
+                 allUsersMissions: allMs,
+                 claimedPermanentTiers: newClaimedPermanentTiers
               });
               
               const updates: any = {
@@ -1717,9 +1750,10 @@ export const useStore = create<UserState>()(
                  $gchocoDiff: m.goldenReward,
                  totalEarnedChoco: newTotalEarnedC,
                  totalEarnedGChoco: newTotalEarnedG,
-                 missions: ms
+                 missions: ms,
+                 claimedPermanentTiers: newClaimedPermanentTiers
               };
-              get().updateUserDoc(updates, `Nhận thưởng nhiệm vụ: ${m.id} - ${m.description}`);
+              get().updateUserDoc(updates, "Nhận thưởng nhiệm vụ: " + m.id + " - " + m.description);
               
               setTimeout(() => {
                  get()._triggerCountAchievementsCheck();
@@ -1734,6 +1768,7 @@ export const useStore = create<UserState>()(
           let totalGoldenAdded = 0;
           let claimedAny = false;
           const claimedDescriptions: string[] = [];
+          const newClaimedPermanentTiers = { ...(state.claimedPermanentTiers || {}) };
 
           for (const m of ms) {
               if (m.completed && !m.claimed) {
@@ -1742,6 +1777,17 @@ export const useStore = create<UserState>()(
                   totalGoldenAdded += m.goldenReward;
                   claimedAny = true;
                   claimedDescriptions.push(m.description);
+
+                  if (m.type === 'permanent') {
+                      const parts = m.id.split('_');
+                      if (parts.length === 3 && parts[0] === 'p') {
+                          const cat = parts[1];
+                          const tier = parseInt(parts[2], 10);
+                          if (!isNaN(tier)) {
+                              newClaimedPermanentTiers[cat] = Math.max(newClaimedPermanentTiers[cat] || 0, tier);
+                          }
+                      }
+                  }
               }
           }
 
@@ -1763,7 +1809,8 @@ export const useStore = create<UserState>()(
                  goldenChoco: newGolden,
                  totalEarnedChoco: newTotalEarnedC,
                  totalEarnedGChoco: newTotalEarnedG,
-                 allUsersMissions: allMs
+                 allUsersMissions: allMs,
+                 claimedPermanentTiers: newClaimedPermanentTiers
               });
               
               const updates: any = {
@@ -1773,9 +1820,48 @@ export const useStore = create<UserState>()(
                  $gchocoDiff: totalGoldenAdded,
                  totalEarnedChoco: newTotalEarnedC,
                  totalEarnedGChoco: newTotalEarnedG,
-                 missions: ms
+                 missions: ms,
+                 claimedPermanentTiers: newClaimedPermanentTiers
               };
-              get().updateUserDoc(updates, `Nhận tất cả thưởng nhiệm vụ: ${claimedDescriptions.join(', ')}`);
+              if (uid) {
+
+                 let runningChoco = state.choco;
+
+                 let runningGolden = state.goldenChoco;
+
+                 for (const m of ms) {
+
+                    const isNewlyClaimed = m.completed && m.claimed && !state.missions.find(oldM => oldM.id === m.id)?.claimed;
+
+                    if (isNewlyClaimed) {
+
+                       runningChoco += m.chocoReward;
+
+                       runningGolden += m.goldenReward;
+
+                       if (m.chocoReward > 0) {
+
+                          logTransaction(uid, m.chocoReward, 'choco', 'earn', `Nhận thưởng nhiệm vụ: ${m.id} - ${m.description}`, runningChoco);
+
+                       }
+
+                       if (m.goldenReward > 0) {
+
+                          logTransaction(uid, m.goldenReward, 'gchoco', 'earn', `Nhận thưởng nhiệm vụ: ${m.id} - ${m.description}`, runningGolden);
+
+                       }
+
+                    }
+
+                 }
+
+              }
+
+              delete updates.$chocoDiff;
+
+              delete updates.$gchocoDiff;
+
+              get().updateUserDoc(updates, undefined);
               
               setTimeout(() => {
                  get()._triggerCountAchievementsCheck();
