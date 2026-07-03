@@ -927,6 +927,65 @@ export const useStore = create<UserState>()(
                 state.chucuGameFragments || 0
             );
 
+            // Khôi phục claimedPermanentTiers tự động cho người dùng cũ để tránh bị hiện bắt nhận lại các tier đã claim trước đây
+            const resolvedClaimedPermanentTiers = data.claimedPermanentTiers !== undefined ? { ...data.claimedPermanentTiers } : {};
+            const categories = ['checkin', 'read', 'level', 'chocomatchlvl', 'comm', 'gacha', 'catch', 'radio', 'spend'];
+            const stepSizes = {
+                checkin: 30,
+                read: 50,
+                level: 10,
+                chocomatchlvl: 100,
+                comm: 50,
+                gacha: 50,
+                catch: 1000,
+                radio: 60,
+                spend: 100
+            };
+
+            const currentProgressValues = {
+                checkin: Math.max(data.totalCheckIns || 0, state.totalCheckIns || 0, rawStreak),
+                read: computedChapters || 0,
+                level: Math.max(data.level || 1, state.level || 1),
+                chocomatchlvl: Math.max((data.chocoMatchLevel || 1) - 1, (state.chocoMatchLevel || 1) - 1, 0),
+                comm: data.totalCommentsCount !== undefined ? data.totalCommentsCount : (state.totalCommentsCount || 0),
+                gacha: totalGachaPullsFallback || 0,
+                catch: totalChocoCaughtFallback || 0,
+                radio: Math.floor((totalRadioSecondsFallback || 0) / 60),
+                spend: totalSpentChocoFallback || 0
+            };
+
+            const loadedMissionsArr = Array.isArray(rawMissions) ? rawMissions : [];
+
+            categories.forEach(cat => {
+                const currentVal = currentProgressValues[cat] || 0;
+                const step = stepSizes[cat];
+                let highestClaimed = resolvedClaimedPermanentTiers[cat] || 0;
+
+                const maxPossibleTier = Math.floor(currentVal / step);
+                for (let i = 1; i <= maxPossibleTier; i++) {
+                   const missionId = `p_${cat}_${i}`;
+                   // Nếu một tier đủ điều kiện đạt nhưng KHÔNG nằm trong mảng missions của Firestore ở trạng thái completed mà chưa claim
+                   // điều đó chứng minh nó đã được claim từ trước và đã bị filter xóa đi.
+                   const foundInDbAndNotClaimed = loadedMissionsArr.find(m => m.id === missionId && !m.claimed && m.completed);
+                   if (!foundInDbAndNotClaimed) {
+                      highestClaimed = Math.max(highestClaimed, i);
+                   }
+                }
+                resolvedClaimedPermanentTiers[cat] = highestClaimed;
+            });
+
+            // So sánh xem có sự thay đổi (tăng tier đã claim) so với Firestore db hay không
+            let claimedTiersChanged = false;
+            const finalClaimedPermanentTiers = { ...(data.claimedPermanentTiers || {}) };
+            categories.forEach(cat => {
+                const calculatedTier = resolvedClaimedPermanentTiers[cat] || 0;
+                const dbTier = data.claimedPermanentTiers?.[cat] || 0;
+                if (calculatedTier > dbTier) {
+                   finalClaimedPermanentTiers[cat] = calculatedTier;
+                   claimedTiersChanged = true;
+                }
+            });
+
             // Lưu bù đắp ngược lại lên Firestore nếu giá trị mới cao hơn trong Firestore
             const mergedUnlocked = Array.from(new Set([
                ...(Array.isArray(data.unlockedAchievements) ? data.unlockedAchievements : []),
@@ -964,11 +1023,14 @@ export const useStore = create<UserState>()(
                writeBack.exp = state.exp;
             }
             if (data.lastClaimedRewardLevel === undefined) {
-               writeBack.lastClaimedRewardLevel = state.lastClaimedRewardLevel || data.level || state.level || 1;
-            } else if (state.lastClaimedRewardLevel > data.lastClaimedRewardLevel) {
-               writeBack.lastClaimedRewardLevel = state.lastClaimedRewardLevel;
-            }
-            if (Object.keys(writeBack).length > 0) {
+                writeBack.lastClaimedRewardLevel = state.lastClaimedRewardLevel || data.level || state.level || 1;
+             } else if (state.lastClaimedRewardLevel > data.lastClaimedRewardLevel) {
+                writeBack.lastClaimedRewardLevel = state.lastClaimedRewardLevel;
+             }
+             if (claimedTiersChanged) {
+                writeBack.claimedPermanentTiers = finalClaimedPermanentTiers;
+             }
+             if (Object.keys(writeBack).length > 0) {
                setTimeout(() => {
                    get().updateUserDoc(writeBack);
                }, 100);
@@ -1022,7 +1084,7 @@ export const useStore = create<UserState>()(
             unlockedPassChapters: isPendingOrFlushing('unlockedPassChapters') ? state.unlockedPassChapters : (data.unlockedPassChapters !== undefined ? data.unlockedPassChapters : state.unlockedPassChapters),
             unlockedEarlyAccessChapters: isPendingOrFlushing('unlockedEarlyAccessChapters') ? state.unlockedEarlyAccessChapters : (data.unlockedEarlyAccessChapters !== undefined ? data.unlockedEarlyAccessChapters : state.unlockedEarlyAccessChapters),
             missions: isPendingOrFlushing('missions') ? state.missions : resolvedMissions,
-            claimedPermanentTiers: isPendingOrFlushing('claimedPermanentTiers') ? state.claimedPermanentTiers : (data.claimedPermanentTiers !== undefined ? data.claimedPermanentTiers : state.claimedPermanentTiers),
+            claimedPermanentTiers: isPendingOrFlushing('claimedPermanentTiers') ? state.claimedPermanentTiers : finalClaimedPermanentTiers,
             storyProgress: isPendingOrFlushing('storyProgress') ? state.storyProgress : (data.storyProgress !== undefined ? data.storyProgress : state.storyProgress),
             readHistoryList: isPendingOrFlushing('readHistoryList') ? state.readHistoryList : (data.readHistoryList !== undefined ? data.readHistoryList : state.readHistoryList),
             chucuLevel: isPendingOrFlushing('chucuLevel') ? state.chucuLevel : (data.chucuLevel !== undefined ? data.chucuLevel : state.chucuLevel),
