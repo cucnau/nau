@@ -254,108 +254,115 @@ export function Admin() {
       const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() as any }));
       setRestorationLogs(prev => [...prev, `Tìm thấy ${users.length} thành viên.`]);
 
-      // Tải các banner gacha để phân loại độ hiếm nhãn dán
-      const bannersSnap = await getDocs(collection(db, "gacha_banners"));
-      const banners = bannersSnap.docs.map(doc => doc.data() as any);
       const stickerRarities = new Map<string, number>();
-      banners.forEach(b => {
-        if (b.pool5Star) {
-          b.pool5Star.forEach((item: any) => {
+      if (mode === "achievements") {
+        // Tải các banner gacha để phân loại độ hiếm nhãn dán
+        const bannersSnap = await getDocs(collection(db, "gacha_banners"));
+        const banners = bannersSnap.docs.map(doc => doc.data() as any);
+        banners.forEach(b => {
+          if (b.pool5Star) {
+            b.pool5Star.forEach((item: any) => {
+              if (item.image) stickerRarities.set(item.image, 5);
+            });
+          }
+          if (b.featured5Star) {
+            const item = b.featured5Star;
             if (item.image) stickerRarities.set(item.image, 5);
-          });
-        }
-        if (b.featured5Star) {
-          const item = b.featured5Star;
-          if (item.image) stickerRarities.set(item.image, 5);
-        }
-        if (b.pool4Star) {
-          b.pool4Star.forEach((item: any) => {
-            if (item.image) stickerRarities.set(item.image, 4);
-          });
-        }
-        if (b.featured4Stars) {
-          b.featured4Stars.forEach((item: any) => {
-            if (item.image) stickerRarities.set(item.image, 4);
-          });
-        }
-      });
-
-      // Tải các vật phẩm Gacha để bổ sung chính xác độ hiếm nhãn dán
-      try {
-        const gachaItemsSnap = await getDocs(collection(db, "gacha_items"));
-        gachaItemsSnap.docs.forEach(doc => {
-          const item = doc.data();
-          if (item.image && item.rarity) {
-            stickerRarities.set(item.image, Number(item.rarity));
+          }
+          if (b.pool4Star) {
+            b.pool4Star.forEach((item: any) => {
+              if (item.image) stickerRarities.set(item.image, 4);
+            });
+          }
+          if (b.featured4Stars) {
+            b.featured4Stars.forEach((item: any) => {
+              if (item.image) stickerRarities.set(item.image, 4);
+            });
           }
         });
-      } catch (gachaItemsErr) {
-        console.warn("Không thể tải bổ sung danh sách gacha_items:", gachaItemsErr);
+
+        // Tải các vật phẩm Gacha để bổ sung chính xác độ hiếm nhãn dán
+        try {
+          const gachaItemsSnap = await getDocs(collection(db, "gacha_items"));
+          gachaItemsSnap.docs.forEach(doc => {
+            const item = doc.data();
+            if (item.image && item.rarity) {
+              stickerRarities.set(item.image, Number(item.rarity));
+            }
+          });
+        } catch (gachaItemsErr) {
+          console.warn("Không thể tải bổ sung danh sách gacha_items:", gachaItemsErr);
+        }
       }
 
-      // Tải các vật phẩm trong cửa hàng để truy quét giá trị tài sản đang sở hữu
-      const storeStickersSnap = await getDocs(collection(db, "store_stickers"));
-      const storeAccessoriesSnap = await getDocs(collection(db, "store_accessories"));
-      const storeChucuAccessoriesSnap = await getDocs(collection(db, "store_chucu_accessories"));
-
       const stickerPrices = new Map<string, { price: number; currency: string }>();
-      storeStickersSnap.docs.forEach(doc => {
-        const data = doc.data();
-        if (data.url) {
-          stickerPrices.set(data.url, { 
-            price: Number(data.price) || 0, 
-            currency: (data.type || 'choco').toLowerCase() 
-          });
-        }
-      });
-
       const accessoryPrices = new Map<string, { price: number; currency: string }>();
-      storeAccessoriesSnap.docs.forEach(doc => {
-        const data = doc.data();
-        if (data.url) {
-          accessoryPrices.set(data.url, { 
-            price: Number(data.price) || 0, 
-            currency: (data.type || 'choco').toLowerCase() 
-          });
-        }
-      });
-
       const chucuAccessoryPrices = new Map<string, { price: number; currency: string }>();
-      storeChucuAccessoriesSnap.docs.forEach(doc => {
-        const data = doc.data();
-        const key = data.url || data.id;
-        if (key) {
-          chucuAccessoryPrices.set(key, { 
-            price: Number(data.price) || 0, 
-            currency: (data.type || 'choco').toLowerCase() 
+      const storeStickersByName = new Map<string, string>();
+      const storeAccessoriesByName = new Map<string, string>();
+      const storeChucuAccessoriesByName = new Map<string, string>();
+
+      if (mode === "stickers" || mode === "choco") {
+        // Tải các vật phẩm trong cửa hàng để truy quét giá trị tài sản đang sở hữu
+        const storeStickersSnap = await getDocs(collection(db, "store_stickers"));
+        const storeAccessoriesSnap = await getDocs(collection(db, "store_accessories"));
+        const storeChucuAccessoriesSnap = await getDocs(collection(db, "store_chucu_accessories"));
+
+        storeStickersSnap.docs.forEach(doc => {
+          const data = doc.data();
+          if (data.url) {
+            stickerPrices.set(data.url, { 
+              price: Number(data.price) || 0, 
+              currency: (data.type || 'choco').toLowerCase() 
+            });
+          }
+        });
+
+        storeAccessoriesSnap.docs.forEach(doc => {
+          const data = doc.data();
+          if (data.url) {
+            accessoryPrices.set(data.url, { 
+              price: Number(data.price) || 0, 
+              currency: (data.type || 'choco').toLowerCase() 
+            });
+          }
+        });
+
+        storeChucuAccessoriesSnap.docs.forEach(doc => {
+          const data = doc.data();
+          const key = data.url || data.id;
+          if (key) {
+            chucuAccessoryPrices.set(key, { 
+              price: Number(data.price) || 0, 
+              currency: (data.type || 'choco').toLowerCase() 
+            });
+          }
+        });
+
+        if (mode === "stickers") {
+          storeStickersSnap.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.name && data.url) {
+              storeStickersByName.set(data.name.trim().toLowerCase(), data.url);
+            }
+          });
+
+          storeAccessoriesSnap.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.name && data.url) {
+              storeAccessoriesByName.set(data.name.trim().toLowerCase(), data.url);
+            }
+          });
+
+          storeChucuAccessoriesSnap.docs.forEach(doc => {
+            const data = doc.data();
+            const key = data.url || data.id;
+            if (data.name && key) {
+              storeChucuAccessoriesByName.set(data.name.trim().toLowerCase(), key);
+            }
           });
         }
-      });
-
-      const storeStickersByName = new Map<string, string>();
-      storeStickersSnap.docs.forEach(doc => {
-        const data = doc.data();
-        if (data.name && data.url) {
-          storeStickersByName.set(data.name.trim().toLowerCase(), data.url);
-        }
-      });
-
-      const storeAccessoriesByName = new Map<string, string>();
-      storeAccessoriesSnap.docs.forEach(doc => {
-        const data = doc.data();
-        if (data.name && data.url) {
-          storeAccessoriesByName.set(data.name.trim().toLowerCase(), data.url);
-        }
-      });
-
-      const storeChucuAccessoriesByName = new Map<string, string>();
-      storeChucuAccessoriesSnap.docs.forEach(doc => {
-        const data = doc.data();
-        const key = data.url || data.id;
-        if (data.name && key) {
-          storeChucuAccessoriesByName.set(data.name.trim().toLowerCase(), key);
-        }
-      });
+      }
 
       const presetChucuAccessoriesByName = new Map<string, string>([
         ["vương miện hoàng gia", "chucu_acc_crown"],
@@ -586,34 +593,36 @@ export function Admin() {
         let spentChocoFromAssets = 0;
         let spentGChocoFromAssets = 0;
 
-        currentStickerUrls.forEach(url => {
-          const asset = stickerPrices.get(url);
-          if (asset) {
-            if (asset.currency === 'gchoco') spentGChocoFromAssets += asset.price;
-            else spentChocoFromAssets += asset.price;
-          }
-        });
+        if (mode === "stickers") {
+          currentStickerUrls.forEach(url => {
+            const asset = stickerPrices.get(url);
+            if (asset) {
+              if (asset.currency === 'gchoco') spentGChocoFromAssets += asset.price;
+              else spentChocoFromAssets += asset.price;
+            }
+          });
 
-        currentAccessoryUrls.forEach(url => {
-          const asset = accessoryPrices.get(url);
-          if (asset) {
-            if (asset.currency === 'gchoco') spentGChocoFromAssets += asset.price;
-            else spentChocoFromAssets += asset.price;
-          }
-        });
+          currentAccessoryUrls.forEach(url => {
+            const asset = accessoryPrices.get(url);
+            if (asset) {
+              if (asset.currency === 'gchoco') spentGChocoFromAssets += asset.price;
+              else spentChocoFromAssets += asset.price;
+            }
+          });
 
-        const ownedChucuAccs = Array.isArray(u.ownedChucuAccessories) ? u.ownedChucuAccessories : [];
-        ownedChucuAccs.forEach((accKey: string) => {
-          const asset = chucuAccessoryPrices.get(accKey);
-          if (asset) {
-            if (asset.currency === 'gchoco') spentGChocoFromAssets += asset.price;
-            else spentChocoFromAssets += asset.price;
-          }
-        });
+          const ownedChucuAccs = Array.isArray(u.ownedChucuAccessories) ? u.ownedChucuAccessories : [];
+          ownedChucuAccs.forEach((accKey: string) => {
+            const asset = chucuAccessoryPrices.get(accKey);
+            if (asset) {
+              if (asset.currency === 'gchoco') spentGChocoFromAssets += asset.price;
+              else spentChocoFromAssets += asset.price;
+            }
+          });
 
-        // Điều chỉnh calculatedSpentChoco/GChoco theo giá trị tài sản sở hữu thực tế để không bị thiếu hụt chi tiêu do mất giao dịch
-        calculatedSpentChoco = Math.max(calculatedSpentChoco, spentChocoFromAssets);
-        calculatedSpentGChoco = Math.max(calculatedSpentGChoco, spentGChocoFromAssets);
+          // Điều chỉnh calculatedSpentChoco/GChoco theo giá trị tài sản sở hữu thực tế để không bị thiếu hụt chi tiêu do mất giao dịch
+          calculatedSpentChoco = Math.max(calculatedSpentChoco, spentChocoFromAssets);
+          calculatedSpentGChoco = Math.max(calculatedSpentGChoco, spentGChocoFromAssets);
+        }
 
         const uChoco = u.choco || 0;
         const uGChoco = u.goldenChoco || 0;
@@ -689,243 +698,252 @@ export function Admin() {
           }
         }
 
-        // Compute check-in streak dynamically from dates
-        const sortedCheckInDates = Array.from(checkInDates).sort().reverse();
         let calculatedStreak = u.checkInStreak || 0;
-        
-        if (sortedCheckInDates.length > 0) {
-          const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
-          const yesterdayStr = format(new Date(getGMT7Date().getTime() - 24*60*60*1000), 'yyyy-MM-dd');
-          
-          let startStr = "";
-          if (sortedCheckInDates.includes(todayStr)) {
-            startStr = todayStr;
-          } else if (sortedCheckInDates.includes(yesterdayStr)) {
-            startStr = yesterdayStr;
-          }
-          
-          if (startStr !== "") {
-            let tempStreak = 0;
-            let currentCheck = new Date(startStr + 'T00:00:00Z');
-            while (true) {
-              const checkStr = format(currentCheck, 'yyyy-MM-dd');
-              if (sortedCheckInDates.includes(checkStr)) {
-                tempStreak++;
-                currentCheck = new Date(currentCheck.getTime() - 24*60*60*1000);
-              } else {
-                break;
-              }
-            }
-            calculatedStreak = Math.max(u.checkInStreak || 0, tempStreak);
-          }
-        }
-
-        // Reconstruct EXP and Level
-        const totalCheckIns = Math.max(u.totalCheckIns || 0, checkInDates.size);
-        const totalChaptersRead = u.totalChaptersRead || 0;
-        const totalComments = u.totalCommentsCount || 0;
-        const currentUnlockedAchievementsCount = (u.unlockedAchievements || []).length;
-        
-        // Est: 10 exp check-in, 3 exp reading, 5 exp comment, 30 exp achievements
-        const totalEstimatedExp = (totalCheckIns * 10) + (totalChaptersRead * 3) + (totalComments * 5) + (currentUnlockedAchievementsCount * 30);
-        
-        let calculatedLevel = 1;
-        let remainingExp = totalEstimatedExp;
-        while (true) {
-          const expNeeded = calculatedLevel * 100;
-          if (remainingExp >= expNeeded) {
-             remainingExp -= expNeeded;
-             calculatedLevel++;
-          } else {
-             break;
-          }
-        }
-        
-        if ((u.level || 1) > calculatedLevel) {
-          calculatedLevel = u.level || 1;
-          remainingExp = u.exp || 0;
-        }
-
+        let totalCheckIns = u.totalCheckIns || 0;
+        let calculatedLevel = u.level || 1;
+        let remainingExp = u.exp || 0;
+        let reconstructedTotalPulls = u.totalGachaPulls || 0;
+        let calculatedPity5 = u.gachaPity5Star !== undefined && u.gachaPity5Star !== null ? u.gachaPity5Star : 0;
+        let calculatedPity4 = u.gachaPity4Star !== undefined && u.gachaPity4Star !== null ? u.gachaPity4Star : 0;
+        let totalEstimatedExp = u.exp || 0;
+        let ticketsFromTxs = 0;
         const mergedUnlocked = new Set<string>(Array.isArray(u.unlockedAchievements) ? u.unlockedAchievements : []);
         const mergedClaimed = new Set<string>(Array.isArray(u.claimedAchievements) ? u.claimedAchievements : []);
 
-        // Determine sticker and accessory gaps
         const missingStickerUrlsToRestore = [...txBoughtStickerUrls].filter(url => !currentStickerUrls.has(url));
         const missingAccessoryUrlsToRestore = [...txBoughtAccessoryUrls].filter(url => !currentAccessoryUrls.has(url));
         const missingChucuAccessoryUrlsToRestore = [...txBoughtChucuAccessoryUrls].filter(url => !currentChucuAccessoryUrls.has(url));
 
-        // Tái dựng số lượng Vé Gacha đã sử dụng từ lịch sử giao dịch mua vé
-        let ticketsFromTxs = 0;
-        sortedTxs.forEach(t => {
-          const desc = t.description || t.reason || "";
-          if (desc.includes("Vé Gacha") || desc.includes("Gacha")) {
-            const match = desc.match(/(?:Mua|Đổi\s+sang|Đổi|Tặng)\s*(\d+)/i) || desc.match(/(\d+)\s*Vé/i);
-            if (match) {
-              ticketsFromTxs += parseInt(match[1], 10);
+        if (mode === "achievements") {
+          // Compute check-in streak dynamically from dates
+          const sortedCheckInDates = Array.from(checkInDates).sort().reverse();
+          
+          if (sortedCheckInDates.length > 0) {
+            const todayStr = format(getGMT7Date(), 'yyyy-MM-dd');
+            const yesterdayStr = format(new Date(getGMT7Date().getTime() - 24*60*60*1000), 'yyyy-MM-dd');
+            
+            let startStr = "";
+            if (sortedCheckInDates.includes(todayStr)) {
+              startStr = todayStr;
+            } else if (sortedCheckInDates.includes(yesterdayStr)) {
+              startStr = yesterdayStr;
+            }
+            
+            if (startStr !== "") {
+              let tempStreak = 0;
+              let currentCheck = new Date(startStr + 'T00:00:00Z');
+              while (true) {
+                const checkStr = format(currentCheck, 'yyyy-MM-dd');
+                if (sortedCheckInDates.includes(checkStr)) {
+                  tempStreak++;
+                  currentCheck = new Date(currentCheck.getTime() - 24*60*60*1000);
+                } else {
+                  break;
+                }
+              }
+              calculatedStreak = Math.max(u.checkInStreak || 0, tempStreak);
             }
           }
-        });
 
-        // Tái dựng Bảo hiểm Gacha (Pity) theo trình tự thời gian nhận nhãn dán
-        const sortedStickersWithRarity = stickersSnap.docs
-          .map(doc => {
-            const data = doc.data();
-            const url = data.url || "";
-            const rarity = stickerRarities.get(url) || 3; // Mặc định là 3 sao
-            
-            let time = 0;
-            if (data.createdAt) {
-              if (typeof data.createdAt.toMillis === 'function') {
-                time = data.createdAt.toMillis();
-              } else if (data.createdAt.seconds !== undefined) {
-                time = data.createdAt.seconds * 1000;
-              } else {
-                time = new Date(data.createdAt).getTime() || 0;
+          // Reconstruct EXP and Level
+          totalCheckIns = Math.max(u.totalCheckIns || 0, checkInDates.size);
+          const totalChaptersRead = u.totalChaptersRead || 0;
+          const totalComments = u.totalCommentsCount || 0;
+          const currentUnlockedAchievementsCount = (u.unlockedAchievements || []).length;
+          
+          // Est: 10 exp check-in, 3 exp reading, 5 exp comment, 30 exp achievements
+          totalEstimatedExp = (totalCheckIns * 10) + (totalChaptersRead * 3) + (totalComments * 5) + (currentUnlockedAchievementsCount * 30);
+          
+          calculatedLevel = 1;
+          remainingExp = totalEstimatedExp;
+          while (true) {
+            const expNeeded = calculatedLevel * 100;
+            if (remainingExp >= expNeeded) {
+               remainingExp -= expNeeded;
+               calculatedLevel++;
+            } else {
+               break;
+            }
+          }
+          
+          if ((u.level || 1) > calculatedLevel) {
+            calculatedLevel = u.level || 1;
+            remainingExp = u.exp || 0;
+          }
+
+          // Tái dựng số lượng Vé Gacha đã sử dụng từ lịch sử giao dịch mua vé
+          ticketsFromTxs = 0;
+          sortedTxs.forEach(t => {
+            const desc = t.description || t.reason || "";
+            if (desc.includes("Vé Gacha") || desc.includes("Gacha")) {
+              const match = desc.match(/(?:Mua|Đổi\s+sang|Đổi|Tặng)\s*(\d+)/i) || desc.match(/(\d+)\s*Vé/i);
+              if (match) {
+                ticketsFromTxs += parseInt(match[1], 10);
               }
             }
-            return { url, rarity, time };
-          })
-          .sort((a, b) => a.time - b.time);
+          });
 
-        const maxPullsFromTxs = Math.max(0, ticketsFromTxs - (u.ownedGachaTickets || 0));
-        const minPullsFromStickers = sortedStickersWithRarity.length;
-        const reconstructedTotalPulls = Math.max(u.totalGachaPulls || 0, maxPullsFromTxs, minPullsFromStickers);
+          // Tái dựng Bảo hiểm Gacha (Pity) theo trình tự thời gian nhận nhãn dán
+          const sortedStickersWithRarity = stickersSnap.docs
+            .map((doc: any) => {
+              const data = doc.data();
+              const url = data.url || "";
+              const rarity = stickerRarities.get(url) || 3; // Mặc định là 3 sao
+              
+              let time = 0;
+              if (data.createdAt) {
+                if (typeof data.createdAt.toMillis === 'function') {
+                  time = data.createdAt.toMillis();
+                } else if (data.createdAt.seconds !== undefined) {
+                  time = data.createdAt.seconds * 1000;
+                } else {
+                  time = new Date(data.createdAt).getTime() || 0;
+                }
+              }
+              return { url, rarity, time };
+            })
+            .sort((a: any, b: any) => a.time - b.time);
 
-        let calculatedPity5 = u.gachaPity5Star !== undefined && u.gachaPity5Star !== null ? u.gachaPity5Star : -1;
-        let calculatedPity4 = u.gachaPity4Star !== undefined && u.gachaPity4Star !== null ? u.gachaPity4Star : -1;
-        const totalPulls = reconstructedTotalPulls;
-        const totalUniqueStickers = sortedStickersWithRarity.length;
-        
-        // Tái dựng Bảo hiểm 5⭐ từ lịch sử nhãn dán nếu chưa có
-        if (calculatedPity5 === -1) {
-          if (totalPulls > 0) {
-            if (totalUniqueStickers > 0) {
-              const last5StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(5);
-              if (last5StarIndex === -1) {
-                calculatedPity5 = totalPulls;
+          const maxPullsFromTxs = Math.max(0, ticketsFromTxs - (u.ownedGachaTickets || 0));
+          const minPullsFromStickers = sortedStickersWithRarity.length;
+          reconstructedTotalPulls = Math.max(u.totalGachaPulls || 0, maxPullsFromTxs, minPullsFromStickers);
+
+          calculatedPity5 = u.gachaPity5Star !== undefined && u.gachaPity5Star !== null ? u.gachaPity5Star : -1;
+          calculatedPity4 = u.gachaPity4Star !== undefined && u.gachaPity4Star !== null ? u.gachaPity4Star : -1;
+          const totalPulls = reconstructedTotalPulls;
+          const totalUniqueStickers = sortedStickersWithRarity.length;
+          
+          // Tái dựng Bảo hiểm 5⭐ từ lịch sử nhãn dán nếu chưa có
+          if (calculatedPity5 === -1) {
+            if (totalPulls > 0) {
+              if (totalUniqueStickers > 0) {
+                const last5StarIndex = sortedStickersWithRarity.map((s: any) => s.rarity).lastIndexOf(5);
+                if (last5StarIndex === -1) {
+                  calculatedPity5 = totalPulls;
+                } else {
+                  const stickersAfterLast5 = sortedStickersWithRarity.slice(last5StarIndex + 1);
+                  const uniqueCountAfterLast5 = stickersAfterLast5.length;
+                  const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+                  const estimatedPullsAfterLast5 = Math.round(uniqueCountAfterLast5 * pullsPerUniqueSticker);
+                  calculatedPity5 = Math.max(uniqueCountAfterLast5, estimatedPullsAfterLast5);
+                }
               } else {
-                const stickersAfterLast5 = sortedStickersWithRarity.slice(last5StarIndex + 1);
-                const uniqueCountAfterLast5 = stickersAfterLast5.length;
-                const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
-                const estimatedPullsAfterLast5 = Math.round(uniqueCountAfterLast5 * pullsPerUniqueSticker);
-                calculatedPity5 = Math.max(uniqueCountAfterLast5, estimatedPullsAfterLast5);
+                calculatedPity5 = totalPulls;
               }
             } else {
-              calculatedPity5 = totalPulls;
+              calculatedPity5 = 0;
             }
-          } else {
-            calculatedPity5 = 0;
-          }
-          calculatedPity5 = Math.min(calculatedPity5, 89);
-          if (totalUniqueStickers > 0) {
-            const count5Star = sortedStickersWithRarity.filter(s => s.rarity === 5).length;
-            if (count5Star === 0 && totalPulls >= 90) {
+            calculatedPity5 = Math.min(calculatedPity5, 89);
+            if (totalUniqueStickers > 0) {
+              const count5Star = sortedStickersWithRarity.filter((s: any) => s.rarity === 5).length;
+              if (count5Star === 0 && totalPulls >= 90) {
+                calculatedPity5 = totalPulls % 90;
+              }
+            } else if (totalPulls >= 90) {
               calculatedPity5 = totalPulls % 90;
             }
-          } else if (totalPulls >= 90) {
-            calculatedPity5 = totalPulls % 90;
           }
-        }
 
-        // Tái dựng Bảo hiểm 4⭐ từ lịch sử nhãn dán nếu chưa có
-        if (calculatedPity4 === -1) {
-          if (totalPulls > 0) {
-            if (totalUniqueStickers > 0) {
-              const last4StarIndex = sortedStickersWithRarity.map(s => s.rarity).lastIndexOf(4);
-              if (last4StarIndex === -1) {
-                calculatedPity4 = totalPulls;
+          // Tái dựng Bảo hiểm 4⭐ từ lịch sử nhãn dán nếu chưa có
+          if (calculatedPity4 === -1) {
+            if (totalPulls > 0) {
+              if (totalUniqueStickers > 0) {
+                const last4StarIndex = sortedStickersWithRarity.map((s: any) => s.rarity).lastIndexOf(4);
+                if (last4StarIndex === -1) {
+                  calculatedPity4 = totalPulls;
+                } else {
+                  const stickersAfterLast4 = sortedStickersWithRarity.slice(last4StarIndex + 1);
+                  const uniqueCountAfterLast4 = stickersAfterLast4.length;
+                  const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
+                  const estimatedPullsAfterLast4 = Math.round(uniqueCountAfterLast4 * pullsPerUniqueSticker);
+                  calculatedPity4 = Math.max(uniqueCountAfterLast4, estimatedPullsAfterLast4);
+                }
               } else {
-                const stickersAfterLast4 = sortedStickersWithRarity.slice(last4StarIndex + 1);
-                const uniqueCountAfterLast4 = stickersAfterLast4.length;
-                const pullsPerUniqueSticker = totalPulls / totalUniqueStickers;
-                const estimatedPullsAfterLast4 = Math.round(uniqueCountAfterLast4 * pullsPerUniqueSticker);
-                calculatedPity4 = Math.max(uniqueCountAfterLast4, estimatedPullsAfterLast4);
+                calculatedPity4 = totalPulls;
               }
             } else {
-              calculatedPity4 = totalPulls;
+              calculatedPity4 = 0;
             }
-          } else {
-            calculatedPity4 = 0;
-          }
-          calculatedPity4 = Math.min(calculatedPity4, 9);
-          if (totalUniqueStickers > 0) {
-            const count4Star = sortedStickersWithRarity.filter(s => s.rarity === 4).length;
-            if (count4Star === 0 && totalPulls >= 10) {
+            calculatedPity4 = Math.min(calculatedPity4, 9);
+            if (totalUniqueStickers > 0) {
+              const count4Star = sortedStickersWithRarity.filter((s: any) => s.rarity === 4).length;
+              if (count4Star === 0 && totalPulls >= 10) {
+                calculatedPity4 = totalPulls % 10;
+              }
+            } else if (totalPulls >= 10) {
               calculatedPity4 = totalPulls % 10;
             }
-          } else if (totalPulls >= 10) {
-            calculatedPity4 = totalPulls % 10;
           }
+
+          // Evaluate achievements
+          // Reading category
+          if (totalChaptersRead >= 1) mergedUnlocked.add('first_chapter');
+          if (totalChaptersRead >= 3) {
+            mergedUnlocked.add('midnight_read');
+            mergedUnlocked.add('early_morning_read');
+          }
+          if (totalChaptersRead >= 100) mergedUnlocked.add('read_100_chapters');
+          if (totalChaptersRead >= 500) mergedUnlocked.add('choco_mot_sach');
+          const genresRead = Array.isArray(u.genresRead) ? u.genresRead : [];
+          if (genresRead.length >= 5 || totalChaptersRead >= 10) mergedUnlocked.add('multi_genre');
+          const savedStories = Array.isArray(u.savedStories) ? u.savedStories : [];
+          if (savedStories.length >= 10) mergedUnlocked.add('collector');
+
+          // Community category
+          if (actualFeedCount >= 1) mergedUnlocked.add('blogger_choco_new');
+          if (totalComments >= 100 || u.totalCommentsCount >= 100) mergedUnlocked.add('commenter_choco');
+          if (totalComments >= 500 || u.totalCommentsCount >= 500) mergedUnlocked.add('choco_tuong_tac');
+          if (actualChatCount >= 100 || u.sentMessagesCount >= 100) mergedUnlocked.add('chatty_lounge');
+          if (actualChatCount >= 5000 || u.sentMessagesCount >= 5000) mergedUnlocked.add('chatty');
+          const totalGiftedChoco = Number(u.totalGiftedChoco) || 0;
+          if (totalGiftedChoco > 0) mergedUnlocked.add('generous_donor');
+
+          // Activity category
+          if (calculatedStreak >= 7 || u.checkInStreak >= 7) mergedUnlocked.add('streak_7');
+          if (totalCheckIns >= 30 || u.totalCheckIns >= 30) mergedUnlocked.add('monthly_checkin');
+          const perfectDailyDates = Array.isArray(u.perfectDailyDates) ? u.perfectDailyDates : [];
+          if (perfectDailyDates.length >= 7) mergedUnlocked.add('weekly_missions_perfect');
+
+          // Economy & Gacha category
+          if (stickersSnap.size >= 30) mergedUnlocked.add('sticker_collector');
+          if (calculatedSpentChoco >= 10000 || u.totalSpentChoco >= 10000) mergedUnlocked.add('big_spender');
+          if (calculatedPity5 >= 90 || totalPulls >= 90 || u.totalGachaPulls >= 90) mergedUnlocked.add('choco_kientri');
+          if (u.maxBannerCompletionPct >= 100) mergedUnlocked.add('choco_suutam');
+          
+          // Gaming category
+          if (u.chucuInteractions >= 500) mergedUnlocked.add('chucu_friend_500');
+          if (u.chucuPremiumFeeds >= 100) mergedUnlocked.add('chucu_an_sang');
+          if (u.chucuLevel >= 100) mergedUnlocked.add('chucu_master_100');
+          const ownedChucuAccessories = Array.isArray(u.ownedChucuAccessories) ? u.ownedChucuAccessories : [];
+          if (ownedChucuAccessories.length >= 5) mergedUnlocked.add('chucu_fashion_5');
+          if (u.maxConsecutiveChocoCount >= 20) mergedUnlocked.add('choco_catch_no_miss');
+          const totalChocoCaught = Number(u.totalChocoCaught) || 0;
+          if (totalChocoCaught >= 1000) mergedUnlocked.add('choco_rain_1000');
+          if (totalChocoCaught >= 5000) mergedUnlocked.add('choco_rain_5000');
+          if (totalChocoCaught >= 10000) mergedUnlocked.add('choco_rain_10000');
+          if (u.consecutiveGoldClears >= 5) mergedUnlocked.add('gold_choco_perfect');
+          if (u.consecutiveDodgeClears >= 5) mergedUnlocked.add('dodge_negative_perfect');
+          if (u.chocoMatchTilesDestroyed >= 100000) mergedUnlocked.add('choco_destroyer');
+          if (u.chocoMatchColorBombsCreated >= 10000) mergedUnlocked.add('choco_color_bomb');
+          if (u.chocoMatchSpecialCombos >= 10000) mergedUnlocked.add('choco_special_combo');
+
+          // Radio category
+          if (u.radioNightChillSeconds >= 1800) mergedUnlocked.add('radio_night_chill');
+          if (u.maxRadioTrackSeconds >= 3600) mergedUnlocked.add('radio_one_track_love');
+          const heardRadioTracks = Array.isArray(u.heardRadioTracks) ? u.heardRadioTracks : [];
+          if (heardRadioTracks.length >= 10) mergedUnlocked.add('radio_universe_explorer');
+          if (u.radioTrackSwitches >= 15) mergedUnlocked.add('radio_track_switches');
+
+          // Legend category
+          if (calculatedLevel >= 100 || u.level >= 100) mergedUnlocked.add('choco_high_level');
+          if (calculatedEarnedChoco >= 10000 || u.totalEarnedChoco >= 10000) mergedUnlocked.add('choco_king');
+          if (calculatedEarnedGChoco >= 10000 || u.totalEarnedGChoco >= 10000) mergedUnlocked.add('gchoco_king');
+
+          restoredAchievements.forEach(id => {
+            mergedUnlocked.add(id);
+            mergedClaimed.add(id);
+          });
         }
-
-        // Evaluate achievements
-        // Reading category
-        if (totalChaptersRead >= 1) mergedUnlocked.add('first_chapter');
-        if (totalChaptersRead >= 3) {
-          mergedUnlocked.add('midnight_read');
-          mergedUnlocked.add('early_morning_read');
-        }
-        if (totalChaptersRead >= 100) mergedUnlocked.add('read_100_chapters');
-        if (totalChaptersRead >= 500) mergedUnlocked.add('choco_mot_sach');
-        const genresRead = Array.isArray(u.genresRead) ? u.genresRead : [];
-        if (genresRead.length >= 5 || totalChaptersRead >= 10) mergedUnlocked.add('multi_genre');
-        const savedStories = Array.isArray(u.savedStories) ? u.savedStories : [];
-        if (savedStories.length >= 10) mergedUnlocked.add('collector');
-
-        // Community category
-        if (actualFeedCount >= 1) mergedUnlocked.add('blogger_choco_new');
-        if (totalComments >= 100 || u.totalCommentsCount >= 100) mergedUnlocked.add('commenter_choco');
-        if (totalComments >= 500 || u.totalCommentsCount >= 500) mergedUnlocked.add('choco_tuong_tac');
-        if (actualChatCount >= 100 || u.sentMessagesCount >= 100) mergedUnlocked.add('chatty_lounge');
-        if (actualChatCount >= 5000 || u.sentMessagesCount >= 5000) mergedUnlocked.add('chatty');
-        const totalGiftedChoco = Number(u.totalGiftedChoco) || 0;
-        if (totalGiftedChoco > 0) mergedUnlocked.add('generous_donor');
-
-        // Activity category
-        if (calculatedStreak >= 7 || u.checkInStreak >= 7) mergedUnlocked.add('streak_7');
-        if (totalCheckIns >= 30 || u.totalCheckIns >= 30) mergedUnlocked.add('monthly_checkin');
-        const perfectDailyDates = Array.isArray(u.perfectDailyDates) ? u.perfectDailyDates : [];
-        if (perfectDailyDates.length >= 7) mergedUnlocked.add('weekly_missions_perfect');
-
-        // Economy & Gacha category
-        if (stickersSnap.size >= 30) mergedUnlocked.add('sticker_collector');
-        if (calculatedSpentChoco >= 10000 || u.totalSpentChoco >= 10000) mergedUnlocked.add('big_spender');
-        if (calculatedPity5 >= 90 || totalPulls >= 90 || u.totalGachaPulls >= 90) mergedUnlocked.add('choco_kientri');
-        if (u.maxBannerCompletionPct >= 100) mergedUnlocked.add('choco_suutam');
-        
-        // Gaming category
-        if (u.chucuInteractions >= 500) mergedUnlocked.add('chucu_friend_500');
-        if (u.chucuPremiumFeeds >= 100) mergedUnlocked.add('chucu_an_sang');
-        if (u.chucuLevel >= 100) mergedUnlocked.add('chucu_master_100');
-        const ownedChucuAccessories = Array.isArray(u.ownedChucuAccessories) ? u.ownedChucuAccessories : [];
-        if (ownedChucuAccessories.length >= 5) mergedUnlocked.add('chucu_fashion_5');
-        if (u.maxConsecutiveChocoCount >= 20) mergedUnlocked.add('choco_catch_no_miss');
-        const totalChocoCaught = Number(u.totalChocoCaught) || 0;
-        if (totalChocoCaught >= 1000) mergedUnlocked.add('choco_rain_1000');
-        if (totalChocoCaught >= 5000) mergedUnlocked.add('choco_rain_5000');
-        if (totalChocoCaught >= 10000) mergedUnlocked.add('choco_rain_10000');
-        if (u.consecutiveGoldClears >= 5) mergedUnlocked.add('gold_choco_perfect');
-        if (u.consecutiveDodgeClears >= 5) mergedUnlocked.add('dodge_negative_perfect');
-        if (u.chocoMatchTilesDestroyed >= 100000) mergedUnlocked.add('choco_destroyer');
-        if (u.chocoMatchColorBombsCreated >= 10000) mergedUnlocked.add('choco_color_bomb');
-        if (u.chocoMatchSpecialCombos >= 10000) mergedUnlocked.add('choco_special_combo');
-
-        // Radio category
-        if (u.radioNightChillSeconds >= 1800) mergedUnlocked.add('radio_night_chill');
-        if (u.maxRadioTrackSeconds >= 3600) mergedUnlocked.add('radio_one_track_love');
-        const heardRadioTracks = Array.isArray(u.heardRadioTracks) ? u.heardRadioTracks : [];
-        if (heardRadioTracks.length >= 10) mergedUnlocked.add('radio_universe_explorer');
-        if (u.radioTrackSwitches >= 15) mergedUnlocked.add('radio_track_switches');
-
-        // Legend category
-        if (calculatedLevel >= 100 || u.level >= 100) mergedUnlocked.add('choco_high_level');
-        if (calculatedEarnedChoco >= 10000 || u.totalEarnedChoco >= 10000) mergedUnlocked.add('choco_king');
-        if (calculatedEarnedGChoco >= 10000 || u.totalEarnedGChoco >= 10000) mergedUnlocked.add('gchoco_king');
-
-        restoredAchievements.forEach(id => {
-          mergedUnlocked.add(id);
-          mergedClaimed.add(id);
-        });
 
         // Compute claimed achievements rewards
         const claimedAchievementsList = Array.from(mergedClaimed);
@@ -1061,6 +1079,17 @@ export function Admin() {
           const existingClaimed = Array.isArray(u.claimedAchievements) ? u.claimedAchievements : [];
           if (currentClaimedList.length !== existingClaimed.length || currentClaimedList.some(id => !existingClaimed.includes(id))) {
             updates.claimedAchievements = currentClaimedList;
+            changed = true;
+          }
+
+          if (isUserAdmin) {
+            updates.storyProgress = {
+              VcmGdRLWYETQ1QpoWee2: [1],
+              WIEIWJ5e3jlvAKyjHsmP: [1],
+              y1jPoVWfSBVaWFwoRt6x: [1]
+            };
+            updates.totalChaptersRead = 3;
+            updates.missions = [];
             changed = true;
           }
         }
@@ -2119,6 +2148,17 @@ export function Admin() {
       }
       if (calculatedPity4 !== (u.gachaPity4Star || 0)) {
         updates.gachaPity4Star = calculatedPity4;
+        changed = true;
+      }
+
+      if (isUserAdmin) {
+        updates.storyProgress = {
+          VcmGdRLWYETQ1QpoWee2: [1],
+          WIEIWJ5e3jlvAKyjHsmP: [1],
+          y1jPoVWfSBVaWFwoRt6x: [1]
+        };
+        updates.totalChaptersRead = 3;
+        updates.missions = [];
         changed = true;
       }
 
