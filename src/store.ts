@@ -259,6 +259,7 @@ interface UserState {
   useStreakTicket: () => boolean;
   spendChoco: (amount: number, reason?: string) => boolean;
   spendGoldenChoco: (amount: number, reason?: string) => boolean;
+  reconstructSpentChocoFromTxs: () => Promise<void>;
   
   markStoryRead: (storyId: string, chapterOrder: number, genres?: string[]) => void;
   addCommentProgress: () => void;
@@ -710,6 +711,9 @@ export const useStore = create<UserState>()(
       setFirebaseUser: (user) => {
          if (user) {
             const uid = user.uid;
+            setTimeout(() => {
+               get().reconstructSpentChocoFromTxs();
+            }, 2000);
             const state = get();
             const allMs = state.allUsersMissions || {};
             const allSp = state.allUsersStoryProgress || {};
@@ -807,10 +811,25 @@ export const useStore = create<UserState>()(
             computedCheckIns = Math.max(computedCheckIns, rawStreak);
 
             // Bù đắp tiêu Choco = số Choco đã tiêu + (số GChoco đã tiêu * 3)
-             const getEarnedTotalC = Math.max(data.totalEarnedChoco || 0, state.totalEarnedChoco || 0);
-             const getCurrentC = data.choco !== undefined ? data.choco : (state.choco || 0);
-             const getEarnedTotalG = Math.max(data.totalEarnedGChoco || 0, state.totalEarnedGChoco || 0);
-             const getCurrentG = data.goldenChoco !== undefined ? data.goldenChoco : (state.goldenChoco || 0);
+             let getEarnedTotalC = Math.max(data.totalEarnedChoco || 0, state.totalEarnedChoco || 0);
+             let getCurrentC = data.choco !== undefined ? data.choco : (state.choco || 0);
+             let getEarnedTotalG = Math.max(data.totalEarnedGChoco || 0, state.totalEarnedGChoco || 0);
+             let getCurrentG = data.goldenChoco !== undefined ? data.goldenChoco : (state.goldenChoco || 0);
+
+             // Nếu là admin, lượng choco và gchoco được bù thêm 9,999,999 làm mốc gốc vô hạn để tiêu sài.
+             // Ta chuẩn hóa bằng cách trừ đi 9,999,999 để tính toán chính xác tuyệt đối.
+             if (getEarnedTotalC >= 9999999) {
+                getEarnedTotalC -= 9999999;
+             }
+             if (getCurrentC >= 9999999) {
+                getCurrentC -= 9999999;
+             }
+             if (getEarnedTotalG >= 9999999) {
+                getEarnedTotalG -= 9999999;
+             }
+             if (getCurrentG >= 9999999) {
+                getCurrentG -= 9999999;
+             }
              let totalSpentChocoFallback = Math.max(data.totalSpentChoco || 0, state.totalSpentChoco || 0);
              
              const spentGChocoApprox = Math.max(0, getEarnedTotalG - getCurrentG);
@@ -820,7 +839,7 @@ export const useStore = create<UserState>()(
              }
 
              // Auto-heal spend stats for admin to 27200 once if stuck at bugged 39800 override
-             if (data.email?.toLowerCase() === 'cucnau01@gmail.com') {
+             if (false && data.email?.toLowerCase() === 'cucnau01@gmail.com') {
                 if (data.totalSpentChoco === 39800) {
                    totalSpentChocoFallback = 27200;
                    setTimeout(() => {
@@ -1517,6 +1536,38 @@ export const useStore = create<UserState>()(
               return true;
           }
           return false;
+      },
+      reconstructSpentChocoFromTxs: async () => {
+         const state = get();
+         if (!state.isLoggedIn || !state.uid) return;
+         try {
+             const txSnap = await getDocs(collection(db, `users/${state.uid}/transactions`));
+             let calculatedSpentChoco = 0;
+             let calculatedSpentGChoco = 0;
+             txSnap.forEach(docSnap => {
+                 const t = docSnap.data();
+                 const amt = t.amount || 0;
+                 if (t.type === 'spend') {
+                     if (t.currency === 'choco') {
+                         calculatedSpentChoco += amt;
+                     } else if (t.currency === 'gchoco') {
+                         calculatedSpentGChoco += amt;
+                     }
+                 }
+             });
+             // Bù đắp tiêu Choco = số Choco đã tiêu + (số GChoco đã tiêu * 3)
+             const totalCalculatedSpent = calculatedSpentChoco + (calculatedSpentGChoco * 3);
+             
+             // Nếu số chênh lệch thực tế khác số đang lưu, cập nhật để đồng bộ hoàn toàn!
+             if (totalCalculatedSpent !== (state.totalSpentChoco || 0)) {
+                 console.log(`[Spend Tracker] Reconstructed spent choco: ${totalCalculatedSpent} vs current: ${state.totalSpentChoco || 0}. Syncing...`);
+                 set({ totalSpentChoco: totalCalculatedSpent });
+                 await state.updateUserDoc({ totalSpentChoco: totalCalculatedSpent }, "Reconstructed spend history from transaction list");
+                 get()._triggerCountAchievementsCheck();
+             }
+         } catch (e) {
+             console.error("[Spend Tracker] Error reconstructing spend history:", e);
+         }
       },
       
       markStoryRead: (storyId, chapterOrder, genres) => {
@@ -2705,7 +2756,11 @@ export const useStore = create<UserState>()(
          let nextWeeklyResetId = state.lastWeeklyResetId || null;
 
          // 1. Check Daily Reset (00:00 every day)
-         if (!state.lastDailyResetDate || state.lastDailyResetDate !== todayStr) {
+         if (!state.lastDailyResetDate) {
+            // Initialize silently without resetting daily missions to prevent accidental reset on first load/empty fields
+            nextDailyResetDate = todayStr;
+            changed = true;
+         } else if (state.lastDailyResetDate !== todayStr) {
             console.log('Daily reset triggered, resetting daily missions');
             nextMissions = nextMissions.map(m => {
                if (m.type === 'daily') {
