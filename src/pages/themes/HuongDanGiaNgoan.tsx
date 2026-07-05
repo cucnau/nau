@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, Briefcase, TrendingUp, MessageSquare, ArrowUpRight, Star, Quote } from 'lucide-react';
+import { BookOpen, Gift, Send, Bookmark, Briefcase, TrendingUp, MessageSquare, ArrowUpRight, Star, Quote, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 
 export function HuongDanGiaNgoanTheme(props: ThemeProps) {
@@ -72,8 +72,13 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                 {story.status === 'completed' ? 'Hoàn Tất' : 'Đang Xử Lý'}
               </span>
               
+              {story.genres?.map((genre: string, i: number) => (
+                <span key={`genre-${i}`} className="px-3 py-1 text-[10px] lg:text-xs font-reading-garamond uppercase tracking-[0.2em] font-medium text-[#13120d] bg-[#695b7f] hover:bg-[#bbee1f] transition-colors border border-[#13120d]">
+                  {genre}
+                </span>
+              ))}
               {story.tags?.map((tag: string, i: number) => (
-                <span key={i} className="px-3 py-1 text-[10px] lg:text-xs font-reading-garamond uppercase tracking-[0.2em] font-medium text-[#13120d] bg-[#695b7f] hover:bg-[#bbee1f] transition-colors border border-[#13120d]">
+                <span key={`tag-${i}`} className="px-3 py-1 text-[10px] lg:text-xs font-reading-garamond uppercase tracking-[0.2em] font-medium text-[#dbcec2] bg-transparent border border-[#695b7f] hover:border-[#bbee1f] hover:text-[#bbee1f] transition-colors">
                   {tag}
                 </span>
               ))}
@@ -106,14 +111,25 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center lg:justify-start relative z-10">
+            <div className="flex flex-col sm:flex-row gap-4 w-full justify-center lg:justify-start relative z-10 flex-wrap">
               <button 
                 onClick={() => chapters.length > 0 && navigate(`/doc/${story.id}/${chapters[0].id}`)}
                 className="px-6 py-3.5 bg-[#bbee1f] text-[#13120d] font-reading-garamond font-black uppercase text-xs tracking-[0.2em] hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(187,238,31,0.3)] flex items-center justify-center gap-2 relative overflow-hidden group"
               >
                 <div className="absolute inset-0 bg-white/30 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
-                Đọc Hồ Sơ <ArrowUpRight className="w-4 h-4" />
+                Đọc Từ Đầu <ArrowUpRight className="w-4 h-4" />
               </button>
+
+              {story?.externalUrl && (
+                <a 
+                  href={story.externalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3.5 border border-[#bbee1f] text-[#bbee1f] font-reading-garamond uppercase text-xs font-bold tracking-[0.1em] hover:bg-[#bbee1f] hover:text-[#13120d] transition-all flex items-center justify-center gap-2"
+                >
+                  Đọc Truyện <ExternalLink className="w-4 h-4" />
+                </a>
+              )}
               
               <button 
                 onClick={handleSaveToggle}
@@ -125,7 +141,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
 
               <button 
                 onClick={() => setShowGiftModal(true)}
-                className="px-5 py-3.5 border border-[#2e2a63] text-[#bbee1f] font-reading-garamond uppercase text-xs font-bold tracking-[0.1em] hover:bg-[#bbee1f]/10 transition-all flex items-center justify-center gap-2 ml-auto lg:ml-0"
+                className="px-5 py-3.5 border border-[#2e2a63] text-[#bbee1f] font-reading-garamond uppercase text-xs font-bold tracking-[0.1em] hover:bg-[#bbee1f]/10 transition-all flex items-center justify-center gap-2 lg:ml-0"
               >
                 <Gift className="w-4 h-4" /> Rót Vốn
               </button>
@@ -152,8 +168,10 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
               <span className="w-8 h-[1px] bg-[#bbee1f]" /> Bản Khảo Sát Dự Án
             </h3>
             
-            <div className="text-lg lg:text-xl leading-[1.8] text-[#dbcec2] font-light whitespace-pre-wrap relative z-10 drop-shadow-sm">
-              {story.description}
+            <div className="text-base lg:text-lg leading-[2] text-[#dbcec2] font-light relative z-10 drop-shadow-sm space-y-4">
+              {story.description?.split('\n').filter((p: string) => p.trim() !== '').map((paragraph: string, idx: number) => (
+                <p key={idx}>{paragraph}</p>
+              ))}
             </div>
           </div>
         )}
@@ -217,7 +235,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                   </div>
                   
                   <div className="flex-1 pr-4">
-                    <span className="text-[#dbcec2] text-sm lg:text-base group-hover:text-white transition-colors leading-relaxed line-clamp-2">
+                    <span className="text-[#dbcec2] text-xs lg:text-sm group-hover:text-white transition-colors leading-relaxed line-clamp-2">
                       {chap.title}
                     </span>
                   </div>
@@ -227,20 +245,24 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
 
             {/* Pagination */}
             {chapters.length > CHAPTERS_PER_PAGE && (
-              <div className="flex justify-center gap-3 mt-12">
-                {Array.from({ length: Math.ceil(chapters.length / CHAPTERS_PER_PAGE) }).map((_, p) => (
-                  <button
-                    key={p}
-                    onClick={() => setChapterPage(p)}
-                    className={`w-12 h-12 flex items-center justify-center font-reading-garamond text-sm font-black transition-all ${
-                      chapterPage === p 
-                        ? 'bg-[#bbee1f] text-[#13120d] shadow-[0_5px_15px_rgba(187,238,31,0.4)] rotate-45' 
-                        : 'bg-[#13120d] text-[#695b7f] border border-[#2e2a63] hover:border-[#bbee1f] hover:text-[#bbee1f]'
-                    }`}
-                  >
-                    <span className={chapterPage === p ? '-rotate-45 block' : 'block'}>{p + 1}</span>
-                  </button>
-                ))}
+              <div className="flex flex-wrap justify-center gap-3 mt-12">
+                {Array.from({ length: Math.ceil(chapters.length / CHAPTERS_PER_PAGE) }).map((_, p) => {
+                  const start = p * CHAPTERS_PER_PAGE + 1;
+                  const end = Math.min((p + 1) * CHAPTERS_PER_PAGE, chapters.length);
+                  return (
+                    <button
+                      key={p}
+                      onClick={() => setChapterPage(p)}
+                      className={`px-4 py-2 flex items-center justify-center font-reading-garamond text-sm font-black transition-all border ${
+                        chapterPage === p 
+                          ? 'bg-[#bbee1f] text-[#13120d] border-[#bbee1f] shadow-[0_5px_15px_rgba(187,238,31,0.4)]' 
+                          : 'bg-[#13120d] text-[#695b7f] border-[#2e2a63] hover:border-[#bbee1f] hover:text-[#bbee1f]'
+                      }`}
+                    >
+                      <span>{start} - {end}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -334,7 +356,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
               <div>
                 <label className="text-[#695b7f] font-reading-garamond text-[9px] font-bold uppercase tracking-[0.3em] mb-3 block text-center">Gói Đầu Tư</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {[10, 50, 100].map(amt => (
+                  {[5, 10, 20, 50, 100].map(amt => (
                     <button
                       key={amt}
                       onClick={() => setGiftAmount(amt)}
@@ -347,6 +369,14 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                       {amt} CC
                     </button>
                   ))}
+                  <input
+                    type="number"
+                    min="1"
+                    value={giftAmount || ''}
+                    onChange={(e) => setGiftAmount(parseInt(e.target.value) || 0)}
+                    placeholder="Khác"
+                    className="py-2.5 bg-[#13120d] text-[#dbcec2] font-reading-garamond text-center text-base font-black border border-[#2e2a63] focus:border-[#bbee1f] focus:outline-none transition-all placeholder:text-[#695b7f]"
+                  />
                 </div>
               </div>
               
