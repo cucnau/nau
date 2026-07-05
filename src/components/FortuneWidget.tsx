@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Dices, ArrowRight } from 'lucide-react';
+import { Sparkles, Dices, ArrowRight, Lock } from 'lucide-react';
 import { useStore } from '../store';
 import { format } from 'date-fns';
 import { getGMT7Date } from '../types/achievements';
+import { useFeatureRestriction } from '../types/features';
 
 const FORTUNES = [
   "Hôm nay bạn sẽ nhặt được tiền... âm phủ.",
@@ -92,12 +93,14 @@ function hashCode(str: string) {
 }
 
 export function FortuneWidget() {
-  const { uid, isLoggedIn } = useStore();
+  const { uid, isLoggedIn, setLockedFeatureId } = useStore();
+  const { isFeatureLocked, getRequiredLevel } = useFeatureRestriction();
   const [fortune, setFortune] = useState('');
   const [genres, setGenres] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   
   const dateStr = format(getGMT7Date(), 'yyyy-MM-dd');
+  const isLocked = isFeatureLocked('fortune');
 
   useEffect(() => {
     // Generate daily fortune based on UID + Date String
@@ -124,14 +127,18 @@ export function FortuneWidget() {
     // Check if drawing was already opened today
     const key = uid ? `choco_fortune_opened_date_${uid}` : 'choco_fortune_opened_date_guest';
     const savedDate = localStorage.getItem(key);
-    if (savedDate === dateStr) {
+    if (savedDate === dateStr && !isLocked) {
       setIsOpen(true);
     } else {
       setIsOpen(false);
     }
-  }, [uid, dateStr]);
+  }, [uid, dateStr, isLocked]);
 
   const handleOpenFortune = () => {
+    if (isLocked) {
+      setLockedFeatureId('fortune');
+      return;
+    }
     const key = uid ? `choco_fortune_opened_date_${uid}` : 'choco_fortune_opened_date_guest';
     localStorage.setItem(key, dateStr);
     setIsOpen(true);
@@ -150,9 +157,20 @@ export function FortuneWidget() {
       {!isOpen ? (
         <button 
           onClick={handleOpenFortune}
-          className="w-full bg-[#FFFDF9] dark:bg-[#1E1815] border-[3px] border-dashed border-[#8D6E63] text-[#3E2723] dark:text-[#ECE5DC] p-4 rounded-2xl font-black uppercase tracking-wider hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D] transition-colors cursor-pointer"
+          className={`w-full border-[3px] border-dashed p-4 rounded-2xl font-black uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 ${
+            isLocked 
+              ? 'bg-stone-100 dark:bg-stone-800 border-stone-300 dark:border-stone-600 text-stone-400 dark:text-stone-500 hover:bg-stone-200 dark:hover:bg-stone-700'
+              : 'bg-[#FFFDF9] dark:bg-[#1E1815] border-[#8D6E63] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-[#F5E6D3] dark:hover:bg-[#2C221D]'
+          }`}
         >
-          Nhấn để xem vận mệnh hôm nay
+          {isLocked ? (
+            <>
+              <Lock className="w-4 h-4" />
+              Yêu cầu cấp {getRequiredLevel('fortune')}
+            </>
+          ) : (
+            'Nhấn để xem vận mệnh hôm nay'
+          )}
         </button>
       ) : (
         <div className="bg-[#F5E6D3] dark:bg-[#2C221D] p-4 rounded-2xl border-2 border-[#D7CCC8] dark:border-[#5D4037] relative">
