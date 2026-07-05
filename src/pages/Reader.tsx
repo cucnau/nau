@@ -157,10 +157,10 @@ const ParagraphCommentNode = ({
                         onClick={() => handleSendReply(comment)}
                         disabled={submittingReply || !replyText.trim()}
                         className={cn(
-                           "px-3 py-1 rounded-xl text-xs font-black uppercase transition-all cursor-pointer disabled:opacity-50 border-2",
+                           "px-3 py-1 rounded-xl text-xs font-black uppercase transition-all cursor-pointer border-2",
                            isStoryTheme 
-                              ? "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63]" 
-                              : "bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
+                              ? "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none" 
+                              : "disabled:opacity-50 bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
                         )}
                      >
                         Gửi
@@ -351,8 +351,8 @@ const ChapterCommentNode = ({
                         className={cn(
                            "px-4 py-1.5 font-black text-xs rounded-xl border-2 transition-all cursor-pointer",
                            isStoryTheme 
-                              ? "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63]" 
-                              : "bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
+                              ? "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none" 
+                              : "disabled:opacity-50 bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
                         )}
                      >
                         Gửi
@@ -898,7 +898,29 @@ export function Reader() {
   if (!story || !currentChapter) return <div className="p-10 text-center">Không tìm thấy chương</div>;
 
   return (
-    <div className={cn("min-h-screen flex flex-col transition-colors duration-300 relative overflow-hidden", isCustomThemeActive ? "bg-[#13120d] text-[#dbcec2] selection:bg-[#bbee1f] selection:text-[#13120d]" : (effectiveIsDark ? "bg-[#14100E] text-[#ECE5DC]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] text-[#3E2723] dark:text-[#3E2723]"))}>
+    <div className={cn("min-h-screen flex flex-col transition-colors duration-300 relative overflow-hidden reader-container-font", isCustomThemeActive ? "bg-[#13120d] text-[#dbcec2] selection:bg-[#bbee1f] selection:text-[#13120d]" : (effectiveIsDark ? "bg-[#14100E] text-[#ECE5DC]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] text-[#3E2723] dark:text-[#3E2723]"), effectiveFontFamily)}>
+       <style>{`
+         .reader-container-font, 
+         .reader-container-font button, 
+         .reader-container-font input, 
+         .reader-container-font textarea, 
+         .reader-container-font select,
+         .reader-container-font h1,
+         .reader-container-font h2,
+         .reader-container-font h3,
+         .reader-container-font h4,
+         .reader-container-font p,
+         .reader-container-font span {
+           font-family: ${
+             effectiveFontFamily === 'font-reading-garamond' ? '"EB Garamond", Georgia, serif' :
+             effectiveFontFamily === 'font-reading-roboto' ? '"Roboto", sans-serif' :
+             effectiveFontFamily === 'font-reading-patrick' ? '"Patrick Hand", cursive, sans-serif' :
+             effectiveFontFamily === 'font-reading-iosevka' ? '"Iosevka Charon", "Iosevka", monospace' :
+             effectiveFontFamily === 'font-reading-notoserif' ? '"Noto Serif", Georgia, serif' :
+             '"Quicksand", sans-serif'
+           } !important;
+         }
+       `}</style>
        {isCustomThemeActive && (
          <>
            <div className="fixed inset-0 pointer-events-none opacity-20"
@@ -954,7 +976,7 @@ export function Reader() {
                                     : "bg-transparent border-[#3E2723] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
                                )}
                             >
-                               {useStoryTheme ? '✓ Đang bật (Hải Đăng Đỏ)' : 'Sử dụng giao diện riêng'}
+                               {useStoryTheme ? '✓ Đang bật' : 'Sử dụng giao diện riêng'}
                             </button>
                          </div>
                       )}
@@ -1006,8 +1028,8 @@ export function Reader() {
                   {needsPass && (
                     <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#3C2E27] bg-[#2C221D]/50" : "border-[#8D6E63] dark:border-[#8D6E63] bg-[#FDF6EC] dark:bg-[#FDF6EC]")}>
                        <Lock className={cn("w-12 h-12 mb-4 animate-bounce", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")} />
-                       <h2 className={cn("text-xl font-bold mb-2 uppercase tracking-tighter", isDark ? "text-[#ECE5DC]" : "text-[#3E2723] dark:text-[#3E2723]")}>Chương có khoá Pass</h2>
-                       <p className={cn("opacity-70 mb-4 italic", isDark ? "text-[#A1887F]" : "text-[#5D4037] dark:text-[#5D4037]")}>Bạn cần dùng "Vé Pass Truyện" để đọc vĩnh viễn chương này.</p>
+                       <h2 className={cn("text-xl font-bold mb-2 uppercase tracking-tighter", isDark ? "text-[#ECE5DC]" : "text-[#3E2723] dark:text-[#3E2723]")}>{isCustomThemeActive ? "Tài liệu có khóa Pass" : "Chương có khóa Pass"}</h2>
+                       <p className={cn("opacity-70 mb-4 italic", isDark ? "text-[#A1887F]" : "text-[#5D4037] dark:text-[#5D4037]")}>Bạn cần dùng "Vé Pass Truyện" để đọc vĩnh viễn {isCustomThemeActive ? "tài liệu" : "chương"} này.</p>
                        <p className={cn("text-sm font-bold mb-6", isDark ? "text-[#ECE5DC]" : "text-[#3E2723] dark:text-[#3E2723]")}>Bạn đang có: {ownedPassTickets || 0} Vé</p>
                        <button onClick={handleUnlockPass} className="bg-[#3E2723] hover:bg-[#2D1B19] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2">
                           Mở khoá bằng 1 Vé Pass
@@ -1018,7 +1040,7 @@ export function Reader() {
                   {needsEarlyAccess && (
                     <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#D4AF37] bg-[#2C221D]/50" : "border-[#D4AF37] dark:border-[#D4AF37] bg-[#FFFDE7] dark:bg-[#FFFDE7]")}>
                        <Zap className="w-12 h-12 mb-4 text-[#D4AF37] animate-pulse fill-[#F5E6D3]" />
-                       <h2 className="text-xl font-bold mb-2 uppercase tracking-tighter text-[#827717]">Chương Đọc Sớm</h2>
+                       <h2 className="text-xl font-bold mb-2 uppercase tracking-tighter text-[#827717]">{isCustomThemeActive ? "Tài liệu Đọc Sớm" : "Chương Đọc Sớm"}</h2>
                        <p className="opacity-70 mb-4 italic text-[#827717]">Bạn cần dùng "Vé Ưu Tiên" để đọc ngay, hoặc chờ hết 24h.</p>
                        <p className="text-sm font-bold mb-6 text-[#827717]">Bạn đang có: {ownedPriorityTickets || 0} Vé</p>
                        <button onClick={handleUnlockEarlyAccess} className="bg-[#D4AF37] hover:bg-[#B5952F] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2">
@@ -1030,7 +1052,7 @@ export function Reader() {
                   {currentChapter?.isLockedRead && (
                     <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#3E2723] bg-[#2C221D]/50" : "border-amber-600 bg-[#FDF6EC]")}>
                        <Lock className={cn("w-12 h-12 mb-4 animate-bounce text-amber-600")} />
-                       <h2 className={cn("text-xl font-bold mb-4 uppercase tracking-tighter text-amber-800 dark:text-amber-400")}>Đã khóa chương</h2>
+                       <h2 className={cn("text-xl font-bold mb-4 uppercase tracking-tighter text-amber-800 dark:text-amber-400")}>{isCustomThemeActive ? "Đã khóa tài liệu" : "Đã khóa chương"}</h2>
                        { (currentChapter?.externalUrl || story?.externalUrl) ? (
                           <div className="flex flex-col items-center gap-3">
                              <a 
@@ -1040,11 +1062,11 @@ export function Reader() {
                                className="bg-[#8D6E63] hover:bg-[#7d5e53] dark:bg-[#5D4037] dark:hover:bg-[#4e342e] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2"
                              >
                                 <ExternalLink className="w-4 h-4" />
-                                Đọc {currentChapter?.title || "chương này"}
+                                Đọc {currentChapter?.title || (isCustomThemeActive ? "tài liệu này" : "chương này")}
                              </a>
                           </div>
                        ) : (
-                          <p className="text-sm font-semibold opacity-60">Tác giả chưa cấu hình Link trang gốc cho chương hoặc bộ truyện này.</p>
+                          <p className="text-sm font-semibold opacity-60">Tác giả chưa cấu hình Link trang gốc cho {isCustomThemeActive ? "tài liệu" : "chương"} hoặc bộ truyện này.</p>
                        )}
                     </div>
                   )}
@@ -1212,13 +1234,13 @@ export function Reader() {
                                                 type="text" 
                                                 value={paragraphCommentText} 
                                                 onChange={(e) => setParagraphCommentText(e.target.value)} 
-                                                placeholder="Viết bình luận..." 
+                                                placeholder={isCustomThemeActive ? "Viết đề xuất..." : "Viết bình luận..."} 
                                                 className={cn("flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}
                                            />
-                                           <button type="submit" disabled={!paragraphCommentText.trim()} className={cn("px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 transition-all disabled:opacity-50 cursor-pointer shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none", isCustomThemeActive ? "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white" : "bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>Gửi</button>
+                                           <button type="submit" disabled={!paragraphCommentText.trim()} className={cn("px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 transition-all active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[2px_2px_0_0_#3E2723]", isCustomThemeActive ? "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none" : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>{isCustomThemeActive ? "Trình" : "Gửi"}</button>
                                        </form>
                                    ) : (
-                                       <div className="text-xs italic opacity-70 text-center">Đăng nhập để bình luận</div>
+                                       <div className="text-xs italic opacity-70 text-center">{isCustomThemeActive ? "Đăng nhập để trình ý kiến" : "Đăng nhập để bình luận"}</div>
                                    )}
                                </div>
                            )}
@@ -1232,13 +1254,13 @@ export function Reader() {
            <div className="mt-16 mb-8 flex items-center justify-between">
               {prevChapter ? (
                  <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
-                    <ArrowLeft className="w-5 h-5"/> Chương trước
+                    <ArrowLeft className="w-5 h-5"/> {isCustomThemeActive ? "Tài liệu trước" : "Chương trước"}
                  </button>
               ) : <div></div>}
               
               {nextChapter ? (
                  <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
-                    Chương sau <ArrowRight className="w-5 h-5"/>
+                    {isCustomThemeActive ? "Tài liệu sau" : "Chương sau"} <ArrowRight className="w-5 h-5"/>
                  </button>
               ) : <div className="text-sm opacity-50 uppercase font-bold tracking-widest">Hết truyện</div>}
            </div>
@@ -1247,26 +1269,26 @@ export function Reader() {
 
            {/* Comments Area (Counts for missions) */}
            <div className="mb-12">
-               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]" : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>Bình luận chương</h3>
+               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]" : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>{isCustomThemeActive ? "Đề xuất và ý kiến" : "Bình luận chương"}</h3>
                <form onSubmit={handleComment} className="flex flex-col gap-3 mb-8">
                   <textarea 
                      value={commentText}
                      onChange={(e) => setCommentText(e.target.value)}
                      disabled={!isLoggedIn}
-                     placeholder={isLoggedIn ? "Nhập bình luận của bạn..." : "Đăng nhập để bình luận"}
+                     placeholder={isLoggedIn ? (isCustomThemeActive ? "Nhập đề xuất và ý kiến của bạn..." : "Nhập bình luận của bạn...") : (isCustomThemeActive ? "Đăng nhập để trình ý kiến" : "Đăng nhập để bình luận")}
                      className={cn("w-full p-4 rounded-2xl resize-none border-2 outline-none font-semibold text-xs sm:text-sm transition-all", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f] focus:shadow-[2px_2px_0_0_#2e2a63]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-white focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#000]" : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#3E2723]")}
                      rows={4}
                   />
                   <div className="flex justify-end">
-                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-xl font-black disabled:opacity-50 transition-all uppercase text-xs tracking-wider border-2 active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[3px_3px_0_0_#3E2723]", isCustomThemeActive ? "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:bg-white" : "bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>
-                        Gửi bình luận
+                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-xl font-black transition-all uppercase text-xs tracking-wider border-2 active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[3px_3px_0_0_#3E2723]", isCustomThemeActive ? "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none" : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>
+                        {isCustomThemeActive ? "Trình ý kiến" : "Gửi bình luận"}
                      </button>
                   </div>
                </form>
 
                <div className="space-y-6">
                    {chapterComments.length === 0 ? (
-                       <p className="text-center italic opacity-50">Chưa có bình luận nào cho chương này.</p>
+                       <p className={cn("text-center italic opacity-50", isCustomThemeActive ? "text-[#dbcec2]/70" : "")}>{isCustomThemeActive ? "Chưa có đề xuất và ý kiến nào cho tài liệu này." : "Chưa có bình luận nào cho chương này."}</p>
                    ) : (
                        chapterComments.map(c => { return <ChapterCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={effectiveIsDark} isStoryTheme={isCustomThemeActive} profilesCache={profilesCache} />; if (false) { return (
                            <div key={c.id} className={cn("p-5 rounded-2xl border relative overflow-visible", isDark ? "bg-[#2C221D]/80 border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8] shadow-sm pr-8")}>
