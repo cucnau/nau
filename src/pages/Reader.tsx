@@ -1111,13 +1111,13 @@ export function Reader() {
                                           : "bg-[#FFFDF9] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]"
                                 )}>
                                    <div className="flex justify-between items-center mb-3">
-                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isCustomThemeActive ? "text-[#bbee1f]" : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Bình luận đoạn</h4>
+                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isCustomThemeActive ? "text-[#bbee1f]" : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>{isCustomThemeActive ? "Ý kiến đoạn" : "Bình luận đoạn"}</h4>
                                        <button onClick={() => setActiveParagraphIndex(null)} className="text-xs uppercase font-bold opacity-50 hover:opacity-100">Đóng</button>
                                    </div>
                                    
                                    <div className="space-y-4 mb-4 max-h-60 overflow-y-auto pr-2 pt-4">
                                        {pComments.length === 0 ? (
-                                           <div className="text-center italic text-sm opacity-50 py-2">Chưa có bình luận. Hãy là người đầu tiên!</div>
+                                           <div className="text-center italic text-sm opacity-50 py-2">{isCustomThemeActive ? "Chưa có ý kiến nào cho đoạn này." : "Chưa có bình luận. Hãy là người đầu tiên!"}</div>
                                        ) : (
                                            pComments.map(c => { return <ParagraphCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={effectiveIsDark} isStoryTheme={isCustomThemeActive} profilesCache={profilesCache} />; if (false) { return (
                                                <div key={c.id} className="flex flex-col gap-1 w-full border-b border-stone-100/15 pb-3 last:border-0 last:pb-0">
