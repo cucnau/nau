@@ -32,11 +32,13 @@ export function FeatureLockModal() {
         {/* Close Button */}
         <button
           onClick={() => setLockedFeatureId(null)}
-          className={`absolute top-4 right-4 w-8 h-8 rounded-full border-2 flex items-center justify-center hover:scale-110 active:scale-95 transition-all ${
-            isDark ? 'border-[#4E342E] text-[#A1887F] hover:bg-[#3E2D25]' : 'border-[#3E2723] text-[#8D6E63] hover:bg-[#F5E6D3]'
+          className={`absolute top-4 right-4 w-8 h-8 flex items-center justify-center border-[3px] shadow-[0_3px_0_0_#3E2723] dark:shadow-[0_3px_0_0_#0D0907] rounded-xl active:translate-y-0.5 active:shadow-none transition-all ${
+            isDark 
+              ? 'bg-[#1E1815] hover:bg-[#2C221D] border-[#4E342E] text-[#ECE5DC]' 
+              : 'bg-[#FDF6EC] hover:bg-[#E6D8C9] border-[#3E2723] text-[#3E2723]'
           }`}
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5" />
         </button>
 
         {/* Locked Icon Illustration */}
