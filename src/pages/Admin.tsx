@@ -82,6 +82,7 @@ interface Book {
   author: string;
   coverUrl: string;
   description?: string;
+  recommendations?: string;
   genres: string[];
   chapterCount: number;
   completed?: boolean;
@@ -2256,6 +2257,7 @@ export function Admin() {
   const [author, setAuthor] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
   const [description, setDescription] = useState("");
+  const [recommendations, setRecommendations] = useState("");
   const [genres, setGenres] = useState("");
   const [completed, setCompleted] = useState(false);
   const [externalUrl, setExternalUrl] = useState("");
@@ -2883,6 +2885,7 @@ export function Admin() {
             author: data.author,
             coverUrl: data.coverUrl || "",
             description: data.description || "",
+            recommendations: data.recommendations || "",
             genres: data.genres || [],
             chapterCount: data.chapterCount || 0,
             completed: data.completed || false,
@@ -3587,6 +3590,7 @@ export function Admin() {
         author,
         coverUrl,
         description,
+        recommendations,
         genres: genreArray,
         chapterCount: 0,
         completed,
@@ -3598,6 +3602,7 @@ export function Admin() {
       setAuthor("");
       setCoverUrl("");
       setDescription("");
+      setRecommendations("");
       setGenres("");
       setCompleted(false);
       setExternalUrl("");
@@ -3637,6 +3642,7 @@ export function Admin() {
         author: editingStory.author,
         coverUrl: editingStory.coverUrl,
         description: editingStory.description || "",
+        recommendations: editingStory.recommendations || "",
         genres: genreArray,
         completed: editingStory.completed || false,
         externalUrl: editingStory.externalUrl || "",
@@ -7265,7 +7271,18 @@ export function Admin() {
                   })
                 }
                 placeholder="Giới thiệu"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] min-h-[100px]"
+                className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all min-h-[100px]"
+              />
+              <textarea
+                value={editingStory.recommendations || ""}
+                onChange={(e) =>
+                  setEditingStory({
+                    ...editingStory,
+                    recommendations: e.target.value,
+                  })
+                }
+                placeholder="Giới thiệu truyện khác (Ví dụ: Để kéo reader sang bộ khác)"
+                className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all min-h-[100px]"
               />
               <input
                 type="text"
@@ -7369,7 +7386,13 @@ export function Admin() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Giới thiệu"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#8D6E63] min-h-[100px]"
+                className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all min-h-[100px]"
+              />
+              <textarea
+                value={recommendations}
+                onChange={(e) => setRecommendations(e.target.value)}
+                placeholder="Giới thiệu truyện khác (Ví dụ: Để kéo reader sang bộ khác)"
+                className="w-full px-4 py-2 bg-[#FFFDF9] dark:bg-[#1E1815] border-2 border-[#3E2723] dark:border-[#4E342E] text-[#3E2723] dark:text-[#ECE5DC] rounded-xl focus:outline-none focus:border-[#8D6E63] dark:focus:border-[#5D4037] transition-all min-h-[100px]"
               />
               <input
                 type="text"
