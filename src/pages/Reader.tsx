@@ -26,7 +26,8 @@ const ParagraphCommentNode = ({
    isLoggedIn,
    isDark,
    depth = 0,
-   profilesCache = {}
+   profilesCache = {},
+   isStoryTheme = false
 }: any) => {
    const { uid: storeUid, equippedStickerComment, stickerPositionComment, displayName: storeDisplayName, avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle, equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition } = useStore();
    const isMe = comment.uid === storeUid;
@@ -46,9 +47,19 @@ const ParagraphCommentNode = ({
       return timeA - timeB;
    });
 
+   const isGift = comment.type === 'choco_gift';
+
    return (
-      <div key={comment.id} className="text-xs pt-2 mt-2 border-t-2 border-dashed border-[#3E2723]/10 dark:border-[#4E342E]/30 first:border-0">
-         <div className={cn("relative flex gap-2.5 items-start p-2.5 rounded-2xl border-2 transition-all hover:-translate-y-0.5", isDark ? "bg-[#1C1613] border-[#3E2723] text-[#ECE5DC] shadow-[1px_1px_0_0_#1C1613]" : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] shadow-[1px_1px_0_0_#3E2723]", currentSticker ? "pr-11" : "")}>
+      <div key={comment.id} className={cn("text-xs pt-2 mt-2 border-t-2 border-dashed first:border-0", isStoryTheme ? "border-[#2e2a63]/20" : "border-[#3E2723]/10 dark:border-[#4E342E]/30")}>
+         <div className={cn(
+            "relative flex gap-2.5 items-start p-2.5 rounded-2xl border-2 transition-all hover:-translate-y-0.5", 
+            isStoryTheme 
+               ? "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]" 
+               : isDark 
+                  ? "bg-[#1C1613] border-[#3E2723] text-[#ECE5DC] shadow-[1px_1px_0_0_#1C1613]" 
+                  : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] shadow-[1px_1px_0_0_#3E2723]", 
+            currentSticker ? "pr-11" : ""
+         )}>
              {currentSticker && (
                <img 
                  src={currentSticker} 
@@ -62,26 +73,40 @@ const ParagraphCommentNode = ({
                equippedAccessory={currentAccessory}
                accessoryPosition={currentAccessoryPos}
                className="w-8 h-8 shrink-0 pointer-events-none" 
-               fallbackIconSizeClass="w-4 h-4 text-[#A1887F]" 
-               borderClass="border border-[#D7CCC8]/30"
+               fallbackIconSizeClass={isStoryTheme ? "w-4 h-4 text-[#bbee1f]" : "w-4 h-4 text-[#A1887F]"} 
+               borderClass={isStoryTheme ? "border border-[#2e2a63]/50" : "border border-[#D7CCC8]/30"}
             />
             <div className="flex-1 min-w-0">
-               <div className="text-[11px] font-black mb-0.5 flex justify-between tracking-tight" style={{ color: getTitleColor(currentActiveTitle) || undefined }}>
-                  <span className="flex items-center gap-1">
-                     {currentDisplayName}
+               <div className="text-[11px] font-black mb-0.5 flex justify-between tracking-tight">
+                  <span className="flex items-center gap-1 flex-wrap">
+                     <span style={{ color: getTitleColor(currentActiveTitle) || (isStoryTheme ? "#bbee1f" : undefined) }}>
+                        {currentDisplayName}
+                     </span>
                      {currentActiveTitle && (
-                        <span className="px-1 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[7px] font-black rounded border border-[#3E2723]">
+                        <span className={cn(
+                           "px-1 py-0.5 text-[7px] font-black rounded border",
+                           isStoryTheme 
+                              ? "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40" 
+                              : "bg-[#F5E6D3] text-[#5D4037] border-[#3E2723]"
+                        )}>
                            🏆 {currentActiveTitle}
                         </span>
                      )}
                   </span>
-                  <span className="text-[9px] text-stone-400 font-mono">
+                  <span className={cn("text-[9px] font-mono", isStoryTheme ? "text-[#695b7f]" : "text-stone-400")}>
                      {comment.createdAt?.toDate 
                         ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                         : 'Vừa xong'}
                   </span>
                </div>
-               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isDark ? "text-[#ECE5DC]" : "text-[#5D4037]")}>
+               
+               {isGift && (
+                  <span className="inline-flex text-[#13120d] text-[8px] font-black bg-[#bbee1f] px-2 py-0.5 uppercase tracking-wider items-center gap-1 mb-1 border border-[#bbee1f]/50">
+                     🎁 Tài trợ {comment.giftAmount || 0} CC
+                  </span>
+               )}
+
+               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isStoryTheme ? "text-[#dbcec2]" : (isDark ? "text-[#ECE5DC]" : "text-[#5D4037]"))}>
                   {comment.content}
                </p>
                
@@ -96,7 +121,7 @@ const ParagraphCommentNode = ({
                            setReplyText('');
                         }
                      }}
-                     className="text-[10px] text-[#8D6E63] hover:text-[#5D4037] font-black uppercase tracking-wider block mt-1 cursor-pointer"
+                     className={cn("text-[10px] font-black uppercase tracking-wider block mt-1 cursor-pointer transition-colors", isStoryTheme ? "text-[#695b7f] hover:text-[#bbee1f]" : "text-[#8D6E63] hover:text-[#5D4037]")}
                   >
                      Trả lời
                   </button>
@@ -110,7 +135,14 @@ const ParagraphCommentNode = ({
                         value={replyText}
                         disabled={submittingReply}
                         onChange={(e) => setReplyText(e.target.value)}
-                        className={cn("flex-1 px-3 py-1.5 text-xs rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold bg-white dark:bg-[#1A1412]", isDark ? "border-[#3E2723] text-[#ECE5DC]" : "border-[#3E2723] text-[#3E2723]")}
+                        className={cn(
+                           "flex-1 px-3 py-1.5 text-xs rounded-xl border-2 focus:outline-none font-semibold", 
+                           isStoryTheme 
+                              ? "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]" 
+                              : isDark 
+                                 ? "bg-white dark:bg-[#1A1412] border-[#3E2723] text-[#ECE5DC] focus:border-[#8D6E63]" 
+                                 : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63]"
+                        )}
                         onKeyDown={(e) => {
                            if (e.key === 'Enter') {
                               e.preventDefault();
@@ -124,7 +156,12 @@ const ParagraphCommentNode = ({
                         type="button"
                         onClick={() => handleSendReply(comment)}
                         disabled={submittingReply || !replyText.trim()}
-                        className="bg-[#8D6E63] hover:bg-[#5D4037] text-white px-3 py-1 rounded-xl text-xs font-black uppercase transition-all border-2 border-[#3E2723] cursor-pointer disabled:opacity-50"
+                        className={cn(
+                           "px-3 py-1 rounded-xl text-xs font-black uppercase transition-all cursor-pointer disabled:opacity-50 border-2",
+                           isStoryTheme 
+                              ? "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63]" 
+                              : "bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
+                        )}
                      >
                         Gửi
                      </button>
@@ -135,7 +172,8 @@ const ParagraphCommentNode = ({
 
          {replies.length > 0 && (
             <div className={cn(
-               "mt-2 pl-4 space-y-2 border-l-2 border-dashed border-[#3E2723]/20 dark:border-white/10",
+               "mt-2 pl-4 space-y-2 border-l-2 border-dashed",
+               isStoryTheme ? "border-[#2e2a63]/20" : "border-[#3E2723]/20 dark:border-white/10",
                depth > 4 ? "pl-1 border-0" : ""
             )}>
                {replies.map(r => (
@@ -153,6 +191,8 @@ const ParagraphCommentNode = ({
                      isLoggedIn={isLoggedIn}
                      isDark={isDark}
                      depth={depth + 1}
+                     isStoryTheme={isStoryTheme}
+                     profilesCache={profilesCache}
                   />
                ))}
             </div>
@@ -174,7 +214,8 @@ const ChapterCommentNode = ({
    isLoggedIn,
    isDark,
    depth = 0,
-   profilesCache = {}
+   profilesCache = {},
+   isStoryTheme = false
 }: any) => {
    const { uid: storeUid, equippedStickerComment, stickerPositionComment, displayName: storeDisplayName, avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle, equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition } = useStore();
    const isMe = comment.uid === storeUid;
@@ -194,8 +235,18 @@ const ChapterCommentNode = ({
       return timeA - timeB;
    });
 
+   const isGift = comment.type === 'choco_gift';
+
    return (
-      <div key={comment.id} className={cn("relative p-5 rounded-3xl border-3 flex flex-col gap-3 transition-all hover:-translate-y-0.5 whitespace-normal", isDark ? "bg-[#1C1613] border-[#3E2723] text-[#ECE5DC] shadow-[2px_2px_0_0_#1A1412]" : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]", currentSticker ? "pr-14" : "")}>
+      <div key={comment.id} className={cn(
+         "relative p-5 rounded-3xl border-3 flex flex-col gap-3 transition-all hover:-translate-y-0.5 whitespace-normal", 
+         isStoryTheme 
+            ? "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]" 
+            : isDark 
+               ? "bg-[#1C1613] border-[#3E2723] text-[#ECE5DC] shadow-[2px_2px_0_0_#1A1412]" 
+               : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]", 
+         currentSticker ? "pr-14" : ""
+      )}>
          {currentSticker && (
            <img 
              src={currentSticker} 
@@ -210,27 +261,41 @@ const ChapterCommentNode = ({
                equippedAccessory={currentAccessory}
                accessoryPosition={currentAccessoryPos}
                className="w-10 h-10 shrink-0 pointer-events-none" 
-               fallbackIconSizeClass="w-5 h-5 text-[#A1887F]" 
-               borderClass="border border-[#D7CCC8]/30"
+               fallbackIconSizeClass={isStoryTheme ? "w-5 h-5 text-[#bbee1f]" : "w-5 h-5 text-[#A1887F]"} 
+               borderClass={isStoryTheme ? "border border-[#2e2a63]/50" : "border border-[#D7CCC8]/30"}
             />
             <div className="flex-1 min-w-0">
                <div className="flex items-center justify-between gap-2 mb-1">
-                  <span className="font-black text-xs flex items-center gap-1.5" style={{ color: getTitleColor(currentActiveTitle) || undefined }}>
-                     {currentDisplayName}
+                  <span className="font-black text-xs flex items-center gap-1.5 flex-wrap">
+                     <span style={{ color: getTitleColor(currentActiveTitle) || (isStoryTheme ? "#bbee1f" : undefined) }}>
+                        {currentDisplayName}
+                     </span>
                      {currentActiveTitle && (
-                        <span className="px-1.5 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[9px] font-black rounded uppercase tracking-tight select-none border border-[#3E2723] inline-block align-middle">
+                        <span className={cn(
+                           "px-1.5 py-0.5 text-[9px] font-black rounded uppercase tracking-tight select-none border inline-block align-middle",
+                           isStoryTheme 
+                              ? "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40" 
+                              : "bg-[#F5E6D3] text-[#5D4037] border-[#3E2723]"
+                        )}>
                            🏆 {currentActiveTitle}
                         </span>
                      )}
                   </span>
                   
-                  <span className="text-[9px] text-stone-400 font-mono shrink-0">
+                  <span className={cn("text-[9px] font-mono shrink-0", isStoryTheme ? "text-[#695b7f]" : "text-stone-400")}>
                      {comment.createdAt?.toDate 
                         ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                         : 'Vừa xong'}
                   </span>
                </div>
-               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isDark ? "text-[#ECE5DC]" : "text-[#5D4037]")}>
+
+               {isGift && (
+                  <span className="inline-flex text-[#13120d] text-[9px] font-black bg-[#bbee1f] px-3 py-1 uppercase tracking-wider items-center gap-1.5 mb-2 border border-[#bbee1f]/50">
+                     🎁 Tài trợ {comment.giftAmount || 0} CC
+                  </span>
+               )}
+
+               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isStoryTheme ? "text-[#dbcec2]" : (isDark ? "text-[#ECE5DC]" : "text-[#5D4037]"))}>
                   {comment.content}
                </p>
 
@@ -246,7 +311,7 @@ const ChapterCommentNode = ({
                               setReplyText('');
                            }
                         }}
-                        className="text-xs text-[#8D6E63] hover:text-[#5D4037] font-black flex items-center gap-1 cursor-pointer transition-colors uppercase tracking-wider"
+                        className={cn("text-xs font-black flex items-center gap-1 cursor-pointer transition-colors uppercase tracking-wider", isStoryTheme ? "text-[#695b7f] hover:text-[#bbee1f]" : "text-[#8D6E63] hover:text-[#5D4037]")}
                      >
                         <MessageSquare className="w-3.5 h-3.5" />
                         Trả lời
@@ -263,7 +328,14 @@ const ChapterCommentNode = ({
                         value={replyText}
                         disabled={submittingReply}
                         onChange={(e) => setReplyText(e.target.value)}
-                        className={cn("flex-1 px-3.5 py-1.5 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold bg-white dark:bg-[#1A1412]", isDark ? "border-[#3E2723] text-[#ECE5DC]" : "border-[#3E2723] text-[#3E2723]")}
+                        className={cn(
+                           "flex-1 px-3.5 py-1.5 text-xs sm:text-sm rounded-xl border-2 focus:outline-none font-semibold", 
+                           isStoryTheme 
+                              ? "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]" 
+                              : isDark 
+                                 ? "bg-white dark:bg-[#1A1412] border-[#3E2723] text-[#ECE5DC] focus:border-[#8D6E63]" 
+                                 : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63]"
+                        )}
                         onKeyDown={(e) => {
                            if (e.key === 'Enter') {
                               e.preventDefault();
@@ -276,7 +348,12 @@ const ChapterCommentNode = ({
                      <button 
                         onClick={() => handleSendReply(comment)}
                         disabled={submittingReply || !replyText.trim()}
-                        className={cn("px-4 py-1.5 bg-[#8D6E63] hover:bg-[#5D4037] text-white font-black text-xs rounded-xl border-2 border-[#3E2723] transition-all cursor-pointer")}
+                        className={cn(
+                           "px-4 py-1.5 font-black text-xs rounded-xl border-2 transition-all cursor-pointer",
+                           isStoryTheme 
+                              ? "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63]" 
+                              : "bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
+                        )}
                      >
                         Gửi
                      </button>
@@ -287,7 +364,8 @@ const ChapterCommentNode = ({
 
          {replies.length > 0 && (
             <div className={cn(
-               "pl-4 space-y-3 border-l-2 border-dashed border-[#3E2723]/20 dark:border-white/10 mt-1",
+               "pl-4 space-y-3 border-l-2 border-dashed mt-1",
+               isStoryTheme ? "border-[#2e2a63]/20" : "border-[#3E2723]/20 dark:border-white/10",
                depth > 4 ? "pl-1 border-0" : ""
             )}>
                {replies.map(r => (
@@ -305,6 +383,8 @@ const ChapterCommentNode = ({
                      isLoggedIn={isLoggedIn}
                      isDark={isDark}
                      depth={depth + 1}
+                     isStoryTheme={isStoryTheme}
+                     profilesCache={profilesCache}
                   />
                ))}
             </div>
@@ -338,6 +418,14 @@ export function Reader() {
     return localStorage.getItem('reader-font-family') || 'font-reading-nunito';
   });
   const [isDark, setIsDark] = useState(theme === 'dark');
+  const [useStoryTheme, setUseStoryTheme] = useState(() => {
+    const saved = localStorage.getItem('reader-use-story-theme');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('reader-use-story-theme', String(useStoryTheme));
+  }, [useStoryTheme]);
 
   useEffect(() => {
     localStorage.setItem('reader-font-family', fontFamily);
@@ -504,7 +592,7 @@ export function Reader() {
             storyId: storyId!,
             chapterId: currentChapter?.id || null,
             chapterTitle: currentChapter?.title || 'Chương',
-            content: type === 'sticker' ? '💬 [Bình luận nhãn dán]' : content
+            content: type === 'sticker' ? '💬 [Bình luận sticker]' : content
          });
      } catch (err) {
          console.error(err);
@@ -762,14 +850,29 @@ export function Reader() {
     return () => clearInterval(interval);
   }, [isFinished, isLocked, timeRequired, currentChapter?.id]);
 
+  const hasCustomTheme = story?.title?.toLowerCase().includes('hướng dẫn giả ngoan');
+  const isCustomThemeActive = !!(hasCustomTheme && useStoryTheme);
+  const effectiveIsDark = isCustomThemeActive ? true : isDark;
+  const effectiveFontFamily = isCustomThemeActive ? 'font-reading-garamond' : fontFamily;
+
   if (loading) return <div className="p-10 text-center">Đang tải...</div>;
   if (!story || !currentChapter) return <div className="p-10 text-center">Không tìm thấy chương</div>;
 
   return (
-    <div className={cn("min-h-screen flex flex-col transition-colors duration-300", isDark ? "bg-[#14100E] text-[#ECE5DC]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] text-[#3E2723] dark:text-[#3E2723]")}>
+    <div className={cn("min-h-screen flex flex-col transition-colors duration-300 relative overflow-hidden", isCustomThemeActive ? "bg-[#13120d] text-[#dbcec2] selection:bg-[#bbee1f] selection:text-[#13120d]" : (effectiveIsDark ? "bg-[#14100E] text-[#ECE5DC]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] text-[#3E2723] dark:text-[#3E2723]"))}>
+       {isCustomThemeActive && (
+         <>
+           <div className="fixed inset-0 pointer-events-none opacity-20"
+                style={{ backgroundImage: 'repeating-linear-gradient(45deg, #2e2a63 0, #2e2a63 1px, transparent 1px, transparent 50px)' }} />
+           <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#2e2a63] rounded-full blur-[150px] opacity-30 pointer-events-none" />
+           <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#bbee1f] rounded-full blur-[180px] opacity-10 pointer-events-none" />
+         </>
+       )}
        {/* Top Navigation */}
-       <header className={cn("sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b-2 transition-all duration-300 shadow-sm", 
-         isDark ? "bg-[#1A1412] border-[#3E2723]" : "bg-[#F5E6D3] dark:bg-[#F5E6D3] border-[#3E2723] dark:border-[#3E2723]",
+       <header className={cn("sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b-2 transition-all duration-300 shadow-sm relative", 
+         isCustomThemeActive 
+           ? "bg-[#13120d]/95 border-[#2e2a63]/50 text-[#dbcec2] backdrop-blur-sm"
+           : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723]" : "bg-[#F5E6D3] dark:bg-[#F5E6D3] border-[#3E2723] dark:border-[#3E2723]",
          showHeader ? "translate-y-0" : "-translate-y-full"
        )}>
           <div className="flex flex-col">
@@ -779,36 +882,67 @@ export function Reader() {
              <h1 className="text-base sm:text-lg font-black tracking-tight">{currentChapter.title}</h1>
           </div>
           <div className="relative flex items-center gap-2">
-             <button onClick={() => setShowSettings(!showSettings)} className="p-2 rounded-xl border-2 border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412] shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer">
+             <button onClick={() => setShowSettings(!showSettings)} className={cn("p-2 rounded-xl border-2 shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer",
+                isCustomThemeActive 
+                   ? "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
+                   : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
+             )}>
                 <Settings2 className="w-5 h-5" />
              </button>
              
              {/* Settings Panel */}
              {showSettings && (
-                <div className={cn("absolute right-0 top-full mt-2 w-64 p-5 rounded-3xl shadow-xl z-20 border-3 border-[#3E2723] transition-colors", isDark ? "bg-[#211B18] text-[#ECE5DC]" : "bg-[#FFFDF9] text-[#3E2723]")}>
-                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isDark ? "text-[#ECE5DC]" : "text-[#3E2723]")}>Cài đặt</h3>
+                <div className={cn("absolute right-0 top-full mt-2 w-64 p-5 rounded-3xl shadow-xl z-20 border-3 transition-colors", 
+                   isCustomThemeActive 
+                      ? "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] font-reading-garamond shadow-lg" 
+                      : effectiveIsDark ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723]" : "bg-[#FFFDF9] text-[#3E2723] border-[#3E2723]"
+                )}>
+                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isCustomThemeActive ? "text-[#bbee1f]" : (effectiveIsDark ? "text-[#ECE5DC]" : "text-[#3E2723]"))}>Cài đặt</h3>
                    <div className="flex flex-col gap-6">
+                      {hasCustomTheme && (
+                         <div className="flex flex-col gap-2 pb-4 border-b-2 border-dashed border-[#2e2a63]/20">
+                            <label className={cn("text-xs font-black uppercase flex items-center justify-between", isCustomThemeActive ? "text-[#bbee1f]" : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>
+                               Giao diện truyện
+                               <span className="text-[9px] bg-[#bbee1f] text-[#13120d] font-bold px-1.5 py-0.5 rounded border border-[#bbee1f]">PREMIUM</span>
+                            </label>
+                            <button 
+                               type="button"
+                               onClick={() => setUseStoryTheme(!useStoryTheme)}
+                               className={cn(
+                                  "w-full py-2 text-xs font-black uppercase rounded-xl border-2 transition-all cursor-pointer",
+                                  useStoryTheme 
+                                    ? "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white" 
+                                    : "bg-transparent border-[#3E2723] text-[#3E2723] dark:text-[#ECE5DC] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
+                               )}
+                            >
+                               {useStoryTheme ? '✓ Đang bật (Hải Đăng Đỏ)' : 'Sử dụng giao diện riêng'}
+                            </button>
+                         </div>
+                      )}
                       <div>
-                           <label className={cn("text-xs font-black uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63]")}>Màu nền</label>
-                           <div className="flex items-center gap-3">
-                              <button onClick={() => setIsDark(false)} style={{ backgroundColor: '#FDF6EC' }} className={cn("w-10 h-10 rounded-full border-3", !isDark ? "border-[#3E2723]" : "border-[#D7CCC8]")}></button>
-                              <button onClick={() => setIsDark(true)} style={{ backgroundColor: '#1A1412' }} className={cn("w-10 h-10 rounded-full border-3", isDark ? "border-[#D4AF37]" : "border-[#3C2E27]")}></button>
-                           </div>
+                            <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? "text-[#695b7f]" : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Màu nền</label>
+                            <div className="flex items-center gap-3">
+                               <button type="button" onClick={() => { setIsDark(false); if(isCustomThemeActive) setUseStoryTheme(false); }} style={{ backgroundColor: '#FDF6EC' }} className={cn("w-10 h-10 rounded-full border-3", !effectiveIsDark && !isCustomThemeActive ? "border-[#3E2723]" : "border-[#D7CCC8]")}></button>
+                               <button type="button" onClick={() => { setIsDark(true); if(isCustomThemeActive) setUseStoryTheme(false); }} style={{ backgroundColor: '#1A1412' }} className={cn("w-10 h-10 rounded-full border-3", effectiveIsDark && !isCustomThemeActive ? "border-[#D4AF37]" : "border-[#3C2E27]")}></button>
+                            </div>
                       </div>
                       <div>
-                         <label className={cn("text-xs font-black uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63]")}>Cỡ chữ: {fontSize}px</label>
-                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full accent-[#3E2723]" />
+                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? "text-[#695b7f]" : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Cỡ chữ: {fontSize}px</label>
+                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className={cn("w-full accent-[#3E2723]", isCustomThemeActive && "accent-[#bbee1f]")} />
                        </div>
                        <div>
-                          <label className={cn("text-xs font-black uppercase mb-3 block", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63]")}>Phông chữ</label>
+                          <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? "text-[#695b7f]" : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Phông chữ</label>
                           <select 
-                            value={fontFamily} 
+                            value={effectiveFontFamily} 
+                            disabled={isCustomThemeActive}
                             onChange={(e) => setFontFamily(e.target.value)} 
                             className={cn(
                               "w-full px-3 py-2 text-sm rounded-xl border-2 outline-none transition-colors",
-                              isDark 
-                                ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723] focus:border-[#D4AF37]" 
-                                : "bg-white text-[#3E2723] border-[#3E2723] focus:border-[#8D6E63]"
+                              isCustomThemeActive 
+                                ? "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] cursor-not-allowed opacity-75"
+                                : effectiveIsDark 
+                                  ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723] focus:border-[#D4AF37]" 
+                                  : "bg-white text-[#3E2723] border-[#3E2723] focus:border-[#8D6E63]"
                             )}
                           >
                             <option value="font-reading-nunito" className="font-reading-nunito">Nunito (Mặc định)</option>
@@ -818,6 +952,7 @@ export function Reader() {
                             <option value="font-reading-iosevka" className="font-reading-iosevka">Iosevka Charon</option>
                             <option value="font-reading-notoserif" className="font-reading-notoserif">Noto Serif</option>
                           </select>
+                          {isCustomThemeActive && <span className="text-[10px] text-[#bbee1f] mt-1 block">Khóa phông chữ EB Garamond theo theme</span>}
                       </div>
                    </div>
                 </div>
@@ -877,7 +1012,14 @@ export function Reader() {
               </div>
            ) : (
               <div 
-                  className={cn("leading-relaxed text-justify space-y-6 select-none p-6 sm:p-10 md:p-12 rounded-[24px] sm:rounded-[32px] border-3 border-[#3E2723] shadow-[3px_3px_0_0_#3E2723] transition-all", isDark ? "bg-[#1E1815] text-[#ECE5DC]" : "bg-[#FFFDF9] text-[#3E2723]", fontFamily)}
+                  className={cn("leading-relaxed text-justify space-y-6 select-none p-6 sm:p-10 md:p-12 rounded-[24px] sm:rounded-[32px] border-3 transition-all relative z-10", 
+                      isCustomThemeActive 
+                         ? "bg-[#13120d]/85 text-[#dbcec2] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:border-[#bbee1f] transition-all duration-500" 
+                         : effectiveIsDark 
+                            ? "bg-[#1E1815] text-[#ECE5DC] border-[#3E2723] shadow-[3px_3px_0_0_#3E2723]" 
+                            : "bg-[#FFFDF9] text-[#3E2723] border-[#3E2723] shadow-[3px_3px_0_0_#3E2723]", 
+                      effectiveFontFamily
+                   )}
                   style={{ fontSize: `${fontSize}px` }}
               >
                  {paragraphs.map((p: string, idx: number) => {
@@ -892,7 +1034,7 @@ export function Reader() {
                                {p}
                                <button 
                                    onClick={(e) => { e.stopPropagation(); setActiveParagraphIndex(activeParagraphIndex === idx ? null : idx); }} 
-                                   className={cn("inline-flex ml-3 items-center justify-center opacity-40 md:opacity-0 md:group-hover/para:opacity-100 transition-opacity hover:opacity-100 hover:text-[#8D6E63] align-baseline", pComments.length > 0 && "opacity-100 md:opacity-100 text-[#8D6E63]")}
+                                   className={cn("inline-flex ml-3 items-center justify-center opacity-40 md:opacity-0 md:group-hover/para:opacity-100 transition-opacity hover:opacity-100 align-baseline cursor-pointer", isCustomThemeActive ? "hover:text-[#bbee1f]" : "hover:text-[#8D6E63]", pComments.length > 0 && (isCustomThemeActive ? "opacity-100 md:opacity-100 text-[#bbee1f]" : "opacity-100 md:opacity-100 text-[#8D6E63]"))}
                                >
                                   <MessageSquare className="w-[0.8em] h-[0.8em] inline-block -translate-y-[0.15em]" />
                                   {pComments.length > 0 && <span className="text-[0.55em] font-bold ml-1 -translate-y-[0.3em]">{pComments.length}</span>}
@@ -900,9 +1042,15 @@ export function Reader() {
                            </p>
 
                            {activeParagraphIndex === idx && (
-                               <div className={cn("mt-4 p-5 rounded-2xl border-2 shadow-[2px_2px_0_0_#3E2723] transition-all", isDark ? "bg-[#120E0C] border-[#3E2723]" : "bg-[#FFFDF9] border-[#3E2723]")}>
+                               <div className={cn("mt-4 p-5 rounded-2xl border-2 transition-all", 
+                                    isCustomThemeActive 
+                                       ? "bg-[#13120d]/95 border-[#2e2a63] text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]" 
+                                       : effectiveIsDark 
+                                          ? "bg-[#120E0C] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]" 
+                                          : "bg-[#FFFDF9] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]"
+                                )}>
                                    <div className="flex justify-between items-center mb-3">
-                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")}>Bình luận đoạn</h4>
+                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isCustomThemeActive ? "text-[#bbee1f]" : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Bình luận đoạn</h4>
                                        <button onClick={() => setActiveParagraphIndex(null)} className="text-xs uppercase font-bold opacity-50 hover:opacity-100">Đóng</button>
                                    </div>
                                    
@@ -910,7 +1058,7 @@ export function Reader() {
                                        {pComments.length === 0 ? (
                                            <div className="text-center italic text-sm opacity-50 py-2">Chưa có bình luận. Hãy là người đầu tiên!</div>
                                        ) : (
-                                           pComments.map(c => { return <ParagraphCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={isDark} profilesCache={profilesCache} />; if (false) { return (
+                                           pComments.map(c => { return <ParagraphCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={effectiveIsDark} isStoryTheme={isCustomThemeActive} profilesCache={profilesCache} />; if (false) { return (
                                                <div key={c.id} className="flex flex-col gap-1 w-full border-b border-stone-100/15 pb-3 last:border-0 last:pb-0">
                                                    <div className="flex gap-3">
                                                        <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="hidden" />
@@ -1026,9 +1174,9 @@ export function Reader() {
                                                 value={paragraphCommentText} 
                                                 onChange={(e) => setParagraphCommentText(e.target.value)} 
                                                 placeholder="Viết bình luận..." 
-                                                className={cn("flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] bg-white dark:bg-[#1A1412]", isDark ? "border-[#3E2723] text-[#ECE5DC]" : "border-[#3E2723] text-[#3E2723]")}
+                                                className={cn("flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}
                                            />
-                                           <button type="submit" disabled={!paragraphCommentText.trim()} className="px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 border-[#3E2723] bg-[#8D6E63] text-white hover:bg-[#5D4037] shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 cursor-pointer">Gửi</button>
+                                           <button type="submit" disabled={!paragraphCommentText.trim()} className={cn("px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 transition-all disabled:opacity-50 cursor-pointer shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none", isCustomThemeActive ? "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white" : "bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>Gửi</button>
                                        </form>
                                    ) : (
                                        <div className="text-xs italic opacity-70 text-center">Đăng nhập để bình luận</div>
@@ -1044,13 +1192,13 @@ export function Reader() {
            {/* Navigation Buttons */}
            <div className="mt-16 mb-8 flex items-center justify-between">
               {prevChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("px-4 py-2 border-2 border-[#3E2723] rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 cursor-pointer bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC]")}>
+                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
                     <ArrowLeft className="w-5 h-5"/> Chương trước
                  </button>
               ) : <div></div>}
               
               {nextChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("px-4 py-2 border-2 border-[#3E2723] rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 cursor-pointer bg-white dark:bg-[#1A1412] text-[#3E2723] dark:text-[#ECE5DC]")}>
+                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
                     Chương sau <ArrowRight className="w-5 h-5"/>
                  </button>
               ) : <div className="text-sm opacity-50 uppercase font-bold tracking-widest">Hết truyện</div>}
@@ -1060,18 +1208,18 @@ export function Reader() {
 
            {/* Comments Area (Counts for missions) */}
            <div className="mb-12">
-               <h3 className="text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 border-[#3E2723] inline-block rounded-xl bg-[#F5E6D3]/65 dark:bg-[#2C221D] shadow-[2px_2px_0_0_#3E2723]">Bình luận chương</h3>
+               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]" : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>Bình luận chương</h3>
                <form onSubmit={handleComment} className="flex flex-col gap-3 mb-8">
                   <textarea 
                      value={commentText}
                      onChange={(e) => setCommentText(e.target.value)}
                      disabled={!isLoggedIn}
                      placeholder={isLoggedIn ? "Nhập bình luận của bạn..." : "Đăng nhập để bình luận"}
-                     className={cn("w-full p-4 rounded-2xl resize-none border-2 border-[#3E2723] focus:border-[#8D6E63] outline-none font-semibold text-xs sm:text-sm transition-all focus:shadow-[2px_2px_0_0_#3E2723] dark:focus:shadow-[2px_2px_0_0_#000] bg-white dark:bg-[#1A1412]", isDark ? "text-white" : "text-[#3E2723]")}
+                     className={cn("w-full p-4 rounded-2xl resize-none border-2 outline-none font-semibold text-xs sm:text-sm transition-all", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f] focus:shadow-[2px_2px_0_0_#2e2a63]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-white focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#000]" : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#3E2723]")}
                      rows={4}
                   />
                   <div className="flex justify-end">
-                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-xl font-black disabled:opacity-50 transition-all uppercase text-xs tracking-wider border-2 border-[#3E2723] bg-[#8D6E63] text-white hover:bg-[#5D4037] shadow-[3px_3px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none cursor-pointer")}>
+                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-xl font-black disabled:opacity-50 transition-all uppercase text-xs tracking-wider border-2 active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[3px_3px_0_0_#3E2723]", isCustomThemeActive ? "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:bg-white" : "bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>
                         Gửi bình luận
                      </button>
                   </div>
@@ -1081,7 +1229,7 @@ export function Reader() {
                    {chapterComments.length === 0 ? (
                        <p className="text-center italic opacity-50">Chưa có bình luận nào cho chương này.</p>
                    ) : (
-                       chapterComments.map(c => { return <ChapterCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={isDark} profilesCache={profilesCache} />; if (false) { return (
+                       chapterComments.map(c => { return <ChapterCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={effectiveIsDark} isStoryTheme={isCustomThemeActive} profilesCache={profilesCache} />; if (false) { return (
                            <div key={c.id} className={cn("p-5 rounded-2xl border relative overflow-visible", isDark ? "bg-[#2C221D]/80 border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8] shadow-sm pr-8")}>
                                {c.equippedSticker && (
                                    <img 
