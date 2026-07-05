@@ -58,31 +58,28 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
             <div className="absolute -bottom-3 -right-3 w-6 h-6 border-b-2 border-r-2 border-[#bbee1f] pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
             <div className="absolute -top-3 -right-3 w-6 h-6 border-t-2 border-r-2 border-[#bbee1f] pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
             <div className="absolute -bottom-3 -left-3 w-6 h-6 border-b-2 border-l-2 border-[#bbee1f] pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity" />
-            
-            {/* Absolute Status Badge */}
-            <div className="absolute top-4 right-4 z-30 hidden md:block">
-              <span className="text-[#bbee1f] text-[9px] font-reading-garamond tracking-[0.3em] uppercase font-bold bg-[#13120d]/90 backdrop-blur-md px-3 py-1.5 border border-[#bbee1f]/50 whitespace-nowrap shadow-lg">
-                {story.status === 'completed' ? 'Hoàn Tất' : 'Đang Xử Lý'}
-              </span>
-            </div>
           </div>
 
           {/* Story Info */}
           <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left mt-10 lg:mt-0 relative">
             
-            <div className="absolute top-0 right-0 text-[#2e2a63] opacity-20 text-9xl font-black italic pointer-events-none leading-none">
+            <div className="absolute top-0 right-0 text-[#2e2a63] opacity-20 text-7xl lg:text-9xl font-black italic pointer-events-none leading-none">
               REBIRTH
             </div>
 
-            <div className="flex flex-wrap justify-center lg:justify-start gap-3 mb-8 relative z-10">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-6 relative z-10">
+              <span className="text-[#bbee1f] text-[10px] font-reading-garamond tracking-[0.3em] uppercase font-bold bg-[#13120d]/90 px-3 py-1.5 border border-[#bbee1f]/50 whitespace-nowrap shadow-lg">
+                {story.status === 'completed' ? 'Hoàn Tất' : 'Đang Xử Lý'}
+              </span>
+              
               {story.tags?.map((tag: string, i: number) => (
-                <span key={i} className="px-4 py-1.5 text-xs font-reading-garamond uppercase tracking-[0.2em] font-medium text-[#13120d] bg-[#695b7f] hover:bg-[#bbee1f] transition-colors border border-[#13120d]">
+                <span key={i} className="px-3 py-1 text-[10px] lg:text-xs font-reading-garamond uppercase tracking-[0.2em] font-medium text-[#13120d] bg-[#695b7f] hover:bg-[#bbee1f] transition-colors border border-[#13120d]">
                   {tag}
                 </span>
               ))}
             </div>
             
-            <h1 className="text-2xl lg:text-4xl font-black text-white leading-[1.2] mb-6 tracking-tight relative z-10 drop-shadow-xl uppercase">
+            <h1 className="text-xl lg:text-3xl font-black text-white leading-[1.3] mb-6 tracking-tight relative z-10 drop-shadow-xl uppercase">
               {story.title}
             </h1>
             
@@ -202,7 +199,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                 <button
                   key={chap.id}
                   onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
-                  className="group flex items-center text-left p-3 lg:p-4 bg-[#13120d]/80 border border-[#2e2a63] hover:border-[#bbee1f]/50 transition-all duration-300 relative overflow-hidden"
+                  className="group flex items-center text-left p-2.5 lg:p-3 bg-[#13120d]/80 border border-[#2e2a63] hover:border-[#bbee1f]/50 transition-all duration-300 relative overflow-hidden"
                 >
                   <div className="absolute left-0 top-0 w-1 h-full bg-[#2e2a63] group-hover:bg-[#bbee1f] transition-colors duration-500" />
                   
@@ -213,14 +210,14 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                   </div>
                   
                   <div className="flex-shrink-0 w-10 lg:w-12 text-center border-r border-[#2e2a63]/50 mr-3 lg:mr-4 pr-3 lg:pr-4">
-                    <span className="block text-[#695b7f] font-reading-garamond text-[8px] tracking-[0.2em] uppercase mb-1">Mã Số</span>
-                    <span className="block text-base lg:text-lg font-light text-[#dbcec2] group-hover:text-[#bbee1f] transition-colors">
+                    <span className="block text-[#695b7f] font-reading-garamond text-[9px] tracking-[0.2em] uppercase mb-1">Mã Số</span>
+                    <span className="block text-lg lg:text-xl font-light text-[#dbcec2] group-hover:text-[#bbee1f] transition-colors">
                       {((chapterPage * CHAPTERS_PER_PAGE) + i + 1).toString().padStart(2, '0')}
                     </span>
                   </div>
                   
                   <div className="flex-1 pr-4">
-                    <span className="text-[#dbcec2] text-xs lg:text-sm group-hover:text-white transition-colors leading-relaxed line-clamp-2">
+                    <span className="text-[#dbcec2] text-sm lg:text-base group-hover:text-white transition-colors leading-relaxed line-clamp-2">
                       {chap.title}
                     </span>
                   </div>
@@ -322,26 +319,26 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
       {/* Gift Modal */}
       {showGiftModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#13120d]/95 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-[#13120d] border-2 border-[#bbee1f] p-6 sm:p-10 max-w-md w-full relative shadow-[0_0_100px_rgba(187,238,31,0.15)] max-h-[90vh] overflow-y-auto custom-scrollbar">
+          <div className="bg-[#13120d] border-2 border-[#bbee1f] p-5 sm:p-8 max-w-md w-full relative shadow-[0_0_100px_rgba(187,238,31,0.15)] max-h-[90vh] overflow-y-auto custom-scrollbar">
             <button onClick={() => setShowGiftModal(false)} className="absolute top-4 right-4 text-[#695b7f] hover:text-[#bbee1f] transition-colors font-reading-garamond text-2xl">✕</button>
             
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-[#2e2a63] flex items-center justify-center mx-auto mb-6 border border-[#695b7f] rotate-45">
-                <Gift className="w-6 h-6 text-[#bbee1f] -rotate-45" />
+            <div className="text-center mb-6">
+              <div className="w-12 h-12 bg-[#2e2a63] flex items-center justify-center mx-auto mb-4 border border-[#695b7f] rotate-45">
+                <Gift className="w-5 h-5 text-[#bbee1f] -rotate-45" />
               </div>
-              <h2 className="text-[#bbee1f] text-2xl font-black uppercase tracking-[0.2em]">Rót Vốn Dự Án</h2>
-              <p className="text-[#695b7f] font-reading-garamond text-xs mt-3 tracking-widest uppercase">Ngân sách: <span className="text-white font-bold">{choco} CC</span></p>
+              <h2 className="text-[#bbee1f] text-xl font-black uppercase tracking-[0.2em]">Rót Vốn Dự Án</h2>
+              <p className="text-[#695b7f] font-reading-garamond text-[10px] mt-2 tracking-widest uppercase">Ngân sách: <span className="text-white font-bold">{choco} CC</span></p>
             </div>
             
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-5">
               <div>
-                <label className="text-[#695b7f] font-reading-garamond text-[10px] font-bold uppercase tracking-[0.3em] mb-4 block text-center">Gói Đầu Tư</label>
-                <div className="grid grid-cols-3 gap-3">
+                <label className="text-[#695b7f] font-reading-garamond text-[9px] font-bold uppercase tracking-[0.3em] mb-3 block text-center">Gói Đầu Tư</label>
+                <div className="grid grid-cols-3 gap-2">
                   {[10, 50, 100].map(amt => (
                     <button
                       key={amt}
                       onClick={() => setGiftAmount(amt)}
-                      className={`py-3 font-reading-garamond text-lg font-black transition-all border-2 ${
+                      className={`py-2.5 font-reading-garamond text-base font-black transition-all border ${
                         giftAmount === amt 
                           ? 'bg-[#bbee1f] text-[#13120d] border-[#bbee1f]' 
                           : 'bg-[#13120d] text-[#dbcec2] border-[#2e2a63] hover:border-[#695b7f]'
@@ -354,21 +351,21 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
               </div>
               
               <div>
-                <label className="text-[#695b7f] font-reading-garamond text-[10px] font-bold uppercase tracking-[0.3em] mb-4 block text-center">Biên Bản Thỏa Thuận (Tùy Chọn)</label>
+                <label className="text-[#695b7f] font-reading-garamond text-[9px] font-bold uppercase tracking-[0.3em] mb-3 block text-center">Biên Bản Thỏa Thuận (Tùy Chọn)</label>
                 <textarea
                   value={giftMessage}
                   onChange={(e) => setGiftMessage(e.target.value)}
                   placeholder="Ghi chú đính kèm..."
-                  className="w-full bg-[#13120d] border border-[#2e2a63] p-4 text-[#dbcec2] text-sm focus:border-[#bbee1f] focus:outline-none resize-none h-24 transition-all"
+                  className="w-full bg-[#13120d] border border-[#2e2a63] p-3 text-[#dbcec2] text-sm focus:border-[#bbee1f] focus:outline-none resize-none h-20 transition-all"
                 />
               </div>
 
               <button
                 onClick={handleGiftSubmit}
                 disabled={giftAmount <= 0}
-                className="w-full py-4 bg-[#bbee1f] text-[#13120d] font-reading-garamond font-black uppercase tracking-[0.2em] hover:bg-white disabled:opacity-50 transition-all mt-2 flex items-center justify-center gap-3"
+                className="w-full py-3 bg-[#bbee1f] text-[#13120d] font-reading-garamond font-black uppercase tracking-[0.2em] hover:bg-white disabled:opacity-50 transition-all mt-1 flex items-center justify-center gap-2 text-xs"
               >
-                Xác Nhận Chuyển Giao <ArrowUpRight className="w-5 h-5" />
+                Xác Nhận Chuyển Giao <ArrowUpRight className="w-4 h-4" />
               </button>
             </div>
           </div>
