@@ -16,6 +16,13 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
     .filter(c => c.type === 'choco_gift')
     .reduce((acc, curr) => acc + (curr.giftAmount || 0), 0);
 
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const displayedChapters = [...chapters]
     .sort((a, b) => {
       const aNum = a.orderIndex !== undefined ? a.orderIndex : parseFloat(a.title?.match(/\d+/)?.[0] || '0');
@@ -157,11 +164,45 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
         </div>
       </div>
 
+      {/* Mini Quick Navigation Bar */}
+      <div className="sticky top-[55px] sm:top-[72px] z-30 w-full bg-[#13120d]/95 backdrop-blur-md border-y border-[#2e2a63]/80 py-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
+        <div className="max-w-5xl mx-auto px-6 lg:px-10 flex items-center justify-center gap-6 sm:gap-12 flex-wrap text-xs font-reading-garamond uppercase tracking-[0.2em]">
+          <button
+            onClick={() => scrollToSection('ban-khao-sat')}
+            className="flex items-center gap-2.5 text-[#dbcec2] hover:text-[#bbee1f] hover:scale-105 transition-all duration-300 font-bold px-3 py-1 bg-[#13120d] border border-transparent hover:border-[#bbee1f]/20"
+          >
+            <Quote className="w-3.5 h-3.5 text-[#bbee1f]" />
+            Bản Khảo Sát
+          </button>
+          
+          {story.recommendations && (
+            <button
+              onClick={() => scrollToSection('lien-ket-de-xuat')}
+              className="flex items-center gap-2.5 text-[#dbcec2] hover:text-[#bbee1f] hover:scale-105 transition-all duration-300 font-bold px-3 py-1 bg-[#13120d] border border-transparent hover:border-[#bbee1f]/20"
+            >
+              <ArrowUpRight className="w-3.5 h-3.5 text-[#bbee1f]" />
+              Dự Án Liên Kết
+            </button>
+          )}
+
+          <button
+            onClick={() => {
+              setActiveTab('chapters');
+              setTimeout(() => scrollToSection('ho-so-thuong-vu'), 50);
+            }}
+            className="flex items-center gap-2.5 text-[#dbcec2] hover:text-[#bbee1f] hover:scale-105 transition-all duration-300 font-bold px-3 py-1 bg-[#13120d] border border-transparent hover:border-[#bbee1f]/20"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-[#bbee1f]" />
+            Hồ Sơ Thương Vụ
+          </button>
+        </div>
+      </div>
+
       <div className="max-w-5xl mx-auto px-6 lg:px-10 mt-16 flex flex-col gap-20 relative z-10">
         
         {/* Synopsis - Executive Summary */}
         {story.description && (
-          <div className="relative p-8 lg:p-14 bg-[#13120d]/80 backdrop-blur-md border border-[#2e2a63] shadow-[0_0_30px_rgba(46,42,99,0.2)] group">
+          <div id="ban-khao-sat" className="relative p-8 lg:p-14 bg-[#13120d]/80 backdrop-blur-md border border-[#2e2a63] shadow-[0_0_30px_rgba(46,42,99,0.2)] group scroll-mt-[130px] sm:scroll-mt-[150px]">
             {/* Corner Brackets */}
             <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#bbee1f] opacity-50 group-hover:opacity-100 transition-opacity" />
             <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#bbee1f] opacity-50 group-hover:opacity-100 transition-opacity" />
@@ -184,23 +225,25 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
 
         {/* Recommendations / Other Stories */}
         {story.recommendations && (
-          <div className="relative p-6 lg:p-10 bg-[#13120d]/80 backdrop-blur-md border border-[#2e2a63] shadow-[0_0_20px_rgba(46,42,99,0.1)] group -mt-12">
+          <div id="lien-ket-de-xuat" className="relative p-8 lg:p-14 bg-[#13120d]/80 backdrop-blur-md border border-[#2e2a63] shadow-[0_0_30px_rgba(46,42,99,0.2)] group scroll-mt-[130px] sm:scroll-mt-[150px]">
             {/* Corner Brackets */}
-            <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-[#bbee1f] opacity-30 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute bottom-0 right-0 w-6 h-6 border-b border-r border-[#bbee1f] opacity-30 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#bbee1f] opacity-50 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#bbee1f] opacity-50 group-hover:opacity-100 transition-opacity" />
             
-            <h3 className="text-[#bbee1f] font-reading-garamond uppercase text-xs font-black tracking-[0.3em] mb-6 flex items-center gap-3">
-              <span className="w-6 h-[1px] bg-[#bbee1f]" /> Dự Án Liên Kết Đề Xuất
+            <h3 className="text-[#bbee1f] font-reading-garamond uppercase text-xs font-black tracking-[0.4em] mb-8 flex items-center gap-4">
+              <span className="w-8 h-[1px] bg-[#bbee1f]" /> Dự Án Liên Kết Đề Xuất
             </h3>
             
-            <div className="text-sm lg:text-base leading-relaxed text-[#dbcec2]/90 whitespace-pre-line font-light relative z-10">
-              {story.recommendations}
+            <div className="text-base lg:text-lg leading-[2] text-[#dbcec2] font-light relative z-10 drop-shadow-sm space-y-4">
+              {story.recommendations?.split('\n').filter((p: string) => p.trim() !== '').map((paragraph: string, idx: number) => (
+                <p key={idx}>{paragraph}</p>
+              ))}
             </div>
           </div>
         )}
 
         {/* Custom Tabs */}
-        <div className="flex justify-center gap-12 border-b-2 border-[#2e2a63]">
+        <div id="ho-so-thuong-vu" className="flex justify-center gap-12 border-b-2 border-[#2e2a63] scroll-mt-[130px] sm:scroll-mt-[150px]">
           <button
             onClick={() => setActiveTab('chapters')}
             className={`pb-6 font-reading-garamond uppercase font-bold tracking-[0.2em] text-sm transition-all relative ${
