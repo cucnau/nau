@@ -148,7 +148,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
 
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-6 relative z-10">
               <span className="text-[#bbee1f] text-[10px] font-reading-garamond tracking-[0.3em] uppercase font-bold bg-[#13120d]/90 px-3 py-1.5 border border-[#bbee1f]/50 whitespace-nowrap shadow-lg">
-                {story.status === 'completed' ? 'Đã Xử Lý Xong' : 'Đang Xử Lý'}
+                {(story.status === 'completed' || story.completed) ? 'Đã Xử Lý Xong' : 'Đang Xử Lý'}
               </span>
               
               {story.tags?.map((tag: string, i: number) => (
@@ -187,7 +187,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
               </div>
               <div className="flex flex-col items-center border-r border-[#2e2a63]">
                 <span className="text-[#695b7f] font-reading-garamond text-[10px] lg:text-xs tracking-widest uppercase mb-3 flex items-center gap-2"><Briefcase className="w-3 h-3 lg:w-4 lg:h-4 text-[#bbee1f]"/> Tình Trạng</span>
-                <span className="text-lg lg:text-xl font-medium text-[#dbcec2] mt-2 text-center">{story.status === 'completed' ? 'Đã Xử Lý Xong' : 'Đang Cập Nhật'}</span>
+                <span className="text-lg lg:text-xl font-medium text-[#dbcec2] mt-2 text-center">{(story.status === 'completed' || story.completed) ? 'Đã Xử Lý Xong' : 'Đang Cập Nhật'}</span>
               </div>
               <div className="flex flex-col items-center">
                 <span className="text-[#695b7f] font-reading-garamond text-[10px] lg:text-xs tracking-widest uppercase mb-3 flex items-center gap-2"><TrendingUp className="w-3 h-3 lg:w-4 lg:h-4 text-[#bbee1f]"/> Đầu Tư</span>
