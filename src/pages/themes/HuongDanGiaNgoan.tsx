@@ -72,11 +72,6 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                 {story.status === 'completed' ? 'Hoàn Tất' : 'Đang Xử Lý'}
               </span>
               
-              {story.genres?.map((genre: string, i: number) => (
-                <span key={`genre-${i}`} className="px-3 py-1 text-[10px] lg:text-xs font-reading-garamond uppercase tracking-[0.2em] font-medium text-[#13120d] bg-[#695b7f] hover:bg-[#bbee1f] transition-colors border border-[#13120d]">
-                  {genre}
-                </span>
-              ))}
               {story.tags?.map((tag: string, i: number) => (
                 <span key={`tag-${i}`} className="px-3 py-1 text-[10px] lg:text-xs font-reading-garamond uppercase tracking-[0.2em] font-medium text-[#dbcec2] bg-transparent border border-[#695b7f] hover:border-[#bbee1f] hover:text-[#bbee1f] transition-colors">
                   {tag}
@@ -88,11 +83,22 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
               {story.title}
             </h1>
             
-            <div className="text-[#dbcec2] text-sm font-reading-garamond tracking-[0.3em] uppercase mb-12 flex items-center gap-4 relative z-10">
+            <div className="text-[#dbcec2] text-sm font-reading-garamond tracking-[0.3em] uppercase mb-4 flex items-center gap-4 relative z-10">
               <span className="w-16 h-[2px] bg-[#bbee1f]" />
               Giám Đốc Dự Án: <span className="font-bold text-white">{story.author || 'Đang cập nhật'}</span>
               <span className="w-16 h-[2px] bg-[#bbee1f]" />
             </div>
+
+            {/* Thể loại (Genres) dưới tên tác giả */}
+            {story.genres && story.genres.length > 0 && (
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-10 relative z-10">
+                {story.genres.map((genre: string, i: number) => (
+                  <span key={`genre-${i}`} className="px-3.5 py-1 text-[10px] lg:text-xs font-reading-garamond uppercase tracking-[0.2em] font-medium text-[#13120d] bg-[#bbee1f] hover:bg-white transition-colors border border-[#13120d] shadow-md">
+                    {genre}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* Dashboard Stats - Corporate Elegant */}
             <div className="grid grid-cols-3 gap-8 mb-12 w-full border-y border-[#2e2a63] py-8 relative z-10 bg-[#13120d]/50 backdrop-blur-sm">
@@ -117,7 +123,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                 className="px-6 py-3.5 bg-[#bbee1f] text-[#13120d] font-reading-garamond font-black uppercase text-xs tracking-[0.2em] hover:bg-white hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(187,238,31,0.3)] flex items-center justify-center gap-2 relative overflow-hidden group"
               >
                 <div className="absolute inset-0 bg-white/30 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12" />
-                Đọc Từ Đầu <ArrowUpRight className="w-4 h-4" />
+                Đọc Từ Đầu <BookOpen className="w-4 h-4" />
               </button>
 
               {story?.externalUrl && (
@@ -127,7 +133,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                   rel="noopener noreferrer"
                   className="px-6 py-3.5 border border-[#bbee1f] text-[#bbee1f] font-reading-garamond uppercase text-xs font-bold tracking-[0.1em] hover:bg-[#bbee1f] hover:text-[#13120d] transition-all flex items-center justify-center gap-2"
                 >
-                  Đọc Truyện <ExternalLink className="w-4 h-4" />
+                  Đọc Hồ Sơ <ExternalLink className="w-4 h-4" />
                 </a>
               )}
               
@@ -243,26 +249,45 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
               ))}
             </div>
 
-            {/* Pagination */}
+            {/* Pagination & Range Selector */}
             {chapters.length > CHAPTERS_PER_PAGE && (
-              <div className="flex flex-wrap justify-center gap-3 mt-12">
-                {Array.from({ length: Math.ceil(chapters.length / CHAPTERS_PER_PAGE) }).map((_, p) => {
-                  const start = p * CHAPTERS_PER_PAGE + 1;
-                  const end = Math.min((p + 1) * CHAPTERS_PER_PAGE, chapters.length);
-                  return (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mt-12 pt-6 border-t border-[#2e2a63]/30">
+                {/* Range Selector Dropdown */}
+                <div className="flex items-center gap-3">
+                  <span className="text-[#695b7f] font-reading-garamond text-xs uppercase tracking-widest">Dải Chương:</span>
+                  <select
+                    value={chapterPage}
+                    onChange={(e) => setChapterPage(Number(e.target.value))}
+                    className="bg-[#13120d] text-[#bbee1f] font-reading-garamond text-xs font-bold px-4 py-2 border border-[#2e2a63] focus:border-[#bbee1f] focus:outline-none transition-all rounded-none uppercase tracking-wider cursor-pointer"
+                  >
+                    {Array.from({ length: Math.ceil(chapters.length / CHAPTERS_PER_PAGE) }).map((_, p) => {
+                      const start = p * CHAPTERS_PER_PAGE + 1;
+                      const end = Math.min((p + 1) * CHAPTERS_PER_PAGE, chapters.length);
+                      return (
+                        <option key={p} value={p} className="bg-[#13120d] text-[#dbcec2]">
+                          Chương {start} - {end}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                {/* Individual Page Buttons (Diamond style from the theme) */}
+                <div className="flex flex-wrap gap-4 justify-center">
+                  {Array.from({ length: Math.ceil(chapters.length / CHAPTERS_PER_PAGE) }).map((_, p) => (
                     <button
                       key={p}
                       onClick={() => setChapterPage(p)}
-                      className={`px-4 py-2 flex items-center justify-center font-reading-garamond text-sm font-black transition-all border ${
+                      className={`w-10 h-10 flex items-center justify-center font-reading-garamond text-xs font-black transition-all ${
                         chapterPage === p 
-                          ? 'bg-[#bbee1f] text-[#13120d] border-[#bbee1f] shadow-[0_5px_15px_rgba(187,238,31,0.4)]' 
-                          : 'bg-[#13120d] text-[#695b7f] border-[#2e2a63] hover:border-[#bbee1f] hover:text-[#bbee1f]'
+                          ? 'bg-[#bbee1f] text-[#13120d] shadow-[0_5px_15px_rgba(187,238,31,0.4)] rotate-45' 
+                          : 'bg-[#13120d] text-[#695b7f] border border-[#2e2a63] hover:border-[#bbee1f] hover:text-[#bbee1f]'
                       }`}
                     >
-                      <span>{start} - {end}</span>
+                      <span className={chapterPage === p ? '-rotate-45 block' : 'block'}>{p + 1}</span>
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
             )}
           </div>
