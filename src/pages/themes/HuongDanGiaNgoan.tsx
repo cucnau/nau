@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ThemeProps } from './ThemeProps';
 import { BookOpen, Gift, Send, Bookmark, Briefcase, TrendingUp, MessageSquare, ArrowUpRight, Star, Quote, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
+import { useStore } from '../../store';
+import { UserAvatar } from '../../components/UserAvatar';
 
 export function HuongDanGiaNgoanTheme(props: ThemeProps) {
   const {
@@ -9,10 +11,22 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
     chapterPage, setChapterPage, chapterSortDesc, setChapterSortDesc, CHAPTERS_PER_PAGE,
     showGiftModal, setShowGiftModal, giftAmount, setGiftAmount, giftMessage, setGiftMessage, handleGiftSubmit,
     commentText, setCommentText, submittingComment, handleSendComment,
-    isLoggedIn, savedStories, handleSaveToggle, choco, navigate
+    isLoggedIn, savedStories, handleSaveToggle, choco, navigate,
+    profilesCache = {}, getTitleColor, uid
   } = props;
 
+  const {
+    equippedStickerComment,
+    stickerPositionComment,
+    displayName: storeDisplayName,
+    avatarUrl: storeAvatarUrl,
+    activeTitle: storeActiveTitle,
+    equippedAccessory: storeEquippedAccessory,
+    accessoryPosition: storeAccessoryPosition
+  } = useStore();
+
   const [activeSection, setActiveSection] = useState<string>('ban-khao-sat');
+  const intersectingRef = useRef<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     const sections = ['ban-khao-sat', 'lien-ket-de-xuat', 'ho-so-thuong-vu'].filter(id => {
@@ -22,16 +36,39 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
 
     const observerOptions = {
       root: null,
-      rootMargin: '-20% 0px -50% 0px',
-      threshold: 0.1,
+      rootMargin: '-10% 0px -40% 0px',
+      threshold: 0,
+    };
+
+    const determineActiveSection = () => {
+      const activeIds = sections.filter(id => intersectingRef.current[id]);
+      if (activeIds.length === 0) return;
+      if (activeIds.length === 1) {
+        setActiveSection(activeIds[0]);
+        return;
+      }
+      
+      let bestId = activeIds[0];
+      let minDiff = Infinity;
+      activeIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const diff = Math.abs(rect.top);
+          if (diff < minDiff) {
+            minDiff = diff;
+            bestId = id;
+          }
+        }
+      });
+      setActiveSection(bestId);
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
+        intersectingRef.current[entry.target.id] = entry.isIntersecting;
       });
+      determineActiveSection();
     }, observerOptions);
 
     sections.forEach((id) => {
@@ -466,35 +503,71 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
 
             {/* Comment List */}
             <div className="flex flex-col gap-6">
-              {comments.map((comment) => (
-                <div key={comment.id} className="bg-[#13120d]/50 border border-[#2e2a63]/50 p-6 lg:p-8 relative group hover:border-[#2e2a63] transition-colors">
-                  <div className="absolute left-0 top-0 w-1 h-0 bg-[#bbee1f] group-hover:h-full transition-all duration-500" />
-                  
-                  <div className="flex flex-wrap items-center gap-6 mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-[#2e2a63] flex items-center justify-center text-white font-reading-garamond font-black text-sm border border-[#695b7f]/50">
-                        {comment.authorName?.[0] || '?'}
+              {comments.map((comment) => {
+                const isGift = comment.type === 'choco_gift';
+                const isMe = comment.uid === uid || comment.authorId === uid;
+                const cached = comment.uid ? profilesCache[comment.uid] : (comment.authorId ? profilesCache[comment.authorId] : null);
+
+                const currentSticker = isMe ? equippedStickerComment : (cached?.equippedStickerComment ?? cached?.equippedSticker ?? comment.equippedSticker);
+                const currentDisplayName = isMe ? storeDisplayName : (cached?.displayName ?? comment.displayName ?? comment.authorName);
+                const currentAvatarUrl = isMe ? storeAvatarUrl : (cached?.avatarUrl ?? comment.avatarUrl);
+                const currentActiveTitle = isMe ? storeActiveTitle : (cached?.activeTitle ?? comment.activeTitle);
+                const currentAccessory = isMe ? storeEquippedAccessory : (cached?.equippedAccessory ?? comment.equippedAccessory);
+                const currentAccessoryPos = isMe ? storeAccessoryPosition : (cached?.accessoryPosition ?? comment.accessoryPosition);
+
+                return (
+                  <div key={comment.id} className="bg-[#13120d]/50 border border-[#2e2a63]/50 p-6 lg:p-8 relative group hover:border-[#2e2a63] transition-colors overflow-visible pr-14">
+                    <div className="absolute left-0 top-0 w-1 h-0 bg-[#bbee1f] group-hover:h-full transition-all duration-500" />
+                    
+                    {currentSticker && (
+                      <img 
+                        src={currentSticker} 
+                        alt="Sticker" 
+                        className="absolute w-12 h-12 object-contain pointer-events-none z-10 right-2 top-1/2 -translate-y-1/2" 
+                        referrerPolicy="no-referrer"
+                      />
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-6 mb-6">
+                      <div className="flex items-center gap-4">
+                        <UserAvatar 
+                          avatarUrl={currentAvatarUrl} 
+                          equippedAccessory={currentAccessory}
+                          accessoryPosition={currentAccessoryPos}
+                          className="w-10 h-10 shrink-0" 
+                          fallbackIconSizeClass="w-5 h-5 text-[#bbee1f]" 
+                          borderClass="border border-[#2e2a63]/50"
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-bold text-[#bbee1f] font-reading-garamond uppercase tracking-widest text-xs lg:text-sm flex items-center gap-1.5 flex-wrap">
+                            <span style={{ color: getTitleColor?.(currentActiveTitle) }}>
+                              {currentDisplayName || 'Vô Danh'}
+                            </span>
+                            {currentActiveTitle && (
+                              <span className="px-1.5 py-0.5 bg-[#2e2a63] text-[#bbee1f] text-[9px] font-extrabold uppercase tracking-tight select-none border border-[#695b7f]/40 ml-1 inline-block align-middle">
+                                🏆 {currentActiveTitle}
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-[#695b7f] font-reading-garamond text-[9px] lg:text-[10px] tracking-[0.2em] uppercase mt-1">
+                            {comment.createdAt ? format(comment.createdAt.toDate(), 'dd.MM.yyyy / HH:mm') : 'Vừa xong'}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-[#bbee1f] font-reading-garamond uppercase tracking-widest text-xs lg:text-sm">{comment.authorName}</span>
-                        <span className="text-[#695b7f] font-reading-garamond text-[9px] lg:text-[10px] tracking-[0.2em] uppercase mt-1">
-                          {comment.createdAt ? format(comment.createdAt.toDate(), 'dd.MM.yyyy / HH:mm') : 'Vừa xong'}
+                      
+                      {isGift && (
+                        <span className="ml-auto text-[#13120d] font-reading-garamond text-[10px] lg:text-xs font-black bg-[#bbee1f] px-3 py-1.5 uppercase tracking-[0.2em] flex items-center gap-2">
+                          <Gift className="w-3 h-3" /> Tài trợ {comment.giftAmount} CC
                         </span>
-                      </div>
+                      )}
                     </div>
                     
-                    {comment.type === 'choco_gift' && (
-                      <span className="ml-auto text-[#13120d] font-reading-garamond text-[10px] lg:text-xs font-black bg-[#bbee1f] px-3 py-1.5 uppercase tracking-[0.2em] flex items-center gap-2">
-                        <Gift className="w-3 h-3" /> Tài trợ {comment.giftAmount} CC
-                      </span>
-                    )}
+                    <div className="text-[#dbcec2] text-sm lg:text-base leading-[1.8] font-light whitespace-pre-wrap pl-14">
+                      {comment.content}
+                    </div>
                   </div>
-                  
-                  <div className="text-[#dbcec2] text-sm lg:text-base leading-[1.8] font-light whitespace-pre-wrap pl-14">
-                    {comment.content}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
