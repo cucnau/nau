@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, Briefcase, TrendingUp, MessageSquare, ArrowUpRight, Star, Quote, ExternalLink } from 'lucide-react';
+import { BookOpen, Gift, Send, Bookmark, Briefcase, TrendingUp, MessageSquare, ArrowUpRight, Star, Quote, ExternalLink, Activity } from 'lucide-react';
 import { format } from 'date-fns';
 import { useStore } from '../../store';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -186,8 +186,8 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                 <span className="text-3xl lg:text-4xl font-light text-white">{chapters.length}</span>
               </div>
               <div className="flex flex-col items-center border-r border-[#2e2a63]">
-                <span className="text-[#695b7f] font-reading-garamond text-[10px] lg:text-xs tracking-widest uppercase mb-3 flex items-center gap-2"><Briefcase className="w-3 h-3 lg:w-4 lg:h-4 text-[#bbee1f]"/> Tình Trạng</span>
-                <span className="text-lg lg:text-xl font-medium text-[#dbcec2] mt-2 text-center">{(story.status === 'completed' || story.completed) ? 'Đã Xử Lý Xong' : 'Đang Cập Nhật'}</span>
+                <span className="text-[#695b7f] font-reading-garamond text-[10px] lg:text-xs tracking-widest uppercase mb-3 flex items-center gap-2"><Activity className="w-3 h-3 lg:w-4 lg:h-4 text-[#bbee1f]"/> Hiệu Suất</span>
+                <span className="text-3xl lg:text-4xl font-light text-white">{new Intl.NumberFormat('en-US', { notation: 'compact' }).format(story.viewCount || 0)}</span>
               </div>
               <div className="flex flex-col items-center">
                 <span className="text-[#695b7f] font-reading-garamond text-[10px] lg:text-xs tracking-widest uppercase mb-3 flex items-center gap-2"><TrendingUp className="w-3 h-3 lg:w-4 lg:h-4 text-[#bbee1f]"/> Đầu Tư</span>
