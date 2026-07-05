@@ -1,3 +1,5 @@
+import React from 'react';
+
 export interface ThemeProps {
   story: any;
   actualStoryId: string | null;
