@@ -3594,6 +3594,7 @@ export function Admin() {
         genres: genreArray,
         chapterCount: 0,
         completed,
+        status: completed ? "completed" : "ongoing",
         externalUrl: externalUrl.trim(),
         createdAt: serverTimestamp(),
         updatedAt: Date.now(),
@@ -3645,6 +3646,7 @@ export function Admin() {
         recommendations: editingStory.recommendations || "",
         genres: genreArray,
         completed: editingStory.completed || false,
+        status: (editingStory.completed || false) ? "completed" : "ongoing",
         externalUrl: editingStory.externalUrl || "",
         updatedAt: Date.now(),
       });
