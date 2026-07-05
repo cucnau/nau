@@ -682,13 +682,26 @@ export function StoryView() {
             </div>
         </div>
 
-        <div className="border-t-[3px] border-[#3E2723]/10 dark:border-[#5D4037]/50 pt-6 flex-1">
-            <h3 className="font-extrabold text-base mb-4 uppercase tracking-widest text-[#3E2723] dark:text-[#ECE5DC]">Giới thiệu</h3>
-            <div className="text-stone-700 dark:text-[#D7CCC8]/90 leading-relaxed italic text-[14px] space-y-4 font-sans font-medium">
-               {story.description?.split('\n').map((para: string, idx: number) => (
-                  <p key={idx} className={para.trim() ? "" : "hidden"}>{para}</p>
-               ))}
+        <div className="border-t-[3px] border-[#3E2723]/10 dark:border-[#5D4037]/50 pt-6 flex-1 flex flex-col gap-6">
+            <div>
+                <h3 className="font-extrabold text-base mb-4 uppercase tracking-widest text-[#3E2723] dark:text-[#ECE5DC]">Giới thiệu</h3>
+                <div className="text-stone-700 dark:text-[#D7CCC8]/90 leading-relaxed italic text-[14px] space-y-4 font-sans font-medium">
+                   {story.description?.split('\n').map((para: string, idx: number) => (
+                      <p key={idx} className={para.trim() ? "" : "hidden"}>{para}</p>
+                   ))}
+                </div>
             </div>
+
+            {story.recommendations && (
+                <div className="border-t-[2px] border-[#3E2723]/5 dark:border-[#5D4037]/20 pt-4">
+                    <h4 className="font-extrabold text-xs mb-3 uppercase tracking-widest text-[#8D6E63] dark:text-[#C29D70]">
+                       ✨ Đề cử truyện hay khác
+                    </h4>
+                    <div className="text-stone-600 dark:text-[#A1887F] leading-relaxed text-[13px] bg-[#FDF6EC]/60 dark:bg-[#2C221D]/40 p-4 rounded-2xl border border-[#3E2723]/10 dark:border-[#5D4037]/30 whitespace-pre-line font-medium">
+                       {story.recommendations}
+                    </div>
+                </div>
+            )}
         </div>
       </div>
 
