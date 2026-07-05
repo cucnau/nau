@@ -182,6 +182,23 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
           </div>
         )}
 
+        {/* Recommendations / Other Stories */}
+        {story.recommendations && (
+          <div className="relative p-6 lg:p-10 bg-[#13120d]/80 backdrop-blur-md border border-[#2e2a63] shadow-[0_0_20px_rgba(46,42,99,0.1)] group -mt-12">
+            {/* Corner Brackets */}
+            <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-[#bbee1f] opacity-30 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute bottom-0 right-0 w-6 h-6 border-b border-r border-[#bbee1f] opacity-30 group-hover:opacity-100 transition-opacity" />
+            
+            <h3 className="text-[#bbee1f] font-reading-garamond uppercase text-xs font-black tracking-[0.3em] mb-6 flex items-center gap-3">
+              <span className="w-6 h-[1px] bg-[#bbee1f]" /> Dự Án Liên Kết Đề Xuất
+            </h3>
+            
+            <div className="text-sm lg:text-base leading-relaxed text-[#dbcec2]/90 whitespace-pre-line font-light relative z-10">
+              {story.recommendations}
+            </div>
+          </div>
+        )}
+
         {/* Custom Tabs */}
         <div className="flex justify-center gap-12 border-b-2 border-[#2e2a63]">
           <button
