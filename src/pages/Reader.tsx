@@ -477,6 +477,7 @@ export function Reader() {
   
   const [story, setStory] = useState<any>(null);
   const [chapters, setChapters] = useState<any[]>([]);
+  const [liveChapter, setLiveChapter] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showHeader, setShowHeader] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -510,6 +511,7 @@ export function Reader() {
     setIsFinished(false);
     lastActivityRef.current = Date.now();
     setIsIdle(false);
+    setLiveChapter(null);
     window.scrollTo(0, 0);
   }, [chapterId]);
 
@@ -532,8 +534,30 @@ export function Reader() {
     fetchData();
   }, [storyId]);
 
+  useEffect(() => {
+    if (!storyId || !chapterId) return;
+    const fetchLiveChapter = async () => {
+      try {
+        let resolvedStoryId = storyId;
+        const foundStory = await getStoryByIdOrSlug(storyId);
+        if (foundStory) {
+          resolvedStoryId = foundStory.id;
+        }
+        const docRef = doc(db, `stories/${resolvedStoryId}/chapters`, chapterId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setLiveChapter({ id: docSnap.id, ...docSnap.data() });
+        }
+      } catch (err) {
+        console.error("Error fetching live chapter details:", err);
+      }
+    };
+    fetchLiveChapter();
+  }, [storyId, chapterId]);
+
   const currentChapterIndex = chapters.findIndex(c => c.id === chapterId);
-  const currentChapter = chapters[currentChapterIndex];
+  const baseChapter = chapters[currentChapterIndex];
+  const currentChapter = liveChapter ? { ...baseChapter, ...liveChapter } : baseChapter;
   
   const prevChapter = chapters[currentChapterIndex - 1];
   const nextChapter = chapters[currentChapterIndex + 1];
