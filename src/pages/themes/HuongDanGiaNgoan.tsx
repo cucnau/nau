@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThemeProps } from './ThemeProps';
 import { BookOpen, Gift, Send, Bookmark, Briefcase, TrendingUp, MessageSquare, ArrowUpRight, Star, Quote, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
@@ -11,6 +11,41 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
     commentText, setCommentText, submittingComment, handleSendComment,
     isLoggedIn, savedStories, handleSaveToggle, choco, navigate
   } = props;
+
+  const [activeSection, setActiveSection] = useState<string>('ban-khao-sat');
+
+  useEffect(() => {
+    const sections = ['ban-khao-sat', 'lien-ket-de-xuat', 'ho-so-thuong-vu'].filter(id => {
+      if (id === 'lien-ket-de-xuat' && !story.recommendations) return false;
+      return true;
+    });
+
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -50% 0px',
+      threshold: 0.1,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      sections.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) observer.unobserve(el);
+      });
+    };
+  }, [story.recommendations]);
 
   const totalGiftedChoco = comments
     .filter(c => c.type === 'choco_gift')
@@ -164,37 +199,79 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
         </div>
       </div>
 
-      {/* Mini Quick Navigation Bar */}
-      <div className="sticky top-[55px] sm:top-[72px] z-30 w-full bg-[#13120d]/95 backdrop-blur-md border-y border-[#2e2a63]/80 py-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
-        <div className="max-w-5xl mx-auto px-6 lg:px-10 flex items-center justify-center gap-6 sm:gap-12 flex-wrap text-xs font-reading-garamond uppercase tracking-[0.2em]">
-          <button
+      {/* Floating Vertical Quick Navigation Bar (Genshin style) */}
+      <div className="fixed right-4 lg:right-10 top-1/2 -translate-y-1/2 z-40 flex flex-col items-end gap-6 select-none pointer-events-auto">
+        {/* Background Vertical Connector Line */}
+        <div className="absolute right-[6px] top-3 bottom-3 w-[1px] bg-gradient-to-b from-[#2e2a63]/20 via-[#2e2a63]/80 to-[#2e2a63]/20" />
+        
+        {/* Navigation Node 1: Bản Khảo Sát */}
+        {story.description && (
+          <div 
             onClick={() => scrollToSection('ban-khao-sat')}
-            className="flex items-center gap-2.5 text-[#dbcec2] hover:text-[#bbee1f] hover:scale-105 transition-all duration-300 font-bold px-3 py-1 bg-[#13120d] border border-transparent hover:border-[#bbee1f]/20"
+            className="flex items-center justify-end group cursor-pointer relative"
           >
-            <Quote className="w-3.5 h-3.5 text-[#bbee1f]" />
-            Bản Khảo Sát
-          </button>
-          
-          {story.recommendations && (
-            <button
-              onClick={() => scrollToSection('lien-ket-de-xuat')}
-              className="flex items-center gap-2.5 text-[#dbcec2] hover:text-[#bbee1f] hover:scale-105 transition-all duration-300 font-bold px-3 py-1 bg-[#13120d] border border-transparent hover:border-[#bbee1f]/20"
-            >
-              <ArrowUpRight className="w-3.5 h-3.5 text-[#bbee1f]" />
-              Dự Án Liên Kết
-            </button>
-          )}
+            <span className={`mr-4 font-reading-garamond text-[10px] lg:text-xs uppercase tracking-[0.2em] font-black transition-all duration-300 whitespace-nowrap hidden md:inline-block ${
+              activeSection === 'ban-khao-sat' 
+                ? 'text-[#bbee1f] drop-shadow-[0_0_8px_rgba(187,238,31,0.6)] translate-x-0 opacity-100' 
+                : 'text-[#695b7f] opacity-40 group-hover:opacity-100 group-hover:text-[#dbcec2] translate-x-2 group-hover:translate-x-0'
+            }`}>
+              Bản Khảo Sát Dự Án
+            </span>
+            <div className={`w-3 h-3 rotate-45 border transition-all duration-500 relative z-10 flex items-center justify-center ${
+              activeSection === 'ban-khao-sat' 
+                ? 'bg-[#bbee1f] border-[#bbee1f] shadow-[0_0_12px_rgba(187,238,31,0.8)] scale-110' 
+                : 'bg-[#13120d] border-[#2e2a63] group-hover:border-[#bbee1f] group-hover:scale-105'
+            }`}>
+              <div className={`w-1 h-1 rotate-45 ${activeSection === 'ban-khao-sat' ? 'bg-[#13120d]' : 'bg-transparent'}`} />
+            </div>
+          </div>
+        )}
 
-          <button
-            onClick={() => {
-              setActiveTab('chapters');
-              setTimeout(() => scrollToSection('ho-so-thuong-vu'), 50);
-            }}
-            className="flex items-center gap-2.5 text-[#dbcec2] hover:text-[#bbee1f] hover:scale-105 transition-all duration-300 font-bold px-3 py-1 bg-[#13120d] border border-transparent hover:border-[#bbee1f]/20"
+        {/* Navigation Node 2: Dự Án Liên Kết */}
+        {story.recommendations && (
+          <div 
+            onClick={() => scrollToSection('lien-ket-de-xuat')}
+            className="flex items-center justify-end group cursor-pointer relative"
           >
-            <BookOpen className="w-3.5 h-3.5 text-[#bbee1f]" />
+            <span className={`mr-4 font-reading-garamond text-[10px] lg:text-xs uppercase tracking-[0.2em] font-black transition-all duration-300 whitespace-nowrap hidden md:inline-block ${
+              activeSection === 'lien-ket-de-xuat' 
+                ? 'text-[#bbee1f] drop-shadow-[0_0_8px_rgba(187,238,31,0.6)] translate-x-0 opacity-100' 
+                : 'text-[#695b7f] opacity-40 group-hover:opacity-100 group-hover:text-[#dbcec2] translate-x-2 group-hover:translate-x-0'
+            }`}>
+              Dự Án Liên Kết
+            </span>
+            <div className={`w-3 h-3 rotate-45 border transition-all duration-500 relative z-10 flex items-center justify-center ${
+              activeSection === 'lien-ket-de-xuat' 
+                ? 'bg-[#bbee1f] border-[#bbee1f] shadow-[0_0_12px_rgba(187,238,31,0.8)] scale-110' 
+                : 'bg-[#13120d] border-[#2e2a63] group-hover:border-[#bbee1f] group-hover:scale-105'
+            }`}>
+              <div className={`w-1 h-1 rotate-45 ${activeSection === 'lien-ket-de-xuat' ? 'bg-[#13120d]' : 'bg-transparent'}`} />
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Node 3: Hồ Sơ Thương Vụ */}
+        <div 
+          onClick={() => {
+            setActiveTab('chapters');
+            setTimeout(() => scrollToSection('ho-so-thuong-vu'), 50);
+          }}
+          className="flex items-center justify-end group cursor-pointer relative"
+        >
+          <span className={`mr-4 font-reading-garamond text-[10px] lg:text-xs uppercase tracking-[0.2em] font-black transition-all duration-300 whitespace-nowrap hidden md:inline-block ${
+            activeSection === 'ho-so-thuong-vu' 
+              ? 'text-[#bbee1f] drop-shadow-[0_0_8px_rgba(187,238,31,0.6)] translate-x-0 opacity-100' 
+              : 'text-[#695b7f] opacity-40 group-hover:opacity-100 group-hover:text-[#dbcec2] translate-x-2 group-hover:translate-x-0'
+          }`}>
             Hồ Sơ Thương Vụ
-          </button>
+          </span>
+          <div className={`w-3 h-3 rotate-45 border transition-all duration-500 relative z-10 flex items-center justify-center ${
+            activeSection === 'ho-so-thuong-vu' 
+              ? 'bg-[#bbee1f] border-[#bbee1f] shadow-[0_0_12px_rgba(187,238,31,0.8)] scale-110' 
+              : 'bg-[#13120d] border-[#2e2a63] group-hover:border-[#bbee1f] group-hover:scale-105'
+          }`}>
+            <div className={`w-1 h-1 rotate-45 ${activeSection === 'ho-so-thuong-vu' ? 'bg-[#13120d]' : 'bg-transparent'}`} />
+          </div>
         </div>
       </div>
 
