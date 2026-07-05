@@ -9,6 +9,8 @@ import { addStoryFire } from '../lib/storyFire';
 import { getStoryByIdOrSlug, getStoryChapters } from '../lib/storyLoader';
 import { doc, getDoc, collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, limit } from 'firebase/firestore';
 import { UserAvatar } from '../components/UserAvatar';
+import { ThemeProps } from './themes/ThemeProps';
+import { HuongDanGiaNgoanTheme } from './themes/HuongDanGiaNgoan';
 
 interface CommentNodeProps {
    comment: any;
@@ -541,6 +543,53 @@ export function StoryView() {
         setSubmittingComment(false);
      }
   };
+
+  if (story.title.toLowerCase().includes('hướng dẫn giả ngoan')) {
+    const themeProps: ThemeProps = {
+      story,
+      actualStoryId,
+      chapters,
+      comments,
+      activeTab,
+      setActiveTab,
+      chapterPage,
+      setChapterPage,
+      chapterSortDesc,
+      setChapterSortDesc,
+      CHAPTERS_PER_PAGE,
+      showGiftModal,
+      setShowGiftModal,
+      giftAmount,
+      setGiftAmount,
+      giftMessage,
+      setGiftMessage,
+      handleGiftSubmit,
+      commentText,
+      setCommentText,
+      submittingComment,
+      handleSendComment,
+      replyingToId,
+      setReplyingToId,
+      replyText,
+      setReplyText,
+      submittingReply,
+      handleSendReply,
+      profilesCache,
+      isLoggedIn,
+      savedStories,
+      toggleSaveStory,
+      handleSaveToggle,
+      choco,
+      uid,
+      displayName,
+      avatarUrl,
+      unlockedPassChapters,
+      unlockedEarlyAccessChapters,
+      getTitleColor,
+      navigate,
+    };
+    return <HuongDanGiaNgoanTheme {...themeProps} />;
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-10 flex flex-col gap-8 max-w-5xl mx-auto w-full">
