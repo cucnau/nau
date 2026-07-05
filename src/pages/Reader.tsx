@@ -536,6 +536,21 @@ export function Reader() {
 
   useEffect(() => {
     if (!storyId || !chapterId) return;
+
+    // Nếu chapters đã tải xong, kiểm tra xem chương này ở file tĩnh đã được mở khóa/không khóa chưa
+    if (chapters.length > 0) {
+      const idx = chapters.findIndex(c => c.id === chapterId);
+      if (idx !== -1) {
+        const base = chapters[idx];
+        const isStaticLocked = base.isLockedRead || base.requiresPass || base.requiresEarlyAccess;
+        if (!isStaticLocked) {
+          // Chương ở file tĩnh vốn không có khóa, không cần gọi Firestore nữa để tiết kiệm Quota
+          setLiveChapter(null);
+          return;
+        }
+      }
+    }
+
     const fetchLiveChapter = async () => {
       try {
         let resolvedStoryId = storyId;
@@ -553,7 +568,7 @@ export function Reader() {
       }
     };
     fetchLiveChapter();
-  }, [storyId, chapterId]);
+  }, [storyId, chapterId, chapters]);
 
   const currentChapterIndex = chapters.findIndex(c => c.id === chapterId);
   const baseChapter = chapters[currentChapterIndex];
