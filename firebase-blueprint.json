@@ -49,6 +49,7 @@
         "coverUrl": { "type": "string" },
         "genres": { "type": "array" },
         "chapterCount": { "type": "number" },
+        "recommendations": { "type": "string" },
         "createdAt": { "type": "number" }
       },
       "required": ["title", "author", "createdAt"]
