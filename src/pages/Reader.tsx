@@ -969,7 +969,7 @@ export function Reader() {
          </>
        )}
        {/* Top Navigation */}
-       <header className={cn("sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b-2 transition-all duration-300 shadow-sm relative",
+       <header className={cn("w-full sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b-2 transition-all duration-300 shadow-sm relative",
           isCustomThemeActive
             ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/90 border-[#47515f] backdrop-blur-md" : "bg-[#13120d]/90 border-[#2e2a63] backdrop-blur-md")
             : effectiveIsDark ? "bg-[#1A1412]/90 border-[#3E2723] backdrop-blur-md" : "bg-[#FDF6EC]/90 border-[#D7CCC8] backdrop-blur-md"
@@ -1080,7 +1080,7 @@ export function Reader() {
                     const pComments = comments.filter(c => c.type === 'paragraph' && c.paragraphIdx === idx && !c.parentId);
                     return (
                         <div key={idx} className="relative group/para">
-                           <p className="relative w-full cursor-pointer md:cursor-auto" onClick={() => {
+                           <p className="relative w-full cursor-pointer md:cursor-auto mb-6" onClick={() => {
                                if (window.getSelection()?.toString().length === 0) {
                                   setActiveParagraphIndex(activeParagraphIndex === idx ? null : idx);
                                }
