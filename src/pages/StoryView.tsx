@@ -12,6 +12,7 @@ import { UserAvatar } from '../components/UserAvatar';
 import { ThemeProps } from './themes/ThemeProps';
 import { HuongDanGiaNgoanTheme } from './themes/HuongDanGiaNgoan';
 import { CanhCuaHomerTheme } from './themes/CanhCuaHomer';
+import { NhatKyKhongTenTheme } from './themes/NhatKyKhongTen';
 import { detectStoryTheme } from '../lib/themeHelper';
 
 interface CommentNodeProps {
@@ -371,6 +372,17 @@ export function StoryView() {
           </div>
         </div>
       );
+    } else if (activeCustomTheme === 'nhatky') {
+      return (
+        <div className="min-h-screen bg-[#1E1614] text-[#DFD6D3] flex flex-col items-center justify-center p-4 font-serif">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#4E3E39] border-t-[#E8DCB8] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#8E7E7A] animate-pulse font-bold font-sans">
+              DIARY.PUPPET // ĐANG LẬT GIỞ KÝ ỨC VỤN...
+            </div>
+          </div>
+        </div>
+      );
     }
     return (
       <div className="min-h-screen bg-[#1A1412] text-[#E0D4C3] flex flex-col items-center justify-center p-4 font-sans">
@@ -675,6 +687,54 @@ export function StoryView() {
       navigate,
     };
     return <CanhCuaHomerTheme {...themeProps} />;
+  }
+
+  const currentTheme = detectStoryTheme(story.title, id);
+  if (currentTheme === 'nhatky') {
+    const themeProps: ThemeProps = {
+      story,
+      actualStoryId,
+      chapters,
+      comments,
+      activeTab,
+      setActiveTab,
+      chapterPage,
+      setChapterPage,
+      chapterSortDesc,
+      setChapterSortDesc,
+      CHAPTERS_PER_PAGE,
+      showGiftModal,
+      setShowGiftModal,
+      giftAmount,
+      setGiftAmount,
+      giftMessage,
+      setGiftMessage,
+      handleGiftSubmit,
+      commentText,
+      setCommentText,
+      submittingComment,
+      handleSendComment,
+      replyingToId,
+      setReplyingToId,
+      replyText,
+      setReplyText,
+      submittingReply,
+      handleSendReply,
+      profilesCache,
+      isLoggedIn,
+      savedStories,
+      toggleSaveStory,
+      handleSaveToggle,
+      choco,
+      uid,
+      displayName,
+      avatarUrl,
+      unlockedPassChapters,
+      unlockedEarlyAccessChapters,
+      getTitleColor,
+      navigate,
+    };
+    return <NhatKyKhongTenTheme {...themeProps} />;
   }
 
   return (
