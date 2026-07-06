@@ -50,11 +50,13 @@ const ParagraphCommentNode = ({
    const isGift = comment.type === 'choco_gift';
 
    return (
-      <div key={comment.id} className={cn("text-xs pt-2 mt-2 border-t-2 border-dashed first:border-0", isStoryTheme ? "border-[#2e2a63]/20" : "border-[#3E2723]/10 dark:border-[#4E342E]/30")}>
+      <div key={comment.id} className={cn("text-xs pt-2 mt-2 border-t-2 border-dashed first:border-0", isStoryTheme ? (isStoryTheme === 'homer' ? "border-[#47515f]/20" : "border-[#2e2a63]/20") : "border-[#3E2723]/10 dark:border-[#4E342E]/30")}>
          <div className={cn(
             "relative flex gap-2.5 items-start p-2.5 rounded-2xl border-2 transition-all hover:-translate-y-0.5", 
             isStoryTheme 
-               ? "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]" 
+               ? (isStoryTheme === 'homer'
+                   ? "bg-[#2d3745]/15 border-[#47515f]/50 text-[#d1d5db] shadow-[1px_1px_0_0_#47515f]"
+                   : "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]")
                : isDark 
                   ? "bg-[#1C1613] border-[#3E2723] text-[#ECE5DC] shadow-[1px_1px_0_0_#1C1613]" 
                   : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] shadow-[1px_1px_0_0_#3E2723]", 
@@ -73,27 +75,29 @@ const ParagraphCommentNode = ({
                equippedAccessory={currentAccessory}
                accessoryPosition={currentAccessoryPos}
                className="w-8 h-8 shrink-0 pointer-events-none" 
-               fallbackIconSizeClass={isStoryTheme ? "w-4 h-4 text-[#bbee1f]" : "w-4 h-4 text-[#A1887F]"} 
-               borderClass={isStoryTheme ? "border border-[#2e2a63]/50" : "border border-[#D7CCC8]/30"}
+               fallbackIconSizeClass={isStoryTheme ? (isStoryTheme === 'homer' ? "w-4 h-4 text-[#a0a6b3]" : "w-4 h-4 text-[#bbee1f]") : "w-4 h-4 text-[#A1887F]"} 
+               borderClass={isStoryTheme ? (isStoryTheme === 'homer' ? "border border-[#47515f]/50" : "border border-[#2e2a63]/50") : "border border-[#D7CCC8]/30"}
             />
             <div className="flex-1 min-w-0">
                <div className="text-[11px] font-black mb-0.5 flex justify-between tracking-tight">
                   <span className="flex items-center gap-1 flex-wrap">
-                     <span style={{ color: getTitleColor(currentActiveTitle) || (isStoryTheme ? "#bbee1f" : undefined) }}>
+                     <span style={{ color: getTitleColor(currentActiveTitle) || (isStoryTheme ? (isStoryTheme === 'homer' ? "#a0a6b3" : "#bbee1f") : undefined) }}>
                         {currentDisplayName}
                      </span>
                      {currentActiveTitle && (
                         <span className={cn(
                            "px-1 py-0.5 text-[7px] font-black rounded border",
                            isStoryTheme 
-                              ? "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40" 
+                              ? (isStoryTheme === 'homer'
+                                  ? "bg-[#2d3745] text-[#a0a6b3] border-[#47515f]"
+                                  : "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40")
                               : "bg-[#F5E6D3] text-[#5D4037] border-[#3E2723]"
                         )}>
                            🏆 {currentActiveTitle}
                         </span>
                      )}
                   </span>
-                  <span className={cn("text-[9px] font-mono", isStoryTheme ? "text-[#695b7f]" : "text-stone-400")}>
+                  <span className={cn("text-[9px] font-mono", isStoryTheme ? (isStoryTheme === 'homer' ? "text-[#67707e]" : "text-[#695b7f]") : "text-stone-400")}>
                      {comment.createdAt?.toDate 
                         ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                         : 'Vừa xong'}
@@ -101,12 +105,16 @@ const ParagraphCommentNode = ({
                </div>
                
                {isGift && (
-                  <span className="inline-flex text-[#13120d] text-[8px] font-black bg-[#bbee1f] px-2 py-0.5 uppercase tracking-wider items-center gap-1 mb-1 border border-[#bbee1f]/50">
-                     🎁 Tài trợ {comment.giftAmount || 0} CC
+                  <span className={cn("inline-flex text-[8px] font-black px-2 py-0.5 uppercase tracking-wider items-center gap-1 mb-1 border",
+                     isStoryTheme === 'homer'
+                        ? "text-[#181f2d] bg-[#a0a6b3] border-[#a0a6b3]/50"
+                        : "text-[#13120d] bg-[#bbee1f] border-[#bbee1f]/50"
+                  )}>
+                     🎁 {isStoryTheme === 'homer' ? "Tiếp tế" : "Tài trợ"} {comment.giftAmount || 0} CC
                   </span>
                )}
 
-               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isStoryTheme ? "text-[#dbcec2]" : (isDark ? "text-[#ECE5DC]" : "text-[#5D4037]"))}>
+               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isStoryTheme ? (isStoryTheme === 'homer' ? "text-[#d1d5db]" : "text-[#dbcec2]") : (isDark ? "text-[#ECE5DC]" : "text-[#5D4037]"))}>
                   {comment.content}
                </p>
                
@@ -241,7 +249,9 @@ const ChapterCommentNode = ({
       <div key={comment.id} className={cn(
          "relative p-5 rounded-3xl border-3 flex flex-col gap-3 transition-all hover:-translate-y-0.5 whitespace-normal", 
          isStoryTheme 
-            ? "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]" 
+            ? (isStoryTheme === 'homer'
+                ? "bg-[#2d3745]/15 border-[#47515f]/50 text-[#d1d5db] shadow-[2px_2px_0_0_#47515f]"
+                : "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]")
             : isDark 
                ? "bg-[#1C1613] border-[#3E2723] text-[#ECE5DC] shadow-[2px_2px_0_0_#1A1412]" 
                : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]", 
@@ -261,20 +271,22 @@ const ChapterCommentNode = ({
                equippedAccessory={currentAccessory}
                accessoryPosition={currentAccessoryPos}
                className="w-10 h-10 shrink-0 pointer-events-none" 
-               fallbackIconSizeClass={isStoryTheme ? "w-5 h-5 text-[#bbee1f]" : "w-5 h-5 text-[#A1887F]"} 
-               borderClass={isStoryTheme ? "border border-[#2e2a63]/50" : "border border-[#D7CCC8]/30"}
+               fallbackIconSizeClass={isStoryTheme ? (isStoryTheme === 'homer' ? "w-5 h-5 text-[#a0a6b3]" : "w-5 h-5 text-[#bbee1f]") : "w-5 h-5 text-[#A1887F]"} 
+               borderClass={isStoryTheme ? (isStoryTheme === 'homer' ? "border border-[#47515f]/50" : "border border-[#2e2a63]/50") : "border border-[#D7CCC8]/30"}
             />
             <div className="flex-1 min-w-0">
                <div className="flex items-center justify-between gap-2 mb-1">
                   <span className="font-black text-xs flex items-center gap-1.5 flex-wrap">
-                     <span style={{ color: getTitleColor(currentActiveTitle) || (isStoryTheme ? "#bbee1f" : undefined) }}>
+                     <span style={{ color: getTitleColor(currentActiveTitle) || (isStoryTheme ? (isStoryTheme === 'homer' ? "#a0a6b3" : "#bbee1f") : undefined) }}>
                         {currentDisplayName}
                      </span>
                      {currentActiveTitle && (
                         <span className={cn(
                            "px-1.5 py-0.5 text-[9px] font-black rounded uppercase tracking-tight select-none border inline-block align-middle",
                            isStoryTheme 
-                              ? "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40" 
+                              ? (isStoryTheme === 'homer'
+                                  ? "bg-[#2d3745] text-[#a0a6b3] border-[#47515f]"
+                                  : "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40")
                               : "bg-[#F5E6D3] text-[#5D4037] border-[#3E2723]"
                         )}>
                            🏆 {currentActiveTitle}
@@ -282,7 +294,7 @@ const ChapterCommentNode = ({
                      )}
                   </span>
                   
-                  <span className={cn("text-[9px] font-mono shrink-0", isStoryTheme ? "text-[#695b7f]" : "text-stone-400")}>
+                  <span className={cn("text-[9px] font-mono shrink-0", isStoryTheme ? (isStoryTheme === 'homer' ? "text-[#67707e]" : "text-[#695b7f]") : "text-stone-400")}>
                      {comment.createdAt?.toDate 
                         ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                         : 'Vừa xong'}
@@ -290,12 +302,16 @@ const ChapterCommentNode = ({
                </div>
 
                {isGift && (
-                  <span className="inline-flex text-[#13120d] text-[9px] font-black bg-[#bbee1f] px-3 py-1 uppercase tracking-wider items-center gap-1.5 mb-2 border border-[#bbee1f]/50">
-                     🎁 Tài trợ {comment.giftAmount || 0} CC
+                  <span className={cn("inline-flex text-[9px] font-black px-3 py-1 uppercase tracking-wider items-center gap-1.5 mb-2 border",
+                     isStoryTheme === 'homer'
+                        ? "text-[#181f2d] bg-[#a0a6b3] border-[#a0a6b3]/50"
+                        : "text-[#13120d] bg-[#bbee1f] border-[#bbee1f]/50"
+                  )}>
+                     🎁 {isStoryTheme === 'homer' ? "Tiếp tế" : "Tài trợ"} {comment.giftAmount || 0} CC
                   </span>
                )}
 
-               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isStoryTheme ? "text-[#dbcec2]" : (isDark ? "text-[#ECE5DC]" : "text-[#5D4037]"))}>
+               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isStoryTheme ? (isStoryTheme === 'homer' ? "text-[#d1d5db]" : "text-[#dbcec2]") : (isDark ? "text-[#ECE5DC]" : "text-[#5D4037]"))}>
                   {comment.content}
                </p>
 
@@ -889,16 +905,39 @@ export function Reader() {
     return () => clearInterval(interval);
   }, [isFinished, isLocked, timeRequired, currentChapter?.id]);
 
-  const hasCustomTheme = story?.title?.toLowerCase().includes('hướng dẫn giả ngoan');
+  const activeCustomTheme: 'giagoan' | 'homer' | null = 
+    story?.title?.toLowerCase().includes('hướng dẫn giả ngoan') ? 'giagoan' :
+    (story?.title?.toLowerCase().includes('cánh cửa homer') || story?.title?.toLowerCase().includes('canh cua homer')) ? 'homer' : null;
+
+  const hasCustomTheme = !!activeCustomTheme;
   const isCustomThemeActive = !!(hasCustomTheme && useStoryTheme);
   const effectiveIsDark = isCustomThemeActive ? true : isDark;
   const effectiveFontFamily = isCustomThemeActive ? 'font-reading-garamond' : fontFamily;
+
+  const tChapterLabel = activeCustomTheme === 'homer' ? "Tọa độ" : activeCustomTheme === 'giagoan' ? "Tài liệu" : "Chương";
+  const tChapterCapLabel = activeCustomTheme === 'homer' ? "TỌA ĐỘ" : activeCustomTheme === 'giagoan' ? "TÀI LIỆU" : "CHƯƠNG";
+  const tPrevChapter = activeCustomTheme === 'homer' ? "Tọa độ trước" : activeCustomTheme === 'giagoan' ? "Tài liệu trước" : "Chương trước";
+  const tNextChapter = activeCustomTheme === 'homer' ? "Tọa độ sau" : activeCustomTheme === 'giagoan' ? "Tài liệu sau" : "Chương sau";
+  const tEarlyAccess = activeCustomTheme === 'homer' ? "Tọa độ Đọc Sớm" : activeCustomTheme === 'giagoan' ? "Tài liệu Đọc Sớm" : "Chương Đọc Sớm";
+  const tLockedChapter = activeCustomTheme === 'homer' ? "Đã khóa tọa độ" : activeCustomTheme === 'giagoan' ? "Đã khóa tài liệu" : "Đã khóa chương";
+  const tReadThis = activeCustomTheme === 'homer' ? "Đọc tọa độ này" : activeCustomTheme === 'giagoan' ? "Đọc tài liệu này" : "Đọc chương này";
+  const tNoLink = activeCustomTheme === 'homer' ? "tọa độ" : activeCustomTheme === 'giagoan' ? "tài liệu" : "chương";
+  const tParagraphComment = activeCustomTheme === 'homer' ? "Phản hồi tọa độ" : activeCustomTheme === 'giagoan' ? "Ý kiến đoạn" : "Bình luận đoạn";
+  const tNoParagraphComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào cho tọa độ này." : activeCustomTheme === 'giagoan' ? "Chưa có ý kiến nào cho đoạn này." : "Chưa có bình luận. Hãy là người đầu tiên!";
+  const tParagraphPlaceholder = activeCustomTheme === 'homer' ? "Viết phản hồi..." : activeCustomTheme === 'giagoan' ? "Viết đề xuất..." : "Viết bình luận...";
+  const tParagraphSubmit = activeCustomTheme === 'homer' ? "Phát" : activeCustomTheme === 'giagoan' ? "Trình" : "Gửi";
+  const tParagraphLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : "Đăng nhập để bình luận";
+  const tCommentAreaTitle = activeCustomTheme === 'homer' ? "Báo cáo sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đề xuất và ý kiến" : "Bình luận chương";
+  const tCommentAreaPlaceholder = activeCustomTheme === 'homer' ? "Nhập sóng phản hồi của bạn..." : activeCustomTheme === 'giagoan' ? "Nhập đề xuất và ý kiến của bạn..." : "Nhập bình luận của bạn...";
+  const tCommentAreaPlaceholderLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phát sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : "Đăng nhập để bình luận";
+  const tCommentSubmit = activeCustomTheme === 'homer' ? "Phát sóng" : activeCustomTheme === 'giagoan' ? "Trình ý kiến" : "Gửi bình luận";
+  const tNoComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào." : activeCustomTheme === 'giagoan' ? "Chưa có đề xuất và ý kiến nào cho tài liệu này." : "Chưa có bình luận nào cho chương này.";
 
   if (loading) return <div className="p-10 text-center">Đang tải...</div>;
   if (!story || !currentChapter) return <div className="p-10 text-center">Không tìm thấy chương</div>;
 
   return (
-    <div className={cn("min-h-screen flex flex-col transition-colors duration-300 relative overflow-hidden reader-container-font", isCustomThemeActive ? "bg-[#13120d] text-[#dbcec2] selection:bg-[#bbee1f] selection:text-[#13120d]" : (effectiveIsDark ? "bg-[#14100E] text-[#ECE5DC]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] text-[#3E2723] dark:text-[#3E2723]"), effectiveFontFamily)}>
+    <div className={cn("min-h-screen flex flex-col transition-colors duration-300 relative overflow-hidden reader-container-font", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#d1d5db] selection:bg-[#47515f] selection:text-white" : "bg-[#13120d] text-[#dbcec2] selection:bg-[#bbee1f] selection:text-[#13120d]") : (effectiveIsDark ? "bg-[#14100E] text-[#ECE5DC]" : "bg-[#FDF6EC] dark:bg-[#FDF6EC] text-[#3E2723] dark:text-[#3E2723]"), effectiveFontFamily)}>
        <style>{`
          .reader-container-font, 
          .reader-container-font button, 
@@ -924,15 +963,21 @@ export function Reader() {
        {isCustomThemeActive && (
          <>
            <div className="fixed inset-0 pointer-events-none opacity-20"
-                style={{ backgroundImage: 'repeating-linear-gradient(45deg, #2e2a63 0, #2e2a63 1px, transparent 1px, transparent 50px)' }} />
-           <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#2e2a63] rounded-full blur-[150px] opacity-30 pointer-events-none" />
-           <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#bbee1f] rounded-full blur-[180px] opacity-10 pointer-events-none" />
+                style={{ backgroundImage: activeCustomTheme === 'homer' 
+                  ? 'repeating-linear-gradient(45deg, #2d3745 0, #2d3745 1px, transparent 1px, transparent 60px)'
+                  : 'repeating-linear-gradient(45deg, #2e2a63 0, #2e2a63 1px, transparent 1px, transparent 50px)' }} />
+           <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-30 pointer-events-none"
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : { backgroundColor: '#2e2a63' }} />
+           <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[180px] opacity-10 pointer-events-none"
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : { backgroundColor: '#bbee1f' }} />
          </>
        )}
        {/* Top Navigation */}
        <header className={cn("sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b-2 transition-all duration-300 shadow-sm relative", 
          isCustomThemeActive 
-           ? "bg-[#13120d]/95 border-[#2e2a63]/50 text-[#dbcec2] backdrop-blur-sm"
+           ? (activeCustomTheme === 'homer' 
+               ? "bg-[#181f2d]/95 border-[#47515f]/50 text-[#d1d5db] backdrop-blur-sm"
+               : "bg-[#13120d]/95 border-[#2e2a63]/50 text-[#dbcec2] backdrop-blur-sm")
            : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723]" : "bg-[#F5E6D3] dark:bg-[#F5E6D3] border-[#3E2723] dark:border-[#3E2723]",
          showHeader ? "translate-y-0" : "-translate-y-full"
        )}>
@@ -1028,8 +1073,8 @@ export function Reader() {
                   {needsPass && (
                     <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#3C2E27] bg-[#2C221D]/50" : "border-[#8D6E63] dark:border-[#8D6E63] bg-[#FDF6EC] dark:bg-[#FDF6EC]")}>
                        <Lock className={cn("w-12 h-12 mb-4 animate-bounce", isDark ? "text-[#D7CCC8]" : "text-[#8D6E63] dark:text-[#8D6E63]")} />
-                       <h2 className={cn("text-xl font-bold mb-2 uppercase tracking-tighter", isDark ? "text-[#ECE5DC]" : "text-[#3E2723] dark:text-[#3E2723]")}>{isCustomThemeActive ? "Tài liệu có khóa Pass" : "Chương có khóa Pass"}</h2>
-                       <p className={cn("opacity-70 mb-4 italic", isDark ? "text-[#A1887F]" : "text-[#5D4037] dark:text-[#5D4037]")}>Bạn cần dùng "Vé Pass Truyện" để đọc vĩnh viễn {isCustomThemeActive ? "tài liệu" : "chương"} này.</p>
+                       <h2 className={cn("text-xl font-bold mb-2 uppercase tracking-tighter", isDark ? "text-[#ECE5DC]" : "text-[#3E2723] dark:text-[#3E2723]")}>{tChapterLabel} có khóa Pass</h2>
+                       <p className={cn("opacity-70 mb-4 italic", isDark ? "text-[#A1887F]" : "text-[#5D4037] dark:text-[#5D4037]")}>Bạn cần dùng "Vé Pass Truyện" để đọc vĩnh viễn {tNoLink} này.</p>
                        <p className={cn("text-sm font-bold mb-6", isDark ? "text-[#ECE5DC]" : "text-[#3E2723] dark:text-[#3E2723]")}>Bạn đang có: {ownedPassTickets || 0} Vé</p>
                        <button onClick={handleUnlockPass} className="bg-[#3E2723] hover:bg-[#2D1B19] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2">
                           Mở khoá bằng 1 Vé Pass
@@ -1040,7 +1085,7 @@ export function Reader() {
                   {needsEarlyAccess && (
                     <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#D4AF37] bg-[#2C221D]/50" : "border-[#D4AF37] dark:border-[#D4AF37] bg-[#FFFDE7] dark:bg-[#FFFDE7]")}>
                        <Zap className="w-12 h-12 mb-4 text-[#D4AF37] animate-pulse fill-[#F5E6D3]" />
-                       <h2 className="text-xl font-bold mb-2 uppercase tracking-tighter text-[#827717]">{isCustomThemeActive ? "Tài liệu Đọc Sớm" : "Chương Đọc Sớm"}</h2>
+                       <h2 className="text-xl font-bold mb-2 uppercase tracking-tighter text-[#827717]">{tEarlyAccess}</h2>
                        <p className="opacity-70 mb-4 italic text-[#827717]">Bạn cần dùng "Vé Ưu Tiên" để đọc ngay, hoặc chờ hết 24h.</p>
                        <p className="text-sm font-bold mb-6 text-[#827717]">Bạn đang có: {ownedPriorityTickets || 0} Vé</p>
                        <button onClick={handleUnlockEarlyAccess} className="bg-[#D4AF37] hover:bg-[#B5952F] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2">
@@ -1052,7 +1097,7 @@ export function Reader() {
                   {currentChapter?.isLockedRead && (
                     <div className={cn("flex flex-col items-center justify-center p-8 text-center rounded-3xl border-2", isDark ? "border-[#3E2723] bg-[#2C221D]/50" : "border-amber-600 bg-[#FDF6EC]")}>
                        <Lock className={cn("w-12 h-12 mb-4 animate-bounce text-amber-600")} />
-                       <h2 className={cn("text-xl font-bold mb-4 uppercase tracking-tighter text-amber-800 dark:text-amber-400")}>{isCustomThemeActive ? "Đã khóa tài liệu" : "Đã khóa chương"}</h2>
+                       <h2 className={cn("text-xl font-bold mb-4 uppercase tracking-tighter text-amber-800 dark:text-amber-400")}>{tLockedChapter}</h2>
                        { (currentChapter?.externalUrl || story?.externalUrl) ? (
                           <div className="flex flex-col items-center gap-3">
                              <a 
@@ -1062,11 +1107,11 @@ export function Reader() {
                                className="bg-[#8D6E63] hover:bg-[#7d5e53] dark:bg-[#5D4037] dark:hover:bg-[#4e342e] text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors uppercase text-sm tracking-widest flex items-center gap-2"
                              >
                                 <ExternalLink className="w-4 h-4" />
-                                Đọc {currentChapter?.title || (isCustomThemeActive ? "tài liệu này" : "chương này")}
+                                Đọc {currentChapter?.title || tReadThis}
                              </a>
                           </div>
                        ) : (
-                          <p className="text-sm font-semibold opacity-60">Tác giả chưa cấu hình Link trang gốc cho {isCustomThemeActive ? "tài liệu" : "chương"} hoặc bộ truyện này.</p>
+                          <p className="text-sm font-semibold opacity-60">Tác giả chưa cấu hình Link trang gốc cho {tNoLink} hoặc bộ truyện này.</p>
                        )}
                     </div>
                   )}
@@ -1075,7 +1120,9 @@ export function Reader() {
               <div 
                   className={cn("leading-relaxed text-justify space-y-6 select-none p-6 sm:p-10 md:p-12 rounded-[24px] sm:rounded-[32px] border-3 transition-all relative z-10", 
                       isCustomThemeActive 
-                         ? "bg-[#13120d]/85 text-[#dbcec2] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:border-[#bbee1f] transition-all duration-500" 
+                         ? (activeCustomTheme === 'homer'
+                             ? "bg-[#181f2d]/85 text-[#d1d5db] border-[#47515f] shadow-[3px_3px_0_0_#47515f] hover:border-[#a0a6b3] transition-all duration-500"
+                             : "bg-[#13120d]/85 text-[#dbcec2] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:border-[#bbee1f] transition-all duration-500")
                          : effectiveIsDark 
                             ? "bg-[#1E1815] text-[#ECE5DC] border-[#3E2723] shadow-[3px_3px_0_0_#3E2723]" 
                             : "bg-[#FFFDF9] text-[#3E2723] border-[#3E2723] shadow-[3px_3px_0_0_#3E2723]", 
@@ -1111,13 +1158,13 @@ export function Reader() {
                                           : "bg-[#FFFDF9] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]"
                                 )}>
                                    <div className="flex justify-between items-center mb-3">
-                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isCustomThemeActive ? "text-[#bbee1f]" : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>{isCustomThemeActive ? "Ý kiến đoạn" : "Bình luận đoạn"}</h4>
+                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isCustomThemeActive ? "text-[#bbee1f]" : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>{tParagraphComment}</h4>
                                        <button onClick={() => setActiveParagraphIndex(null)} className="text-xs uppercase font-bold opacity-50 hover:opacity-100">Đóng</button>
                                    </div>
                                    
                                    <div className="space-y-4 mb-4 max-h-60 overflow-y-auto pr-2 pt-4">
                                        {pComments.length === 0 ? (
-                                           <div className="text-center italic text-sm opacity-50 py-2">{isCustomThemeActive ? "Chưa có ý kiến nào cho đoạn này." : "Chưa có bình luận. Hãy là người đầu tiên!"}</div>
+                                           <div className="text-center italic text-sm opacity-50 py-2">{tNoParagraphComment}</div>
                                        ) : (
                                            pComments.map(c => { return <ParagraphCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={effectiveIsDark} isStoryTheme={isCustomThemeActive} profilesCache={profilesCache} />; if (false) { return (
                                                <div key={c.id} className="flex flex-col gap-1 w-full border-b border-stone-100/15 pb-3 last:border-0 last:pb-0">
@@ -1234,13 +1281,13 @@ export function Reader() {
                                                 type="text" 
                                                 value={paragraphCommentText} 
                                                 onChange={(e) => setParagraphCommentText(e.target.value)} 
-                                                placeholder={isCustomThemeActive ? "Viết đề xuất..." : "Viết bình luận..."} 
+                                                placeholder={tParagraphPlaceholder} 
                                                 className={cn("flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}
                                            />
-                                           <button type="submit" disabled={!paragraphCommentText.trim()} className={cn("px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 transition-all active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[2px_2px_0_0_#3E2723]", isCustomThemeActive ? "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none" : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>{isCustomThemeActive ? "Trình" : "Gửi"}</button>
+                                           <button type="submit" disabled={!paragraphCommentText.trim()} className={cn("px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 transition-all active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[2px_2px_0_0_#3E2723]", isCustomThemeActive ? "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none" : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>{tParagraphSubmit}</button>
                                        </form>
                                    ) : (
-                                       <div className="text-xs italic opacity-70 text-center">{isCustomThemeActive ? "Đăng nhập để trình ý kiến" : "Đăng nhập để bình luận"}</div>
+                                       <div className="text-xs italic opacity-70 text-center">{tParagraphLogin}</div>
                                    )}
                                </div>
                            )}
@@ -1254,13 +1301,13 @@ export function Reader() {
            <div className="mt-16 mb-8 flex items-center justify-between">
               {prevChapter ? (
                  <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
-                    <ArrowLeft className="w-5 h-5"/> {isCustomThemeActive ? "Tài liệu trước" : "Chương trước"}
+                    <ArrowLeft className="w-5 h-5"/> {tPrevChapter}
                  </button>
               ) : <div></div>}
               
               {nextChapter ? (
                  <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
-                    {isCustomThemeActive ? "Tài liệu sau" : "Chương sau"} <ArrowRight className="w-5 h-5"/>
+                    {tNextChapter} <ArrowRight className="w-5 h-5"/>
                  </button>
               ) : <div className="text-sm opacity-50 uppercase font-bold tracking-widest">Hết truyện</div>}
            </div>
@@ -1269,26 +1316,26 @@ export function Reader() {
 
            {/* Comments Area (Counts for missions) */}
            <div className="mb-12">
-               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]" : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>{isCustomThemeActive ? "Đề xuất và ý kiến" : "Bình luận chương"}</h3>
+               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]" : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>{tCommentAreaTitle}</h3>
                <form onSubmit={handleComment} className="flex flex-col gap-3 mb-8">
                   <textarea 
                      value={commentText}
                      onChange={(e) => setCommentText(e.target.value)}
                      disabled={!isLoggedIn}
-                     placeholder={isLoggedIn ? (isCustomThemeActive ? "Nhập đề xuất và ý kiến của bạn..." : "Nhập bình luận của bạn...") : (isCustomThemeActive ? "Đăng nhập để trình ý kiến" : "Đăng nhập để bình luận")}
+                     placeholder={isLoggedIn ? tCommentAreaPlaceholder : tCommentAreaPlaceholderLogin}
                      className={cn("w-full p-4 rounded-2xl resize-none border-2 outline-none font-semibold text-xs sm:text-sm transition-all", isCustomThemeActive ? "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f] focus:shadow-[2px_2px_0_0_#2e2a63]" : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-white focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#000]" : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#3E2723]")}
                      rows={4}
                   />
                   <div className="flex justify-end">
                      <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-xl font-black transition-all uppercase text-xs tracking-wider border-2 active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[3px_3px_0_0_#3E2723]", isCustomThemeActive ? "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none" : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>
-                        {isCustomThemeActive ? "Trình ý kiến" : "Gửi bình luận"}
+                        {tCommentSubmit}
                      </button>
                   </div>
                </form>
 
                <div className="space-y-6">
                    {chapterComments.length === 0 ? (
-                       <p className={cn("text-center italic opacity-50", isCustomThemeActive ? "text-[#dbcec2]/70" : "")}>{isCustomThemeActive ? "Chưa có đề xuất và ý kiến nào cho tài liệu này." : "Chưa có bình luận nào cho chương này."}</p>
+                       <p className={cn("text-center italic opacity-50", isCustomThemeActive ? "text-[#dbcec2]/70" : "")}>{tNoComment}</p>
                    ) : (
                        chapterComments.map(c => { return <ChapterCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={effectiveIsDark} isStoryTheme={isCustomThemeActive} profilesCache={profilesCache} />; if (false) { return (
                            <div key={c.id} className={cn("p-5 rounded-2xl border relative overflow-visible", isDark ? "bg-[#2C221D]/80 border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8] shadow-sm pr-8")}>
