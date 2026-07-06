@@ -128,10 +128,10 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
   return (
     <>
       {/* Blurred overlay */}
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-45 transition-opacity" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[190] transition-opacity" onClick={onClose} />
       
       {/* Navigation Drawer Container */}
-      <div className="fixed left-0 top-0 bottom-0 w-80 sm:w-[360px] bg-[#FDF6EC] dark:bg-[#161311] z-50 shadow-2xl flex flex-col border-r-4 border-[#3E2723] dark:border-[#261E1A] overflow-hidden animate-in slide-in-from-left duration-300 font-sans">
+      <div className="fixed left-0 top-0 bottom-0 w-80 sm:w-[360px] bg-[#FDF6EC] dark:bg-[#161311] z-[200] shadow-2xl flex flex-col border-r-4 border-[#3E2723] dark:border-[#261E1A] overflow-hidden animate-in slide-in-from-left duration-300 font-sans">
         
         {/* Header Row */}
         <div className="p-4 bg-[#3E2723] text-[#FDF6EC] flex items-center justify-between border-b border-[#5D4037]">
