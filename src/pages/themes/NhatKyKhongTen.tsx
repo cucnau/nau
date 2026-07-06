@@ -31,30 +31,65 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
     })
     .slice(chapterPage * CHAPTERS_PER_PAGE, (chapterPage + 1) * CHAPTERS_PER_PAGE);
 
-  // Custom interactive feature: Puppet Memory Fragments
-  const [activeFragment, setActiveFragment] = useState<number | null>(null);
-  const memoryFragments = [
-    {
-      title: "Mảnh hồi ức I: Người con của kỹ nữ",
-      text: "Được sinh ra nơi ngõ hẻm bụi bặm, tiếng cười cợt của khách làng chơi và mùi phấn hoa nồng nặc là những gì đầu tiên tôi nhớ. Tôi không có tên, người ta chỉ gọi tôi là 'đứa con hoang của hẻm nhỏ'."
-    },
-    {
-      title: "Mảnh hồi ức II: Sự phản bội và hiến tế",
-      text: "Mẹ đã bán tôi... lấy vài đồng bạc sứt mẻ. Họ kéo tôi lên bục đá lạnh buốt, một lưỡi dao sáng loáng dâng lên tế thần. Máu tôi thấm qua khe đá, linh hồn tan biến vào khoảng không trống rỗng."
-    },
-    {
-      title: "Mảnh hồi ức III: Sự tái sinh vô tri",
-      text: "Bậc thầy rối đã nhặt những mảnh linh hồn vỡ nát của tôi, ghép chúng vào một cơ thể gỗ tinh xảo. 'Giờ em là búp bê của ta.' Đau đớn tan biến, chỉ còn tiếng lách cách của khớp gỗ và hơi ấm của đôi bàn tay anh ấy."
-    },
-    {
-      title: "Mảnh hồi ức IV: Nụ hôn vụn trộm dưới đêm đen",
-      text: "Khi anh ấy ngủ say, tôi đã lặng lẽ di chuyển những khớp gỗ nặng nề, cúi xuống lén hôn trộm đôi môi lạnh lùng ấy. Sợi dây rối rung lên khe khẽ, một bí mật vĩnh viễn bị chôn vùi trong bóng đêm."
-    },
-    {
-      title: "Mảnh hồi ức V: Khói lửa chiến tranh & Sự thật cuối cùng",
-      text: "Khói lửa thiêu rụi thành phố, các khớp gỗ của tôi rạn nứt vì những mũi kiếm tàn nhẫn. Nhưng khi tỉnh lại, tôi vẫn nguyên vẹn. Bên cạnh tôi, Bậc thầy rối nằm yên bình với những sợi chỉ đứt đoạn, để lộ cơ thể gỗ lấp ló dưới lớp áo sờn... Hóa ra, anh ấy cũng giống tôi."
+  // Custom interactive features: Reader's Mood Rating & Personal Reading Notebook
+  const [userMood, setUserMood] = useState<string>(() => {
+    return localStorage.getItem(`story_user_mood_${story.id}`) || '';
+  });
+  const [moodVotes, setMoodVotes] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem(`story_mood_votes_${story.id}`);
+    if (saved) return JSON.parse(saved);
+    return {
+      'u-sau': 42,
+      'am-ap': 28,
+      'huyen-bi': 35,
+      'day-dut': 49
+    };
+  });
+
+  const [personalNotes, setPersonalNotes] = useState<Array<{id: string, text: string, createdAt: string}>>(() => {
+    const saved = localStorage.getItem(`story_personal_notes_${story.id}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [newNoteText, setNewNoteText] = useState('');
+
+  const handleVoteMood = (moodKey: string) => {
+    if (userMood === moodKey) {
+      const newVotes = { ...moodVotes, [moodKey]: Math.max(0, moodVotes[moodKey] - 1) };
+      setMoodVotes(newVotes);
+      setUserMood('');
+      localStorage.setItem(`story_mood_votes_${story.id}`, JSON.stringify(newVotes));
+      localStorage.removeItem(`story_user_mood_${story.id}`);
+    } else {
+      const newVotes = { ...moodVotes };
+      if (userMood) {
+        newVotes[userMood] = Math.max(0, newVotes[userMood] - 1);
+      }
+      newVotes[moodKey] = (newVotes[moodKey] || 0) + 1;
+      setMoodVotes(newVotes);
+      setUserMood(moodKey);
+      localStorage.setItem(`story_mood_votes_${story.id}`, JSON.stringify(newVotes));
+      localStorage.setItem(`story_user_mood_${story.id}`, moodKey);
     }
-  ];
+  };
+
+  const handleAddPersonalNote = () => {
+    if (!newNoteText.trim()) return;
+    const newNote = {
+      id: Date.now().toString(),
+      text: newNoteText.trim(),
+      createdAt: new Date().toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    };
+    const updated = [newNote, ...personalNotes];
+    setPersonalNotes(updated);
+    localStorage.setItem(`story_personal_notes_${story.id}`, JSON.stringify(updated));
+    setNewNoteText('');
+  };
+
+  const handleDeletePersonalNote = (noteId: string) => {
+    const updated = personalNotes.filter(n => n.id !== noteId);
+    setPersonalNotes(updated);
+    localStorage.setItem(`story_personal_notes_${story.id}`, JSON.stringify(updated));
+  };
 
   return (
     <div className="bg-[#1E1614] min-h-screen text-[#DFD6D3] font-serif selection:bg-[#8E7E7A] selection:text-[#1E1614] pb-10">
@@ -65,12 +100,9 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
           <span className="flex items-center gap-1.5 text-[#E8DCB8] animate-pulse">
             <Scissors className="w-3.5 h-3.5" /> DIARY.PUPPET_SOUL // HOẠT ĐỘNG
           </span>
-          <span className="hidden md:inline-block text-[10px] text-[#5D4B45]">|</span>
-          <span className="hidden md:inline-block">NGÔI THỨ NHẤT</span>
         </div>
         <div className="flex items-center gap-4 text-[10px] sm:text-xs">
-          <span className="hidden sm:inline-block text-[#8E7E7A]">RỐI & BẬC THẦY RỐI</span>
-          <span className="px-2 py-0.5 bg-[#4E3E39] text-[#E8DCB8] rounded border border-[#5D4B45]">OE (?)</span>
+          <span className="text-[#8E7E7A]">Ghi chép bên lề nhật ký</span>
         </div>
       </div>
 
@@ -201,40 +233,121 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
             </div>
           </div>
 
-          {/* CUSTOM INTERACTIVE SECTION: MEMORY FRAGMENTS */}
-          <div className="border-2 border-[#4E3E39] bg-[#251B19] p-6 rounded-2xl">
-            <h3 className="font-serif text-[#E8DCB8] text-base font-bold mb-4 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#E8DCB8]" /> Mở Khóa Mảnh Vỡ Ký Ức Của Rối
-            </h3>
-            <p className="text-xs text-[#8E7E7A] font-sans mb-4">
-              Nhấp vào từng mảnh chỉ nối bên dưới để lật giở từng trang bí mật u tối về chú búp bê gỗ và bậc thầy của anh ấy.
-            </p>
+          {/* CUSTOM INTERACTIVE SECTION: READER REFLECTION & MOOD */}
+          <div className="border-2 border-[#4E3E39] bg-[#251B19] p-6 rounded-2xl flex flex-col gap-6">
+            {/* 1. MẢNG CẢM XÚC */}
+            <div>
+              <h3 className="font-serif text-[#E8DCB8] text-sm font-black uppercase tracking-wider mb-2 flex items-center gap-2">
+                <Compass className="w-4 h-4 text-[#E8DCB8]" /> Cảm nhận tâm trạng tác phẩm
+              </h3>
+              <p className="text-xs text-[#8E7E7A] font-sans mb-4">
+                Hãy bình chọn cảm xúc sâu sắc nhất mà bạn cảm nhận được qua tác phẩm này.
+              </p>
 
-            <div className="flex flex-col gap-3">
-              {memoryFragments.map((frag, idx) => (
-                <div 
-                  key={idx}
-                  className="border border-[#4E3E39] bg-[#1E1614] rounded-xl overflow-hidden transition-all duration-300"
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { key: 'u-sau', label: 'U sầu cổ kính', desc: 'Nét buồn mộc mạc', color: 'bg-[#5D4B45]' },
+                  { key: 'am-ap', label: 'Ấm áp dịu êm', desc: 'Hơi ấm sưởi tâm hồn', color: 'bg-[#8D6E63]' },
+                  { key: 'huyen-bi', label: 'Huyền bí ly kỳ', desc: 'Bí ẩn chưa hé lộ', color: 'bg-[#4E3E39]' },
+                  { key: 'day-dut', label: 'Tiếc nuối day dứt', desc: 'Nỗi buồn thầm lặng', color: 'bg-[#3E2723]' }
+                ].map((mood) => {
+                  const totalVotes = Object.keys(moodVotes).reduce((acc: number, key: string) => acc + (moodVotes[key] || 0), 0) || 1;
+                  const voteCount = moodVotes[mood.key] || 0;
+                  const percent = Math.round((voteCount / totalVotes) * 100);
+                  const isSelected = userMood === mood.key;
+
+                  return (
+                    <button
+                      key={mood.key}
+                      onClick={() => handleVoteMood(mood.key)}
+                      className={`text-left p-3 rounded-xl border-2 transition-all cursor-pointer relative overflow-hidden group ${
+                        isSelected 
+                          ? 'border-[#E8DCB8] bg-[#1E1614] shadow-[0_0_10px_rgba(232,220,184,0.15)]' 
+                          : 'border-[#4E3E39] bg-[#1E1614] hover:border-[#8E7E7A]'
+                      }`}
+                    >
+                      {/* Background Progress bar bar */}
+                      <div 
+                        className={`absolute left-0 top-0 bottom-0 opacity-10 transition-all duration-500 ${mood.color}`}
+                        style={{ width: `${percent}%` }}
+                      />
+                      <div className="relative z-10 flex justify-between items-start">
+                        <div>
+                          <div className={`text-xs font-serif font-bold ${isSelected ? 'text-[#E8DCB8]' : 'text-[#DFD6D3]'}`}>
+                            {mood.label} {isSelected && '✓'}
+                          </div>
+                          <div className="text-[10px] text-[#8E7E7A] font-sans mt-0.5">{mood.desc}</div>
+                        </div>
+                        <span className="text-xs font-mono font-bold text-[#E8DCB8]">
+                          {percent}%
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Đường gạch phân cách */}
+            <div className="border-t border-[#4E3E39] border-dashed" />
+
+            {/* 2. SỔ TAY CHIÊM NGHIỆM RIÊNG TƯ */}
+            <div>
+              <h3 className="font-serif text-[#E8DCB8] text-sm font-black uppercase tracking-wider mb-2 flex items-center gap-2">
+                <PenTool className="w-4 h-4 text-[#E8DCB8]" /> Sổ tay suy ngẫm cá nhân
+              </h3>
+              <p className="text-xs text-[#8E7E7A] font-sans mb-4">
+                Không gian lưu trữ riêng tư giúp bạn ghi chép lại các suy ngẫm, cảm nhận cá nhân khi thưởng thức tác phẩm.
+              </p>
+
+              {/* Form ghi chép */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newNoteText}
+                  onChange={(e) => setNewNoteText(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddPersonalNote()}
+                  placeholder="Ghi chép nhanh suy nghĩ, dòng tâm đắc của bạn..."
+                  className="flex-1 bg-[#1E1614] text-[#DFD6D3] placeholder-[#8E7E7A]/75 px-3 py-2 rounded-xl border-2 border-[#4E3E39] focus:outline-none focus:border-[#8E7E7A] text-xs font-serif italic"
+                />
+                <button
+                  onClick={handleAddPersonalNote}
+                  disabled={!newNoteText.trim()}
+                  className="px-4 py-2 bg-[#E8DCB8] hover:bg-[#F5E8C8] text-[#1E1614] text-xs font-black uppercase rounded-xl transition-all cursor-pointer disabled:opacity-40"
                 >
-                  <button
-                    onClick={() => setActiveFragment(activeFragment === idx ? null : idx)}
-                    className="w-full px-4 py-3.5 text-left flex items-center justify-between hover:bg-[#251B19] transition-all"
-                  >
-                    <span className={`font-serif text-sm font-bold ${activeFragment === idx ? 'text-[#E8DCB8]' : 'text-[#DFD6D3]'}`}>
-                      {frag.title}
-                    </span>
-                    <span className="text-xs font-mono text-[#8E7E7A]">
-                      {activeFragment === idx ? '▲ THU LẠI' : '▼ ĐỌC MẢNH VỠ'}
-                    </span>
-                  </button>
+                  Lưu
+                </button>
+              </div>
 
-                  {activeFragment === idx && (
-                    <div className="p-4 bg-[#171110] text-[#DFD6D3]/95 text-sm leading-relaxed border-t border-[#4E3E39] font-serif italic text-justify animate-in fade-in duration-300">
-                      {frag.text}
+              {/* Danh sách ghi chép cá nhân */}
+              {personalNotes.length > 0 && (
+                <div className="mt-4 flex flex-col gap-2 max-h-48 overflow-y-auto pr-1">
+                  {personalNotes.map((note) => (
+                    <div 
+                      key={note.id}
+                      className="p-3 bg-[#1E1614]/70 border border-[#4E3E39] rounded-xl flex justify-between items-start gap-2 group animate-in fade-in slide-in-from-top-1 duration-200"
+                    >
+                      <div className="flex-1">
+                        <p className="text-xs text-[#DFD6D3] font-serif leading-relaxed text-justify italic">
+                          "{note.text}"
+                        </p>
+                        <span className="text-[9px] text-[#8E7E7A] font-mono block mt-1">
+                          Ghi lúc: {note.createdAt}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleDeletePersonalNote(note.id)}
+                        className="text-[#8E7E7A] hover:text-[#E8DCB8] transition-colors p-1 rounded hover:bg-[#251B19]"
+                        title="Xoá ghi chép"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
                     </div>
-                  )}
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -372,7 +485,10 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
                             avatarUrl={avatar} 
                             equippedAccessory={cacheUser.equippedAccessory || comment.equippedAccessory} 
                             accessoryPosition={cacheUser.accessoryPosition || comment.accessoryPosition} 
-                            size="md" 
+                            className="w-10 h-10 shrink-0 pointer-events-none" 
+                            fallbackIconSizeClass="w-5 h-5 text-[#E8DCB8]" 
+                            borderClass="border border-[#4E3E39]"
+                            bgClass="bg-[#171110]"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
