@@ -7,6 +7,7 @@ import { cn } from '../components/Layout';
 import { Settings2, ArrowLeft, ArrowRight, List, Lock, Unlock, Zap, MessageSquare, Clock, Pause, CheckCircle, ExternalLink } from 'lucide-react';
 import { db, checkIfQuotaError } from '../lib/firebase';
 import { getStoryByIdOrSlug, getStoryChapters } from '../lib/storyLoader';
+import { detectStoryTheme } from '../lib/themeHelper';
 import { collection, query, orderBy, getDocs, addDoc, serverTimestamp, onSnapshot, where, doc, getDoc, updateDoc, increment, limit } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { getWeeklyId, getGMT7Date } from '../types/achievements';
@@ -530,6 +531,7 @@ export function Reader() {
         const foundStory = await getStoryByIdOrSlug(storyId);
         if (foundStory) {
           setStory(foundStory);
+          detectStoryTheme(foundStory.title, foundStory.id);
           const foundChapters = await getStoryChapters(foundStory.id);
           setChapters(foundChapters);
         }
@@ -897,9 +899,7 @@ export function Reader() {
     return () => clearInterval(interval);
   }, [isFinished, isLocked, timeRequired, currentChapter?.id]);
 
-  const activeCustomTheme: 'giagoan' | 'homer' | null = 
-    story?.title?.toLowerCase().includes('hướng dẫn giả ngoan') ? 'giagoan' :
-    (story?.title?.toLowerCase().includes('cánh cửa homer') || story?.title?.toLowerCase().includes('canh cua homer')) ? 'homer' : null;
+  const activeCustomTheme = detectStoryTheme(story?.title, storyId);
 
   if (loading || !story || !currentChapter) {
     if (activeCustomTheme === 'homer') {
