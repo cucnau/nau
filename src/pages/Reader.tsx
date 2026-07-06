@@ -924,6 +924,17 @@ export function Reader() {
           </div>
         </div>
       );
+    } else if (activeCustomTheme === 'nhatky') {
+      return (
+        <div className="min-h-screen bg-[#1E1614] text-[#DFD6D3] flex flex-col items-center justify-center p-4 font-serif">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#4E3E39] border-t-[#E8DCB8] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#8E7E7A] animate-pulse font-bold font-sans">
+              DIARY.PUPPET // ĐANG MỞ TRANG NHẬT KÝ...
+            </div>
+          </div>
+        </div>
+      );
     }
 
     return (
@@ -941,31 +952,34 @@ export function Reader() {
   const hasCustomTheme = !!activeCustomTheme;
   const isCustomThemeActive = !!(hasCustomTheme && useStoryTheme);
   const effectiveIsDark = isCustomThemeActive ? true : isDark;
-  const effectiveFontFamily = isCustomThemeActive ? (activeCustomTheme === 'homer' ? 'font-reading-iosevka' : 'font-reading-garamond') : fontFamily;
-  const tChapterLabel = activeCustomTheme === 'homer' ? "Tọa độ" : activeCustomTheme === 'giagoan' ? "Tài liệu" : "Chương";
-  const tChapterCapLabel = activeCustomTheme === 'homer' ? "TỌA ĐỘ" : activeCustomTheme === 'giagoan' ? "TÀI LIỆU" : "CHƯƠNG";
-  const tPrevChapter = activeCustomTheme === 'homer' ? "Tọa độ trước" : activeCustomTheme === 'giagoan' ? "Tài liệu trước" : "Chương trước";
-  const tNextChapter = activeCustomTheme === 'homer' ? "Tọa độ sau" : activeCustomTheme === 'giagoan' ? "Tài liệu sau" : "Chương sau";
-  const tChapterEarly = activeCustomTheme === 'homer' ? "Tọa độ Đọc Sớm" : activeCustomTheme === 'giagoan' ? "Tài liệu Đọc Sớm" : "Chương Đọc Sớm";
-  const tChapterLocked = activeCustomTheme === 'homer' ? "Đã khóa tọa độ" : activeCustomTheme === 'giagoan' ? "Đã khóa tài liệu" : "Đã khóa chương";
-  const tReadThis = activeCustomTheme === 'homer' ? "Đọc tọa độ này" : activeCustomTheme === 'giagoan' ? "Đọc tài liệu này" : "Đọc chương này";
-  const tChapterSingle = activeCustomTheme === 'homer' ? "tọa độ" : activeCustomTheme === 'giagoan' ? "tài liệu" : "chương";
-  const tParagraphComment = activeCustomTheme === 'homer' ? "Phản hồi tọa độ" : activeCustomTheme === 'giagoan' ? "Ý kiến đoạn" : "Bình luận đoạn";
-  const tNoParagraphComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào cho tọa độ này." : activeCustomTheme === 'giagoan' ? "Chưa có ý kiến nào cho đoạn này." : "Chưa có bình luận. Hãy là người đầu tiên!";
-  const tParagraphPlaceholder = activeCustomTheme === 'homer' ? "Viết phản hồi..." : activeCustomTheme === 'giagoan' ? "Viết đề xuất..." : "Viết bình luận...";
-  const tParagraphSubmit = activeCustomTheme === 'homer' ? "Phát" : activeCustomTheme === 'giagoan' ? "Trình" : "Gửi";
-  const tParagraphLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : "Đăng nhập để bình luận";
-  const tCommentAreaTitle = activeCustomTheme === 'homer' ? "Báo cáo sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đề xuất và ý kiến" : "Bình luận chương";
-  const tCommentAreaPlaceholder = activeCustomTheme === 'homer' ? "Nhập sóng phản hồi của bạn..." : activeCustomTheme === 'giagoan' ? "Nhập đề xuất và ý kiến của bạn..." : "Nhập bình luận của bạn...";
-  const tCommentAreaPlaceholderLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phát sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : "Đăng nhập để bình luận";
-  const tCommentSubmit = activeCustomTheme === 'homer' ? "Phát sóng" : activeCustomTheme === 'giagoan' ? "Trình ý kiến" : "Gửi bình luận";
-  const tNoComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào." : activeCustomTheme === 'giagoan' ? "Chưa có đề xuất và ý kiến nào cho tài liệu này." : "Chưa có bình luận nào cho chương này.";
+  const effectiveFontFamily = isCustomThemeActive ? (
+    activeCustomTheme === 'homer' ? 'font-reading-iosevka' : 
+    activeCustomTheme === 'nhatky' ? 'font-reading-georgia font-serif' : 'font-reading-garamond'
+  ) : fontFamily;
+  const tChapterLabel = activeCustomTheme === 'homer' ? "Tọa độ" : activeCustomTheme === 'giagoan' ? "Tài liệu" : activeCustomTheme === 'nhatky' ? "Trang" : "Chương";
+  const tChapterCapLabel = activeCustomTheme === 'homer' ? "TỌA ĐỘ" : activeCustomTheme === 'giagoan' ? "TÀI LIỆU" : activeCustomTheme === 'nhatky' ? "TRANG NHẬT KÝ" : "CHƯƠNG";
+  const tPrevChapter = activeCustomTheme === 'homer' ? "Tọa độ trước" : activeCustomTheme === 'giagoan' ? "Tài liệu trước" : activeCustomTheme === 'nhatky' ? "Trang nhật ký trước" : "Chương trước";
+  const tNextChapter = activeCustomTheme === 'homer' ? "Tọa độ sau" : activeCustomTheme === 'giagoan' ? "Tài liệu sau" : activeCustomTheme === 'nhatky' ? "Trang nhật ký sau" : "Chương sau";
+  const tChapterEarly = activeCustomTheme === 'homer' ? "Tọa độ Đọc Sớm" : activeCustomTheme === 'giagoan' ? "Tài liệu Đọc Sớm" : activeCustomTheme === 'nhatky' ? "Trang Đọc Sớm" : "Chương Đọc Sớm";
+  const tChapterLocked = activeCustomTheme === 'homer' ? "Đã khóa tọa độ" : activeCustomTheme === 'giagoan' ? "Đã khóa tài liệu" : activeCustomTheme === 'nhatky' ? "Ký ức bị khép lại" : "Đã khóa chương";
+  const tReadThis = activeCustomTheme === 'homer' ? "Đọc tọa độ này" : activeCustomTheme === 'giagoan' ? "Đọc tài liệu này" : activeCustomTheme === 'nhatky' ? "Lật giở ký ức này" : "Đọc chương này";
+  const tChapterSingle = activeCustomTheme === 'homer' ? "tọa độ" : activeCustomTheme === 'giagoan' ? "tài liệu" : activeCustomTheme === 'nhatky' ? "trang" : "chương";
+  const tParagraphComment = activeCustomTheme === 'homer' ? "Phản hồi tọa độ" : activeCustomTheme === 'giagoan' ? "Ý kiến đoạn" : activeCustomTheme === 'nhatky' ? "Bút tích đoạn" : "Bình luận đoạn";
+  const tNoParagraphComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào cho tọa độ này." : activeCustomTheme === 'giagoan' ? "Chưa có ý kiến nào cho đoạn này." : activeCustomTheme === 'nhatky' ? "Chưa có dấu bút tích nào tại dòng ký ức này." : "Chưa có bình luận. Hãy là người đầu tiên!";
+  const tParagraphPlaceholder = activeCustomTheme === 'homer' ? "Viết phản hồi..." : activeCustomTheme === 'giagoan' ? "Viết đề xuất..." : activeCustomTheme === 'nhatky' ? "Để lại dòng bút tích..." : "Viết bình luận...";
+  const tParagraphSubmit = activeCustomTheme === 'homer' ? "Phát" : activeCustomTheme === 'giagoan' ? "Trình" : activeCustomTheme === 'nhatky' ? "Ghi" : "Gửi";
+  const tParagraphLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : activeCustomTheme === 'nhatky' ? "Đăng nhập để lại bút tích" : "Đăng nhập để bình luận";
+  const tCommentAreaTitle = activeCustomTheme === 'homer' ? "Báo cáo sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đề xuất và ý kiến" : activeCustomTheme === 'nhatky' ? "Dấu vết bút tích chương" : "Bình luận chương";
+  const tCommentAreaPlaceholder = activeCustomTheme === 'homer' ? "Nhập sóng phản hồi của bạn..." : activeCustomTheme === 'giagoan' ? "Nhập đề xuất và ý kiến của bạn..." : activeCustomTheme === 'nhatky' ? "Nhập bút tích thương nhớ của bạn..." : "Nhập bình luận của bạn...";
+  const tCommentAreaPlaceholderLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phát sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : activeCustomTheme === 'nhatky' ? "Đăng nhập để ghi lại dòng hoài niệm" : "Đăng nhập để bình luận";
+  const tCommentSubmit = activeCustomTheme === 'homer' ? "Phát sóng" : activeCustomTheme === 'giagoan' ? "Trình ý kiến" : activeCustomTheme === 'nhatky' ? "Khắc ghi bút tích" : "Gửi bình luận";
+  const tNoComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào." : activeCustomTheme === 'giagoan' ? "Chưa có đề xuất và ý kiến nào cho tài liệu này." : activeCustomTheme === 'nhatky' ? "Trang ký ức này chưa lưu lại nét bút nào." : "Chưa có bình luận nào cho chương này.";
 
   return (
     <div className={cn(
       "min-h-screen transition-colors duration-500 pb-32 font-medium flex flex-col items-center",
       isCustomThemeActive 
-        ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3]" : "bg-[#13120d] text-[#dbcec2]")
+        ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#1E1614] text-[#DFD6D3] font-serif" : "bg-[#13120d] text-[#dbcec2]")
         : effectiveIsDark 
           ? "bg-[#1A1412] text-[#ECE5DC]" 
           : "bg-[#FDF6EC] text-[#3E2723]"
