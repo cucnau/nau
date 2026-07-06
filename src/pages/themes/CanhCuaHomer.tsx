@@ -35,7 +35,7 @@ export function CanhCuaHomerTheme(props: ThemeProps) {
     <div className="bg-[#181f2d] min-h-screen text-[#a0a6b3] font-mono selection:bg-[#a0a6b3] selection:text-[#181f2d] pb-10">
       
       {/* Top Terminal Bar */}
-      <div className="border-b border-[#47515f] bg-[#2d3745] px-4 py-2 flex items-center justify-between sticky top-0 z-50 text-[10px] uppercase tracking-widest text-[#67707e]">
+      <div className="border-b border-[#47515f] bg-[#2d3745] px-4 py-2 flex items-center justify-between sticky top-0 z-30 text-[10px] uppercase tracking-widest text-[#67707e]">
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-2 text-[#a0a6b3] animate-pulse"><Terminal className="w-3 h-3" /> SYS.HOMER.ACTIVE</span>
           <span className="hidden sm:inline-block">CONNECTION_STABLE</span>
@@ -337,8 +337,9 @@ export function CanhCuaHomerTheme(props: ThemeProps) {
                             equippedAccessory={currentAccessory}
                             accessoryPosition={currentAccessoryPos}
                             className="w-8 h-8 rounded-none border border-[#67707e]" 
-                            fallbackIconSizeClass="w-4 h-4 text-[#a0a6b3]" 
+                            fallbackIconSizeClass="w-4 h-4 text-[#a0a6b3]"
                             borderClass=""
+                            bgClass="bg-[#181f2d]"
                           />
                           <div className="flex flex-col">
                             <span className="text-[#a0a6b3] text-xs font-bold uppercase tracking-widest flex items-center gap-2">
