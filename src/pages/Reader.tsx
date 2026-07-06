@@ -1028,7 +1028,7 @@ export function Reader() {
   const effectiveIsDark = isCustomThemeActive ? true : isDark;
   const effectiveFontFamily = isCustomThemeActive ? (
     activeCustomTheme === 'homer' ? 'font-reading-iosevka' : 
-    activeCustomTheme === 'nhatky' ? 'font-reading-georgia font-serif' : 'font-reading-garamond'
+    activeCustomTheme === 'nhatky' ? 'font-reading-cormorant' : 'font-reading-garamond'
   ) : fontFamily;
   const tChapterLabel = activeCustomTheme === 'homer' ? "Tọa độ" : activeCustomTheme === 'giagoan' ? "Tài liệu" : activeCustomTheme === 'nhatky' ? "Trang" : "Chương";
   const tChapterCapLabel = activeCustomTheme === 'homer' ? "TỌA ĐỘ" : activeCustomTheme === 'giagoan' ? "TÀI LIỆU" : activeCustomTheme === 'nhatky' ? "TRANG NHẬT KÝ" : "CHƯƠNG";
@@ -1063,6 +1063,7 @@ export function Reader() {
            font-family: ${
              effectiveFontFamily === 'font-reading-iosevka' ? '"Iosevka", monospace' :
              effectiveFontFamily === 'font-reading-garamond' ? '"EB Garamond", serif' :
+             effectiveFontFamily === 'font-reading-cormorant' ? '"Cormorant Garamond", Georgia, serif' :
              effectiveFontFamily === 'font-reading-notoserif' ? '"Noto Serif", Georgia, serif' :
              '"Quicksand", sans-serif'
            } !important;
