@@ -92,7 +92,7 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
   };
 
   return (
-    <div className="bg-[#1E1614] min-h-screen text-[#DFD6D3] font-serif selection:bg-[#8E7E7A] selection:text-[#1E1614] pb-10">
+    <div className="bg-[#1E1614] min-h-screen text-[#DFD6D3] font-reading-cormorant selection:bg-[#8E7E7A] selection:text-[#1E1614] pb-10">
       
       {/* Top Thread Bar with String-like borders */}
       <div className="border-b-2 border-[#5D4B45] bg-[#171110] px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 text-xs uppercase tracking-widest text-[#8E7E7A] font-sans">
