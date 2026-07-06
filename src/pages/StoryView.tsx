@@ -12,6 +12,7 @@ import { UserAvatar } from '../components/UserAvatar';
 import { ThemeProps } from './themes/ThemeProps';
 import { HuongDanGiaNgoanTheme } from './themes/HuongDanGiaNgoan';
 import { CanhCuaHomerTheme } from './themes/CanhCuaHomer';
+import { detectStoryTheme } from '../lib/themeHelper';
 
 interface CommentNodeProps {
    comment: any;
@@ -315,6 +316,7 @@ export function StoryView() {
         const foundStory = await getStoryByIdOrSlug(id);
         if (foundStory) {
           setStory(foundStory);
+          detectStoryTheme(foundStory.title, foundStory.id);
           setActualStoryId(foundStory.id);
           const foundChapters = await getStoryChapters(foundStory.id);
           setChapters(foundChapters);
@@ -345,7 +347,43 @@ export function StoryView() {
     return () => unsub();
   }, [actualStoryId]);
   
-  if (loading) return <div className="p-10 text-center">Đang tải truyện...</div>;
+  if (loading) {
+    const activeCustomTheme = detectStoryTheme(story?.title, id);
+    if (activeCustomTheme === 'homer') {
+      return (
+        <div className="min-h-screen bg-[#181f2d] text-[#a0a6b3] flex flex-col items-center justify-center p-4 font-mono">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#47515f] border-t-[#a0a6b3] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#a0a6b3] animate-pulse font-bold">
+              SYS.HOMER // TRUY XUẤT TỌA ĐỘ DỮ LIỆU...
+            </div>
+          </div>
+        </div>
+      );
+    } else if (activeCustomTheme === 'giagoan') {
+      return (
+        <div className="min-h-screen bg-[#13120d] text-[#dbcec2] flex flex-col items-center justify-center p-4 font-sans">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#2e2a63] border-t-[#bbee1f] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#695b7f] animate-pulse font-bold">
+              ĐANG TẢI DỮ LIỆU TÀI LIỆU...
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="min-h-screen bg-[#1A1412] text-[#E0D4C3] flex flex-col items-center justify-center p-4 font-sans">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#3E2723] border-t-[#D7CCC8] rounded-full animate-spin" />
+          <div className="text-xs uppercase tracking-[0.2em] text-[#8D6E63] animate-pulse font-bold">
+            Đang tải dữ liệu truyện...
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
   if (!story) return <div className="p-10 text-center">Không tìm thấy truyện</div>;
 
   const progressData = storyProgress[story.id];
@@ -667,7 +705,7 @@ export function StoryView() {
      
                 <div className="flex items-center gap-6 mb-6">
                    <div className="flex flex-col">
-                       <span className="text-[#8D6E63] text-xs uppercase font-extrabold tracking-widest">{tChapters}</span>
+                       <span className="text-[#8D6E63] text-xs uppercase font-extrabold tracking-widest">{"chương"}</span>
                        <span className="font-extrabold text-2xl text-[#3E2723] dark:text-[#ECE5DC]">{Math.max(story.chapterCount || 0, chapters.length)}</span>
                    </div>
                    <div className="w-[3px] h-10 bg-[#3E2723]/25 dark:bg-stone-600/40 rounded-full"></div>
@@ -788,7 +826,7 @@ export function StoryView() {
                {chapters.length > 0 && (
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between xl:justify-end gap-3 mb-4 bg-[#F5F2EB]/50 dark:bg-[#1C1613]/50 p-2 sm:p-3 rounded-xl border border-stone-200/50 dark:border-[#3E2D25]/50">
                      <span className="text-xs font-bold text-[#8D6E63] uppercase tracking-wider hidden sm:inline-block mr-auto">
-                        {chapters.length} {tChapters}
+                        {chapters.length} {"chương"}
                      </span>
                      
                      <div className="flex items-center gap-2 justify-between sm:justify-start w-full sm:w-auto">
@@ -807,7 +845,7 @@ export function StoryView() {
                               const end = Math.min((i + 1) * CHAPTERS_PER_PAGE, chapters.length);
                               return (
                                  <option key={i} value={i}>
-                                    {tChapterSingle} {start} - {end}
+                                    {"chương"} {start} - {end}
                                  </option>
                               );
                            })}
