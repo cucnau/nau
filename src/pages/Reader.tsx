@@ -897,22 +897,46 @@ export function Reader() {
     return () => clearInterval(interval);
   }, [isFinished, isLocked, timeRequired, currentChapter?.id]);
 
+  const activeCustomTheme: 'giagoan' | 'homer' | null = 
+    story?.title?.toLowerCase().includes('hướng dẫn giả ngoan') ? 'giagoan' :
+    (story?.title?.toLowerCase().includes('cánh cửa homer') || story?.title?.toLowerCase().includes('canh cua homer')) ? 'homer' : null;
+
   if (loading || !story || !currentChapter) {
+    if (activeCustomTheme === 'homer') {
+      return (
+        <div className="min-h-screen bg-[#181f2d] text-[#a0a6b3] flex flex-col items-center justify-center p-4 font-mono">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#47515f] border-t-[#a0a6b3] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#a0a6b3] animate-pulse font-bold">
+              SYS.HOMER // TRUY XUẤT TỌA ĐỘ DỮ LIỆU...
+            </div>
+          </div>
+        </div>
+      );
+    } else if (activeCustomTheme === 'giagoan') {
+      return (
+        <div className="min-h-screen bg-[#13120d] text-[#dbcec2] flex flex-col items-center justify-center p-4 font-sans">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#2e2a63] border-t-[#bbee1f] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#695b7f] animate-pulse font-bold">
+              ĐANG TẢI DỮ LIỆU TÀI LIỆU...
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className="min-h-screen bg-[#13120d] text-[#dbcec2] flex flex-col items-center justify-center p-4 font-sans">
+      <div className="min-h-screen bg-[#1A1412] text-[#E0D4C3] flex flex-col items-center justify-center p-4 font-sans">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-[#2e2a63] border-t-[#bbee1f] rounded-full animate-spin" />
-          <div className="text-xs uppercase tracking-[0.2em] text-[#695b7f] animate-pulse">
-            ĐANG TẢI DỮ LIỆU TÀI LIỆU...
+          <div className="w-12 h-12 border-4 border-[#3E2723] border-t-[#D7CCC8] rounded-full animate-spin" />
+          <div className="text-xs uppercase tracking-[0.2em] text-[#8D6E63] animate-pulse font-bold">
+            Đang tải dữ liệu chương...
           </div>
         </div>
       </div>
     );
   }
-
-  const activeCustomTheme: 'giagoan' | 'homer' | null = 
-    story?.title?.toLowerCase().includes('hướng dẫn giả ngoan') ? 'giagoan' :
-    (story?.title?.toLowerCase().includes('cánh cửa homer') || story?.title?.toLowerCase().includes('canh cua homer')) ? 'homer' : null;
 
   const hasCustomTheme = !!activeCustomTheme;
   const isCustomThemeActive = !!(hasCustomTheme && useStoryTheme);
