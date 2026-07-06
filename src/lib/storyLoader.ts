@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query, where, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase';
 
 export interface Story {
