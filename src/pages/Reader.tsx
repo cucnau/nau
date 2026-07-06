@@ -897,6 +897,19 @@ export function Reader() {
     return () => clearInterval(interval);
   }, [isFinished, isLocked, timeRequired, currentChapter?.id]);
 
+  if (loading || !story || !currentChapter) {
+    return (
+      <div className="min-h-screen bg-[#13120d] text-[#dbcec2] flex flex-col items-center justify-center p-4 font-sans">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-[#2e2a63] border-t-[#bbee1f] rounded-full animate-spin" />
+          <div className="text-xs uppercase tracking-[0.2em] text-[#695b7f] animate-pulse">
+            ĐANG TẢI DỮ LIỆU TÀI LIỆU...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const activeCustomTheme: 'giagoan' | 'homer' | null = 
     story?.title?.toLowerCase().includes('hướng dẫn giả ngoan') ? 'giagoan' :
     (story?.title?.toLowerCase().includes('cánh cửa homer') || story?.title?.toLowerCase().includes('canh cua homer')) ? 'homer' : null;
