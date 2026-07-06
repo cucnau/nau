@@ -4,7 +4,7 @@
 
 @theme {
   --font-sans: "Quicksand", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Cormorant Garamond", "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
 
 /* Custom font utilities for readers */
@@ -14,8 +14,8 @@
 .font-reading-garamond {
   font-family: "EB Garamond", Georgia, serif;
 }
-.font-reading-cormorant {
-  font-family: "Cormorant Garamond", Georgia, serif;
+.font-reading-cormorant, .font-reading-cormorant .font-serif {
+  font-family: "Cormorant Garamond", Georgia, serif !important;
 }
 .font-reading-roboto {
   font-family: "Roboto", sans-serif;
