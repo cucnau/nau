@@ -11,6 +11,7 @@ import { doc, getDoc, collection, query, orderBy, getDocs, addDoc, serverTimesta
 import { UserAvatar } from '../components/UserAvatar';
 import { ThemeProps } from './themes/ThemeProps';
 import { HuongDanGiaNgoanTheme } from './themes/HuongDanGiaNgoan';
+import { CanhCuaHomerTheme } from './themes/CanhCuaHomer';
 
 interface CommentNodeProps {
    comment: any;
@@ -591,6 +592,53 @@ export function StoryView() {
     return <HuongDanGiaNgoanTheme {...themeProps} />;
   }
 
+  if (story.title.toLowerCase().includes('cánh cửa homer') || story.title.toLowerCase().includes('canh cua homer')) {
+    const themeProps: ThemeProps = {
+      story,
+      actualStoryId,
+      chapters,
+      comments,
+      activeTab,
+      setActiveTab,
+      chapterPage,
+      setChapterPage,
+      chapterSortDesc,
+      setChapterSortDesc,
+      CHAPTERS_PER_PAGE,
+      showGiftModal,
+      setShowGiftModal,
+      giftAmount,
+      setGiftAmount,
+      giftMessage,
+      setGiftMessage,
+      handleGiftSubmit,
+      commentText,
+      setCommentText,
+      submittingComment,
+      handleSendComment,
+      replyingToId,
+      setReplyingToId,
+      replyText,
+      setReplyText,
+      submittingReply,
+      handleSendReply,
+      profilesCache,
+      isLoggedIn,
+      savedStories,
+      toggleSaveStory,
+      handleSaveToggle,
+      choco,
+      uid,
+      displayName,
+      avatarUrl,
+      unlockedPassChapters,
+      unlockedEarlyAccessChapters,
+      getTitleColor,
+      navigate,
+    };
+    return <CanhCuaHomerTheme {...themeProps} />;
+  }
+
   return (
     <div className="p-4 sm:p-6 lg:p-10 flex flex-col gap-8 max-w-5xl mx-auto w-full">
       {/* Story Profile Card */}
@@ -619,7 +667,7 @@ export function StoryView() {
      
                 <div className="flex items-center gap-6 mb-6">
                    <div className="flex flex-col">
-                       <span className="text-[#8D6E63] text-xs uppercase font-extrabold tracking-widest">Chương</span>
+                       <span className="text-[#8D6E63] text-xs uppercase font-extrabold tracking-widest">{tChapters}</span>
                        <span className="font-extrabold text-2xl text-[#3E2723] dark:text-[#ECE5DC]">{Math.max(story.chapterCount || 0, chapters.length)}</span>
                    </div>
                    <div className="w-[3px] h-10 bg-[#3E2723]/25 dark:bg-stone-600/40 rounded-full"></div>
@@ -740,7 +788,7 @@ export function StoryView() {
                {chapters.length > 0 && (
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between xl:justify-end gap-3 mb-4 bg-[#F5F2EB]/50 dark:bg-[#1C1613]/50 p-2 sm:p-3 rounded-xl border border-stone-200/50 dark:border-[#3E2D25]/50">
                      <span className="text-xs font-bold text-[#8D6E63] uppercase tracking-wider hidden sm:inline-block mr-auto">
-                        {chapters.length} Chương
+                        {chapters.length} {tChapters}
                      </span>
                      
                      <div className="flex items-center gap-2 justify-between sm:justify-start w-full sm:w-auto">
@@ -759,7 +807,7 @@ export function StoryView() {
                               const end = Math.min((i + 1) * CHAPTERS_PER_PAGE, chapters.length);
                               return (
                                  <option key={i} value={i}>
-                                    Chương {start} - {end}
+                                    {tChapterSingle} {start} - {end}
                                  </option>
                               );
                            })}
