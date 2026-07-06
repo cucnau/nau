@@ -14,6 +14,84 @@ import { getWeeklyId, getGMT7Date } from '../types/achievements';
 import { useUserProfilesCache } from '../hooks/useUserProfilesCache';
 import { addStoryFire } from '../lib/storyFire';
 
+const getThemeBorderClass = (theme: string) => {
+  if (theme === 'homer') return "border-[#47515f]/20";
+  if (theme === 'nhatky') return "border-[#4E3E39]/30";
+  return "border-[#2e2a63]/20"; // giagoan
+};
+
+const getThemeBgBorderTextClass = (theme: string) => {
+  if (theme === 'homer') return "bg-[#181f2d]/50 border-[#47515f]/50 text-[#a0a6b3] shadow-[1px_1px_0_0_#47515f]";
+  if (theme === 'nhatky') return "bg-[#171110]/55 border-[#4E3E39] text-[#DFD6D3] shadow-[1px_1px_0_0_#4E3E39]";
+  return "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]"; // giagoan
+};
+
+const getThemeAvatarFallbackIconClass = (theme: string) => {
+  if (theme === 'homer') return "w-4 h-4 text-[#a0a6b3]";
+  if (theme === 'nhatky') return "w-4 h-4 text-[#E8DCB8]";
+  return "w-4 h-4 text-[#bbee1f]"; // giagoan
+};
+
+const getThemeAvatarBorderClass = (theme: string) => {
+  if (theme === 'homer') return "border border-[#47515f]/50";
+  if (theme === 'nhatky') return "border border-[#4E3E39]";
+  return "border border-[#2e2a63]/50"; // giagoan
+};
+
+const getThemeAvatarBgClass = (theme: string) => {
+  if (theme === 'homer') return "bg-[#181f2d]";
+  if (theme === 'nhatky') return "bg-[#171110]";
+  return "bg-[#13120d]"; // giagoan
+};
+
+const getThemeAccentTextColor = (theme: string) => {
+  if (theme === 'homer') return "#a0a6b3";
+  if (theme === 'nhatky') return "#E8DCB8";
+  return "#bbee1f"; // giagoan
+};
+
+const getThemeTitleBadgeClass = (theme: string) => {
+  if (theme === 'homer') return "bg-[#47515f] text-[#a0a6b3] border-[#67707e]/40";
+  if (theme === 'nhatky') return "bg-[#4E3E39] text-[#E8DCB8] border-[#5D4B45]/40";
+  return "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40"; // giagoan
+};
+
+const getThemeSubTextColor = (theme: string) => {
+  if (theme === 'homer') return "text-[#67707e]";
+  if (theme === 'nhatky') return "text-[#8E7E7A]";
+  return "text-[#695b7f]"; // giagoan
+};
+
+const getThemeGiftBadgeClass = (theme: string) => {
+  if (theme === 'homer') return "text-[#181f2d] bg-[#a0a6b3] border-[#a0a6b3]/50";
+  if (theme === 'nhatky') return "text-[#1E1614] bg-[#E8DCB8] border-[#E8DCB8]/50";
+  return "text-[#13120d] bg-[#bbee1f] border-[#bbee1f]/50"; // giagoan
+};
+
+const getThemeContentTextColor = (theme: string) => {
+  if (theme === 'homer') return "text-[#a0a6b3]";
+  if (theme === 'nhatky') return "text-[#DFD6D3]";
+  return "text-[#dbcec2]"; // giagoan
+};
+
+const getThemeReplyButtonClass = (theme: string) => {
+  if (theme === 'homer') return "text-[#67707e] hover:text-[#a0a6b3]";
+  if (theme === 'nhatky') return "text-[#8E7E7A] hover:text-[#E8DCB8]";
+  return "text-[#695b7f] hover:text-[#bbee1f]"; // giagoan
+};
+
+const getThemeInputClass = (theme: string) => {
+  if (theme === 'homer') return "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]";
+  if (theme === 'nhatky') return "bg-[#171110] border-[#4E3E39] text-[#DFD6D3] focus:border-[#E8DCB8]";
+  return "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]"; // giagoan
+};
+
+const getThemeSendButtonClass = (theme: string) => {
+  if (theme === 'homer') return "bg-[#a0a6b3] hover:bg-white text-[#181f2d] border-[#47515f] disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none";
+  if (theme === 'nhatky') return "bg-[#E8DCB8] hover:bg-white text-[#1E1614] border-[#4E3E39] disabled:bg-[#E8DCB8]/20 disabled:text-[#8E7E7A]/40 disabled:border-[#4E3E39]/50 disabled:shadow-none";
+  return "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none"; // giagoan
+};
+
 const ParagraphCommentNode = ({
    comment,
    comments,
@@ -51,11 +129,11 @@ const ParagraphCommentNode = ({
    const isGift = comment.type === 'choco_gift';
 
    return (
-      <div key={comment.id} className={cn("text-xs pt-2 mt-2 border-t-2 border-dashed first:border-0", isStoryTheme ? (isStoryTheme === 'homer' ? "border-[#47515f]/20" : "border-[#2e2a63]/20") : "border-[#3E2723]/10 dark:border-[#4E342E]/30")}>
+      <div key={comment.id} className={cn("text-xs pt-2 mt-2 border-t-2 border-dashed first:border-0", isStoryTheme ? getThemeBorderClass(isStoryTheme) : "border-[#3E2723]/10 dark:border-[#4E342E]/30")}>
          <div className={cn(
             "relative flex gap-2.5 items-start p-2.5 rounded-2xl border-2 transition-all hover:-translate-y-0.5", 
             isStoryTheme 
-               ? (isStoryTheme === 'homer' ? "bg-[#181f2d]/50 border-[#47515f]/50 text-[#a0a6b3] shadow-[1px_1px_0_0_#47515f]" : "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]")
+               ? getThemeBgBorderTextClass(isStoryTheme)
                : isDark 
                   ? "bg-[#1C1613] border-[#3E2723] text-[#ECE5DC] shadow-[1px_1px_0_0_#1C1613]" 
                   : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] shadow-[1px_1px_0_0_#3E2723]", 
@@ -74,28 +152,28 @@ const ParagraphCommentNode = ({
                equippedAccessory={currentAccessory}
                accessoryPosition={currentAccessoryPos}
                className="w-8 h-8 shrink-0 pointer-events-none" 
-               fallbackIconSizeClass={isStoryTheme ? (isStoryTheme === 'homer' ? "w-4 h-4 text-[#a0a6b3]" : "w-4 h-4 text-[#bbee1f]") : "w-4 h-4 text-[#A1887F]"} 
-               borderClass={isStoryTheme ? (isStoryTheme === 'homer' ? "border border-[#47515f]/50" : "border border-[#2e2a63]/50") : "border border-[#D7CCC8]/30"}
-               bgClass={isStoryTheme ? (isStoryTheme === 'homer' ? "bg-[#181f2d]" : "bg-[#13120d]") : (isDark ? "bg-[#2C221D]" : "bg-[#5D4037]")}
+               fallbackIconSizeClass={isStoryTheme ? getThemeAvatarFallbackIconClass(isStoryTheme) : "w-4 h-4 text-[#A1887F]"} 
+               borderClass={isStoryTheme ? getThemeAvatarBorderClass(isStoryTheme) : "border border-[#D7CCC8]/30"}
+               bgClass={isStoryTheme ? getThemeAvatarBgClass(isStoryTheme) : (isDark ? "bg-[#2C221D]" : "bg-[#5D4037]")}
             />
             <div className="flex-1 min-w-0">
                <div className="text-[11px] font-black mb-0.5 flex justify-between tracking-tight">
                   <span className="flex items-center gap-1 flex-wrap">
-                     <span style={{ color: getTitleColor(currentActiveTitle) || (isStoryTheme ? (isStoryTheme === 'homer' ? "#a0a6b3" : "#bbee1f") : undefined) }}>
+                     <span style={{ color: getTitleColor(currentActiveTitle) || (isStoryTheme ? getThemeAccentTextColor(isStoryTheme) : undefined) }}>
                         {currentDisplayName}
                      </span>
                      {currentActiveTitle && (
                         <span className={cn(
                            "px-1 py-0.5 text-[7px] font-black rounded border",
                            isStoryTheme 
-                              ? (isStoryTheme === 'homer' ? "bg-[#47515f] text-[#a0a6b3] border-[#67707e]/40" : "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40")
+                              ? getThemeTitleBadgeClass(isStoryTheme)
                               : "bg-[#F5E6D3] text-[#5D4037] border-[#3E2723]"
                         )}>
                            🏆 {currentActiveTitle}
                         </span>
                      )}
                   </span>
-                  <span className={cn("text-[9px] font-mono", isStoryTheme ? (isStoryTheme === 'homer' ? "text-[#67707e]" : "text-[#695b7f]") : "text-stone-400")}>
+                  <span className={cn("text-[9px] font-mono", isStoryTheme ? getThemeSubTextColor(isStoryTheme) : "text-stone-400")}>
                      {comment.createdAt?.toDate 
                         ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                         : 'Vừa xong'}
@@ -104,15 +182,13 @@ const ParagraphCommentNode = ({
                
                {isGift && (
                   <span className={cn("inline-flex text-[8px] font-black px-2 py-0.5 uppercase tracking-wider items-center gap-1 mb-1 border",
-                     isStoryTheme === 'homer'
-                        ? "text-[#181f2d] bg-[#a0a6b3] border-[#a0a6b3]/50"
-                        : (isStoryTheme === 'homer' ? "text-[#181f2d] bg-[#a0a6b3] border-[#a0a6b3]/50" : "text-[#13120d] bg-[#bbee1f] border-[#bbee1f]/50")
+                     isStoryTheme ? getThemeGiftBadgeClass(isStoryTheme) : ""
                   )}>
                      🎁 {isStoryTheme === 'homer' ? "Tiếp tế" : "Tài trợ"} {comment.giftAmount || 0} CC
                   </span>
                )}
 
-               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isStoryTheme ? (isStoryTheme === 'homer' ? "text-[#a0a6b3]" : "text-[#dbcec2]") : (isDark ? "text-[#ECE5DC]" : "text-[#5D4037]"))}>
+               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isStoryTheme ? getThemeContentTextColor(isStoryTheme) : (isDark ? "text-[#ECE5DC]" : "text-[#5D4037]"))}>
                   {comment.content}
                </p>
                
@@ -126,8 +202,8 @@ const ParagraphCommentNode = ({
                            setReplyingToId(comment.id);
                            setReplyText('');
                         }
-                     }}
-                     className={cn("text-[10px] font-black uppercase tracking-wider block mt-1 cursor-pointer transition-colors", isStoryTheme ? (isStoryTheme === 'homer' ? "text-[#67707e] hover:text-[#a0a6b3]" : "text-[#695b7f] hover:text-[#bbee1f]") : "text-[#8D6E63] hover:text-[#5D4037]")}
+                      }}
+                     className={cn("text-[10px] font-black uppercase tracking-wider block mt-1 cursor-pointer transition-colors", isStoryTheme ? getThemeReplyButtonClass(isStoryTheme) : "text-[#8D6E63] hover:text-[#5D4037]")}
                   >
                      Trả lời
                   </button>
@@ -143,7 +219,7 @@ const ParagraphCommentNode = ({
                         onChange={(e) => setReplyText(e.target.value)}
                         className={cn(
                            "flex-1 px-3 py-1.5 text-xs rounded-xl border-2 focus:outline-none font-semibold", 
-                           isStoryTheme ? (isStoryTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]" : "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]") 
+                           isStoryTheme ? getThemeInputClass(isStoryTheme) 
                               : isDark 
                                  ? "bg-white dark:bg-[#1A1412] border-[#3E2723] text-[#ECE5DC] focus:border-[#8D6E63]" 
                                  : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63]"
@@ -164,7 +240,7 @@ const ParagraphCommentNode = ({
                         className={cn(
                            "px-3 py-1 rounded-xl text-xs font-black uppercase transition-all cursor-pointer border-2",
                            isStoryTheme 
-                              ? (isStoryTheme === 'homer' ? "bg-[#a0a6b3] hover:bg-white text-[#181f2d] border-[#47515f] disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none" : "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none") 
+                              ? getThemeSendButtonClass(isStoryTheme) 
                               : "disabled:opacity-50 bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
                         )}
                      >
@@ -178,7 +254,7 @@ const ParagraphCommentNode = ({
          {replies.length > 0 && (
             <div className={cn(
                "mt-2 pl-4 space-y-2 border-l-2 border-dashed",
-               isStoryTheme ? (isStoryTheme === 'homer' ? "border-[#47515f]/20" : "border-[#2e2a63]/20") : "border-[#3E2723]/20 dark:border-white/10",
+               isStoryTheme ? getThemeBorderClass(isStoryTheme) : "border-[#3E2723]/20 dark:border-white/10",
                depth > 4 ? "pl-1 border-0" : ""
             )}>
                {replies.map(r => (
@@ -246,7 +322,7 @@ const ChapterCommentNode = ({
       <div key={comment.id} className={cn(
          "relative p-5 rounded-3xl border-3 flex flex-col gap-3 transition-all hover:-translate-y-0.5 whitespace-normal", 
          isStoryTheme 
-            ? (isStoryTheme === 'homer' ? "bg-[#181f2d]/50 border-[#47515f]/50 text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]")
+            ? getThemeBgBorderTextClass(isStoryTheme)
             : isDark 
                ? "bg-[#1C1613] border-[#3E2723] text-[#ECE5DC] shadow-[2px_2px_0_0_#1A1412]" 
                : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]", 
@@ -266,21 +342,21 @@ const ChapterCommentNode = ({
                equippedAccessory={currentAccessory}
                accessoryPosition={currentAccessoryPos}
                className="w-10 h-10 shrink-0 pointer-events-none" 
-               fallbackIconSizeClass={isStoryTheme ? (isStoryTheme === 'homer' ? "w-5 h-5 text-[#a0a6b3]" : "w-5 h-5 text-[#bbee1f]") : "w-5 h-5 text-[#A1887F]"} 
-               borderClass={isStoryTheme ? (isStoryTheme === 'homer' ? "border border-[#47515f]/50" : "border border-[#2e2a63]/50") : "border border-[#D7CCC8]/30"}
-               bgClass={isStoryTheme ? (isStoryTheme === 'homer' ? "bg-[#181f2d]" : "bg-[#13120d]") : (isDark ? "bg-[#2C221D]" : "bg-[#5D4037]")}
+               fallbackIconSizeClass={isStoryTheme ? getThemeAvatarFallbackIconClass(isStoryTheme) : "w-5 h-5 text-[#A1887F]"} 
+               borderClass={isStoryTheme ? getThemeAvatarBorderClass(isStoryTheme) : "border border-[#D7CCC8]/30"}
+               bgClass={isStoryTheme ? getThemeAvatarBgClass(isStoryTheme) : (isDark ? "bg-[#2C221D]" : "bg-[#5D4037]")}
             />
             <div className="flex-1 min-w-0">
                <div className="flex items-center justify-between gap-2 mb-1">
                   <span className="font-black text-xs flex items-center gap-1.5 flex-wrap">
-                     <span style={{ color: getTitleColor(currentActiveTitle) || (isStoryTheme ? (isStoryTheme === 'homer' ? "#a0a6b3" : "#bbee1f") : undefined) }}>
+                     <span style={{ color: getTitleColor(currentActiveTitle) || (isStoryTheme ? getThemeAccentTextColor(isStoryTheme) : undefined) }}>
                         {currentDisplayName}
                      </span>
                      {currentActiveTitle && (
                         <span className={cn(
                            "px-1.5 py-0.5 text-[9px] font-black rounded uppercase tracking-tight select-none border inline-block align-middle",
                            isStoryTheme 
-                              ? (isStoryTheme === 'homer' ? "bg-[#47515f] text-[#a0a6b3] border-[#67707e]/40" : "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40")
+                              ? getThemeTitleBadgeClass(isStoryTheme)
                               : "bg-[#F5E6D3] text-[#5D4037] border-[#3E2723]"
                         )}>
                            🏆 {currentActiveTitle}
@@ -288,7 +364,7 @@ const ChapterCommentNode = ({
                      )}
                   </span>
                   
-                  <span className={cn("text-[9px] font-mono shrink-0", isStoryTheme ? (isStoryTheme === 'homer' ? "text-[#67707e]" : "text-[#695b7f]") : "text-stone-400")}>
+                  <span className={cn("text-[9px] font-mono shrink-0", isStoryTheme ? getThemeSubTextColor(isStoryTheme) : "text-stone-400")}>
                      {comment.createdAt?.toDate 
                         ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
                         : 'Vừa xong'}
@@ -297,15 +373,13 @@ const ChapterCommentNode = ({
 
                {isGift && (
                   <span className={cn("inline-flex text-[9px] font-black px-3 py-1 uppercase tracking-wider items-center gap-1.5 mb-2 border",
-                     isStoryTheme === 'homer'
-                        ? "text-[#181f2d] bg-[#a0a6b3] border-[#a0a6b3]/50"
-                        : (isStoryTheme === 'homer' ? "text-[#181f2d] bg-[#a0a6b3] border-[#a0a6b3]/50" : "text-[#13120d] bg-[#bbee1f] border-[#bbee1f]/50")
+                     isStoryTheme ? getThemeGiftBadgeClass(isStoryTheme) : ""
                   )}>
                      🎁 {isStoryTheme === 'homer' ? "Tiếp tế" : "Tài trợ"} {comment.giftAmount || 0} CC
                   </span>
                )}
 
-               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isStoryTheme ? (isStoryTheme === 'homer' ? "text-[#a0a6b3]" : "text-[#dbcec2]") : (isDark ? "text-[#ECE5DC]" : "text-[#5D4037]"))}>
+               <p className={cn("text-xs leading-relaxed text-justify break-words font-semibold", isStoryTheme ? getThemeContentTextColor(isStoryTheme) : (isDark ? "text-[#ECE5DC]" : "text-[#5D4037]"))}>
                   {comment.content}
                </p>
 
@@ -321,7 +395,7 @@ const ChapterCommentNode = ({
                               setReplyText('');
                            }
                         }}
-                        className={cn("text-xs font-black flex items-center gap-1 cursor-pointer transition-colors uppercase tracking-wider", isStoryTheme ? (isStoryTheme === 'homer' ? "text-[#67707e] hover:text-[#a0a6b3]" : "text-[#695b7f] hover:text-[#bbee1f]") : "text-[#8D6E63] hover:text-[#5D4037]")}
+                        className={cn("text-xs font-black flex items-center gap-1 cursor-pointer transition-colors uppercase tracking-wider", isStoryTheme ? getThemeReplyButtonClass(isStoryTheme) : "text-[#8D6E63] hover:text-[#5D4037]")}
                      >
                         <MessageSquare className="w-3.5 h-3.5" />
                         Trả lời
@@ -340,7 +414,7 @@ const ChapterCommentNode = ({
                         onChange={(e) => setReplyText(e.target.value)}
                         className={cn(
                            "flex-1 px-3.5 py-1.5 text-xs sm:text-sm rounded-xl border-2 focus:outline-none font-semibold", 
-                           isStoryTheme ? (isStoryTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]" : "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]") 
+                           isStoryTheme ? getThemeInputClass(isStoryTheme) 
                               : isDark 
                                  ? "bg-white dark:bg-[#1A1412] border-[#3E2723] text-[#ECE5DC] focus:border-[#8D6E63]" 
                                  : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63]"
@@ -360,7 +434,7 @@ const ChapterCommentNode = ({
                         className={cn(
                            "px-4 py-1.5 font-black text-xs rounded-xl border-2 transition-all cursor-pointer",
                            isStoryTheme 
-                              ? (isStoryTheme === 'homer' ? "bg-[#a0a6b3] hover:bg-white text-[#181f2d] border-[#47515f] disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none" : "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none") 
+                              ? getThemeSendButtonClass(isStoryTheme) 
                               : "disabled:opacity-50 bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
                         )}
                      >
@@ -374,7 +448,7 @@ const ChapterCommentNode = ({
          {replies.length > 0 && (
             <div className={cn(
                "pl-4 space-y-3 border-l-2 border-dashed mt-1",
-               isStoryTheme ? (isStoryTheme === 'homer' ? "border-[#47515f]/20" : "border-[#2e2a63]/20") : "border-[#3E2723]/20 dark:border-white/10",
+               isStoryTheme ? getThemeBorderClass(isStoryTheme) : "border-[#3E2723]/20 dark:border-white/10",
                depth > 4 ? "pl-1 border-0" : ""
             )}>
                {replies.map(r => (
@@ -999,22 +1073,27 @@ export function Reader() {
            <div className="fixed inset-0 pointer-events-none opacity-20"
                 style={{ backgroundImage: activeCustomTheme === 'homer' 
                    ? 'repeating-linear-gradient(45deg, #2d3745 0, #2d3745 1px, transparent 1px, transparent 60px)'
+                  : activeCustomTheme === 'nhatky'
+                  ? 'repeating-linear-gradient(45deg, #4e3e39 0, #4e3e39 1px, transparent 1px, transparent 80px)'
                   : 'repeating-linear-gradient(45deg, #2e2a63 0, #2e2a63 1px, transparent 1px, transparent 50px)' }} />
            <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-30 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : { backgroundColor: '#2e2a63' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#4e3e39' } : { backgroundColor: '#2e2a63' }} />
            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[180px] opacity-10 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : { backgroundColor: '#bbee1f' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#2a1f1d' } : { backgroundColor: '#bbee1f' }} />
          </>
        )}
        {/* Top Navigation */}
        <header className={cn("w-full sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b-2 transition-all duration-300 shadow-sm relative",
           isCustomThemeActive
-            ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/90 border-[#47515f] backdrop-blur-md" : "bg-[#13120d]/90 border-[#2e2a63] backdrop-blur-md")
+            ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/90 border-[#47515f] backdrop-blur-md" : activeCustomTheme === 'nhatky' ? "bg-[#1E1614]/90 border-[#4E3E39] backdrop-blur-md" : "bg-[#13120d]/90 border-[#2e2a63] backdrop-blur-md")
             : effectiveIsDark ? "bg-[#1A1412]/90 border-[#3E2723] backdrop-blur-md" : "bg-[#FDF6EC]/90 border-[#D7CCC8] backdrop-blur-md"
        )}>
           <button onClick={() => navigate(`/truyen/${story.slug || story.id}`)} className={cn("p-2 rounded-xl border-2 transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none",
-             isCustomThemeActive ? (activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]")
-                : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
+             isCustomThemeActive ? (
+                activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
+                activeCustomTheme === 'nhatky' ? "border-[#4E3E39]/50 bg-[#1E1614] hover:bg-[#4E3E39]/20 hover:border-[#E8DCB8] text-[#E8DCB8] shadow-[2px_2px_0_0_#4E3E39]" :
+                "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
+             ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
           )}>
              <ArrowLeft className="w-5 h-5" />
           </button>
@@ -1026,8 +1105,11 @@ export function Reader() {
           
           <div className="relative flex items-center gap-2">
              <button onClick={() => setShowSettings(!showSettings)} className={cn("p-2 rounded-xl border-2 shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer",
-                isCustomThemeActive ? (activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]")
-                   : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
+                isCustomThemeActive ? (
+                   activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
+                   activeCustomTheme === 'nhatky' ? "border-[#4E3E39]/50 bg-[#1E1614] hover:bg-[#4E3E39]/20 hover:border-[#E8DCB8] text-[#E8DCB8] shadow-[2px_2px_0_0_#4E3E39]" :
+                   "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
+                ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
              )}>
                 <Settings2 className="w-5 h-5" />
              </button>
@@ -1035,16 +1117,19 @@ export function Reader() {
              {/* Settings Panel */}
              {showSettings && (
                 <div className={cn("absolute right-0 top-full mt-2 w-64 p-5 rounded-3xl shadow-xl z-20 border-3 transition-colors",
-                    isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3] border-[#47515f] font-reading-garamond shadow-lg" : "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] font-reading-garamond shadow-lg")
-                       : effectiveIsDark ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723]" : "bg-[#FFFDF9] text-[#3E2723] border-[#3E2723]"
+                    isCustomThemeActive ? (
+                       activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3] border-[#47515f] font-reading-garamond shadow-lg" :
+                       activeCustomTheme === 'nhatky' ? "bg-[#1E1614] text-[#DFD6D3] border-[#4E3E39] font-reading-cormorant shadow-lg" :
+                       "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] font-reading-garamond shadow-lg"
+                    ) : effectiveIsDark ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723]" : "bg-[#FFFDF9] text-[#3E2723] border-[#3E2723]"
                 )}>
-                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#ECE5DC]" : "text-[#3E2723]"))}>Cài đặt</h3>
+                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#E8DCB8]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#ECE5DC]" : "text-[#3E2723]"))}>Cài đặt</h3>
                    <div className="flex flex-col gap-6">
                       {hasCustomTheme && (
-                         <div className={cn("flex flex-col gap-2 pb-4 border-b-2 border-dashed", activeCustomTheme === 'homer' ? 'border-[#47515f]/20' : 'border-[#2e2a63]/20')}>
-                            <label className={cn("text-xs font-black uppercase flex items-center justify-between", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>
+                         <div className={cn("flex flex-col gap-2 pb-4 border-b-2 border-dashed", activeCustomTheme === 'homer' ? 'border-[#47515f]/20' : activeCustomTheme === 'nhatky' ? 'border-[#4E3E39]/20' : 'border-[#2e2a63]/20')}>
+                            <label className={cn("text-xs font-black uppercase flex items-center justify-between", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#E8DCB8]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>
                                Giao diện truyện
-                               {activeCustomTheme === 'homer' ? <span className="text-[9px] bg-[#a0a6b3] text-[#181f2d] font-bold px-1.5 py-0.5 rounded border border-[#a0a6b3]">PREMIUM</span> : <span className="text-[9px] bg-[#bbee1f] text-[#13120d] font-bold px-1.5 py-0.5 rounded border border-[#bbee1f]">PREMIUM</span>}
+                               {activeCustomTheme === 'homer' ? <span className="text-[9px] bg-[#a0a6b3] text-[#181f2d] font-bold px-1.5 py-0.5 rounded border border-[#a0a6b3]">PREMIUM</span> : activeCustomTheme === 'nhatky' ? <span className="text-[9px] bg-[#E8DCB8] text-[#1E1614] font-bold px-1.5 py-0.5 rounded border border-[#4E3E39]">PREMIUM</span> : <span className="text-[9px] bg-[#bbee1f] text-[#13120d] font-bold px-1.5 py-0.5 rounded border border-[#bbee1f]">PREMIUM</span>}
                             </label>
                             <button 
                                type="button"
@@ -1052,7 +1137,7 @@ export function Reader() {
                                className={cn(
                                   "w-full py-2 text-xs font-black uppercase rounded-xl border-2 transition-all cursor-pointer",
                                   useStoryTheme
-                                     ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white") 
+                                     ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCB8] text-[#1E1614] border-[#4E3E39] shadow-[2px_2px_0_0_#4E3E39] hover:bg-white" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white") 
                                      : (effectiveIsDark ? "bg-[#2C221D] text-[#ECE5DC] border-[#3E2723] hover:bg-[#3E2723]" : "bg-white text-[#3E2723] border-[#3E2723] hover:bg-stone-100")
                                )}
                             >
@@ -1061,26 +1146,29 @@ export function Reader() {
                          </div>
                       )}
                       <div className="flex items-center justify-between">
-                         <label className={cn("text-xs font-black uppercase", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Chế độ nền tối</label>
+                         <label className={cn("text-xs font-black uppercase", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#8E7E7A]" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Chế độ nền tối</label>
                          <div className="flex items-center gap-2">
-                            <button type="button" onClick={() => { setIsDark(false); if(isCustomThemeActive) setUseStoryTheme(false); }} style={{ backgroundColor: '#FDF6EC' }} className={cn("w-10 h-10 rounded-full border-3", !effectiveIsDark && !isCustomThemeActive ? (activeCustomTheme === 'homer' ? "border-[#3E2723]" : "border-[#3E2723]") : "border-[#D7CCC8]")}></button>
-                            <button type="button" onClick={() => { setIsDark(true); if(isCustomThemeActive) setUseStoryTheme(false); }} style={{ backgroundColor: '#1A1412' }} className={cn("w-10 h-10 rounded-full border-3", effectiveIsDark && !isCustomThemeActive ? (activeCustomTheme === 'homer' ? "border-[#D4AF37]" : "border-[#D4AF37]") : "border-[#3C2E27]")}></button>
+                            <button type="button" onClick={() => { setIsDark(false); if(isCustomThemeActive) setUseStoryTheme(false); }} style={{ backgroundColor: '#FDF6EC' }} className={cn("w-10 h-10 rounded-full border-3", !effectiveIsDark && !isCustomThemeActive ? "border-[#3E2723]" : "border-[#D7CCC8]")}></button>
+                            <button type="button" onClick={() => { setIsDark(true); if(isCustomThemeActive) setUseStoryTheme(false); }} style={{ backgroundColor: '#1A1412' }} className={cn("w-10 h-10 rounded-full border-3", effectiveIsDark && !isCustomThemeActive ? "border-[#D4AF37]" : "border-[#3C2E27]")}></button>
                          </div>
                       </div>
                       <div>
-                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Cỡ chữ: {fontSize}px</label>
-                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className={cn("w-full accent-[#3E2723]", isCustomThemeActive && (activeCustomTheme === 'homer' ? "accent-[#a0a6b3]" : "accent-[#bbee1f]"))} />
+                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#8E7E7A]" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Cỡ chữ: {fontSize}px</label>
+                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className={cn("w-full accent-[#3E2723]", isCustomThemeActive && (activeCustomTheme === 'homer' ? "accent-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "accent-[#E8DCB8]" : "accent-[#bbee1f]"))} />
                       </div>
                       <div>
-                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Phông chữ</label>
+                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#8E7E7A]" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Phông chữ</label>
                          <select 
                            value={fontFamily} 
                            disabled={isCustomThemeActive}
                            onChange={(e) => setFontFamily(e.target.value as any)}
                            className={cn(
                              "w-full p-2.5 rounded-xl border-2 font-black text-sm transition-all focus:outline-none focus:border-[#8D6E63]",
-                             isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3] border-[#47515f] cursor-not-allowed opacity-75" : "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] cursor-not-allowed opacity-75")
-                             : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]"
+                             isCustomThemeActive ? (
+                               activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3] border-[#47515f] cursor-not-allowed opacity-75" :
+                               activeCustomTheme === 'nhatky' ? "bg-[#1E1614] text-[#DFD6D3] border-[#4E3E39] cursor-not-allowed opacity-75" :
+                               "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] cursor-not-allowed opacity-75"
+                             ) : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]"
                            )}
                          >
                             <option value="font-reading-quicksand">Quicksand (Mặc định)</option>
@@ -1088,7 +1176,7 @@ export function Reader() {
                             <option value="font-reading-notoserif">Noto Serif (Truyền thống)</option>
                             <option value="font-reading-iosevka">Iosevka (Kỹ thuật)</option>
                          </select>
-                         {isCustomThemeActive && <span className={cn("text-[10px] mt-1 block", activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : "text-[#bbee1f]")}>{activeCustomTheme === 'homer' ? 'Khóa phông chữ Iosevka theo theme' : 'Khóa phông chữ EB Garamond theo theme'}</span>}
+                         {isCustomThemeActive && <span className={cn("text-[10px] mt-1 block", activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#E8DCB8]" : "text-[#bbee1f]")}>{activeCustomTheme === 'homer' ? 'Khóa phông chữ Iosevka theo theme' : activeCustomTheme === 'nhatky' ? 'Khóa phông chữ Cormorant Garamond theo theme' : 'Khóa phông chữ EB Garamond theo theme'}</span>}
                       </div>
                    </div>
                 </div>
