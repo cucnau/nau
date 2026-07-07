@@ -320,14 +320,6 @@ export function TinhYeuThuyTienTheme(props: ThemeProps) {
                   </div>
                 )}
                 
-                {/* Mythological flower silhouette in background water pool */}
-                <div className="absolute opacity-[0.04] pointer-events-none">
-                  <svg width="150" height="150" viewBox="0 0 100 100" fill="currentColor">
-                    <path d="M50 10 C45 30, 25 45, 10 50 C25 55, 45 70, 50 90 C55 70, 75 55, 90 50 C75 45, 55 30, 50 10 Z" />
-                    <circle cx="50" cy="50" r="10" />
-                  </svg>
-                </div>
-
                 <p className={`text-base md:text-lg text-[#F2E6D0] italic font-serif leading-relaxed tracking-wide text-center relative z-10 max-w-lg transition-all duration-500 whitespace-pre-line ${isRippling ? 'opacity-0 scale-95 blur-sm' : 'opacity-100 scale-100'}`}>
                   {reflections[reflectionIdx]}
                 </p>
@@ -468,12 +460,22 @@ export function TinhYeuThuyTienTheme(props: ThemeProps) {
                   const avatar = cacheUser.avatarUrl || comment.avatarUrl || '';
                   const dName = cacheUser.displayName || comment.displayName || 'Khách lãng du ẩn danh';
                   const customTitle = cacheUser.activeTitle || comment.activeTitle;
-                  
+                  const isMe = comment.uid === uid;
+                  const currentSticker = isMe ? equippedStickerComment : (cacheUser?.equippedStickerComment ?? cacheUser?.equippedSticker ?? comment.equippedSticker);
+
                   return (
                     <div 
                       key={comment.id}
-                      className={`p-4 rounded-xl border transition-all duration-300 ${isGift ? 'bg-[#3D362E]/60 border-[#B6A996]' : 'bg-[#12110F]/60 border-[#3D362E]'}`}
+                      className={`relative p-4 rounded-xl border transition-all duration-300 ${isGift ? 'bg-[#3D362E]/60 border-[#B6A996]' : 'bg-[#12110F]/60 border-[#3D362E]'} ${currentSticker ? 'pr-14' : ''}`}
                     >
+                      {currentSticker && (
+                        <img 
+                          src={currentSticker} 
+                          alt="Sticker" 
+                          className="absolute w-12 h-12 object-contain pointer-events-none z-10 right-2 top-1/2 -translate-y-1/2" 
+                          referrerPolicy="no-referrer"
+                        />
+                      )}
                       <div className="flex items-start gap-3">
                         <UserAvatar 
                           avatarUrl={avatar} 
