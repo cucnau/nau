@@ -74,7 +74,8 @@ const CommentNode: React.FC<CommentNodeProps> = ({
                      "p-4 rounded-2xl flex gap-3.5 border transition-all shadow-sm relative overflow-visible pr-8",
                      isGift 
                         ? "bg-[#FDF6EC]/70 border-[#D7CCC8]/80 hover:bg-[#F5E6D3] dark:bg-[#3E2723]/30 dark:border-[#5D4037]/60 dark:hover:bg-[#3E2723]/50" 
-                        : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50 dark:bg-[#2C221D] dark:border-[#3C2E27] dark:hover:border-[#4E342E]/60"
+                        : "bg-white border-[#F5E6D3]/60 hover:border-[#D7CCC8]/50 dark:bg-[#2C221D] dark:border-[#3C2E27] dark:hover:border-[#4E342E]/60",
+                     currentSticker ? "pr-12" : ""
                     )
                   : cn(
                      "p-3.5 rounded-2xl flex gap-3 bg-[#FAF7F2]/60 dark:bg-[#1E1512]/50 border border-[#F5E6D3]/40 dark:border-[#3C2E27]/50 hover:border-[#D7CCC8]/40 transition-colors relative block",
@@ -390,16 +391,16 @@ export function StoryView() {
       );
     } else if (activeCustomTheme === 'thuytien') {
       return (
-        <div className="min-h-screen bg-[#12110F] text-[#F2E6D0] flex flex-col items-center justify-center p-4 font-serif relative overflow-hidden">
+        <div className="min-h-screen bg-[#0E0C0A] text-[#EADDC9] flex flex-col items-center justify-center p-4 font-serif relative overflow-hidden">
           {/* Classical Greek corner decorations */}
-          <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#B6A996]/30 pointer-events-none" />
-          <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#B6A996]/30 pointer-events-none" />
-          <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#B6A996]/30 pointer-events-none" />
-          <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[#B6A996]/30 pointer-events-none" />
+          <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#9A8E7D]/30 pointer-events-none" />
+          <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#9A8E7D]/30 pointer-events-none" />
+          <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#9A8E7D]/30 pointer-events-none" />
+          <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[#9A8E7D]/30 pointer-events-none" />
           
           <div className="flex flex-col items-center gap-5 relative z-10">
-            <div className="w-14 h-14 border-4 border-[#3D362E] border-t-[#B6A996] rounded-full animate-spin shadow-lg" />
-            <div className="text-xs uppercase tracking-[0.25em] text-[#B6A996] animate-pulse text-center px-4 font-sans font-black">
+            <div className="w-14 h-14 border-4 border-[#2E251E] border-t-[#9A8E7D] rounded-full animate-spin shadow-lg" />
+            <div className="text-xs uppercase tracking-[0.25em] text-[#9A8E7D] animate-pulse text-center px-4 font-sans font-black">
               ĐANG KHƠI NGUỒN SỬ THI THỦY TIÊN...
             </div>
           </div>
