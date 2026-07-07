@@ -134,7 +134,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
             
             <div className="flex items-center gap-4 text-xs font-bold text-[#facaca]">
               <span className="flex items-center gap-1.5 bg-[#823323]/40 px-2 py-1 rounded-md border border-[#823323]">
-                <Gamepad2 className="w-4 h-4" /> TRẠNG THÁI: {story.completed ? 'PHÁ ĐẢO (HOÀN THÀNH)' : 'ĐANG KẾT NỐI...'}
+                <Gamepad2 className="w-4 h-4" /> TRẠNG THÁI: {story.completed ? 'PHÁ ĐẢO' : 'ĐANG KẾT NỐI...'}
               </span>
               <span className="flex items-center gap-1.5 bg-[#780606]/40 px-2 py-1 rounded-md border border-[#780606]">
                 <BookOpen className="w-4 h-4" /> {chapters.length} MÀN CHƠI
