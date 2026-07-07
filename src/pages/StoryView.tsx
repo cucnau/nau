@@ -378,7 +378,7 @@ export function StoryView() {
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 border-4 border-[#4E3E39] border-t-[#E8DCB8] rounded-full animate-spin" />
             <div className="text-xs uppercase tracking-[0.2em] text-[#8E7E7A] animate-pulse font-bold font-sans">
-              DIARY.PUPPET // ĐANG LẬT GIỞ KÝ ỨC VỤN...
+              ĐANG LẬT GIỞ NHẬT KÝ...
             </div>
           </div>
         </div>
