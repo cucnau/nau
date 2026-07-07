@@ -374,11 +374,15 @@ export function StoryView() {
       );
     } else if (activeCustomTheme === 'nhatky') {
       return (
-        <div className="min-h-screen bg-[#1E1614] text-[#DFD6D3] flex flex-col items-center justify-center p-4 font-serif">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-12 h-12 border-4 border-[#4E3E39] border-t-[#E8DCB8] rounded-full animate-spin" />
-            <div className="text-xs uppercase tracking-[0.2em] text-[#8E7E7A] animate-pulse font-bold font-sans">
-              ĐANG LẬT GIỞ NHẬT KÝ...
+        <div className="min-h-screen bg-gradient-to-r from-[#DFCEB4] via-[#E8DCC4] to-[#DFCEB4] text-[#2C1814] flex flex-col items-center justify-center p-4 font-serif relative overflow-hidden">
+          {/* Top & Bottom stitched lines for loading */}
+          <div className="absolute top-4 left-0 right-0 border-t border-dashed border-[#BCA782]/60 pointer-events-none" />
+          <div className="absolute bottom-4 left-0 right-0 border-b border-dashed border-[#BCA782]/60 pointer-events-none" />
+          
+          <div className="flex flex-col items-center gap-5 relative z-10">
+            <div className="w-14 h-14 border-4 border-[#BCA782]/40 border-t-[#2C1814] rounded-full animate-spin shadow-md" />
+            <div className="text-sm font-medium tracking-widest text-[#2C1814] animate-pulse text-center px-4 font-sans uppercase">
+              <span>Đang lật giở nhật ký...</span>
             </div>
           </div>
         </div>
