@@ -96,9 +96,9 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
           <div className="w-full md:w-56 shrink-0 relative flex justify-center">
             <div className="relative w-48 h-64 md:w-full md:h-72 rounded-2xl overflow-hidden border-4 border-[#facaca] shadow-[0_0_20px_#9c0800]">
               
-              {story.coverImage ? (
+              {story.coverUrl ? (
                 <img 
-                  src={story.coverImage} 
+                  src={story.coverUrl} 
                   alt={story.title} 
                   className="w-full h-full object-cover group-hover:brightness-110 group-hover:scale-105 transition-all duration-700"
                 />
@@ -117,8 +117,8 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
           {/* Info */}
           <div className="flex flex-col justify-center flex-1 space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              {story.tags && story.tags.length > 0 ? (
-                story.tags.map((tag: string, i: number) => (
+              {story.genres && story.genres.length > 0 ? (
+                story.genres.map((tag: string, i: number) => (
                   <span key={i} className="px-3 py-1 bg-[#facaca] text-[#780606] rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-[#780606]">
                     {tag}
                   </span>
@@ -132,7 +132,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
             
             <div className="flex items-center gap-4 text-xs font-bold text-[#facaca]">
               <span className="flex items-center gap-1.5 bg-[#823323]/40 px-2 py-1 rounded-md border border-[#823323]">
-                <Gamepad2 className="w-4 h-4" /> TRẠNG THÁI: {story.status?.toLowerCase() === 'completed' ? 'HOÀN THÀNH' : 'ĐANG KẾT NỐI...'}
+                <Gamepad2 className="w-4 h-4" /> TRẠNG THÁI: {story.completed ? 'HOÀN THÀNH' : 'ĐANG KẾT NỐI...'}
               </span>
               <span className="flex items-center gap-1.5 bg-[#780606]/40 px-2 py-1 rounded-md border border-[#780606]">
                 <BookOpen className="w-4 h-4" /> {chapters.length} MÀN CHƠI
@@ -147,10 +147,10 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
             <div className="flex flex-wrap gap-3 pt-4">
               {chapters.length > 0 && (
                 <button
-                  onClick={() => navigate(`/story/${actualStoryId}/chapter/${chapters[0].id}`)}
+                  onClick={() => navigate(`/doc/${actualStoryId}/${chapters[0].id}`)}
                   className="flex-1 py-3 px-4 bg-[#780606] hover:bg-[#9c0800] text-[#ffffff] rounded-xl text-sm font-black tracking-wider uppercase border-2 border-[#780606] transition-all flex items-center justify-center gap-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
                 >
-                  <BookOpen className="w-5 h-5" /> Bắt đầu đọc
+                  <BookOpen className="w-5 h-5" /> BẮT ĐẦU TRÒ CHƠI
                 </button>
               )}
               <button
@@ -223,7 +223,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                   chapters.slice(chapterPage * CHAPTERS_PER_PAGE, (chapterPage + 1) * CHAPTERS_PER_PAGE).map((chap, idx) => (
                     <button
                       key={chap.id}
-                      onClick={() => navigate(`/story/${actualStoryId}/chapter/${chap.id}`)}
+                      onClick={() => navigate(`/doc/${actualStoryId}/${chap.id}`)}
                       className="group relative bg-[#823323]/20 border-2 border-[#780606] p-4 rounded-2xl hover:bg-[#780606]/40 hover:border-[#facaca] transition-all text-left flex justify-between items-center overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(250,202,202,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px] pointer-events-none"></div>
