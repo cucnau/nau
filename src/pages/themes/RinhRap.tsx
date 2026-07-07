@@ -5,6 +5,18 @@ import { format } from 'date-fns';
 import { useStore } from '../../store';
 import { UserAvatar } from '../../components/UserAvatar';
 
+
+const RabbitMask = ({ className, ...props }: any) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
+    <path d="M15 8V4a2 2 0 0 0-4 0v4"/>
+    <path d="M9 8V2a2 2 0 0 0-4 0v6"/>
+    <rect x="3" y="8" width="18" height="12" rx="6" />
+    <circle cx="8" cy="14" r="2" />
+    <circle cx="16" cy="14" r="2" />
+    <path d="M12 17v1" />
+  </svg>
+);
+
 export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
   const {
     story, actualStoryId, chapters, comments, activeTab, setActiveTab,
@@ -40,7 +52,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
          {/* Subtle red tint at the bottom */}
          <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#780606] to-transparent mix-blend-multiply"></div>
          {/* Floating icons */}
-         <Rabbit className="absolute top-[10%] left-[5%] w-32 h-32 text-[#fde0e0] opacity-10 animate-pulse" />
+         <RabbitMask className="absolute top-[10%] left-[5%] w-32 h-32 text-[#fde0e0] opacity-10 animate-pulse" />
          <Skull className="absolute top-[30%] right-[10%] w-48 h-48 text-[#823323] opacity-5 -rotate-12" />
          <Ghost className="absolute bottom-[20%] left-[15%] w-24 h-24 text-[#facaca] opacity-10 rotate-12" />
       </div>
@@ -56,7 +68,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
         </button>
 
         <div className="flex items-center justify-center gap-2 cursor-pointer group" onClick={triggerGlitch}>
-          <Rabbit className={`w-6 h-6 transition-colors ${glitch ? 'text-[#ffffff]' : 'text-[#facaca]'}`} />
+          <RabbitMask className={`w-6 h-6 transition-colors ${glitch ? 'text-[#ffffff]' : 'text-[#facaca]'}`} />
           <h2 className="font-black text-[#fff2f1] text-lg md:text-2xl tracking-[0.3em] uppercase drop-shadow-[0_0_8px_#780606]">
             RÌNH RẬP
           </h2>
@@ -83,16 +95,16 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
           {/* Cover Art */}
           <div className="w-full md:w-56 shrink-0 relative flex justify-center">
             <div className="relative w-48 h-64 md:w-full md:h-72 rounded-2xl overflow-hidden border-4 border-[#facaca] shadow-[0_0_20px_#9c0800]">
-              <div className="absolute inset-0 bg-[#780606]/30 mix-blend-color-burn z-10 pointer-events-none group-hover:bg-transparent transition-all duration-700"></div>
+              
               {story.coverImage ? (
                 <img 
                   src={story.coverImage} 
                   alt={story.title} 
-                  className="w-full h-full object-cover filter contrast-125 brightness-90 group-hover:brightness-110 group-hover:scale-105 transition-all duration-700"
+                  className="w-full h-full object-cover group-hover:brightness-110 group-hover:scale-105 transition-all duration-700"
                 />
               ) : (
                 <div className="w-full h-full bg-[#823323] flex items-center justify-center">
-                  <Rabbit className="w-20 h-20 text-[#000000] opacity-50" />
+                  <RabbitMask className="w-20 h-20 text-[#000000] opacity-50" />
                 </div>
               )}
               {/* Cute heart sticker overlay */}
@@ -104,13 +116,14 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
 
           {/* Info */}
           <div className="flex flex-col justify-center flex-1 space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-               <span className="px-3 py-1 bg-[#facaca] text-[#780606] rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-[#780606]">
-                  VR GAME / SYSTEM
-               </span>
-               <span className="px-3 py-1 bg-[#000000] text-[#fde0e0] rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-[#fde0e0]">
-                  CUTE x CREEPY
-               </span>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              {story.tags && story.tags.length > 0 ? (
+                story.tags.map((tag: string, i: number) => (
+                  <span key={i} className="px-3 py-1 bg-[#facaca] text-[#780606] rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-[#780606]">
+                    {tag}
+                  </span>
+                ))
+              ) : null}
             </div>
             
             <h1 className="text-3xl md:text-5xl font-black text-[#ffffff] uppercase tracking-tighter drop-shadow-[2px_2px_0_#9c0800]">
@@ -119,19 +132,29 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
             
             <div className="flex items-center gap-4 text-xs font-bold text-[#facaca]">
               <span className="flex items-center gap-1.5 bg-[#823323]/40 px-2 py-1 rounded-md border border-[#823323]">
-                <Gamepad2 className="w-4 h-4" /> TRẠNG THÁI: {story.status === 'completed' ? 'HOÀN THÀNH' : 'ĐANG KẾT NỐI...'}
+                <Gamepad2 className="w-4 h-4" /> TRẠNG THÁI: {story.status?.toLowerCase() === 'completed' ? 'HOÀN THÀNH' : 'ĐANG KẾT NỐI...'}
               </span>
               <span className="flex items-center gap-1.5 bg-[#780606]/40 px-2 py-1 rounded-md border border-[#780606]">
                 <BookOpen className="w-4 h-4" /> {chapters.length} MÀN CHƠI
               </span>
             </div>
 
-            <p className="text-sm text-[#fff2f1] leading-relaxed font-medium bg-[#823323]/20 p-4 rounded-xl border border-[#780606] border-dashed text-justify">
+            <p className="text-sm text-[#fff2f1] leading-relaxed font-medium bg-[#823323]/20 p-4 rounded-xl border border-[#780606] border-dashed text-justify whitespace-pre-line">
               {story.description || "Hệ thống đang tải dữ liệu... Đừng nhìn ra sau lưng."}
             </p>
 
-            <div className="flex gap-3 pt-4">
+            
+            <div className="flex flex-wrap gap-3 pt-4">
+              {chapters.length > 0 && (
+                <button
+                  onClick={() => navigate(`/story/${actualStoryId}/chapter/${chapters[0].id}`)}
+                  className="flex-1 py-3 px-4 bg-[#780606] hover:bg-[#9c0800] text-[#ffffff] rounded-xl text-sm font-black tracking-wider uppercase border-2 border-[#780606] transition-all flex items-center justify-center gap-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)]"
+                >
+                  <BookOpen className="w-5 h-5" /> Bắt đầu đọc
+                </button>
+              )}
               <button
+
                 onClick={handleSaveToggle}
                 className={`flex-1 py-3 px-4 rounded-xl text-sm font-black tracking-wider uppercase border-2 transition-all flex items-center justify-center gap-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)] ${
                   isSaved 
@@ -212,7 +235,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                           {chap.title}
                         </span>
                       </div>
-                      <Rabbit className="w-5 h-5 text-[#9c0800] group-hover:text-[#facaca] transition-colors relative z-10" />
+                      <RabbitMask className="w-5 h-5 text-[#9c0800] group-hover:text-[#facaca] transition-colors relative z-10" />
                     </button>
                   ))
                 )}
@@ -302,7 +325,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
 
                             {isGift && (
                               <div className="mt-1 flex items-center gap-1.5 bg-[#facaca] text-[#780606] px-2 py-1 rounded-md text-[10px] font-black max-w-max border-2 border-[#ffffff] shadow-sm">
-                                <Rabbit className="w-3.5 h-3.5" /> SUPPORT DROP: {comment.giftAmount} CC
+                                <RabbitMask className="w-3.5 h-3.5" /> SUPPORT DROP: {comment.giftAmount} CC
                               </div>
                             )}
 
@@ -327,7 +350,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
         <div className="fixed inset-0 bg-[#000000]/90 flex items-center justify-center p-4 z-50">
           <div className="bg-[#000000] border-4 border-[#facaca] w-full max-w-sm p-6 rounded-[2rem] shadow-[0_0_40px_rgba(156,8,0,0.6)] relative">
             <div className="absolute -top-6 -right-6 bg-[#ffffff] p-2 rounded-full border-4 border-[#000000]">
-               <Rabbit className="w-8 h-8 text-[#9c0800]" />
+               <RabbitMask className="w-8 h-8 text-[#9c0800]" />
             </div>
             
             <h3 className="text-[#ffffff] text-xl font-black mb-2 uppercase tracking-widest flex items-center gap-2">
