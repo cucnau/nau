@@ -210,42 +210,42 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
                 </span>
               ))}
             </div>
+          </div>
 
-            {/* INTERACTIVE MARIONETTE SOUL WHISPERS PANEL - MOVED HERE */}
-            <div className="border-2 border-[#4E3E39] bg-[#1C100E] p-5 rounded-2xl relative overflow-hidden shadow-[4px_4px_15px_rgba(0,0,0,0.5)] mb-6">
-              {/* String Anchor Hook on top */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-5 bg-[#3E2D2A] border-b border-[#C5A059]/40 flex justify-center items-end">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#C5A059] animate-ping absolute" />
-                <div className="w-1.5 h-1.5 rounded-full bg-[#C5A059]" />
+          {/* INTERACTIVE MARIONETTE SOUL WHISPERS PANEL - SEPARATED BELOW */}
+          <div className="border-2 border-[#4E3E39] bg-[#1C100E] p-5 rounded-2xl relative overflow-hidden shadow-[4px_4px_15px_rgba(0,0,0,0.5)]">
+            {/* String Anchor Hook on top */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-5 bg-[#3E2D2A] border-b border-[#C5A059]/40 flex justify-center items-end">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#C5A059] animate-ping absolute" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#C5A059]" />
+            </div>
+            
+            <div className="text-center pt-2">
+              <h3 className="text-[10px] text-[#C5A059] font-sans uppercase tracking-[0.25em] font-bold mb-3">
+                LINH HỒN RỐI THÌ THẦM
+              </h3>
+
+              <div className="min-h-[105px] flex items-center justify-center px-4 py-3 bg-[#0F0908] border border-[#3E2D2A] rounded-xl relative shadow-inner">
+                {/* Vintage ornamental corner background */}
+                <div className="absolute top-1 left-1 text-[8px] text-[#4E3E39] select-none font-sans">✦</div>
+                <div className="absolute bottom-1 right-1 text-[8px] text-[#4E3E39] select-none font-sans">✦</div>
+
+                <p className={`text-xs md:text-sm text-[#E8DCB8] italic font-serif leading-relaxed text-center whitespace-pre-line transition-all duration-500 ${isPulling ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+                  {whispers[whisperIdx]}
+                </p>
               </div>
-              
-              <div className="text-center pt-2">
-                <h3 className="text-[10px] text-[#C5A059] font-sans uppercase tracking-[0.25em] font-bold mb-3">
-                  LINH HỒN RỐI THÌ THẦM
-                </h3>
 
-                <div className="min-h-[105px] flex items-center justify-center px-4 py-3 bg-[#0F0908] border border-[#3E2D2A] rounded-xl relative shadow-inner">
-                  {/* Vintage ornamental corner background */}
-                  <div className="absolute top-1 left-1 text-[8px] text-[#4E3E39] select-none font-sans">✦</div>
-                  <div className="absolute bottom-1 right-1 text-[8px] text-[#4E3E39] select-none font-sans">✦</div>
-
-                  <p className={`text-xs md:text-sm text-[#E8DCB8] italic font-serif leading-relaxed text-center whitespace-pre-line transition-all duration-500 ${isPulling ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
-                    {whispers[whisperIdx]}
-                  </p>
-                </div>
-
-                {/* Sợi dây kéo múa rối có tính tương tác cao */}
-                <div className="mt-4 flex flex-col items-center">
-                  <div className={`w-[2px] bg-[#C5A059] transition-all duration-300 ${isPulling ? 'h-14 bg-[#E8DCB8]' : 'h-8'}`} />
-                  <button 
-                    onClick={handlePullString}
-                    disabled={isPulling}
-                    className={`mt-1 px-4 py-1.5 bg-[#3E2D2A] hover:bg-[#4E3E39] border border-[#C5A059] text-[#C5A059] hover:text-[#E8DCB8] text-[9px] font-sans font-black uppercase tracking-widest rounded-full transition-all shadow-[0_2px_6px_rgba(0,0,0,0.4)] ${isPulling ? 'translate-y-2' : ''}`}
-                  >
-                    {isPulling ? 'Đang kéo tơ...' : 'Kéo Tơ Đánh Thức Rối'}
-                  </button>
-                  <p className="text-[8px] text-[#8E7E7A] font-sans italic mt-1.5">Mỗi cái kéo dệt một sợi tơ liên kết tâm hồn</p>
-                </div>
+              {/* Sợi dây kéo múa rối có tính tương tác cao */}
+              <div className="mt-4 flex flex-col items-center">
+                <div className={`w-[2px] bg-[#C5A059] transition-all duration-300 ${isPulling ? 'h-14 bg-[#E8DCB8]' : 'h-8'}`} />
+                <button 
+                  onClick={handlePullString}
+                  disabled={isPulling}
+                  className={`mt-1 px-4 py-1.5 bg-[#3E2D2A] hover:bg-[#4E3E39] border border-[#C5A059] text-[#C5A059] hover:text-[#E8DCB8] text-[9px] font-sans font-black uppercase tracking-widest rounded-full transition-all shadow-[0_2px_6px_rgba(0,0,0,0.4)] ${isPulling ? 'translate-y-2' : ''}`}
+                >
+                  {isPulling ? 'Đang kéo tơ...' : 'Kéo Tơ Đánh Thức Rối'}
+                </button>
+                <p className="text-[8px] text-[#8E7E7A] font-sans italic mt-1.5">Mỗi cái kéo dệt một sợi tơ liên kết tâm hồn</p>
               </div>
             </div>
           </div>
