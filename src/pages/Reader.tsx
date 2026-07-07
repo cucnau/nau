@@ -24,7 +24,7 @@ const getThemeBorderClass = (theme: string) => {
 const getThemeBgBorderTextClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d]/50 border-[#47515f]/50 text-[#a0a6b3] shadow-[1px_1px_0_0_#47515f]";
   if (theme === 'nhatky') return "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[1px_1px_0_0_#C9B695]";
-  if (theme === 'thuytien') return "bg-[#12110F]/80 border-[#B6A996]/40 text-[#F2E6D0] shadow-[1px_1px_0_0_#3D362E]";
+  if (theme === 'thuytien') return "bg-[#3D362E]/60 border-[#B6A996]/50 text-[#F2E6D0] shadow-[1px_1px_0_0_#12110F] outline outline-1 outline-[#B6A996]/20 outline-offset-[-4px]";
   return "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]"; // giagoan
 };
 
@@ -45,14 +45,14 @@ const getThemeAvatarBorderClass = (theme: string) => {
 const getThemeAvatarBgClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d]";
   if (theme === 'nhatky') return "bg-[#DFCEB4]";
-  if (theme === 'thuytien') return "bg-[#3D362E]";
+  if (theme === 'thuytien') return "bg-[#12110F]";
   return "bg-[#13120d]"; // giagoan
 };
 
 const getThemeAccentTextColor = (theme: string) => {
   if (theme === 'homer') return "#a0a6b3";
   if (theme === 'nhatky') return "#2C1814";
-  if (theme === 'thuytien') return "#F2E6D0";
+  if (theme === 'thuytien') return "#B6A996";
   return "#bbee1f"; // giagoan
 };
 
@@ -94,14 +94,14 @@ const getThemeReplyButtonClass = (theme: string) => {
 const getThemeInputClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]";
   if (theme === 'nhatky') return "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695]";
-  if (theme === 'thuytien') return "bg-[#12110F] border-[#3D362E] text-[#F2E6D0] focus:border-[#B6A996]";
+  if (theme === 'thuytien') return "bg-[#12110F] border-[#B6A996]/30 text-[#F2E6D0] focus:border-[#B6A996]";
   return "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]"; // giagoan
 };
 
 const getThemeSendButtonClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#a0a6b3] hover:bg-white text-[#181f2d] border-[#47515f] disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none";
   if (theme === 'nhatky') return "bg-[#BCA782] hover:bg-[#C9B695] text-[#2C1814] border-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none";
-  if (theme === 'thuytien') return "bg-[#B6A996] hover:bg-[#F2E6D0] text-[#12110F] border-[#3D362E] disabled:bg-[#B6A996]/20 disabled:text-[#F2E6D0]/40 disabled:border-[#3D362E]/50 disabled:shadow-none";
+  if (theme === 'thuytien') return "bg-[#B6A996] hover:bg-[#F2E6D0] text-[#12110F] border-[#B6A996] disabled:opacity-30 disabled:shadow-none";
   return "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none"; // giagoan
 };
 
@@ -1071,7 +1071,7 @@ export function Reader() {
     <div className={cn(
       "min-h-screen transition-colors duration-500 pb-32 font-medium flex flex-col items-center",
       isCustomThemeActive 
-        ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#C9B695] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#D5C2A5] via-[#C9B695] to-[#BCA782] text-[#2C1814] font-serif" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#3D362E] via-[#12110F] to-[#12110F] text-[#F2E6D0] font-serif" : "bg-[#13120d] text-[#dbcec2]")
+        ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#C9B695] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#D5C2A5] via-[#C9B695] to-[#BCA782] text-[#2C1814] font-serif" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#2E251E] via-[#12110F] to-[#12110F] text-[#EADDC9] font-serif" : "bg-[#13120d] text-[#dbcec2]")
         : effectiveIsDark 
           ? "bg-[#1A1412] text-[#ECE5DC]" 
           : "bg-[#FDF6EC] text-[#3E2723]"
@@ -1098,9 +1098,9 @@ export function Reader() {
                   ? 'none'
                   : 'repeating-linear-gradient(45deg, #2e2a63 0, #2e2a63 1px, transparent 1px, transparent 50px)' }} />
            <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-30 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#D5C2A5' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#3D362E' } : { backgroundColor: '#2e2a63' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#D5C2A5' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#2E251E' } : { backgroundColor: '#2e2a63' }} />
            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[180px] opacity-10 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#BCA782' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#B6A996' } : { backgroundColor: '#bbee1f' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#BCA782' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#9A8E7D' } : { backgroundColor: '#bbee1f' }} />
          </>
        )}
        {/* Top Navigation */}
@@ -1113,7 +1113,7 @@ export function Reader() {
              isCustomThemeActive ? (
                 activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
                 activeCustomTheme === 'nhatky' ? "border-[#BCA782]/50 bg-[#E8DCC4] hover:bg-[#DFCEB4] hover:border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" :
-                activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#3D362E]" :
+                activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" :
                 "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
              ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
           )}>
@@ -1130,7 +1130,7 @@ export function Reader() {
                 isCustomThemeActive ? (
                    activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
                    activeCustomTheme === 'nhatky' ? "border-[#BCA782]/50 bg-[#E8DCC4] hover:bg-[#DFCEB4] hover:border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" :
-                   activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#3D362E]" :
+                   activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" :
                    "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
                 ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
              )}>
@@ -1143,7 +1143,7 @@ export function Reader() {
                     isCustomThemeActive ? (
                        activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3] border-[#47515f] font-reading-garamond shadow-lg" :
                        activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] text-[#2C1814] border-[#BCA782] font-reading-cormorant shadow-2xl" :
-                       activeCustomTheme === 'thuytien' ? "bg-[#12110F] text-[#F2E6D0] border-[#3D362E] font-reading-cormorant shadow-lg" :
+                       activeCustomTheme === 'thuytien' ? "bg-[#12110F] text-[#F2E6D0] border-[#B6A996] font-reading-cormorant shadow-lg outline outline-1 outline-[#B6A996]/20 outline-offset-[-4px]" :
                        "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] font-reading-garamond shadow-lg"
                     ) : effectiveIsDark ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723]" : "bg-[#FFFDF9] text-[#3E2723] border-[#3E2723]"
                 )}>
@@ -1161,7 +1161,7 @@ export function Reader() {
                                className={cn(
                                   "w-full py-2 text-xs font-black uppercase rounded-xl border-2 transition-all cursor-pointer",
                                   useStoryTheme
-                                     ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[2px_2px_0_0_#C9B695] hover:bg-[#C9B695]" : activeCustomTheme === 'thuytien' ? "bg-[#B6A996] text-[#12110F] border-[#3D362E] shadow-[2px_2px_0_0_#3D362E] hover:bg-[#F2E6D0]" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white") 
+                                     ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[2px_2px_0_0_#C9B695] hover:bg-[#C9B695]" : activeCustomTheme === 'thuytien' ? "bg-[#B6A996] text-[#12110F] border-[#B6A996] shadow-[2px_2px_0_0_#12110F] hover:bg-[#F2E6D0]" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white") 
                                      : (effectiveIsDark ? "bg-[#2C221D] text-[#ECE5DC] border-[#3E2723] hover:bg-[#3E2723]" : "bg-white text-[#3E2723] border-[#3E2723] hover:bg-stone-100")
                                )}
                             >
@@ -1251,7 +1251,7 @@ export function Reader() {
 
                            {activeParagraphIndex === idx && (
                                <div className={cn("mt-4 p-5 rounded-2xl border-2 transition-all", 
-                                    isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/95 border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : "bg-[#13120d]/95 border-[#2e2a63] text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]") 
+                                    isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/95 border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/95 border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" : "bg-[#13120d]/95 border-[#2e2a63] text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]") 
                                        : effectiveIsDark 
                                           ? "bg-[#120E0C] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]" 
                                           : "bg-[#FFFDF9] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]"
@@ -1265,127 +1265,39 @@ export function Reader() {
                                        {pComments.length === 0 ? (
                                            <div className="text-center italic text-sm opacity-50 py-2">{tNoParagraphComment}</div>
                                        ) : (
-                                           pComments.map(c => { return <ParagraphCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={effectiveIsDark} isStoryTheme={activeCustomTheme} profilesCache={profilesCache} />; if (false) { return (
-                                               <div key={c.id} className="flex flex-col gap-1 w-full border-b border-stone-100/15 pb-3 last:border-0 last:pb-0">
-                                                   <div className="flex gap-3">
-                                                       <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="hidden" />
-                                                        <div className="w-8 h-8 shrink-0 relative bg-stone-200 rounded-full">
-                                                            <img src={c.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-full h-full rounded-full object-cover" />
-                                                            {c.equippedSticker && (
-                                                                <img 
-                                                                    src={c.equippedSticker} 
-                                                                    alt="Sticker" 
-                                                                    className="absolute w-8 h-8 object-contain pointer-events-none z-10 -right-3 top-1/2 -translate-y-1/2" 
-                                                                    referrerPolicy="no-referrer"
-                                                                />
-                                                            )}
-                                                        </div>
-                                                       <div className="flex-1 min-w-0">
-                                                           <div className="text-xs font-bold mb-0.5 flex items-center gap-1" style={{ color: getTitleColor(c.activeTitle) || undefined }}>
-                                                               {c.displayName}
-                                                               {c.activeTitle && (
-                                                                   <span className="px-1.5 py-0.5 bg-[#F5E6D3]/80 text-[#5D4037] text-[8px] font-extrabold rounded-md uppercase tracking-tight select-none border border-[#D7CCC8]">
-                                                                       🏆 {c.activeTitle}
-                                                                   </span>
-                                                               )}
-                                                           </div>
-                                                           <div className="text-sm break-words">{c.content}</div>
-                                                           
-                                                           {isLoggedIn && (
-                                                              <button 
-                                                                 type="button"
-                                                                 onClick={() => {
-                                                                    if (replyingToId === c.id) {
-                                                                       setReplyingToId(null);
-                                                                    } else {
-                                                                       setReplyingToId(c.id);
-                                                                       setReplyText('');
-                                                                    }
-                                                                 }}
-                                                                 className={cn("text-xs mt-1 font-bold block hover:underline", isDark ? "text-[#D7CCC8] hover:text-white" : "text-[#8D6E63] dark:text-[#8D6E63] hover:text-[#5D4037] dark:hover:text-[#5D4037]")}
-                                                              >
-                                                                 Trả lời
-                                                              </button>
-                                                           )}
-                                                       </div>
-                                                   </div>
+pComments.map(c => (
+                                                <ParagraphCommentNode 
+                                                    key={c.id} 
+                                                    comment={c} 
+                                                    comments={comments} 
+                                                    replyingToId={replyingToId} 
+                                                    setReplyingToId={setReplyingToId} 
+                                                    replyText={replyText} 
+                                                    setReplyText={setReplyText} 
+                                                    submittingReply={submittingReply} 
+                                                    handleSendReply={handleSendReply} 
+                                                    getTitleColor={getTitleColor} 
+                                                    isLoggedIn={isLoggedIn} 
+                                                    isDark={effectiveIsDark} 
+                                                    isStoryTheme={activeCustomTheme} 
+                                                    profilesCache={profilesCache} 
+                                                />
+                                            ))
+                                        )}
+                                    </div>
 
-                                                   {/* Input trả lời */}
-                                                   {replyingToId === c.id && (
-                                                      <div className="mt-2 pl-11 flex gap-2">
-                                                         <input 
-                                                            type="text" 
-                                                            placeholder={`Trả lời ${c.displayName}...`}
-                                                            value={replyText}
-                                                            disabled={submittingReply}
-                                                            onChange={(e) => setReplyText(e.target.value)}
-                                                            className={cn("flex-1 px-2.5 py-1 text-xs rounded-lg border focus:outline-none focus:border-[#8D6E63] bg-transparent", isDark ? "border-[#3C2E27] text-[#ECE5DC]" : "border-[#D7CCC8] dark:border-[#D7CCC8] text-[#3E2723] dark:text-[#3E2723]")}
-                                                            onKeyDown={(e) => {
-                                                               if (e.key === 'Enter') {
-                                                                  e.preventDefault();
-                                                                  if (replyText.trim() && !submittingReply) {
-                                                                     handleSendReply(c);
-                                                                  }
-                                                               }
-                                                            }}
-                                                         />
-                                                         <button 
-                                                            type="button"
-                                                            onClick={() => handleSendReply(c)}
-                                                            disabled={submittingReply || !replyText.trim()}
-                                                            className="bg-[#8D6E63] text-white px-3 py-1 rounded-lg text-xs font-bold uppercase transition-colors hover:bg-[#5D4037] disabled:opacity-50"
-                                                         >
-                                                            Gửi
-                                                         </button>
-                                                      </div>
-                                                   )}
-
-                                                   {/* Các phản hồi lồng nhau */}
-                                                   {(() => {
-                                                      const subReplies = comments.filter(r => r.parentId === c.id).sort((a: any, b: any) => {
-                                                         const timeA = typeof a.createdAt === 'number' ? a.createdAt : (a.createdAt?.toMillis?.() || 0);
-                                                         const timeB = typeof b.createdAt === 'number' ? b.createdAt : (b.createdAt?.toMillis?.() || 0);
-                                                         return timeA - timeB;
-                                                      });
-                                                      if (subReplies.length === 0) return null;
-                                                      return (
-                                                         <div className="mt-2 pl-11 space-y-2 border-l border-[#D7CCC8]/40">
-                                                            {subReplies.map(reply => (
-                                                               <div key={reply.id} className={cn("flex gap-2 p-2 rounded-lg", isDark ? "bg-[#2C221D]/40" : "bg-stone-50/50 dark:bg-stone-50/50")}>
-                                                                  <img src={reply.avatarUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=150&q=80'} className="w-6 h-6 rounded-full object-cover shrink-0" />
-                                                                  <div className="flex-1 min-w-0">
-                                                                     <div className="text-[11px] font-bold mb-0.5 flex items-center gap-1" style={{ color: getTitleColor(reply.activeTitle) || undefined }}>
-                                                                        {reply.displayName}
-                                                                        {reply.activeTitle && (
-                                                                           <span className="px-1 py-0.5 bg-[#F5E6D3] text-[#5D4037] text-[7px] font-extrabold rounded">
-                                                                              🏆 {reply.activeTitle}
-                                                                           </span>
-                                                                        )}
-                                                                     </div>
-                                                                     <div className="text-xs text-stone-700 break-words">{reply.content}</div>
-                                                                  </div>
-                                                               </div>
-                                                            ))}
-                                                         </div>
-                                                      );
-                                                   })()}
-                                                </div>
-                                           )}})
-                                       )}
-                                   </div>
-
-                                   {isLoggedIn ? (
+                                    {isLoggedIn ? (
                                        <form onSubmit={(e) => handleParagraphComment(e, idx)} className="flex gap-2">
                                            <input 
                                                 type="text" 
                                                 value={paragraphCommentText} 
                                                 onChange={(e) => setParagraphCommentText(e.target.value)} 
                                                 placeholder={tParagraphPlaceholder} 
-                                                className={cn("flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] border-[#3D362E] text-[#F2E6D0] focus:border-[#B6A996]" : "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}
+                                                className={cn("flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/40 text-[#F2E6D0] focus:border-[#B6A996]" : "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}
                                            />
-                                           <button type="submit" disabled={!paragraphCommentText.trim()} className={cn("px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 transition-all active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[2px_2px_0_0_#3E2723]", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[2px_2px_0_0_#C9B695] hover:bg-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none" : activeCustomTheme === 'thuytien' ? "bg-[#B6A996] text-[#12110F] border-[#3D362E] shadow-[2px_2px_0_0_#3D362E] hover:bg-[#F2E6D0] disabled:bg-[#B6A996]/20 disabled:text-[#F2E6D0]/40 disabled:border-[#3D362E]/50 disabled:shadow-none" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none") : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>{tParagraphSubmit}</button>
+                                           <button type="submit" disabled={!paragraphCommentText.trim()} className={cn("px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 transition-all active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[2px_2px_0_0_#3E2723]", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[2px_2px_0_0_#C9B695] hover:bg-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none" : activeCustomTheme === 'thuytien' ? "bg-[#B6A996] text-[#12110F] border-[#B6A996] shadow-[2px_2px_0_0_#12110F] hover:bg-[#F2E6D0] disabled:opacity-30 disabled:shadow-none" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none") : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>{tParagraphSubmit}</button>
                                        </form>
-                                   ) : (
+                                    ) : (
                                        <div className="text-xs italic opacity-70 text-center">{tParagraphLogin}</div>
                                    )}
                                </div>
@@ -1397,13 +1309,13 @@ export function Reader() {
            {/* Navigation Buttons */}
            <div className="mt-16 mb-8 flex items-center justify-between">
               {prevChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] border-[#3D362E] text-[#B6A996] shadow-[2px_2px_0_0_#3D362E] hover:bg-[#1C1A17]" : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
+                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#0E0C0A] border-[#9A8E7D]/40 text-[#EADDC9] shadow-[2px_2px_0_0_#0E0C0A] hover:bg-[#1C1A17]" : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
                     <ArrowLeft className="w-5 h-5"/> {tPrevChapter}
                  </button>
               ) : <div></div>}
               
               {nextChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] border-[#3D362E] text-[#B6A996] shadow-[2px_2px_0_0_#3D362E] hover:bg-[#1C1A17]" : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
+                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#0E0C0A] border-[#9A8E7D]/40 text-[#EADDC9] shadow-[2px_2px_0_0_#0E0C0A] hover:bg-[#1C1A17]" : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
                     {tNextChapter} <ArrowRight className="w-5 h-5"/>
                  </button>
               ) : <div className="text-sm opacity-50 uppercase font-bold tracking-widest">Hết truyện</div>}
@@ -1413,18 +1325,18 @@ export function Reader() {
 
            {/* Comments Area (Counts for missions) */}
            <div className="mb-12">
-               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "border-[#47515f] bg-[#181f2d] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "border-[#BCA782] bg-[#E8DCC4] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "border-[#3D362E] bg-[#12110F] text-[#B6A996] shadow-[2px_2px_0_0_#3D362E]" : "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]") : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>{tCommentAreaTitle}</h3>
+               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "border-[#47515f] bg-[#181f2d] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "border-[#BCA782] bg-[#E8DCC4] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "border-[#B6A996]/30 bg-[#12110F] text-[#B6A996] shadow-[2px_2px_0_0_#12110F]" : "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]") : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>{tCommentAreaTitle}</h3>
                <form onSubmit={handleComment} className="flex flex-col gap-3 mb-8">
                   <textarea 
                      value={commentText}
                      onChange={(e) => setCommentText(e.target.value)}
                      disabled={!isLoggedIn}
                      placeholder={isLoggedIn ? tCommentAreaPlaceholder : tCommentAreaPlaceholderLogin}
-                     className={cn("w-full p-4 rounded-2xl resize-none border-2 outline-none font-semibold text-xs sm:text-sm transition-all", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3] focus:shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695] focus:shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] border-[#3D362E] text-[#F2E6D0] focus:border-[#B6A996] focus:shadow-[2px_2px_0_0_#3D362E]" : "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f] focus:shadow-[2px_2px_0_0_#2e2a63]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-white focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#000]" : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#3E2723]")}
+                     className={cn("w-full p-4 rounded-2xl resize-none border-2 outline-none font-semibold text-xs sm:text-sm transition-all", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3] focus:shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695] focus:shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] border-[#B6A996]/30 text-[#F2E6D0] focus:border-[#B6A996] focus:shadow-[2px_2px_0_0_#12110F]" : "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f] focus:shadow-[2px_2px_0_0_#2e2a63]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-white focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#000]" : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#3E2723]")}
                      rows={4}
                   />
                   <div className="flex justify-end">
-                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-xl font-black transition-all uppercase text-xs tracking-wider border-2 active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[3px_3px_0_0_#3E2723]", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[3px_3px_0_0_#47515f] hover:bg-white disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[3px_3px_0_0_#C9B695] hover:bg-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none" : activeCustomTheme === 'thuytien' ? "bg-[#B6A996] text-[#12110F] border-[#3D362E] shadow-[3px_3px_0_0_#3D362E] hover:bg-[#F2E6D0] disabled:bg-[#B6A996]/20 disabled:text-[#F2E6D0]/40 disabled:border-[#3D362E]/50 disabled:shadow-none" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none") : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>
+                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-xl font-black transition-all uppercase text-xs tracking-wider border-2 active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[3px_3px_0_0_#3E2723]", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[3px_3px_0_0_#47515f] hover:bg-white disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[3px_3px_0_0_#C9B695] hover:bg-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none" : activeCustomTheme === 'thuytien' ? "bg-[#9A8E7D] text-[#0E0C0A] border-[#9A8E7D] shadow-[3px_3px_0_0_#0E0C0A] hover:bg-[#EADDC9] disabled:bg-[#9A8E7D]/20 disabled:text-[#EADDC9]/40 disabled:border-[#9A8E7D]/50 disabled:shadow-none" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none") : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>
                         {tCommentSubmit}
                      </button>
                   </div>
