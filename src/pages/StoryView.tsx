@@ -13,6 +13,7 @@ import { ThemeProps } from './themes/ThemeProps';
 import { HuongDanGiaNgoanTheme } from './themes/HuongDanGiaNgoan';
 import { CanhCuaHomerTheme } from './themes/CanhCuaHomer';
 import { NhatKyKhongTenTheme } from './themes/NhatKyKhongTen';
+import { TinhYeuThuyTienTheme } from './themes/TinhYeuThuyTien';
 import { detectStoryTheme } from '../lib/themeHelper';
 
 interface CommentNodeProps {
@@ -387,6 +388,23 @@ export function StoryView() {
           </div>
         </div>
       );
+    } else if (activeCustomTheme === 'thuytien') {
+      return (
+        <div className="min-h-screen bg-[#12110F] text-[#F2E6D0] flex flex-col items-center justify-center p-4 font-serif relative overflow-hidden">
+          {/* Classical Greek corner decorations */}
+          <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#B6A996]/30 pointer-events-none" />
+          <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#B6A996]/30 pointer-events-none" />
+          <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#B6A996]/30 pointer-events-none" />
+          <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[#B6A996]/30 pointer-events-none" />
+          
+          <div className="flex flex-col items-center gap-5 relative z-10">
+            <div className="w-14 h-14 border-4 border-[#3D362E] border-t-[#B6A996] rounded-full animate-spin shadow-lg" />
+            <div className="text-xs uppercase tracking-[0.25em] text-[#B6A996] animate-pulse text-center px-4 font-sans font-black">
+              ĐANG KHƠI NGUỒN SỬ THI THỦY TIÊN...
+            </div>
+          </div>
+        </div>
+      );
     }
     return (
       <div className="min-h-screen bg-[#1A1412] text-[#E0D4C3] flex flex-col items-center justify-center p-4 font-sans">
@@ -694,7 +712,7 @@ export function StoryView() {
   }
 
   const currentTheme = detectStoryTheme(story.title, id);
-  if (currentTheme === 'nhatky') {
+  if (currentTheme === 'nhatky' || currentTheme === 'thuytien') {
     const themeProps: ThemeProps = {
       story,
       actualStoryId,
@@ -738,6 +756,9 @@ export function StoryView() {
       getTitleColor,
       navigate,
     };
+    if (currentTheme === 'thuytien') {
+      return <TinhYeuThuyTienTheme {...themeProps} />;
+    }
     return <NhatKyKhongTenTheme {...themeProps} />;
   }
 
