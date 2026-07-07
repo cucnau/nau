@@ -29,24 +29,27 @@ export function detectStoryTheme(
 ): 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap' | null {
   // 1. Check title if available
   if (storyTitle) {
-    const titleLower = storyTitle.toLowerCase();
-    if (titleLower.includes('hướng dẫn giả ngoan')) {
+    // Normalize to NFC and remove diacritics for robust matching
+    const normalizedTitle = storyTitle.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const rawTitle = storyTitle.toLowerCase();
+
+    if (rawTitle.includes('hướng dẫn giả ngoan') || normalizedTitle.includes('huong dan gia ngoan') || normalizedTitle.includes('gia ngoan')) {
       if (storyIdOrSlug) saveStoryThemeMapping(storyIdOrSlug, 'giagoan');
       return 'giagoan';
     }
-    if (titleLower.includes('cánh cửa homer') || titleLower.includes('canh cua homer')) {
+    if (rawTitle.includes('cánh cửa homer') || normalizedTitle.includes('canh cua homer') || normalizedTitle.includes('homer')) {
       if (storyIdOrSlug) saveStoryThemeMapping(storyIdOrSlug, 'homer');
       return 'homer';
     }
-    if (titleLower.includes('nhật ký không tên') || titleLower.includes('nhat ky khong ten')) {
+    if (rawTitle.includes('nhật ký không tên') || normalizedTitle.includes('nhat ky khong ten')) {
       if (storyIdOrSlug) saveStoryThemeMapping(storyIdOrSlug, 'nhatky');
       return 'nhatky';
     }
-    if (titleLower.includes('thủy tiên') || titleLower.includes('thuy tien') || titleLower.includes('narcissus')) {
+    if (rawTitle.includes('thủy tiên') || normalizedTitle.includes('thuy tien') || normalizedTitle.includes('narcissus')) {
       if (storyIdOrSlug) saveStoryThemeMapping(storyIdOrSlug, 'thuytien');
       return 'thuytien';
     }
-    if (titleLower.includes('rình rập') || titleLower.includes('rinh rap')) {
+    if (rawTitle.includes('rình rập') || normalizedTitle.includes('rinh rap')) {
       if (storyIdOrSlug) saveStoryThemeMapping(storyIdOrSlug, 'rinhrap');
       return 'rinhrap';
     }
@@ -73,7 +76,10 @@ export function detectStoryTheme(
 
     // 3. Check memory/localStorage cache for document ID
     if (idThemeCache[storyIdOrSlug]) {
-      return idThemeCache[storyIdOrSlug];
+      const cached = idThemeCache[storyIdOrSlug];
+      if (['giagoan', 'homer', 'nhatky', 'thuytien', 'rinhrap'].includes(cached as string)) {
+        return cached;
+      }
     }
   }
 
