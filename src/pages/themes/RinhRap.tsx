@@ -7,13 +7,23 @@ import { UserAvatar } from '../../components/UserAvatar';
 
 
 const RabbitMask = ({ className, ...props }: any) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>
-    <path d="M15 8V4a2 2 0 0 0-4 0v4"/>
-    <path d="M9 8V2a2 2 0 0 0-4 0v6"/>
-    <rect x="3" y="8" width="18" height="12" rx="6" />
-    <circle cx="8" cy="14" r="2" />
-    <circle cx="16" cy="14" r="2" />
-    <path d="M12 17v1" />
+  <svg viewBox="0 0 100 100" className={className} {...props}>
+    <path d="M 35 45 C 35 15, 20 0, 35 5 C 45 10, 45 40, 45 45 Z" fill="#ffffff" />
+    <path d="M 37 40 C 37 20, 28 10, 37 12 C 41 15, 41 35, 41 40 Z" fill="#facaca" />
+    <path d="M 65 45 C 65 15, 80 0, 65 5 C 55 10, 55 40, 55 45 Z" fill="#ffffff" />
+    <path d="M 63 40 C 63 20, 72 10, 63 12 C 59 15, 59 35, 59 40 Z" fill="#facaca" />
+    <path d="M 20 40 C 0 40, 0 75, 20 85 C 35 90, 65 90, 80 85 C 100 75, 100 40, 80 40 C 60 30, 40 30, 20 40 Z" fill="#ffffff" />
+    <ellipse cx="32" cy="65" rx="14" ry="11" fill="currentColor" />
+    <ellipse cx="68" cy="65" rx="14" ry="11" fill="currentColor" />
+    <circle cx="50" cy="82" r="5" fill="#facaca" />
+    <path d="M 26 48 Q 33 43 40 48" stroke="#facaca" strokeWidth="4" strokeLinecap="round" fill="none" />
+    <path d="M 74 48 Q 67 43 60 48" stroke="#facaca" strokeWidth="4" strokeLinecap="round" fill="none" />
+    <line x1="15" y1="65" x2="3" y2="60" stroke="#facaca" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="12" y1="72" x2="0" y2="72" stroke="#facaca" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="16" y1="78" x2="5" y2="84" stroke="#facaca" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="85" y1="65" x2="97" y2="60" stroke="#facaca" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="88" y1="72" x2="100" y2="72" stroke="#facaca" strokeWidth="2.5" strokeLinecap="round" />
+    <line x1="84" y1="78" x2="95" y2="84" stroke="#facaca" strokeWidth="2.5" strokeLinecap="round" />
   </svg>
 );
 
@@ -116,15 +126,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
 
           {/* Info */}
           <div className="flex flex-col justify-center flex-1 space-y-4">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              {story.genres && story.genres.length > 0 ? (
-                story.genres.map((tag: string, i: number) => (
-                  <span key={i} className="px-3 py-1 bg-[#facaca] text-[#780606] rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-[#780606]">
-                    {tag}
-                  </span>
-                ))
-              ) : null}
-            </div>
+
             
             <h1 className="text-3xl md:text-5xl font-black text-[#ffffff] uppercase tracking-tighter drop-shadow-[2px_2px_0_#9c0800]">
               {story.title}
@@ -132,11 +134,21 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
             
             <div className="flex items-center gap-4 text-xs font-bold text-[#facaca]">
               <span className="flex items-center gap-1.5 bg-[#823323]/40 px-2 py-1 rounded-md border border-[#823323]">
-                <Gamepad2 className="w-4 h-4" /> TRẠNG THÁI: {story.completed ? 'HOÀN THÀNH' : 'ĐANG KẾT NỐI...'}
+                <Gamepad2 className="w-4 h-4" /> TRẠNG THÁI: {story.completed ? 'PHÁ ĐẢO (HOÀN THÀNH)' : 'ĐANG KẾT NỐI...'}
               </span>
               <span className="flex items-center gap-1.5 bg-[#780606]/40 px-2 py-1 rounded-md border border-[#780606]">
                 <BookOpen className="w-4 h-4" /> {chapters.length} MÀN CHƠI
               </span>
+            </div>
+            
+            <div className="flex flex-wrap items-center gap-2 mt-2 mb-2">
+              {story.genres && story.genres.length > 0 ? (
+                story.genres.map((tag: string, i: number) => (
+                  <span key={i} className="px-3 py-1 bg-[#facaca] text-[#780606] rounded-full text-[10px] font-black uppercase tracking-wider border-2 border-[#780606]">
+                    {tag}
+                  </span>
+                ))
+              ) : null}
             </div>
 
             <p className="text-sm text-[#fff2f1] leading-relaxed font-medium bg-[#823323]/20 p-4 rounded-xl border border-[#780606] border-dashed text-justify whitespace-pre-line">
