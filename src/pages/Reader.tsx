@@ -1096,11 +1096,13 @@ export function Reader() {
                   ? 'repeating-linear-gradient(45deg, #BCA782 0, #BCA782 1px, transparent 1px, transparent 80px)'
                   : activeCustomTheme === 'thuytien'
                   ? 'none'
+                  : activeCustomTheme === 'rinhrap'
+                  ? 'repeating-linear-gradient(45deg, #7F1D1D 0, #7F1D1D 1px, transparent 1px, transparent 60px)'
                   : 'repeating-linear-gradient(45deg, #2e2a63 0, #2e2a63 1px, transparent 1px, transparent 50px)' }} />
            <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-30 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#D5C2A5' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#2E251E' } : { backgroundColor: '#2e2a63' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#D5C2A5' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#2E251E' } : activeCustomTheme === 'rinhrap' ? { backgroundColor: '#450A0A' } : { backgroundColor: '#2e2a63' }} />
            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[180px] opacity-10 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#BCA782' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#9A8E7D' } : { backgroundColor: '#bbee1f' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#BCA782' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#9A8E7D' } : activeCustomTheme === 'rinhrap' ? { backgroundColor: '#991B1B' } : { backgroundColor: '#bbee1f' }} />
          </>
        )}
        {/* Top Navigation */}
@@ -1346,7 +1348,7 @@ pComments.map(c => (
 
                <div className="space-y-6">
                    {chapterComments.length === 0 ? (
-                       <p className={cn("text-center italic opacity-50", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]/70" : activeCustomTheme === 'nhatky' ? "text-[#DFD6D3]/70" : "text-[#dbcec2]/70") : "")}>{tNoComment}</p>
+                       <p className={cn("text-center italic opacity-50", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]/70" : activeCustomTheme === 'nhatky' ? "text-[#DFD6D3]/70" : activeCustomTheme === 'thuytien' ? "text-[#EADDC9]/70" : activeCustomTheme === 'rinhrap' ? "text-[#D8B4B4]/70" : "text-[#dbcec2]/70") : "")}>{tNoComment}</p>
                    ) : (
                        chapterComments.map(c => { return <ChapterCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={effectiveIsDark} isStoryTheme={activeCustomTheme} profilesCache={profilesCache} />; if (false) { return (
                            <div key={c.id} className={cn("p-5 rounded-2xl border relative overflow-visible", isDark ? "bg-[#2C221D]/80 border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8] shadow-sm pr-8")}>
