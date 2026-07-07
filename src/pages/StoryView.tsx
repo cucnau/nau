@@ -353,6 +353,19 @@ export function StoryView() {
   
   if (loading) {
     const activeCustomTheme = detectStoryTheme(story?.title, id);
+    
+    if (activeCustomTheme === 'rinhrap') {
+      return (
+        <div className="min-h-screen bg-[#0B0505] text-[#D8B4B4] flex flex-col items-center justify-center p-4 font-sans">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#450A0A] border-t-[#EF4444] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#EF4444] animate-pulse font-black">
+              ĐANG TẢI DỮ LIỆU...
+            </div>
+          </div>
+        </div>
+      );
+    }
     if (activeCustomTheme === 'homer') {
       return (
         <div className="min-h-screen bg-[#181f2d] text-[#a0a6b3] flex flex-col items-center justify-center p-4 font-mono">
