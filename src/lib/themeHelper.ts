@@ -1,7 +1,7 @@
 // Theme helper to detect custom themes based on story properties, document IDs, or slugs.
 
 // A small local memory cache to remember Firestore IDs mapping to themes
-const idThemeCache: Record<string, 'giagoan' | 'homer' | 'nhatky' | 'thuytien'> = {};
+const idThemeCache: Record<string, 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap'> = {};
 
 // Try to load cached mappings from localStorage on startup
 try {
@@ -13,7 +13,7 @@ try {
   console.warn('Failed to load theme mappings from localStorage', e);
 }
 
-export function saveStoryThemeMapping(storyId: string, theme: 'giagoan' | 'homer' | 'nhatky' | 'thuytien') {
+export function saveStoryThemeMapping(storyId: string, theme: 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap') {
   if (!storyId || !theme) return;
   idThemeCache[storyId] = theme;
   try {
@@ -26,7 +26,7 @@ export function saveStoryThemeMapping(storyId: string, theme: 'giagoan' | 'homer
 export function detectStoryTheme(
   storyTitle?: string,
   storyIdOrSlug?: string
-): 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | null {
+): 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap' | null {
   // 1. Check title if available
   if (storyTitle) {
     const titleLower = storyTitle.toLowerCase();
@@ -46,6 +46,10 @@ export function detectStoryTheme(
       if (storyIdOrSlug) saveStoryThemeMapping(storyIdOrSlug, 'thuytien');
       return 'thuytien';
     }
+    if (titleLower.includes('rình rập') || titleLower.includes('rinh rap')) {
+      if (storyIdOrSlug) saveStoryThemeMapping(storyIdOrSlug, 'rinhrap');
+      return 'rinhrap';
+    }
   }
 
   // 2. Check slug / ID text
@@ -62,6 +66,9 @@ export function detectStoryTheme(
     }
     if (lower.includes('thuy-tien') || lower.includes('thuytien') || lower.includes('narcissus')) {
       return 'thuytien';
+    }
+    if (lower.includes('rinh-rap') || lower.includes('rinhrap') || lower === 'rinhrap') {
+      return 'rinhrap';
     }
 
     // 3. Check memory/localStorage cache for document ID
