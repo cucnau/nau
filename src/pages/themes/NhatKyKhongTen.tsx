@@ -423,12 +423,22 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
                     const avatar = cacheUser.avatarUrl || comment.avatarUrl || '';
                     const dName = cacheUser.displayName || comment.displayName || 'Nhà lữ hành ẩn danh';
                     const customTitle = cacheUser.activeTitle || comment.activeTitle;
+                    const isMe = comment.uid === uid;
+                    const currentSticker = isMe ? equippedStickerComment : (cacheUser?.equippedStickerComment ?? cacheUser?.equippedSticker ?? comment.equippedSticker);
                     
                     return (
                       <div 
                         key={comment.id}
-                        className={`p-4 rounded-xl border transition-all duration-300 ${isGift ? 'bg-[#DFCEB4] border-[#BCA782]' : 'bg-[#E8DCC4] border-[#C9B695]'}`}
+                        className={`relative p-4 rounded-xl border transition-all duration-300 ${isGift ? 'bg-[#DFCEB4] border-[#BCA782]' : 'bg-[#E8DCC4] border-[#C9B695]'} ${currentSticker ? 'pr-16' : ''}`}
                       >
+                        {currentSticker && (
+                          <img 
+                            src={currentSticker} 
+                            alt="Sticker" 
+                            className="absolute w-12 h-12 object-contain pointer-events-none z-10 right-2 top-1/2 -translate-y-1/2" 
+                            referrerPolicy="no-referrer"
+                          />
+                        )}
                         <div className="flex items-start gap-3">
                           <UserAvatar 
                             avatarUrl={avatar} 
