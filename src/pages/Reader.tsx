@@ -17,78 +17,91 @@ import { addStoryFire } from '../lib/storyFire';
 const getThemeBorderClass = (theme: string) => {
   if (theme === 'homer') return "border-[#47515f]/20";
   if (theme === 'nhatky') return "border-[#BCA782]/40";
+  if (theme === 'thuytien') return "border-[#B6A996]/30";
   return "border-[#2e2a63]/20"; // giagoan
 };
 
 const getThemeBgBorderTextClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d]/50 border-[#47515f]/50 text-[#a0a6b3] shadow-[1px_1px_0_0_#47515f]";
   if (theme === 'nhatky') return "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[1px_1px_0_0_#C9B695]";
+  if (theme === 'thuytien') return "bg-[#12110F]/80 border-[#B6A996]/40 text-[#F2E6D0] shadow-[1px_1px_0_0_#3D362E]";
   return "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]"; // giagoan
 };
 
 const getThemeAvatarFallbackIconClass = (theme: string) => {
   if (theme === 'homer') return "w-4 h-4 text-[#a0a6b3]";
   if (theme === 'nhatky') return "w-4 h-4 text-[#2C1814]";
+  if (theme === 'thuytien') return "w-4 h-4 text-[#F2E6D0]";
   return "w-4 h-4 text-[#bbee1f]"; // giagoan
 };
 
 const getThemeAvatarBorderClass = (theme: string) => {
   if (theme === 'homer') return "border border-[#47515f]/50";
   if (theme === 'nhatky') return "border border-[#BCA782]/80";
+  if (theme === 'thuytien') return "border border-[#B6A996]/50";
   return "border border-[#2e2a63]/50"; // giagoan
 };
 
 const getThemeAvatarBgClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d]";
   if (theme === 'nhatky') return "bg-[#DFCEB4]";
+  if (theme === 'thuytien') return "bg-[#3D362E]";
   return "bg-[#13120d]"; // giagoan
 };
 
 const getThemeAccentTextColor = (theme: string) => {
   if (theme === 'homer') return "#a0a6b3";
   if (theme === 'nhatky') return "#2C1814";
+  if (theme === 'thuytien') return "#F2E6D0";
   return "#bbee1f"; // giagoan
 };
 
 const getThemeTitleBadgeClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#47515f] text-[#a0a6b3] border-[#67707e]/40";
   if (theme === 'nhatky') return "bg-[#DFCEB4] text-[#2C1814] border-[#BCA782]/40";
+  if (theme === 'thuytien') return "bg-[#3D362E] text-[#F2E6D0] border-[#B6A996]/30";
   return "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40"; // giagoan
 };
 
 const getThemeSubTextColor = (theme: string) => {
   if (theme === 'homer') return "text-[#67707e]";
   if (theme === 'nhatky') return "text-[#5C3627]/80";
+  if (theme === 'thuytien') return "text-[#B6A996]";
   return "text-[#695b7f]"; // giagoan
 };
 
 const getThemeGiftBadgeClass = (theme: string) => {
   if (theme === 'homer') return "text-[#181f2d] bg-[#a0a6b3] border-[#a0a6b3]/50";
   if (theme === 'nhatky') return "text-[#2C1814] bg-[#DFCEB4] border-[#BCA782]/50";
+  if (theme === 'thuytien') return "text-[#12110F] bg-[#B6A996] border-[#B6A996]/50";
   return "text-[#13120d] bg-[#bbee1f] border-[#bbee1f]/50"; // giagoan
 };
 
 const getThemeContentTextColor = (theme: string) => {
   if (theme === 'homer') return "text-[#a0a6b3]";
   if (theme === 'nhatky') return "text-[#2C1814]";
+  if (theme === 'thuytien') return "text-[#F2E6D0]";
   return "text-[#dbcec2]"; // giagoan
 };
 
 const getThemeReplyButtonClass = (theme: string) => {
   if (theme === 'homer') return "text-[#67707e] hover:text-[#a0a6b3]";
   if (theme === 'nhatky') return "text-[#5C3627] hover:text-[#2C1814]";
+  if (theme === 'thuytien') return "text-[#B6A996] hover:text-[#F2E6D0]";
   return "text-[#695b7f] hover:text-[#bbee1f]"; // giagoan
 };
 
 const getThemeInputClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]";
   if (theme === 'nhatky') return "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695]";
+  if (theme === 'thuytien') return "bg-[#12110F] border-[#3D362E] text-[#F2E6D0] focus:border-[#B6A996]";
   return "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]"; // giagoan
 };
 
 const getThemeSendButtonClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#a0a6b3] hover:bg-white text-[#181f2d] border-[#47515f] disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none";
   if (theme === 'nhatky') return "bg-[#BCA782] hover:bg-[#C9B695] text-[#2C1814] border-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none";
+  if (theme === 'thuytien') return "bg-[#B6A996] hover:bg-[#F2E6D0] text-[#12110F] border-[#3D362E] disabled:bg-[#B6A996]/20 disabled:text-[#F2E6D0]/40 disabled:border-[#3D362E]/50 disabled:shadow-none";
   return "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none"; // giagoan
 };
 
@@ -1032,32 +1045,33 @@ export function Reader() {
   const effectiveIsDark = isCustomThemeActive ? false : isDark; // Với theme nhatky sáng màu, ta chuyển effectiveIsDark thành false để tránh xung đột prose-invert
   const effectiveFontFamily = isCustomThemeActive ? (
     activeCustomTheme === 'homer' ? 'font-reading-iosevka' : 
-    activeCustomTheme === 'nhatky' ? 'font-reading-cormorant' : 'font-reading-garamond'
+    activeCustomTheme === 'nhatky' ? 'font-reading-cormorant' : 
+    activeCustomTheme === 'thuytien' ? 'font-reading-cormorant' : 'font-reading-garamond'
   ) : fontFamily;
-  const tChapterLabel = activeCustomTheme === 'homer' ? "Tọa độ" : activeCustomTheme === 'giagoan' ? "Tài liệu" : activeCustomTheme === 'nhatky' ? "Trang" : "Chương";
-  const tChapterCapLabel = activeCustomTheme === 'homer' ? "TỌA ĐỘ" : activeCustomTheme === 'giagoan' ? "TÀI LIỆU" : activeCustomTheme === 'nhatky' ? "TRANG NHẬT KÝ" : "CHƯƠNG";
-  const tPrevChapter = activeCustomTheme === 'homer' ? "Tọa độ trước" : activeCustomTheme === 'giagoan' ? "Tài liệu trước" : activeCustomTheme === 'nhatky' ? "Trang nhật ký trước" : "Chương trước";
-  const tNextChapter = activeCustomTheme === 'homer' ? "Tọa độ sau" : activeCustomTheme === 'giagoan' ? "Tài liệu sau" : activeCustomTheme === 'nhatky' ? "Trang nhật ký sau" : "Chương sau";
-  const tChapterEarly = activeCustomTheme === 'homer' ? "Tọa độ Đọc Sớm" : activeCustomTheme === 'giagoan' ? "Tài liệu Đọc Sớm" : activeCustomTheme === 'nhatky' ? "Trang Đọc Sớm" : "Chương Đọc Sớm";
-  const tChapterLocked = activeCustomTheme === 'homer' ? "Đã khóa tọa độ" : activeCustomTheme === 'giagoan' ? "Đã khóa tài liệu" : activeCustomTheme === 'nhatky' ? "Ký ức bị khép lại" : "Đã khóa chương";
-  const tReadThis = activeCustomTheme === 'homer' ? "Đọc tọa độ này" : activeCustomTheme === 'giagoan' ? "Đọc tài liệu này" : activeCustomTheme === 'nhatky' ? "Lật giở ký ức này" : "Đọc chương này";
-  const tChapterSingle = activeCustomTheme === 'homer' ? "tọa độ" : activeCustomTheme === 'giagoan' ? "tài liệu" : activeCustomTheme === 'nhatky' ? "trang" : "chương";
-  const tParagraphComment = activeCustomTheme === 'homer' ? "Phản hồi tọa độ" : activeCustomTheme === 'giagoan' ? "Ý kiến đoạn" : activeCustomTheme === 'nhatky' ? "Bút tích đoạn" : "Bình luận đoạn";
-  const tNoParagraphComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào cho tọa độ này." : activeCustomTheme === 'giagoan' ? "Chưa có ý kiến nào cho đoạn này." : activeCustomTheme === 'nhatky' ? "Chưa có dấu bút tích nào tại dòng ký ức này." : "Chưa có bình luận. Hãy là người đầu tiên!";
-  const tParagraphPlaceholder = activeCustomTheme === 'homer' ? "Viết phản hồi..." : activeCustomTheme === 'giagoan' ? "Viết đề xuất..." : activeCustomTheme === 'nhatky' ? "Để lại dòng bút tích..." : "Viết bình luận...";
-  const tParagraphSubmit = activeCustomTheme === 'homer' ? "Phát" : activeCustomTheme === 'giagoan' ? "Trình" : activeCustomTheme === 'nhatky' ? "Ghi" : "Gửi";
-  const tParagraphLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : activeCustomTheme === 'nhatky' ? "Đăng nhập để lại bút tích" : "Đăng nhập để bình luận";
-  const tCommentAreaTitle = activeCustomTheme === 'homer' ? "Báo cáo sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đề xuất và ý kiến" : activeCustomTheme === 'nhatky' ? "Dấu vết bút tích chương" : "Bình luận chương";
-  const tCommentAreaPlaceholder = activeCustomTheme === 'homer' ? "Nhập sóng phản hồi của bạn..." : activeCustomTheme === 'giagoan' ? "Nhập đề xuất và ý kiến của bạn..." : activeCustomTheme === 'nhatky' ? "Nhập bút tích thương nhớ của bạn..." : "Nhập bình luận của bạn...";
-  const tCommentAreaPlaceholderLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phát sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : activeCustomTheme === 'nhatky' ? "Đăng nhập để ghi lại dòng hoài niệm" : "Đăng nhập để bình luận";
-  const tCommentSubmit = activeCustomTheme === 'homer' ? "Phát sóng" : activeCustomTheme === 'giagoan' ? "Trình ý kiến" : activeCustomTheme === 'nhatky' ? "Khắc ghi bút tích" : "Gửi bình luận";
-  const tNoComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào." : activeCustomTheme === 'giagoan' ? "Chưa có đề xuất và ý kiến nào cho tài liệu này." : activeCustomTheme === 'nhatky' ? "Trang ký ức này chưa lưu lại nét bút nào." : "Chưa có bình luận nào cho chương này.";
+  const tChapterLabel = activeCustomTheme === 'homer' ? "Tọa độ" : activeCustomTheme === 'giagoan' ? "Tài liệu" : activeCustomTheme === 'nhatky' ? "Trang" : activeCustomTheme === 'thuytien' ? "Khúc tự luyến" : "Chương";
+  const tChapterCapLabel = activeCustomTheme === 'homer' ? "TỌA ĐỘ" : activeCustomTheme === 'giagoan' ? "TÀI LIỆU" : activeCustomTheme === 'nhatky' ? "TRANG NHẬT KÝ" : activeCustomTheme === 'thuytien' ? "KHÚC TỰ LUYẾN" : "CHƯƠNG";
+  const tPrevChapter = activeCustomTheme === 'homer' ? "Tọa độ trước" : activeCustomTheme === 'giagoan' ? "Tài liệu trước" : activeCustomTheme === 'nhatky' ? "Trang nhật ký trước" : activeCustomTheme === 'thuytien' ? "Khúc tự luyến trước" : "Chương trước";
+  const tNextChapter = activeCustomTheme === 'homer' ? "Tọa độ sau" : activeCustomTheme === 'giagoan' ? "Tài liệu sau" : activeCustomTheme === 'nhatky' ? "Trang nhật ký sau" : activeCustomTheme === 'thuytien' ? "Khúc tự luyến sau" : "Chương sau";
+  const tChapterEarly = activeCustomTheme === 'homer' ? "Tọa độ Đọc Sớm" : activeCustomTheme === 'giagoan' ? "Tài liệu Đọc Sớm" : activeCustomTheme === 'nhatky' ? "Trang Đọc Sớm" : activeCustomTheme === 'thuytien' ? "Tự luyến Đọc Sớm" : "Chương Đọc Sớm";
+  const tChapterLocked = activeCustomTheme === 'homer' ? "Đã khóa tọa độ" : activeCustomTheme === 'giagoan' ? "Đã khóa tài liệu" : activeCustomTheme === 'nhatky' ? "Ký ức bị khép lại" : activeCustomTheme === 'thuytien' ? "Bóng gương chưa hiển hiện" : "Đã khóa chương";
+  const tReadThis = activeCustomTheme === 'homer' ? "Đọc tọa độ này" : activeCustomTheme === 'giagoan' ? "Đọc tài liệu này" : activeCustomTheme === 'nhatky' ? "Lật giở ký ức này" : activeCustomTheme === 'thuytien' ? "Chiêm ngưỡng khúc ca này" : "Đọc chương này";
+  const tChapterSingle = activeCustomTheme === 'homer' ? "tọa độ" : activeCustomTheme === 'giagoan' ? "tài liệu" : activeCustomTheme === 'nhatky' ? "trang" : activeCustomTheme === 'thuytien' ? "khúc" : "chương";
+  const tParagraphComment = activeCustomTheme === 'homer' ? "Phản hồi tọa độ" : activeCustomTheme === 'giagoan' ? "Ý kiến đoạn" : activeCustomTheme === 'nhatky' ? "Bút tích đoạn" : activeCustomTheme === 'thuytien' ? "Lời soi bóng" : "Bình luận đoạn";
+  const tNoParagraphComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào cho tọa độ này." : activeCustomTheme === 'giagoan' ? "Chưa có ý kiến nào cho đoạn này." : activeCustomTheme === 'nhatky' ? "Chưa có dấu bút tích nào tại dòng ký ức này." : activeCustomTheme === 'thuytien' ? "Chưa có lời soi bóng nào được lưu lại bên đoạn tuyệt mỹ này." : "Chưa có bình luận. Hãy là người đầu tiên!";
+  const tParagraphPlaceholder = activeCustomTheme === 'homer' ? "Viết phản hồi..." : activeCustomTheme === 'giagoan' ? "Viết đề xuất..." : activeCustomTheme === 'nhatky' ? "Để lại dòng bút tích..." : activeCustomTheme === 'thuytien' ? "Để lại lời ca tụng nhan sắc..." : "Viết bình luận...";
+  const tParagraphSubmit = activeCustomTheme === 'homer' ? "Phát" : activeCustomTheme === 'giagoan' ? "Trình" : activeCustomTheme === 'nhatky' ? "Ghi" : activeCustomTheme === 'thuytien' ? "Soi" : "Gửi";
+  const tParagraphLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : activeCustomTheme === 'nhatky' ? "Đăng nhập để lại bút tích" : activeCustomTheme === 'thuytien' ? "Đăng nhập để tự soi bóng" : "Đăng nhập để bình luận";
+  const tCommentAreaTitle = activeCustomTheme === 'homer' ? "Báo cáo sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đề xuất và ý kiến" : activeCustomTheme === 'nhatky' ? "Dấu vết bút tích chương" : activeCustomTheme === 'thuytien' ? "Mặt hồ tự chiêm ngưỡng" : "Bình luận chương";
+  const tCommentAreaPlaceholder = activeCustomTheme === 'homer' ? "Nhập sóng phản hồi của bạn..." : activeCustomTheme === 'giagoan' ? "Nhập đề xuất và ý kiến của bạn..." : activeCustomTheme === 'nhatky' ? "Nhập bút tích thương nhớ của bạn..." : activeCustomTheme === 'thuytien' ? "Khắc ghi dòng chiêm ngưỡng bản thân bên bờ nước thẳm..." : "Nhập bình luận của bạn...";
+  const tCommentAreaPlaceholderLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phát sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : activeCustomTheme === 'nhatky' ? "Đăng nhập để ghi lại dòng hoài niệm" : activeCustomTheme === 'thuytien' ? "Đăng nhập để ca tụng dung nhan chính mình" : "Đăng nhập để bình luận";
+  const tCommentSubmit = activeCustomTheme === 'homer' ? "Phát sóng" : activeCustomTheme === 'giagoan' ? "Trình ý kiến" : activeCustomTheme === 'nhatky' ? "Khắc ghi bút tích" : activeCustomTheme === 'thuytien' ? "Khắc lời tự chiêm" : "Gửi bình luận";
+  const tNoComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào." : activeCustomTheme === 'giagoan' ? "Chưa có đề xuất và ý kiến nào cho tài liệu này." : activeCustomTheme === 'nhatky' ? "Trang ký ức này chưa lưu lại nét bút nào." : activeCustomTheme === 'thuytien' ? "Mặt hồ phẳng lặng chưa ghi nhận lời tự chiêm ngưỡng nào..." : "Chưa có bình luận nào cho chương này.";
 
   return (
     <div className={cn(
       "min-h-screen transition-colors duration-500 pb-32 font-medium flex flex-col items-center",
       isCustomThemeActive 
-        ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#C9B695] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#D5C2A5] via-[#C9B695] to-[#BCA782] text-[#2C1814] font-serif" : "bg-[#13120d] text-[#dbcec2]")
+        ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#C9B695] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#D5C2A5] via-[#C9B695] to-[#BCA782] text-[#2C1814] font-serif" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#3D362E] via-[#12110F] to-[#12110F] text-[#F2E6D0] font-serif" : "bg-[#13120d] text-[#dbcec2]")
         : effectiveIsDark 
           ? "bg-[#1A1412] text-[#ECE5DC]" 
           : "bg-[#FDF6EC] text-[#3E2723]"
@@ -1080,23 +1094,26 @@ export function Reader() {
                    ? 'repeating-linear-gradient(45deg, #2d3745 0, #2d3745 1px, transparent 1px, transparent 60px)'
                   : activeCustomTheme === 'nhatky'
                   ? 'repeating-linear-gradient(45deg, #BCA782 0, #BCA782 1px, transparent 1px, transparent 80px)'
+                  : activeCustomTheme === 'thuytien'
+                  ? 'repeating-linear-gradient(45deg, #B6A996 0, #B6A996 1px, transparent 1px, transparent 100px)'
                   : 'repeating-linear-gradient(45deg, #2e2a63 0, #2e2a63 1px, transparent 1px, transparent 50px)' }} />
            <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-30 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#D5C2A5' } : { backgroundColor: '#2e2a63' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#D5C2A5' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#3D362E' } : { backgroundColor: '#2e2a63' }} />
            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[180px] opacity-10 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#BCA782' } : { backgroundColor: '#bbee1f' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#BCA782' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#B6A996' } : { backgroundColor: '#bbee1f' }} />
          </>
        )}
        {/* Top Navigation */}
        <header className={cn("w-full sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b-2 transition-all duration-300 shadow-sm relative",
           isCustomThemeActive
-            ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/90 border-[#47515f] backdrop-blur-md" : activeCustomTheme === 'nhatky' ? "bg-[#DFCEB4]/90 border-[#BCA782] text-[#2C1814] backdrop-blur-md" : "bg-[#13120d]/90 border-[#2e2a63] backdrop-blur-md")
+            ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/90 border-[#47515f] backdrop-blur-md" : activeCustomTheme === 'nhatky' ? "bg-[#DFCEB4]/90 border-[#BCA782] text-[#2C1814] backdrop-blur-md" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/90 border-[#B6A996]/30 text-[#F2E6D0] backdrop-blur-md" : "bg-[#13120d]/90 border-[#2e2a63] backdrop-blur-md")
             : effectiveIsDark ? "bg-[#1A1412]/90 border-[#3E2723] backdrop-blur-md" : "bg-[#FDF6EC]/90 border-[#D7CCC8] backdrop-blur-md"
        )}>
           <button onClick={() => navigate(`/truyen/${story.slug || story.id}`)} className={cn("p-2 rounded-xl border-2 transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none",
              isCustomThemeActive ? (
                 activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
                 activeCustomTheme === 'nhatky' ? "border-[#BCA782]/50 bg-[#E8DCC4] hover:bg-[#DFCEB4] hover:border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" :
+                activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#3D362E]" :
                 "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
              ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
           )}>
@@ -1113,6 +1130,7 @@ export function Reader() {
                 isCustomThemeActive ? (
                    activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
                    activeCustomTheme === 'nhatky' ? "border-[#BCA782]/50 bg-[#E8DCC4] hover:bg-[#DFCEB4] hover:border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" :
+                   activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#3D362E]" :
                    "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
                 ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
              )}>
@@ -1125,16 +1143,17 @@ export function Reader() {
                     isCustomThemeActive ? (
                        activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3] border-[#47515f] font-reading-garamond shadow-lg" :
                        activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] text-[#2C1814] border-[#BCA782] font-reading-cormorant shadow-2xl" :
+                       activeCustomTheme === 'thuytien' ? "bg-[#12110F] text-[#F2E6D0] border-[#3D362E] font-reading-cormorant shadow-lg" :
                        "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] font-reading-garamond shadow-lg"
                     ) : effectiveIsDark ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723]" : "bg-[#FFFDF9] text-[#3E2723] border-[#3E2723]"
                 )}>
-                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#E8DCB8]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#ECE5DC]" : "text-[#3E2723]"))}>Cài đặt</h3>
+                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#E8DCB8]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#ECE5DC]" : "text-[#3E2723]"))}>Cài đặt</h3>
                    <div className="flex flex-col gap-6">
                       {hasCustomTheme && (
-                         <div className={cn("flex flex-col gap-2 pb-4 border-b-2 border-dashed", activeCustomTheme === 'homer' ? 'border-[#47515f]/20' : activeCustomTheme === 'nhatky' ? 'border-[#BCA782]/30' : 'border-[#2e2a63]/20')}>
-                            <label className={cn("text-xs font-black uppercase flex items-center justify-between", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#E8DCB8]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>
+                         <div className={cn("flex flex-col gap-2 pb-4 border-b-2 border-dashed", activeCustomTheme === 'homer' ? 'border-[#47515f]/20' : activeCustomTheme === 'nhatky' ? 'border-[#BCA782]/30' : activeCustomTheme === 'thuytien' ? 'border-[#B6A996]/20' : 'border-[#2e2a63]/20')}>
+                            <label className={cn("text-xs font-black uppercase flex items-center justify-between", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#E8DCB8]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>
                                Giao diện truyện
-                               {activeCustomTheme === 'homer' ? <span className="text-[9px] bg-[#a0a6b3] text-[#181f2d] font-bold px-1.5 py-0.5 rounded border border-[#a0a6b3]">PREMIUM</span> : activeCustomTheme === 'nhatky' ? <span className="text-[9px] bg-[#DFCEB4] text-[#2C1814] font-bold px-1.5 py-0.5 rounded border border-[#BCA782]">PREMIUM</span> : <span className="text-[9px] bg-[#bbee1f] text-[#13120d] font-bold px-1.5 py-0.5 rounded border border-[#bbee1f]">PREMIUM</span>}
+                               {activeCustomTheme === 'homer' ? <span className="text-[9px] bg-[#a0a6b3] text-[#181f2d] font-bold px-1.5 py-0.5 rounded border border-[#a0a6b3]">PREMIUM</span> : activeCustomTheme === 'nhatky' ? <span className="text-[9px] bg-[#DFCEB4] text-[#2C1814] font-bold px-1.5 py-0.5 rounded border border-[#BCA782]">PREMIUM</span> : activeCustomTheme === 'thuytien' ? <span className="text-[9px] bg-[#B6A996] text-[#12110F] font-bold px-1.5 py-0.5 rounded border border-[#B6A996]">PREMIUM</span> : <span className="text-[9px] bg-[#bbee1f] text-[#13120d] font-bold px-1.5 py-0.5 rounded border border-[#bbee1f]">PREMIUM</span>}
                             </label>
                             <button 
                                type="button"
@@ -1142,7 +1161,7 @@ export function Reader() {
                                className={cn(
                                   "w-full py-2 text-xs font-black uppercase rounded-xl border-2 transition-all cursor-pointer",
                                   useStoryTheme
-                                     ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[2px_2px_0_0_#C9B695] hover:bg-[#C9B695]" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white") 
+                                     ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[2px_2px_0_0_#C9B695] hover:bg-[#C9B695]" : activeCustomTheme === 'thuytien' ? "bg-[#B6A996] text-[#12110F] border-[#3D362E] shadow-[2px_2px_0_0_#3D362E] hover:bg-[#F2E6D0]" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white") 
                                      : (effectiveIsDark ? "bg-[#2C221D] text-[#ECE5DC] border-[#3E2723] hover:bg-[#3E2723]" : "bg-white text-[#3E2723] border-[#3E2723] hover:bg-stone-100")
                                )}
                             >
