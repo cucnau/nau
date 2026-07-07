@@ -33,14 +33,19 @@ export function TinhYeuThuyTienTheme(props: ThemeProps) {
 
   // Thần thoại Hy Lạp & Ái tình tự luyến tột cùng của Narcissus
   const reflections = [
-    "“Hỡi dung nhan tuyệt mỹ khôn cùng dưới làn nước lạnh, thế gian làm sao có thể sánh được với bóng hình tiên tử của chính ta?”",
-    "“Cớ sao mỗi lần ta cúi xuống trao nụ hôn thành kính, ngươi lại tan vỡ thành muôn vàn vòng sóng xao động rồi lẩn tránh ta?”",
-    "“Ta tự say đắm bóng hình của chính mình. Sự kiêu hãnh của cõi trần gian đều phải cúi đầu trước nhan sắc thần thánh này.”",
-    "“Không một tiên nữ hay phàm nhân nào xứng đáng có được ái tình này. Ta nguyện dâng hiến cả sinh mệnh để ôm lấy bóng mình dưới đáy suối thẳm.”",
-    "“Yêu một bóng hình hư ảo, tự si mê chính sinh mệnh mình, đó không phải là lời nguyền, đó là đặc ân tuyệt diệu nhất của tạo hóa.”",
-    "Đóa hoa Thủy Tiên muôn đời soi bóng xuống dòng nước lặng, mọc lên từ nơi trái tim rực cháy ngọn lửa tự luyến của Narcissus.",
-    "“Thần chết có thể mang đi hơi thở, nhưng vĩnh viễn không thể cướp đi sự sùng bái tuyệt đối mà ta dành cho bản thân.”",
-    "“Chạm khẽ vào bóng gương soi, ta thấy cả thiên đường và địa ngục, tất cả đều tan chảy trong ánh mắt si mê của chính ta dành cho mình.”"
+    "Narcissus không đứng dậy, cứ thế ngồi nghiêng trên bãi cỏ, mái tóc dài mềm mại của chàng lay động ánh vàng lấp lánh, xõa xuống như rong biển bung nở, chúng bao bọc lấy chiếc cổ mảnh khảnh trắng lạnh của chàng, tựa như những sợi vàng ròng len lỏi vào mạch khoáng của đá ngọc.",
+    "Ánh lửa nhảy múa dữ tợn trên khuôn mặt chàng, như một đám yêu quái nhỏ cười đùa, tổ lên khuôn mặt sâu thẳm lớp sơn màu vàng cam, nồng đậm rực rỡ vô cùng.\nHàng mi dài mảnh là chiếc cọ dày, vẽ bóng râm lên làn da trắng nõn, ánh sáng vụn vỡ loang lổ run rẩy rơi xuống.",
+    "Băng đô lụa buộc lại mái tóc dài của Narcissus, chàng đứng dậy dưới ánh đèn dầu mỡ cừu.\nLàn da trắng lạnh ửng lên sắc hồng nhạt, màu vàng kim vụn vỡ và màu xanh nước trong suốt quấn quýt, đôi mắt xanh lục lấp lánh ánh sóng tuyệt đẹp, đổi môi tựa hoa hồng.",
+    "Chàng phanh cổ áo, để lộ yết hầu, rồi cởi bỏ áo ngoài, người Hy Lạp cổ đại vốn tổn sùng vẻ đẹp của cơ thể trần trụi. Tuy làn da chàng trắng lạnh, nhưng khi những giọt mồ hôi li ti bám vào, các thớ cơ lại hiện lên vẻ bóng bẩy như được thoa dâu.",
+    "Bóng hoa diên vĩ vàng in hằn trong những gợn sóng lăn tăn, nó thoáng thấy vệt đỏ nhạt hiện lên trên làn da trắng lạnh, khẽ cười nhạo lại thêm một kẻ ngốc rơi vào lưới tình.",
+    "Trong phút chốc, kẻ cao ngạo đã bị khuất phục.\nThế giới dường như nổ tung thành vô số mảnh vụn, vĩnh viễn không thể cứu vãn.",
+    "Người đó lặng lẽ giấu đi đôi mắt gieo rắc mộng ảo, có lẽ là vì thẹn thùng. Hàng mi thanh mảnh vẽ nên vẻ đẹp tinh tế, có ai đó đã dệt vàng ròng nóng chảy thành mái tóc dài của người đó, dùng ngọc lục bảo thượng hạng làm đôi mắt, lắng đọng vẻ sang trọng tràn ngập tầm nhìn.",
+    "Narcissus cổ độc nằm bò bên bờ nước, sự mờ mịt xen lẫn nỗi u sầu, nỗi buồn không thể diễn tả bằng lời đang điên cuồng nảy nở.\nChàng thậm chí còn khóc thành tiếng, nguyền rủa đôi tay mình, không những không ôm được người trong mộng mà còn đẩy người đó ra xa.",
+    "Sau đó, Narcissus không ngừng thốt ra đủ loại lời đường mật, chàng đã trở thành loại người mà mình ghét nhất, loại ngu ngốc đó. Chàng lục lọi hết tâm trí, cuồng nhiệt bày tỏ tình yêu của mình.",
+    "Những hạt ngọc xinh đẹp sau khi ngấm nước càng thêm long lanh trong suốt, kéo theo những sợi nước li ti.\nNhững giọt nước tiếp tục rơi xuống.\nNgười đẹp tóc vàng lại trở nên mờ ảo.",
+    "Thế là chàng bất chấp tất cả cúi xuống hồn, hình bóng phản chiếu cũng hồn chàng. Dù động tác có nồng cháy đến đâu, thứ chàng nhận được cũng chỉ là sự ẩm ướt lạnh lẽo, nó thấm đẫm trái tim chàng, phải chăng mũi tên tình yêu của Cupid đã bắn trúng chàng? Tình yêu ngọt ngào mang lại từ thứ kim loại lạnh lẽo đó. Lúc này linh hồn chàng tràn ngập tình ý nồng nàn.",
+    "Chàng không quan tâm.\nChàng không cần lo lắng liệu có nhận được sự thương hại của người trong mộng hay không.\nChàng yêu chính mình.\nChắc chắn là vậy.",
+    "\"Ta sẽ yêu ngươi cho đến chết cũng không thay lòng.\"\nThế là, chàng nói với hình bóng phản chiếu của mình như vậy."
   ];
 
   const [reflectionIdx, setReflectionIdx] = useState(0);
@@ -323,7 +328,7 @@ export function TinhYeuThuyTienTheme(props: ThemeProps) {
                   </svg>
                 </div>
 
-                <p className={`text-base md:text-lg text-[#F2E6D0] italic font-serif leading-relaxed tracking-wide text-center relative z-10 max-w-lg transition-all duration-500 ${isRippling ? 'opacity-0 scale-95 blur-sm' : 'opacity-100 scale-100'}`}>
+                <p className={`text-base md:text-lg text-[#F2E6D0] italic font-serif leading-relaxed tracking-wide text-center relative z-10 max-w-lg transition-all duration-500 whitespace-pre-line ${isRippling ? 'opacity-0 scale-95 blur-sm' : 'opacity-100 scale-100'}`}>
                   {reflections[reflectionIdx]}
                 </p>
               </div>
