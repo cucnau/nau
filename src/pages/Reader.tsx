@@ -1200,7 +1200,7 @@ export function Reader() {
                        ? (activeCustomTheme === 'homer'
                            ? "prose-p:text-[#a0a6b3] prose-h2:text-[#a0a6b3] prose-blockquote:border-[#47515f] prose-blockquote:text-[#67707e]"
                            : activeCustomTheme === 'nhatky'
-                               ? "prose-p:text-[#DFD6D3] prose-h2:text-[#E8DCB8] prose-blockquote:border-[#4E3E39] prose-blockquote:text-[#8E7E7A]"
+                               ? "prose-p:text-[#2C1814] prose-h2:text-[#2C1814] prose-blockquote:border-[#BCA782] prose-blockquote:text-[#2C1814]/80"
                                : "prose-p:text-[#dbcec2] prose-h2:text-[#bbee1f] prose-blockquote:border-[#2e2a63] prose-blockquote:text-[#695b7f]")
                        : effectiveIsDark 
                            ? "prose-p:text-[#ECE5DC] prose-h2:text-[#ECE5DC] prose-blockquote:text-[#D7CCC8]"
@@ -1230,7 +1230,7 @@ export function Reader() {
 
                            {activeParagraphIndex === idx && (
                                <div className={cn("mt-4 p-5 rounded-2xl border-2 transition-all", 
-                                    isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/95 border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#1E1614]/95 border-[#4E3E39] text-[#DFD6D3] shadow-[2px_2px_0_0_#4E3E39]" : "bg-[#13120d]/95 border-[#2e2a63] text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]") 
+                                    isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/95 border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : "bg-[#13120d]/95 border-[#2e2a63] text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]") 
                                        : effectiveIsDark 
                                           ? "bg-[#120E0C] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]" 
                                           : "bg-[#FFFDF9] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]"
