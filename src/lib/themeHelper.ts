@@ -1,7 +1,7 @@
 // Theme helper to detect custom themes based on story properties, document IDs, or slugs.
 
 // A static mapping for known story IDs to avoid waiting for title load or cache load.
-const staticIdToThemeMap: Record<string, 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap'> = {
+const staticIdToThemeMap: Record<string, 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap' | 'thientai'> = {
   'huXx6uVvZbgNiE7ExoKo': 'homer',
   'TekklEWE3Eli1YFuyE5z': 'nhatky',
   'TyIFHdGAqP7LMXAhL44k': 'giagoan',
@@ -11,7 +11,7 @@ const staticIdToThemeMap: Record<string, 'giagoan' | 'homer' | 'nhatky' | 'thuyt
 };
 
 // A small local memory cache to remember Firestore IDs mapping to themes
-const idThemeCache: Record<string, 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap'> = {};
+const idThemeCache: Record<string, 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap' | 'thientai'> = {};
 
 // Try to load cached mappings from localStorage on startup
 try {
@@ -23,7 +23,7 @@ try {
   console.warn('Failed to load theme mappings from localStorage', e);
 }
 
-export function saveStoryThemeMapping(storyId: string, theme: 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap') {
+export function saveStoryThemeMapping(storyId: string, theme: 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap' | 'thientai') {
   if (!storyId || !theme) return;
   idThemeCache[storyId] = theme;
   try {
@@ -36,7 +36,7 @@ export function saveStoryThemeMapping(storyId: string, theme: 'giagoan' | 'homer
 export function detectStoryTheme(
   storyTitle?: string,
   storyIdOrSlug?: string
-): 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap' | null {
+): 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap' | 'thientai' | null {
   // 1. Check static ID mapping first (instant match for known IDs)
   if (storyIdOrSlug && staticIdToThemeMap[storyIdOrSlug]) {
     return staticIdToThemeMap[storyIdOrSlug];
@@ -68,6 +68,10 @@ export function detectStoryTheme(
       if (storyIdOrSlug) saveStoryThemeMapping(storyIdOrSlug, 'rinhrap');
       return 'rinhrap';
     }
+    if (rawTitle.includes('thien tai thao tac') || normalizedTitle.includes('thien tai thao tac') || rawTitle.includes('thiên tài thao tác')) {
+      if (storyIdOrSlug) saveStoryThemeMapping(storyIdOrSlug, 'thientai');
+      return 'thientai';
+    }
   }
 
   // 3. Check slug / ID text
@@ -88,11 +92,14 @@ export function detectStoryTheme(
     if (lower.includes('rinh-rap') || lower.includes('rinhrap') || lower === 'rinhrap') {
       return 'rinhrap';
     }
+    if (lower.includes('thien-tai') || lower.includes('thientai') || lower.includes('thao-tac') || lower === 'thientai') {
+      return 'thientai';
+    }
 
     // 4. Check memory/localStorage cache for document ID
     if (idThemeCache[storyIdOrSlug]) {
       const cached = idThemeCache[storyIdOrSlug];
-      if (['giagoan', 'homer', 'nhatky', 'thuytien', 'rinhrap'].includes(cached as string)) {
+      if (['giagoan', 'homer', 'nhatky', 'thuytien', 'rinhrap', 'thientai'].includes(cached as string)) {
         return cached;
       }
     }
