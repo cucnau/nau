@@ -15,6 +15,7 @@ import { CanhCuaHomerTheme } from './themes/CanhCuaHomer';
 import { NhatKyKhongTenTheme } from './themes/NhatKyKhongTen';
 import { TinhYeuThuyTienTheme } from './themes/TinhYeuThuyTien';
 import { RinhRapTheme } from './themes/RinhRap';
+import { ThienTaiThaoTacTheme } from './themes/ThienTaiThaoTac';
 import { detectStoryTheme } from '../lib/themeHelper';
 
 interface CommentNodeProps {
@@ -355,12 +356,37 @@ export function StoryView() {
     const activeCustomTheme = detectStoryTheme(story?.title, id);
     
     if (activeCustomTheme === 'rinhrap') {
+      const rinhrapMode = (localStorage.getItem('reader-rinhrap-mode') as 'thodo' | 'thotrang') || 'thodo';
+      if (rinhrapMode === 'thotrang') {
+        return (
+          <div className="min-h-screen bg-[#fff2f1] text-[#780606] flex flex-col items-center justify-center p-4 font-sans">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-12 h-12 border-4 border-[#facaca] border-t-[#780606] rounded-full animate-spin" />
+              <div className="text-xs uppercase tracking-[0.2em] text-[#780606] animate-pulse font-black">
+                ĐANG QUÉT MÀN CHƠI RÌNH RẬP...
+              </div>
+            </div>
+          </div>
+        );
+      }
       return (
         <div className="min-h-screen bg-[#0B0505] text-[#D8B4B4] flex flex-col items-center justify-center p-4 font-sans">
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 border-4 border-[#450A0A] border-t-[#EF4444] rounded-full animate-spin" />
             <div className="text-xs uppercase tracking-[0.2em] text-[#EF4444] animate-pulse font-black">
-              ĐANG TẢI DỮ LIỆU...
+              ĐANG QUÉT MÀN CHƠI RÌNH RẬP...
+            </div>
+          </div>
+        </div>
+      );
+    }
+    if (activeCustomTheme === 'thientai') {
+      return (
+        <div className="min-h-screen bg-[#060406] text-[#d4c6c9] flex flex-col items-center justify-center p-4 font-mono animate-fade-in">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#34282d] border-t-[#9a858d] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#9a858d] animate-pulse font-extrabold">
+              THẦN THỤ OS // ĐANG TẢI THIÊN TÀI THAO TÁC...
             </div>
           </div>
         </div>
@@ -727,7 +753,7 @@ export function StoryView() {
   }
 
   const currentTheme = detectStoryTheme(story.title, id);
-  if (currentTheme === 'nhatky' || currentTheme === 'thuytien' || currentTheme === 'rinhrap') {
+  if (currentTheme === 'nhatky' || currentTheme === 'thuytien' || currentTheme === 'rinhrap' || currentTheme === 'thientai') {
     const themeProps: ThemeProps = {
       story,
       actualStoryId,
@@ -776,6 +802,9 @@ export function StoryView() {
     }
     if (currentTheme === 'rinhrap') {
       return <RinhRapTheme {...themeProps} />;
+    }
+    if (currentTheme === 'thientai') {
+      return <ThienTaiThaoTacTheme {...themeProps} />;
     }
     return <NhatKyKhongTenTheme {...themeProps} />;
   }
