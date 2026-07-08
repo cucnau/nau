@@ -18,7 +18,8 @@ const getThemeBorderClass = (theme: string) => {
   if (theme === 'homer') return "border-[#47515f]/20";
   if (theme === 'nhatky') return "border-[#BCA782]/40";
   if (theme === 'thuytien') return "border-[#B6A996]/30";
-  if (theme === 'rinhrap') return "border-[#7F1D1D]/30";
+  if (theme === 'rinhrap-thotrang') return "border-[#823323]/30";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "border-[#7F1D1D]/30";
   return "border-[#2e2a63]/20"; // giagoan
 };
 
@@ -26,7 +27,8 @@ const getThemeBgBorderTextClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d]/50 border-[#47515f]/50 text-[#a0a6b3] shadow-[1px_1px_0_0_#47515f]";
   if (theme === 'nhatky') return "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[1px_1px_0_0_#C9B695]";
   if (theme === 'thuytien') return "bg-[#3D362E]/60 border-[#B6A996]/50 text-[#F2E6D0] shadow-[1px_1px_0_0_#12110F] outline outline-1 outline-[#B6A996]/20 outline-offset-[-4px]";
-  if (theme === 'rinhrap') return "bg-[#0B0505]/60 border-[#7F1D1D]/50 text-[#D8B4B4] shadow-[1px_1px_0_0_#450A0A]";
+  if (theme === 'rinhrap-thotrang') return "bg-[#fde0e0]/80 border-[#823323]/50 text-[#000000] shadow-[1px_1px_0_0_#facaca]";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#0B0505]/60 border-[#7F1D1D]/50 text-[#D8B4B4] shadow-[1px_1px_0_0_#450A0A]";
   return "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]"; // giagoan
 };
 
@@ -34,7 +36,8 @@ const getThemeAvatarFallbackIconClass = (theme: string) => {
   if (theme === 'homer') return "w-4 h-4 text-[#a0a6b3]";
   if (theme === 'nhatky') return "w-4 h-4 text-[#2C1814]";
   if (theme === 'thuytien') return "w-4 h-4 text-[#F2E6D0]";
-  if (theme === 'rinhrap') return "w-4 h-4 text-[#EF4444]";
+  if (theme === 'rinhrap-thotrang') return "w-4 h-4 text-[#780606]";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "w-4 h-4 text-[#EF4444]";
   return "w-4 h-4 text-[#bbee1f]"; // giagoan
 };
 
@@ -42,7 +45,8 @@ const getThemeAvatarBorderClass = (theme: string) => {
   if (theme === 'homer') return "border border-[#47515f]/50";
   if (theme === 'nhatky') return "border border-[#BCA782]/80";
   if (theme === 'thuytien') return "border border-[#B6A996]/50";
-  if (theme === 'rinhrap') return "border border-[#7F1D1D]/50";
+  if (theme === 'rinhrap-thotrang') return "border border-[#823323]/50";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "border border-[#7F1D1D]/50";
   return "border border-[#2e2a63]/50"; // giagoan
 };
 
@@ -50,7 +54,8 @@ const getThemeAvatarBgClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d]";
   if (theme === 'nhatky') return "bg-[#DFCEB4]";
   if (theme === 'thuytien') return "bg-[#12110F]";
-  if (theme === 'rinhrap') return "bg-[#0B0505]";
+  if (theme === 'rinhrap-thotrang') return "bg-[#fff2f1]";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#0B0505]";
   return "bg-[#13120d]"; // giagoan
 };
 
@@ -58,7 +63,8 @@ const getThemeAccentTextColor = (theme: string) => {
   if (theme === 'homer') return "#a0a6b3";
   if (theme === 'nhatky') return "#2C1814";
   if (theme === 'thuytien') return "#B6A996";
-  if (theme === 'rinhrap') return "#EF4444";
+  if (theme === 'rinhrap-thotrang') return "#9c0800";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "#EF4444";
   return "#bbee1f"; // giagoan
 };
 
@@ -66,7 +72,8 @@ const getThemeTitleBadgeClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#47515f] text-[#a0a6b3] border-[#67707e]/40";
   if (theme === 'nhatky') return "bg-[#DFCEB4] text-[#2C1814] border-[#BCA782]/40";
   if (theme === 'thuytien') return "bg-[#3D362E] text-[#F2E6D0] border-[#B6A996]/30";
-  if (theme === 'rinhrap') return "bg-[#7F1D1D] text-white border-[#EF4444]/40";
+  if (theme === 'rinhrap-thotrang') return "bg-[#facaca] text-[#780606] border-[#823323]/40";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#7F1D1D] text-white border-[#EF4444]/40";
   return "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40"; // giagoan
 };
 
@@ -74,7 +81,8 @@ const getThemeSubTextColor = (theme: string) => {
   if (theme === 'homer') return "text-[#67707e]";
   if (theme === 'nhatky') return "text-[#5C3627]/80";
   if (theme === 'thuytien') return "text-[#B6A996]";
-  if (theme === 'rinhrap') return "text-[#991B1B]";
+  if (theme === 'rinhrap-thotrang') return "text-[#780606]";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-[#991B1B]";
   return "text-[#695b7f]"; // giagoan
 };
 
@@ -82,7 +90,8 @@ const getThemeGiftBadgeClass = (theme: string) => {
   if (theme === 'homer') return "text-[#181f2d] bg-[#a0a6b3] border-[#a0a6b3]/50";
   if (theme === 'nhatky') return "text-[#2C1814] bg-[#DFCEB4] border-[#BCA782]/50";
   if (theme === 'thuytien') return "text-[#12110F] bg-[#B6A996] border-[#B6A996]/50";
-  if (theme === 'rinhrap') return "text-white bg-[#7F1D1D] border-[#7F1D1D]/50";
+  if (theme === 'rinhrap-thotrang') return "text-[#780606] bg-[#facaca] border-[#823323]/50";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-white bg-[#7F1D1D] border-[#7F1D1D]/50";
   return "text-[#13120d] bg-[#bbee1f] border-[#bbee1f]/50"; // giagoan
 };
 
@@ -90,7 +99,8 @@ const getThemeContentTextColor = (theme: string) => {
   if (theme === 'homer') return "text-[#a0a6b3]";
   if (theme === 'nhatky') return "text-[#2C1814]";
   if (theme === 'thuytien') return "text-[#F2E6D0]";
-  if (theme === 'rinhrap') return "text-[#D8B4B4]";
+  if (theme === 'rinhrap-thotrang') return "text-[#000000]";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-[#D8B4B4]";
   return "text-[#dbcec2]"; // giagoan
 };
 
@@ -98,7 +108,8 @@ const getThemeReplyButtonClass = (theme: string) => {
   if (theme === 'homer') return "text-[#67707e] hover:text-[#a0a6b3]";
   if (theme === 'nhatky') return "text-[#5C3627] hover:text-[#2C1814]";
   if (theme === 'thuytien') return "text-[#B6A996] hover:text-[#F2E6D0]";
-  if (theme === 'rinhrap') return "text-[#991B1B] hover:text-[#EF4444]";
+  if (theme === 'rinhrap-thotrang') return "text-[#823323] hover:text-[#9c0800]";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-[#991B1B] hover:text-[#EF4444]";
   return "text-[#695b7f] hover:text-[#bbee1f]"; // giagoan
 };
 
@@ -106,7 +117,8 @@ const getThemeInputClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]";
   if (theme === 'nhatky') return "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695]";
   if (theme === 'thuytien') return "bg-[#12110F] border-[#B6A996]/30 text-[#F2E6D0] focus:border-[#B6A996]";
-  if (theme === 'rinhrap') return "bg-[#0B0505] border-[#7F1D1D] text-[#D8B4B4] focus:border-[#EF4444]";
+  if (theme === 'rinhrap-thotrang') return "bg-[#fff2f1] border-[#823323] text-[#000000] focus:border-[#9c0800]";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#0B0505] border-[#7F1D1D] text-[#D8B4B4] focus:border-[#EF4444]";
   return "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]"; // giagoan
 };
 
@@ -114,7 +126,8 @@ const getThemeSendButtonClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#a0a6b3] hover:bg-white text-[#181f2d] border-[#47515f] disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none";
   if (theme === 'nhatky') return "bg-[#BCA782] hover:bg-[#C9B695] text-[#2C1814] border-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none";
   if (theme === 'thuytien') return "bg-[#B6A996] hover:bg-[#F2E6D0] text-[#12110F] border-[#B6A996] disabled:opacity-30 disabled:shadow-none";
-  if (theme === 'rinhrap') return "bg-[#7F1D1D] hover:bg-[#991B1B] text-white border-[#450A0A] disabled:bg-[#7F1D1D]/20 disabled:text-white/40 disabled:border-[#450A0A]/50 disabled:shadow-none";
+  if (theme === 'rinhrap-thotrang') return "bg-[#facaca] hover:bg-[#fff2f1] text-[#780606] border-[#823323] disabled:bg-[#facaca]/20 disabled:text-[#780606]/40 disabled:border-[#823323]/50 disabled:shadow-none";
+  if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#7F1D1D] hover:bg-[#991B1B] text-white border-[#450A0A] disabled:bg-[#7F1D1D]/20 disabled:text-white/40 disabled:border-[#450A0A]/50 disabled:shadow-none";
   return "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none"; // giagoan
 };
 
@@ -531,6 +544,14 @@ export function Reader() {
     const saved = localStorage.getItem('reader-use-story-theme');
     return saved !== null ? saved === 'true' : true;
   });
+
+  const [rinhrapMode, setRinhrapMode] = useState<'thodo' | 'thotrang'>(() => {
+    return (localStorage.getItem('reader-rinhrap-mode') as 'thodo' | 'thotrang') || 'thodo';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('reader-rinhrap-mode', rinhrapMode);
+  }, [rinhrapMode]);
 
   useEffect(() => {
     localStorage.setItem('reader-use-story-theme', String(useStoryTheme));
@@ -1079,6 +1100,7 @@ export function Reader() {
 
   const hasCustomTheme = !!activeCustomTheme;
   const isCustomThemeActive = !!(hasCustomTheme && useStoryTheme);
+  const effectiveStoryTheme = activeCustomTheme === 'rinhrap' ? `rinhrap-${rinhrapMode}` : activeCustomTheme;
   const effectiveIsDark = isCustomThemeActive ? false : isDark; // Với theme nhatky sáng màu, ta chuyển effectiveIsDark thành false để tránh xung đột prose-invert
   const effectiveFontFamily = isCustomThemeActive ? (
     activeCustomTheme === 'homer' ? 'font-reading-iosevka' : 
@@ -1109,7 +1131,7 @@ export function Reader() {
     <div className={cn(
       "min-h-screen transition-colors duration-500 pb-32 font-medium flex flex-col items-center",
       isCustomThemeActive 
-        ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#C9B695] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#D5C2A5] via-[#C9B695] to-[#BCA782] text-[#2C1814] font-serif" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#2E251E] via-[#12110F] to-[#12110F] text-[#EADDC9] font-serif" : activeCustomTheme === 'rinhrap' ? "bg-[#0B0505] text-[#D8B4B4] font-sans" : "bg-[#13120d] text-[#dbcec2]")
+        ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#C9B695] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#D5C2A5] via-[#C9B695] to-[#BCA782] text-[#2C1814] font-serif" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#2E251E] via-[#12110F] to-[#12110F] text-[#EADDC9] font-serif" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] text-[#000000] font-sans" : "bg-[#0B0505] text-[#D8B4B4] font-sans") : "bg-[#13120d] text-[#dbcec2]")
         : effectiveIsDark 
           ? "bg-[#1A1412] text-[#ECE5DC]" 
           : "bg-[#FDF6EC] text-[#3E2723]"
@@ -1136,12 +1158,14 @@ export function Reader() {
                   : activeCustomTheme === 'thuytien'
                   ? 'none'
                   : activeCustomTheme === 'rinhrap'
-                  ? 'repeating-linear-gradient(45deg, #7F1D1D 0, #7F1D1D 1px, transparent 1px, transparent 60px)'
+                  ? (rinhrapMode === 'thotrang'
+                     ? 'repeating-linear-gradient(45deg, #facaca 0, #facaca 1px, transparent 1px, transparent 60px)'
+                     : 'repeating-linear-gradient(45deg, #7F1D1D 0, #7F1D1D 1px, transparent 1px, transparent 60px)')
                   : 'repeating-linear-gradient(45deg, #2e2a63 0, #2e2a63 1px, transparent 1px, transparent 50px)' }} />
            <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-30 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#D5C2A5' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#2E251E' } : activeCustomTheme === 'rinhrap' ? { backgroundColor: '#450A0A' } : { backgroundColor: '#2e2a63' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#D5C2A5' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#2E251E' } : activeCustomTheme === 'rinhrap' ? { backgroundColor: rinhrapMode === 'thotrang' ? '#facaca' : '#450A0A' } : { backgroundColor: '#2e2a63' }} />
            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[180px] opacity-10 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#BCA782' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#9A8E7D' } : activeCustomTheme === 'rinhrap' ? { backgroundColor: '#991B1B' } : { backgroundColor: '#bbee1f' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#BCA782' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#9A8E7D' } : activeCustomTheme === 'rinhrap' ? { backgroundColor: rinhrapMode === 'thotrang' ? '#780606' : '#991B1B' } : { backgroundColor: '#bbee1f' }} />
          </>
        )}
        {/* Top Navigation */}
@@ -1222,7 +1246,7 @@ export function Reader() {
                       </div>
                       <div>
                          <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]/80" : activeCustomTheme === 'rinhrap' ? "text-[#7F1D1D]/80" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Cỡ chữ: {fontSize}px</label>
-                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className={cn("w-full accent-[#3E2723]", isCustomThemeActive && (activeCustomTheme === 'homer' ? "accent-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "accent-[#2C1814]" : activeCustomTheme === 'thuytien' ? "accent-[#B6A996]" : activeCustomTheme === 'rinhrap' ? "accent-[#991B1B]" : "accent-[#bbee1f]"))} />
+                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className={cn("w-full accent-[#3E2723]", isCustomThemeActive && (activeCustomTheme === 'homer' ? "accent-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "accent-[#2C1814]" : activeCustomTheme === 'thuytien' ? "accent-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "accent-[#780606]" : "accent-[#991B1B]") : "accent-[#bbee1f]"))} />
                       </div>
                       <div>
                          <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]/80" : activeCustomTheme === 'rinhrap' ? "text-[#7F1D1D]/80" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Phông chữ</label>
@@ -1326,7 +1350,7 @@ pComments.map(c => (
                                                     getTitleColor={getTitleColor} 
                                                     isLoggedIn={isLoggedIn} 
                                                     isDark={effectiveIsDark} 
-                                                    isStoryTheme={activeCustomTheme} 
+                                                    isStoryTheme={effectiveStoryTheme} 
                                                     profilesCache={profilesCache} 
                                                 />
                                             ))
@@ -1340,9 +1364,9 @@ pComments.map(c => (
                                                 value={paragraphCommentText} 
                                                 onChange={(e) => setParagraphCommentText(e.target.value)} 
                                                 placeholder={tParagraphPlaceholder} 
-                                                className={cn("flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/40 text-[#F2E6D0] focus:border-[#B6A996]" : activeCustomTheme === 'rinhrap' ? "bg-[#0B0505] border-[#7F1D1D] text-[#D8B4B4] focus:border-[#EF4444]" : "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}
+                                                className={cn("flex-1 px-3.5 py-2 text-xs sm:text-sm rounded-xl border-2 focus:outline-none focus:border-[#8D6E63] font-semibold", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/40 text-[#F2E6D0] focus:border-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] border-[#823323] text-[#000000] focus:border-[#9c0800]" : "bg-[#0B0505] border-[#7F1D1D] text-[#D8B4B4] focus:border-[#EF4444]") : "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}
                                            />
-                                           <button type="submit" disabled={!paragraphCommentText.trim()} className={cn("px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 transition-all active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[2px_2px_0_0_#3E2723]", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[2px_2px_0_0_#C9B695] hover:bg-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none" : activeCustomTheme === 'thuytien' ? "bg-[#B6A996] text-[#12110F] border-[#B6A996] shadow-[2px_2px_0_0_#12110F] hover:bg-[#F2E6D0] disabled:opacity-30 disabled:shadow-none" : activeCustomTheme === 'rinhrap' ? "bg-[#7F1D1D] text-[#FFF] border-[#450A0A] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#991B1B] disabled:bg-[#7F1D1D]/20 disabled:text-[#FFF]/40 disabled:border-[#450A0A]/50 disabled:shadow-none" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none") : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>{tParagraphSubmit}</button>
+                                           <button type="submit" disabled={!paragraphCommentText.trim()} className={cn("px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider border-2 transition-all active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[2px_2px_0_0_#3E2723]", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[2px_2px_0_0_#C9B695] hover:bg-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none" : activeCustomTheme === 'thuytien' ? "bg-[#B6A996] text-[#12110F] border-[#B6A996] shadow-[2px_2px_0_0_#12110F] hover:bg-[#F2E6D0] disabled:opacity-30 disabled:shadow-none" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#facaca] text-[#780606] border-[#823323] shadow-[2px_2px_0_0_#facaca] hover:bg-[#fff2f1] disabled:bg-[#facaca]/20 disabled:text-[#780606]/40 disabled:border-[#823323]/50 disabled:shadow-none" : "bg-[#7F1D1D] text-[#FFF] border-[#450A0A] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#991B1B] disabled:bg-[#7F1D1D]/20 disabled:text-[#FFF]/40 disabled:border-[#450A0A]/50 disabled:shadow-none") : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none") : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>{tParagraphSubmit}</button>
                                        </form>
                                     ) : (
                                        <div className="text-xs italic opacity-70 text-center">{tParagraphLogin}</div>
@@ -1356,13 +1380,13 @@ pComments.map(c => (
            {/* Navigation Buttons */}
            <div className="mt-16 mb-8 flex items-center justify-between">
               {prevChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#0E0C0A] border-[#9A8E7D]/40 text-[#EADDC9] shadow-[2px_2px_0_0_#0E0C0A] hover:bg-[#1C1A17]" : activeCustomTheme === 'rinhrap' ? "bg-[#0B0505] border-[#7F1D1D] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#100707]" : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
+                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#0E0C0A] border-[#9A8E7D]/40 text-[#EADDC9] shadow-[2px_2px_0_0_#0E0C0A] hover:bg-[#1C1A17]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] border-[#823323] text-[#780606] shadow-[2px_2px_0_0_#facaca] hover:bg-[#fde0e0]" : "bg-[#0B0505] border-[#7F1D1D] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#100707]") : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
                     <ArrowLeft className="w-5 h-5"/> {tPrevChapter}
                  </button>
               ) : <div></div>}
               
               {nextChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#0E0C0A] border-[#9A8E7D]/40 text-[#EADDC9] shadow-[2px_2px_0_0_#0E0C0A] hover:bg-[#1C1A17]" : activeCustomTheme === 'rinhrap' ? "bg-[#0B0505] border-[#7F1D1D] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#100707]" : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
+                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#0E0C0A] border-[#9A8E7D]/40 text-[#EADDC9] shadow-[2px_2px_0_0_#0E0C0A] hover:bg-[#1C1A17]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] border-[#823323] text-[#780606] shadow-[2px_2px_0_0_#facaca] hover:bg-[#fde0e0]" : "bg-[#0B0505] border-[#7F1D1D] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#100707]") : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
                     {tNextChapter} <ArrowRight className="w-5 h-5"/>
                  </button>
               ) : <div className="text-sm opacity-50 uppercase font-bold tracking-widest">Hết truyện</div>}
@@ -1372,18 +1396,18 @@ pComments.map(c => (
 
            {/* Comments Area (Counts for missions) */}
            <div className="mb-12">
-               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "border-[#47515f] bg-[#181f2d] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "border-[#BCA782] bg-[#E8DCC4] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "border-[#B6A996]/30 bg-[#12110F] text-[#B6A996] shadow-[2px_2px_0_0_#12110F]" : activeCustomTheme === 'rinhrap' ? "border-[#7F1D1D] bg-[#0B0505] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A]" : "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]") : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>{tCommentAreaTitle}</h3>
+               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "border-[#47515f] bg-[#181f2d] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "border-[#BCA782] bg-[#E8DCC4] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "border-[#B6A996]/30 bg-[#12110F] text-[#B6A996] shadow-[2px_2px_0_0_#12110F]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "border-[#823323] bg-[#fff2f1] text-[#780606] shadow-[2px_2px_0_0_#facaca]" : "border-[#7F1D1D] bg-[#0B0505] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A]") : "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]") : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>{tCommentAreaTitle}</h3>
                <form onSubmit={handleComment} className="flex flex-col gap-3 mb-8">
                   <textarea 
                      value={commentText}
                      onChange={(e) => setCommentText(e.target.value)}
                      disabled={!isLoggedIn}
                      placeholder={isLoggedIn ? tCommentAreaPlaceholder : tCommentAreaPlaceholderLogin}
-                     className={cn("w-full p-4 rounded-2xl resize-none border-2 outline-none font-semibold text-xs sm:text-sm transition-all", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3] focus:shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695] focus:shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] border-[#B6A996]/30 text-[#F2E6D0] focus:border-[#B6A996] focus:shadow-[2px_2px_0_0_#12110F]" : activeCustomTheme === 'rinhrap' ? "bg-[#0B0505] border-[#7F1D1D] text-[#D8B4B4] focus:border-[#EF4444] focus:shadow-[2px_2px_0_0_#450A0A]" : "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f] focus:shadow-[2px_2px_0_0_#2e2a63]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-white focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#000]" : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#3E2723]")}
+                     className={cn("w-full p-4 rounded-2xl resize-none border-2 outline-none font-semibold text-xs sm:text-sm transition-all", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3] focus:shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695] focus:shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] border-[#B6A996]/30 text-[#F2E6D0] focus:border-[#B6A996] focus:shadow-[2px_2px_0_0_#12110F]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] border-[#823323] text-[#000000] focus:border-[#9c0800] focus:shadow-[2px_2px_0_0_#facaca]" : "bg-[#0B0505] border-[#7F1D1D] text-[#D8B4B4] focus:border-[#EF4444] focus:shadow-[2px_2px_0_0_#450A0A]") : "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f] focus:shadow-[2px_2px_0_0_#2e2a63]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-white focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#000]" : "bg-white border-[#3E2723] text-[#3E2723] focus:border-[#8D6E63] focus:shadow-[2px_2px_0_0_#3E2723]")}
                      rows={4}
                   />
                   <div className="flex justify-end">
-                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-xl font-black transition-all uppercase text-xs tracking-wider border-2 active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[3px_3px_0_0_#3E2723]", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[3px_3px_0_0_#47515f] hover:bg-white disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[3px_3px_0_0_#C9B695] hover:bg-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none" : activeCustomTheme === 'thuytien' ? "bg-[#9A8E7D] text-[#0E0C0A] border-[#9A8E7D] shadow-[3px_3px_0_0_#0E0C0A] hover:bg-[#EADDC9] disabled:bg-[#9A8E7D]/20 disabled:text-[#EADDC9]/40 disabled:border-[#9A8E7D]/50 disabled:shadow-none" : activeCustomTheme === 'rinhrap' ? "bg-[#991B1B] text-white border-[#7F1D1D] shadow-[3px_3px_0_0_#450A0A] hover:bg-[#DC2626] disabled:bg-[#991B1B]/20 disabled:text-white/40 disabled:border-[#7F1D1D]/50 disabled:shadow-none" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none") : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>
+                     <button type="submit" disabled={!isLoggedIn || !commentText.trim()} className={cn("px-8 py-2.5 rounded-xl font-black transition-all uppercase text-xs tracking-wider border-2 active:translate-y-0.5 active:shadow-none cursor-pointer shadow-[3px_3px_0_0_#3E2723]", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[3px_3px_0_0_#47515f] hover:bg-white disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[3px_3px_0_0_#C9B695] hover:bg-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none" : activeCustomTheme === 'thuytien' ? "bg-[#9A8E7D] text-[#0E0C0A] border-[#9A8E7D] shadow-[3px_3px_0_0_#0E0C0A] hover:bg-[#EADDC9] disabled:bg-[#9A8E7D]/20 disabled:text-[#EADDC9]/40 disabled:border-[#9A8E7D]/50 disabled:shadow-none" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#facaca] text-[#780606] border-[#823323] shadow-[3px_3px_0_0_#facaca] hover:bg-[#fff2f1] disabled:bg-[#facaca]/20 disabled:text-[#780606]/40 disabled:border-[#823323]/50 disabled:shadow-none" : "bg-[#991B1B] text-white border-[#7F1D1D] shadow-[3px_3px_0_0_#450A0A] hover:bg-[#DC2626] disabled:bg-[#991B1B]/20 disabled:text-white/40 disabled:border-[#7F1D1D]/50 disabled:shadow-none") : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63] hover:bg-white disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none") : "disabled:opacity-50 bg-[#8D6E63] text-white border-[#3E2723] hover:bg-[#5D4037]")}>
                         {tCommentSubmit}
                      </button>
                   </div>
@@ -1391,9 +1415,9 @@ pComments.map(c => (
 
                <div className="space-y-6">
                    {chapterComments.length === 0 ? (
-                       <p className={cn("text-center italic opacity-50", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]/70" : activeCustomTheme === 'nhatky' ? "text-[#DFD6D3]/70" : activeCustomTheme === 'thuytien' ? "text-[#EADDC9]/70" : activeCustomTheme === 'rinhrap' ? "text-[#D8B4B4]/70" : "text-[#dbcec2]/70") : "")}>{tNoComment}</p>
+                       <p className={cn("text-center italic opacity-50", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]/70" : activeCustomTheme === 'nhatky' ? "text-[#DFD6D3]/70" : activeCustomTheme === 'thuytien' ? "text-[#EADDC9]/70" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]/70" : "text-[#D8B4B4]/70") : "text-[#dbcec2]/70") : "")}>{tNoComment}</p>
                    ) : (
-                       chapterComments.map(c => { return <ChapterCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={effectiveIsDark} isStoryTheme={activeCustomTheme} profilesCache={profilesCache} />; if (false) { return (
+                       chapterComments.map(c => { return <ChapterCommentNode key={c.id} comment={c} comments={comments} replyingToId={replyingToId} setReplyingToId={setReplyingToId} replyText={replyText} setReplyText={setReplyText} submittingReply={submittingReply} handleSendReply={handleSendReply} getTitleColor={getTitleColor} isLoggedIn={isLoggedIn} isDark={effectiveIsDark} isStoryTheme={effectiveStoryTheme} profilesCache={profilesCache} />; if (false) { return (
                            <div key={c.id} className={cn("p-5 rounded-2xl border relative overflow-visible", isDark ? "bg-[#2C221D]/80 border-[#3C2E27]" : "bg-white dark:bg-white border-[#D7CCC8] dark:border-[#D7CCC8] shadow-sm pr-8")}>
                                {c.equippedSticker && (
                                    <img 
