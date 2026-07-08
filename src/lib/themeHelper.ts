@@ -1,5 +1,15 @@
 // Theme helper to detect custom themes based on story properties, document IDs, or slugs.
 
+// A static mapping for known story IDs to avoid waiting for title load or cache load.
+const staticIdToThemeMap: Record<string, 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap'> = {
+  'huXx6uVvZbgNiE7ExoKo': 'homer',
+  'TekklEWE3Eli1YFuyE5z': 'nhatky',
+  'TyIFHdGAqP7LMXAhL44k': 'giagoan',
+  'nedBjLcOKO1egv2kAWZc': 'thuytien',
+  'y1jPoVWfSBVaWFwoRt6x': 'rinhrap',
+  '5D5LiyrtXbfJHqGNCM7K': 'rinhrap', // ID of the Rình Rập story in user's Vercel production db
+};
+
 // A small local memory cache to remember Firestore IDs mapping to themes
 const idThemeCache: Record<string, 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap'> = {};
 
@@ -27,7 +37,12 @@ export function detectStoryTheme(
   storyTitle?: string,
   storyIdOrSlug?: string
 ): 'giagoan' | 'homer' | 'nhatky' | 'thuytien' | 'rinhrap' | null {
-  // 1. Check title if available
+  // 1. Check static ID mapping first (instant match for known IDs)
+  if (storyIdOrSlug && staticIdToThemeMap[storyIdOrSlug]) {
+    return staticIdToThemeMap[storyIdOrSlug];
+  }
+
+  // 2. Check title if available
   if (storyTitle) {
     // Normalize to NFC and remove diacritics for robust matching
     const normalizedTitle = storyTitle.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -55,7 +70,7 @@ export function detectStoryTheme(
     }
   }
 
-  // 2. Check slug / ID text
+  // 3. Check slug / ID text
   if (storyIdOrSlug) {
     const lower = storyIdOrSlug.toLowerCase();
     if (lower.includes('gia-ngoan') || lower.includes('giagoan') || lower === 'giagoan') {
@@ -74,7 +89,7 @@ export function detectStoryTheme(
       return 'rinhrap';
     }
 
-    // 3. Check memory/localStorage cache for document ID
+    // 4. Check memory/localStorage cache for document ID
     if (idThemeCache[storyIdOrSlug]) {
       const cached = idThemeCache[storyIdOrSlug];
       if (['giagoan', 'homer', 'nhatky', 'thuytien', 'rinhrap'].includes(cached as string)) {
