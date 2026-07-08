@@ -1072,13 +1072,26 @@ export function Reader() {
         </div>
       );
     } else if (activeCustomTheme === 'rinhrap') {
+      const isThoTrang = rinhrapMode === 'thotrang';
       return (
-        <div className="min-h-screen bg-[#0B0505] text-[#D8B4B4] flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden">
+        <div className={cn(
+          "min-h-screen flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden transition-all duration-300",
+          isThoTrang ? "bg-[#fff2f1] text-[#780606]" : "bg-[#0B0505] text-[#D8B4B4]"
+        )}>
           {/* Subtle toxic grid background effect */}
-          <div className="absolute inset-0 pointer-events-none opacity-5 bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:24px_24px]" />
+          <div className={cn(
+            "absolute inset-0 pointer-events-none opacity-5 bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:24px_24px]",
+            isThoTrang ? "invert opacity-10" : ""
+          )} />
           <div className="flex flex-col items-center gap-4 relative z-10">
-            <div className="w-12 h-12 border-4 border-[#450A0A] border-t-[#EF4444] rounded-full animate-spin" />
-            <div className="text-xs uppercase tracking-[0.2em] text-[#EF4444] animate-pulse font-bold">
+            <div className={cn(
+              "w-12 h-12 border-4 rounded-full animate-spin",
+              isThoTrang ? "border-[#facaca] border-t-[#780606]" : "border-[#450A0A] border-t-[#EF4444]"
+            )} />
+            <div className={cn(
+              "text-xs uppercase tracking-[0.2em] animate-pulse font-bold",
+              isThoTrang ? "text-[#780606]" : "text-[#EF4444]"
+            )}>
               ĐANG DÒ TÌM TẦN SỐ RÌNH RẬP...
             </div>
           </div>
