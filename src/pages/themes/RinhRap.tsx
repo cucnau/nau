@@ -271,7 +271,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                 }`}
               >
                 <Bookmark className="w-5 h-5" fill={isSaved ? "currentColor" : "none"} />
-                {isSaved ? 'Đã lưu file' : 'Lưu tiến trình'}
+                {isSaved ? 'Đã lưu tiến trình' : 'Lưu tiến trình'}
               </button>
               
               <button
@@ -405,7 +405,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                   <span className={`text-[10px] font-black uppercase tracking-wider transition-all ${
                      rinhrapMode === 'thotrang' ? 'text-[#780606]' : 'text-[#facaca]'
                   }`}>
-                    {isLoggedIn ? "> Tần số sẵn sàng" : "> Yêu cầu đăng nhập để kết nối tần số"}
+                    {isLoggedIn ? "> Đường truyền sẵn sàng" : "> Yêu cầu đăng nhập để kết nối đường truyền"}
                   </span>
                   <button 
                     onClick={handleSendComment}
@@ -416,7 +416,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                           : 'bg-[#ffffff] hover:bg-[#facaca] text-[#000000] border-[#000000]'
                     }`}
                   >
-                    PHÁT SÓNG <Send className="w-4 h-4" />
+                    GỬI TIN <Send className="w-4 h-4" />
                   </button>
                 </div>
               </div>
