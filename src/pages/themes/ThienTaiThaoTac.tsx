@@ -88,166 +88,177 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
       <div className="max-w-[1200px] mx-auto p-4 md:p-8 relative z-10 flex flex-col gap-12 mt-4 md:mt-12">
         
         
+        
         {/* HUD HEADER: CHARACTER / STORY DATA */}
-        <div className="flex flex-col gap-8 items-start w-full">
-          
-          {/* Top Block: Cover + Title + Stats + Characters + Buttons */}
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 w-full">
-            {/* LEFT: HOLOGRAPHIC COVER */}
-            <div className="w-full lg:w-[320px] shrink-0 relative group perspective-1000">
-              <div className="relative rounded-lg overflow-hidden border border-[#9a858d]/40 bg-[#060406]/80 shadow-[0_0_40px_rgba(154,133,141,0.15)] transform transition-transform duration-700 hover:rotate-y-12">
-                {/* Scanline overlay */}
-                <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] pointer-events-none z-20 opacity-50" />
-                <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-transparent via-[#9a858d]/20 to-transparent -translate-y-full group-hover:animate-[scan_2s_ease-in-out_infinite] z-20 pointer-events-none" />
-                
-                {/* Corner brackets */}
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-[#9a858d] z-30" />
-                <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-[#9a858d] z-30" />
-                <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-[#9a858d] z-30" />
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-[#9a858d] z-30" />
+        <div className="w-full relative border border-[#9a858d]/20 bg-[#060406]/60 p-4 md:p-6 lg:p-8 backdrop-blur-md">
+          {/* Grid Layout HUD */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 w-full relative z-10">
+            
+            {/* LEFT COLUMN: COVER & ACTIONS (Span 3) */}
+            <div className="lg:col-span-3 lg:col-start-1 flex flex-col gap-4">
+              {/* HOLOGRAPHIC COVER */}
+              <div className="w-full relative group perspective-1000">
+                <div className="relative rounded-sm overflow-hidden border-2 border-[#9a858d]/40 bg-[#060406]/80 shadow-[0_0_20px_rgba(154,133,141,0.15)] transform transition-transform duration-700 hover:rotate-y-6">
+                  {/* Scanline overlay */}
+                  <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] pointer-events-none z-20 opacity-50" />
+                  <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-transparent via-[#9a858d]/20 to-transparent -translate-y-full group-hover:animate-[scan_2s_ease-in-out_infinite] z-20 pointer-events-none" />
+                  
+                  {/* Corner brackets */}
+                  <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#9a858d] z-30" />
+                  <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#9a858d] z-30" />
+                  <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#9a858d] z-30" />
+                  <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#9a858d] z-30" />
 
-                <div className="absolute top-2 right-2 px-2 py-1 bg-[#060406]/80 border border-[#9a858d]/50 text-[10px] font-mono font-bold text-[#9a858d] z-30 backdrop-blur-md">
-                  SYS.V1.2
-                </div>
-
-                {story.coverUrl ? (
-                  <img 
-                    src={story.coverUrl} 
-                    alt={story.title} 
-                    className="w-full aspect-[2/3] object-cover relative z-10 filter contrast-125 brightness-90 group-hover:brightness-110 transition-all duration-500"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <div className="w-full aspect-[2/3] flex items-center justify-center bg-[#34282d]/20 relative z-10">
-                    <span className="text-[#645a6c] font-mono text-xs">NO VISUAL DATA</span>
+                  <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-[#060406]/90 border border-[#9a858d] text-[8px] font-mono font-bold text-[#9a858d] z-30 tracking-widest">
+                    SYS.V1.2
                   </div>
-                )}
+
+                  {story.coverUrl ? (
+                    <img 
+                      src={story.coverUrl} 
+                      alt={story.title} 
+                      className="w-full aspect-[2/3] object-cover relative z-10 filter contrast-125 brightness-90 group-hover:brightness-110 transition-all duration-500"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full aspect-[2/3] flex items-center justify-center bg-[#34282d]/20 relative z-10">
+                      <span className="text-[#645a6c] font-mono text-xs tracking-widest">NO VISUAL DATA</span>
+                    </div>
+                  )}
+                </div>
               </div>
-              
+
               {/* Quick stats under cover */}
-              <div className="mt-4 grid grid-cols-2 gap-2 font-mono text-[10px]">
-                <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-2 flex flex-col gap-1 text-center">
-                  <span className="text-[#645a6c]">TÌNH TRẠNG</span>
+              <div className="grid grid-cols-2 gap-2 font-mono text-[10px]">
+                <div className="border border-[#645a6c]/30 bg-[#060406]/80 p-2 flex flex-col gap-0.5 text-center items-center justify-center">
+                  <span className="text-[#645a6c] tracking-widest text-[8px]">TÌNH TRẠNG</span>
                   <span className="text-[#9a858d] font-bold">{story.isFull ? 'ĐÃ ĐÓNG' : 'ONLINE'}</span>
                 </div>
-                <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-2 flex flex-col gap-1 text-center">
-                  <span className="text-[#645a6c]">ĐỘ ỔN ĐỊNH</span>
+                <div className="border border-[#645a6c]/30 bg-[#060406]/80 p-2 flex flex-col gap-0.5 text-center items-center justify-center">
+                  <span className="text-[#645a6c] tracking-widest text-[8px]">ĐỘ ỔN ĐỊNH</span>
                   <span className="text-emerald-500 font-bold animate-pulse">100%</span>
+                </div>
+              </div>
+
+              {/* Action buttons (Stacked) */}
+              <div className="flex flex-col gap-2 mt-2">
+                {chapters.length > 0 && (
+                  <button 
+                    onClick={() => navigate(`/doc/${actualStoryId}/${chapters[0].id}`)}
+                    className="w-full py-3 bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] font-bold font-mono text-sm tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(154,133,141,0.2)] hover:shadow-[0_0_25px_rgba(154,133,141,0.5)] flex items-center justify-center gap-2"
+                  >
+                    <Zap className="w-4 h-4" /> BẮT ĐẦU
+                  </button>
+                )}
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={handleSaveToggle}
+                    className={`py-2 font-bold font-mono text-[10px] tracking-widest uppercase transition-all flex items-center justify-center gap-1 border ${
+                      isSaved 
+                        ? 'border-[#9a858d] text-[#9a858d] bg-[#9a858d]/10' 
+                        : 'border-[#645a6c] text-[#645a6c] hover:border-[#d4c6c9] hover:text-[#d4c6c9]'
+                    }`}
+                  >
+                    <Bookmark className="w-3 h-3" /> {isSaved ? 'ĐÃ LƯU' : 'LƯU LẠI'}
+                  </button>
+
+                  <button 
+                    onClick={() => setShowGiftModal(true)}
+                    className="py-2 font-bold font-mono text-[10px] tracking-widest uppercase transition-all flex items-center justify-center gap-1 border border-[#645a6c] text-[#d4c6c9] hover:border-[#9a858d] hover:bg-[#9a858d]/10"
+                  >
+                    <Gift className="w-3 h-3" /> TIẾP TẾ
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* RIGHT: DATA ARCHIVES */}
-            <div className="flex-1 flex flex-col font-mono w-full">
-              
-              <h1 className="text-3xl md:text-5xl font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#d4c6c9] to-[#9a858d] leading-tight tracking-wider mb-4 drop-shadow-[0_0_10px_rgba(154,133,141,0.3)]">
+            {/* MIDDLE COLUMN: INFO & DESC (Span 5) */}
+            <div className="lg:col-span-5 flex flex-col font-mono h-full">
+              <h1 className="text-2xl md:text-4xl font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#d4c6c9] to-[#9a858d] leading-tight tracking-wider mb-2 drop-shadow-[0_0_10px_rgba(154,133,141,0.3)]">
                 {story.title}
               </h1>
-              <div className="flex items-center gap-2 text-[#9a858d] mb-4 font-mono text-sm tracking-widest uppercase">
+              <div className="flex items-center gap-2 text-[#9a858d] mb-4 font-mono text-sm tracking-widest uppercase border-b border-[#9a858d]/20 pb-4">
                 <User className="w-4 h-4" /> {story.author || 'Đang cập nhật'}
               </div>
               
               <div className="flex flex-wrap gap-2 mb-6">
                 {story.genres && story.genres.length > 0 ? (
                   story.genres.map((tag: string, i: number) => (
-                    <span key={i} className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest border border-[#645a6c]/50 bg-[#060406]/60 text-[#9a858d]">
+                    <span key={i} className="px-2 py-1 text-[9px] font-bold uppercase tracking-widest border border-[#645a6c]/50 bg-[#060406]/80 text-[#9a858d]">
                       {tag}
                     </span>
                   ))
                 ) : (
-                  ['Cả đôi đều mạnh', 'Game online', 'Truyện sướng', 'Hành trình tăng cấp', 'Thực tế ảo'].map((tag, i) => (
-                    <span key={i} className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest border border-[#645a6c]/50 bg-[#060406]/60 text-[#9a858d]">
+                  ['Cả đôi đều mạnh', 'Game online', 'Truyện sướng', 'Thực tế ảo'].map((tag, i) => (
+                    <span key={i} className="px-2 py-1 text-[9px] font-bold uppercase tracking-widest border border-[#645a6c]/50 bg-[#060406]/80 text-[#9a858d]">
                       {tag}
                     </span>
                   ))
                 )}
               </div>
 
-              {/* Action buttons right under genres for easy access */}
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                {chapters.length > 0 && (
-                  <button 
-                    onClick={() => navigate(`/doc/${actualStoryId}/${chapters[0].id}`)}
-                    className="px-8 py-3 bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] font-bold font-mono text-sm tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(154,133,141,0.4)] flex items-center gap-2 hover:scale-105"
-                  >
-                    <Zap className="w-5 h-5" /> BẮT ĐẦU THỬ THÁCH
-                  </button>
-                )}
-                
-                <button 
-                  onClick={handleSaveToggle}
-                  className={`px-6 py-3 font-bold font-mono text-sm tracking-widest uppercase transition-all flex items-center gap-2 border ${
-                    isSaved 
-                      ? 'border-[#9a858d] text-[#9a858d] bg-[#9a858d]/10' 
-                      : 'border-[#645a6c] text-[#645a6c] hover:border-[#d4c6c9] hover:text-[#d4c6c9]'
-                  }`}
-                >
-                  <Bookmark className="w-5 h-5" /> {isSaved ? 'ĐÃ LƯU TỌA ĐỘ' : 'LƯU TỌA ĐỘ'}
-                </button>
-
-                <button 
-                  onClick={() => setShowGiftModal(true)}
-                  className="px-6 py-3 font-bold font-mono text-sm tracking-widest uppercase transition-all flex items-center gap-2 border border-[#645a6c] text-[#d4c6c9] hover:border-[#9a858d] hover:bg-[#9a858d]/10"
-                >
-                  <Gift className="w-5 h-5" /> TIẾP TẾ
-                </button>
+              {/* Description box */}
+              <div className="relative border border-[#645a6c]/30 bg-[#060406]/60 p-4 flex-1 flex flex-col">
+                <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-3 text-xs tracking-widest uppercase flex items-center gap-2">
+                  <Terminal className="w-4 h-4" /> TRÍCH XUẤT DỮ LIỆU
+                </div>
+                <div className="overflow-y-auto pr-2 custom-scrollbar text-sm md:text-base leading-relaxed text-[#d4c6c9]/80 font-sans text-justify space-y-2 flex-1 max-h-[300px] lg:max-h-[500px]">
+                  {story.description ? story.description.split('\n').map((line, i) => <p key={i}>{line}</p>) : <p>Dữ liệu truyện Thần Thụ đang nạp trực tuyến... Bước vào thế giới thực tế ảo cùng những pha thao tác thần sầu và bước nhảy cấp đầy sảng khoái.</p>}
+                </div>
               </div>
+            </div>
 
-              {/* Character Info */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 font-mono text-[10px] mt-auto">
-                <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 flex flex-col gap-1 relative overflow-hidden group hover:border-[#9a858d]/50 transition-colors">
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-[#9a858d]/10 to-transparent"></div>
-                  <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-1 mb-1 text-xs flex justify-between">
-                    <span>1. Chu Tùy - thụ</span>
-                    <span className="text-[8px] opacity-50">PLAYER 1</span>
-                  </div>
+            {/* RIGHT COLUMN: PLAYERS & RECOMMENDATIONS (Span 4) */}
+            <div className="lg:col-span-4 flex flex-col gap-4 font-mono h-full">
+              
+              {/* Player 1 */}
+              <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 relative overflow-hidden group hover:border-[#9a858d]/50 transition-colors">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#9a858d]/10 to-transparent pointer-events-none"></div>
+                <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-1 mb-2 text-xs flex justify-between tracking-widest uppercase">
+                  <span className="flex items-center gap-2"><Sword className="w-3 h-3"/> 1. Chu Tùy - thụ</span>
+                  <span className="text-[9px] opacity-50 bg-[#9a858d]/20 px-1 py-0.5">PLAYER 1</span>
+                </div>
+                <div className="flex flex-col gap-1 text-[10px]">
                   <div className="text-[#d4c6c9] flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-[#d4c6c9]"></div> Sinh viên</div>
                   <div className="text-[#d4c6c9] flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-[#d4c6c9]"></div> ID: <span className="text-emerald-400 font-bold">[Chu Phi Nhục Thủy]</span></div>
-                  <div className="text-[#645a6c] mt-1 pl-3 border-l border-[#645a6c]/30">- DPS bạo lực</div>
-                  <div className="text-[#645a6c] pl-3 border-l border-[#645a6c]/30">- Thiên tài thao tác</div>
-                  <div className="text-[#645a6c] pl-3 border-l border-[#645a6c]/30">- Healer sát thủ</div>
+                  <div className="text-[#645a6c] mt-1 pl-3 border-l-2 border-[#645a6c]/30 py-0.5">DPS bạo lực</div>
+                  <div className="text-[#645a6c] pl-3 border-l-2 border-[#645a6c]/30 py-0.5">Thiên tài thao tác</div>
+                  <div className="text-[#645a6c] pl-3 border-l-2 border-[#645a6c]/30 py-0.5">Healer sát thủ</div>
                 </div>
-                
-                <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 flex flex-col gap-1 relative overflow-hidden group hover:border-[#9a858d]/50 transition-colors">
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-[#9a858d]/10 to-transparent"></div>
-                  <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-1 mb-1 text-xs flex justify-between">
-                    <span>2. Quý Tê Nguyên - công</span>
-                    <span className="text-[8px] opacity-50">PLAYER 2</span>
-                  </div>
+              </div>
+
+              {/* Player 2 */}
+              <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 relative overflow-hidden group hover:border-[#9a858d]/50 transition-colors">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-[#9a858d]/10 to-transparent pointer-events-none"></div>
+                <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-1 mb-2 text-xs flex justify-between tracking-widest uppercase">
+                  <span className="flex items-center gap-2"><Shield className="w-3 h-3"/> 2. Quý Tê Nguyên - công</span>
+                  <span className="text-[9px] opacity-50 bg-[#9a858d]/20 px-1 py-0.5">PLAYER 2</span>
+                </div>
+                <div className="flex flex-col gap-1 text-[10px]">
                   <div className="text-[#d4c6c9] flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-[#d4c6c9]"></div> Bác sĩ</div>
                   <div className="text-[#d4c6c9] flex flex-wrap items-center gap-x-2 gap-y-1"><div className="w-1 h-1 rounded-full bg-[#d4c6c9]"></div> ID: <span className="text-emerald-400 font-bold">[Nhất Độ Âm Dương]</span> <span className="text-emerald-400 font-bold">[Bé Thỏ Con 123]</span></div>
-                  <div className="text-[#645a6c] mt-1 pl-3 border-l border-[#645a6c]/30">- Phái kỹ thuật đỉnh cao</div>
-                  <div className="text-[#645a6c] pl-3 border-l border-[#645a6c]/30">- healer</div>
+                  <div className="text-[#645a6c] mt-1 pl-3 border-l-2 border-[#645a6c]/30 py-0.5">Phái kỹ thuật đỉnh cao</div>
+                  <div className="text-[#645a6c] pl-3 border-l-2 border-[#645a6c]/30 py-0.5">Healer</div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Bottom Block: Description and Other Intro - Full Width */}
-          <div className="w-full flex flex-col gap-8">
-            <div className="relative border-l-2 border-[#9a858d] pl-5 py-2">
-              <div className="absolute -left-1.5 top-0 w-3 h-3 bg-[#060406] border-2 border-[#9a858d]" />
-              <div className="absolute -left-1.5 bottom-0 w-3 h-3 bg-[#060406] border-2 border-[#9a858d]" />
-              <p className="text-sm md:text-base leading-loose text-[#d4c6c9]/80 font-sans text-justify">
-                {story.description ? story.description.split('\n').map((line, i) => <span key={i}>{line}<br/></span>) : "Dữ liệu truyện Thần Thụ đang nạp trực tuyến... Bước vào thế giới thực tế ảo cùng những pha thao tác thần sầu và bước nhảy cấp đầy sảng khoái."}
-              </p>
-            </div>
-
-            {/* Giới thiệu truyện khác */}
-            {(story as any).recommendations && (
-              <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-6 relative group">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#9a858d]/5 to-transparent pointer-events-none"></div>
-                <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-3 mb-4 text-xs tracking-widest uppercase flex items-center gap-2">
-                  <BookOpen className="w-4 h-4" /> GIỚI THIỆU TRUYỆN KHÁC
+              {/* Recommendations */}
+              <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 flex-1 flex flex-col relative group">
+                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-[#9a858d]/5 to-transparent pointer-events-none"></div>
+                <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-2 text-xs tracking-widest uppercase flex items-center gap-2">
+                  <BookOpen className="w-3 h-3" /> TRUYỆN KHÁC
                 </div>
-                <div className="text-[#d4c6c9]/80 font-sans text-sm italic leading-loose text-justify whitespace-pre-line">
-                  {(story as any).recommendations}
+                <div className="text-[#d4c6c9]/80 font-sans text-xs italic leading-relaxed text-justify whitespace-pre-line overflow-y-auto pr-2 custom-scrollbar max-h-[150px] lg:max-h-[300px]">
+                  {(story as any).recommendations || '(Chưa có dữ liệu. Vui lòng cập nhật thêm từ hệ thống trung tâm.)'}
                 </div>
               </div>
-            )}
+
+            </div>
+
           </div>
         </div>
-
+        
         {/* BẢN ĐỒ HÀNH TRÌNH PHÓ BẢN THẦN THỤ */}
         <div className="mt-8 border border-[#9a858d]/30 bg-[#060406]/80 p-6 relative">
           <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#9a858d]" />
