@@ -1092,7 +1092,18 @@ export function Reader() {
               "text-xs uppercase tracking-[0.2em] animate-pulse font-bold",
               isThoTrang ? "text-[#780606]" : "text-[#EF4444]"
             )}>
-              ĐANG DÒ TÌM TẦN SỐ RÌNH RẬP...
+              ĐANG DÒ ĐƯỜNG TRUYỀN RÌNH RẬP...
+            </div>
+          </div>
+        </div>
+      );
+    } else if (activeCustomTheme === 'thientai') {
+      return (
+        <div className="min-h-screen bg-[#060406] text-[#d4c6c9] flex flex-col items-center justify-center p-4 font-mono animate-fade-in">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#34282d] border-t-[#9a858d] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#9a858d] animate-pulse font-extrabold">
+              THẦN THỤ OS // ĐANG TẢI THIÊN TÀI THAO TÁC...
             </div>
           </div>
         </div>
@@ -1114,37 +1125,46 @@ export function Reader() {
   const hasCustomTheme = !!activeCustomTheme;
   const isCustomThemeActive = !!(hasCustomTheme && useStoryTheme);
   const effectiveStoryTheme = activeCustomTheme === 'rinhrap' ? `rinhrap-${rinhrapMode}` : activeCustomTheme;
+  const btnThemeClass = isCustomThemeActive ? (
+    activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
+    activeCustomTheme === 'nhatky' ? "border-[#BCA782]/50 bg-[#E8DCC4] hover:bg-[#DFCEB4] hover:border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" :
+    activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" :
+    activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "border-[#823323]/50 bg-[#facaca]/20 hover:bg-[#facaca]/40 hover:border-[#780606] text-[#780606] shadow-[2px_2px_0_0_#facaca]" : "border-[#7F1D1D]/50 bg-[#0B0505] hover:bg-[#7F1D1D]/20 hover:border-[#EF4444] text-[#D8B4B4] shadow-[2px_2px_0_0_#450A0A]") :
+    activeCustomTheme === 'thientai' ? "border-[#34282d]/50 bg-[#060406] hover:bg-[#34282d]/20 hover:border-[#9a858d] text-[#9a858d] shadow-[2px_2px_0_0_#34282d]" :
+    "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
+  ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]";
   const effectiveIsDark = isCustomThemeActive ? false : isDark; // Với theme nhatky sáng màu, ta chuyển effectiveIsDark thành false để tránh xung đột prose-invert
   const effectiveFontFamily = isCustomThemeActive ? (
     activeCustomTheme === 'homer' ? 'font-reading-iosevka' : 
     activeCustomTheme === 'nhatky' ? 'font-reading-cormorant' : 
     activeCustomTheme === 'thuytien' ? 'font-reading-cormorant' : 
-    activeCustomTheme === 'rinhrap' ? 'font-reading-quicksand' : 'font-reading-garamond'
+    activeCustomTheme === 'rinhrap' ? 'font-reading-quicksand' : 
+    activeCustomTheme === 'thientai' ? 'font-reading-iosevka' : 'font-reading-garamond'
   ) : fontFamily;
-  const tChapterLabel = activeCustomTheme === 'homer' ? "Tọa độ" : activeCustomTheme === 'giagoan' ? "Tài liệu" : activeCustomTheme === 'nhatky' ? "Trang" : activeCustomTheme === 'thuytien' ? "Khúc tự luyến" : activeCustomTheme === 'rinhrap' ? "Màn" : "Chương";
-  const tChapterCapLabel = activeCustomTheme === 'homer' ? "TỌA ĐỘ" : activeCustomTheme === 'giagoan' ? "TÀI LIỆU" : activeCustomTheme === 'nhatky' ? "TRANG NHẬT KÝ" : activeCustomTheme === 'thuytien' ? "KHÚC TỰ LUYẾN" : activeCustomTheme === 'rinhrap' ? "MÀN CHƠI" : "CHƯƠNG";
-  const tPrevChapter = activeCustomTheme === 'homer' ? "Tọa độ trước" : activeCustomTheme === 'giagoan' ? "Tài liệu trước" : activeCustomTheme === 'nhatky' ? "Trang nhật ký trước" : activeCustomTheme === 'thuytien' ? "Khúc tự luyến trước" : activeCustomTheme === 'rinhrap' ? "Màn trước" : "Chương trước";
-  const tNextChapter = activeCustomTheme === 'homer' ? "Tọa độ sau" : activeCustomTheme === 'giagoan' ? "Tài liệu sau" : activeCustomTheme === 'nhatky' ? "Trang nhật ký sau" : activeCustomTheme === 'thuytien' ? "Khúc tự luyến sau" : activeCustomTheme === 'rinhrap' ? "Màn sau" : "Chương sau";
-  const tChapterEarly = activeCustomTheme === 'homer' ? "Tọa độ Đọc Sớm" : activeCustomTheme === 'giagoan' ? "Tài liệu Đọc Sớm" : activeCustomTheme === 'nhatky' ? "Trang Đọc Sớm" : activeCustomTheme === 'thuytien' ? "Tự luyến Đọc Sớm" : activeCustomTheme === 'rinhrap' ? "Sinh tồn sớm" : "Chương Đọc Sớm";
-  const tChapterLocked = activeCustomTheme === 'homer' ? "Đã khóa tọa độ" : activeCustomTheme === 'giagoan' ? "Đã khóa tài liệu" : activeCustomTheme === 'nhatky' ? "Ký ức bị khép lại" : activeCustomTheme === 'thuytien' ? "Bóng gương chưa hiển hiện" : activeCustomTheme === 'rinhrap' ? "Màn bị ẩn" : "Đã khóa chương";
-  const tReadThis = activeCustomTheme === 'homer' ? "Đọc tọa độ này" : activeCustomTheme === 'giagoan' ? "Đọc tài liệu này" : activeCustomTheme === 'nhatky' ? "Lật giở ký ức này" : activeCustomTheme === 'thuytien' ? "Chiêm ngưỡng khúc ca này" : activeCustomTheme === 'rinhrap' ? "Chơi màn này" : "Đọc chương này";
-  const tChapterSingle = activeCustomTheme === 'homer' ? "tọa độ" : activeCustomTheme === 'giagoan' ? "tài liệu" : activeCustomTheme === 'nhatky' ? "trang" : activeCustomTheme === 'thuytien' ? "khúc" : activeCustomTheme === 'rinhrap' ? "màn" : "chương";
-  const tParagraphComment = activeCustomTheme === 'homer' ? "Phản hồi tọa độ" : activeCustomTheme === 'giagoan' ? "Ý kiến đoạn" : activeCustomTheme === 'nhatky' ? "Bút tích đoạn" : activeCustomTheme === 'thuytien' ? "Lời soi bóng" : activeCustomTheme === 'rinhrap' ? "Tiếng động đoạn" : "Bình luận đoạn";
-  const tNoParagraphComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào cho tọa độ này." : activeCustomTheme === 'giagoan' ? "Chưa có ý kiến nào cho đoạn này." : activeCustomTheme === 'nhatky' ? "Chưa có dấu bút tích nào tại dòng ký ức này." : activeCustomTheme === 'thuytien' ? "Chưa có lời soi bóng nào được lưu lại bên đoạn tuyệt mỹ này." : activeCustomTheme === 'rinhrap' ? "Đoạn này hoàn toàn im lặng..." : "Chưa có bình luận. Hãy là người đầu tiên!";
-  const tParagraphPlaceholder = activeCustomTheme === 'homer' ? "Viết phản hồi..." : activeCustomTheme === 'giagoan' ? "Viết đề xuất..." : activeCustomTheme === 'nhatky' ? "Để lại dòng bút tích..." : activeCustomTheme === 'thuytien' ? "Để lại lời ca tụng nhan sắc..." : activeCustomTheme === 'rinhrap' ? "Tạo tiếng động..." : "Viết bình luận...";
+  const tChapterLabel = activeCustomTheme === 'homer' ? "Tọa độ" : activeCustomTheme === 'giagoan' ? "Tài liệu" : activeCustomTheme === 'nhatky' ? "Trang" : activeCustomTheme === 'thuytien' ? "Khúc tự luyến" : activeCustomTheme === 'rinhrap' ? "Màn" : activeCustomTheme === 'thientai' ? "Phó bản" : "Chương";
+  const tChapterCapLabel = activeCustomTheme === 'homer' ? "TỌA ĐỘ" : activeCustomTheme === 'giagoan' ? "TÀI LIỆU" : activeCustomTheme === 'nhatky' ? "TRANG NHẬT KÝ" : activeCustomTheme === 'thuytien' ? "KHÚC TỰ LUYẾN" : activeCustomTheme === 'rinhrap' ? "MÀN CHƠI" : activeCustomTheme === 'thientai' ? "PHÓ BẢN" : "CHƯƠNG";
+  const tPrevChapter = activeCustomTheme === 'homer' ? "Tọa độ trước" : activeCustomTheme === 'giagoan' ? "Tài liệu trước" : activeCustomTheme === 'nhatky' ? "Trang nhật ký trước" : activeCustomTheme === 'thuytien' ? "Khúc tự luyến trước" : activeCustomTheme === 'rinhrap' ? "Màn trước" : activeCustomTheme === 'thientai' ? "Phó bản trước" : "Chương trước";
+  const tNextChapter = activeCustomTheme === 'homer' ? "Tọa độ sau" : activeCustomTheme === 'giagoan' ? "Tài liệu sau" : activeCustomTheme === 'nhatky' ? "Trang nhật ký sau" : activeCustomTheme === 'thuytien' ? "Khúc tự luyến sau" : activeCustomTheme === 'rinhrap' ? "Màn sau" : activeCustomTheme === 'thientai' ? "Phó bản sau" : "Chương sau";
+  const tChapterEarly = activeCustomTheme === 'homer' ? "Tọa độ Đọc Sớm" : activeCustomTheme === 'giagoan' ? "Tài liệu Đọc Sớm" : activeCustomTheme === 'nhatky' ? "Trang Đọc Sớm" : activeCustomTheme === 'thuytien' ? "Tự luyến Đọc Sớm" : activeCustomTheme === 'rinhrap' ? "Sinh tồn sớm" : activeCustomTheme === 'thientai' ? "Phó bản Đọc Sớm" : "Chương Đọc Sớm";
+  const tChapterLocked = activeCustomTheme === 'homer' ? "Đã khóa tọa độ" : activeCustomTheme === 'giagoan' ? "Đã khóa tài liệu" : activeCustomTheme === 'nhatky' ? "Ký ức bị khép lại" : activeCustomTheme === 'thuytien' ? "Bóng gương chưa hiển hiện" : activeCustomTheme === 'rinhrap' ? "Màn bị ẩn" : activeCustomTheme === 'thientai' ? "Đã khóa phó bản" : "Đã khóa chương";
+  const tReadThis = activeCustomTheme === 'homer' ? "Đọc tọa độ này" : activeCustomTheme === 'giagoan' ? "Đọc tài liệu này" : activeCustomTheme === 'nhatky' ? "Lật giở ký ức này" : activeCustomTheme === 'thuytien' ? "Chiêm ngưỡng khúc ca này" : activeCustomTheme === 'rinhrap' ? "Chơi màn này" : activeCustomTheme === 'thientai' ? "Chinh phục phó bản này" : "Đọc chương này";
+  const tChapterSingle = activeCustomTheme === 'homer' ? "tọa độ" : activeCustomTheme === 'giagoan' ? "tài liệu" : activeCustomTheme === 'nhatky' ? "trang" : activeCustomTheme === 'thuytien' ? "khúc" : activeCustomTheme === 'rinhrap' ? "màn" : activeCustomTheme === 'thientai' ? "phó bản" : "chương";
+  const tParagraphComment = activeCustomTheme === 'homer' ? "Phản hồi tọa độ" : activeCustomTheme === 'giagoan' ? "Ý kiến đoạn" : activeCustomTheme === 'nhatky' ? "Bút tích đoạn" : activeCustomTheme === 'thuytien' ? "Lời soi bóng" : activeCustomTheme === 'rinhrap' ? "Tiếng động đoạn" : activeCustomTheme === 'thientai' ? "Phát kiến phó bản" : "Bình luận đoạn";
+  const tNoParagraphComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào cho tọa độ này." : activeCustomTheme === 'giagoan' ? "Chưa có ý kiến nào cho đoạn này." : activeCustomTheme === 'nhatky' ? "Chưa có dấu bút tích nào tại dòng ký ức này." : activeCustomTheme === 'thuytien' ? "Chưa có lời soi bóng nào được lưu lại bên đoạn tuyệt mỹ này." : activeCustomTheme === 'rinhrap' ? "Đoạn này hoàn toàn im lặng..." : activeCustomTheme === 'thientai' ? "Chưa có phát kiến nào cho tọa độ này." : "Chưa có bình luận. Hãy là người đầu tiên!";
+  const tParagraphPlaceholder = activeCustomTheme === 'homer' ? "Viết phản hồi..." : activeCustomTheme === 'giagoan' ? "Viết đề xuất..." : activeCustomTheme === 'nhatky' ? "Để lại dòng bút tích..." : activeCustomTheme === 'thuytien' ? "Để lại lời ca tụng nhan sắc..." : activeCustomTheme === 'rinhrap' ? "Tạo tiếng động..." : activeCustomTheme === 'thientai' ? "Ghi lại phát kiến..." : "Viết bình luận...";
   const tParagraphSubmit = activeCustomTheme === 'homer' ? "Phát" : activeCustomTheme === 'giagoan' ? "Trình" : activeCustomTheme === 'nhatky' ? "Ghi" : activeCustomTheme === 'thuytien' ? "Soi" : activeCustomTheme === 'rinhrap' ? "Phát" : "Gửi";
   const tParagraphLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : activeCustomTheme === 'nhatky' ? "Đăng nhập để lại bút tích" : activeCustomTheme === 'thuytien' ? "Đăng nhập để tự soi bóng" : activeCustomTheme === 'rinhrap' ? "Đăng nhập để tạo tiếng động" : "Đăng nhập để bình luận";
-  const tCommentAreaTitle = activeCustomTheme === 'homer' ? "Báo cáo sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đề xuất và ý kiến" : activeCustomTheme === 'nhatky' ? "Dấu vết bút tích chương" : activeCustomTheme === 'thuytien' ? "Mặt hồ tự chiêm ngưỡng" : activeCustomTheme === 'rinhrap' ? "Dấu vết để lại" : "Bình luận chương";
-  const tCommentAreaPlaceholder = activeCustomTheme === 'homer' ? "Nhập sóng phản hồi của bạn..." : activeCustomTheme === 'giagoan' ? "Nhập đề xuất và ý kiến của bạn..." : activeCustomTheme === 'nhatky' ? "Nhập bút tích thương nhớ của bạn..." : activeCustomTheme === 'thuytien' ? "Khắc ghi dòng chiêm ngưỡng bản thân bên bờ nước thẳm..." : activeCustomTheme === 'rinhrap' ? "Để lại dấu vết của bạn..." : "Nhập bình luận của bạn...";
-  const tCommentAreaPlaceholderLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phát sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : activeCustomTheme === 'nhatky' ? "Đăng nhập để ghi lại dòng hoài niệm" : activeCustomTheme === 'thuytien' ? "Đăng nhập để ca tụng dung nhan chính mình" : activeCustomTheme === 'rinhrap' ? "Đăng nhập để để lại dấu vết" : "Đăng nhập để bình luận";
-  const tCommentSubmit = activeCustomTheme === 'homer' ? "Phát sóng" : activeCustomTheme === 'giagoan' ? "Trình ý kiến" : activeCustomTheme === 'nhatky' ? "Khắc ghi bút tích" : activeCustomTheme === 'thuytien' ? "Khắc lời tự chiêm" : activeCustomTheme === 'rinhrap' ? "Ghi dấu vết" : "Gửi bình luận";
-  const tNoComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào." : activeCustomTheme === 'giagoan' ? "Chưa có đề xuất và ý kiến nào cho tài liệu này." : activeCustomTheme === 'nhatky' ? "Trang ký ức này chưa lưu lại nét bút nào." : activeCustomTheme === 'thuytien' ? "Mặt hồ phẳng lặng chưa ghi nhận lời tự chiêm ngưỡng nào..." : activeCustomTheme === 'rinhrap' ? "Không có dấu vết nào được để lại..." : "Chưa có bình luận nào cho chương này.";
+  const tCommentAreaTitle = activeCustomTheme === 'homer' ? "Báo cáo sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đề xuất và ý kiến" : activeCustomTheme === 'nhatky' ? "Dấu vết bút tích chương" : activeCustomTheme === 'thuytien' ? "Mặt hồ tự chiêm ngưỡng" : activeCustomTheme === 'rinhrap' ? "Dấu vết để lại" : activeCustomTheme === 'thientai' ? "Báo cáo chiến thuật phó bản" : "Bình luận chương";
+  const tCommentAreaPlaceholder = activeCustomTheme === 'homer' ? "Nhập sóng phản hồi của bạn..." : activeCustomTheme === 'giagoan' ? "Nhập đề xuất và ý kiến của bạn..." : activeCustomTheme === 'nhatky' ? "Nhập bút tích thương nhớ của bạn..." : activeCustomTheme === 'thuytien' ? "Khắc ghi dòng chiêm ngưỡng bản thân bên bờ nước thẳm..." : activeCustomTheme === 'rinhrap' ? "Để lại dấu vết của bạn..." : activeCustomTheme === 'thientai' ? "Nhập chiến thuật của bạn..." : "Nhập bình luận của bạn...";
+  const tCommentAreaPlaceholderLogin = activeCustomTheme === 'homer' ? "Đăng nhập để phát sóng phản hồi" : activeCustomTheme === 'giagoan' ? "Đăng nhập để trình ý kiến" : activeCustomTheme === 'nhatky' ? "Đăng nhập để ghi lại dòng hoài niệm" : activeCustomTheme === 'thuytien' ? "Đăng nhập để ca tụng dung nhan chính mình" : activeCustomTheme === 'rinhrap' ? "Đăng nhập để để lại dấu vết" : activeCustomTheme === 'thientai' ? "Đăng nhập để chia sẻ chiến thuật" : "Đăng nhập để bình luận";
+  const tCommentSubmit = activeCustomTheme === 'homer' ? "Phát sóng" : activeCustomTheme === 'giagoan' ? "Trình ý kiến" : activeCustomTheme === 'nhatky' ? "Khắc ghi bút tích" : activeCustomTheme === 'thuytien' ? "Khắc lời tự chiêm" : activeCustomTheme === 'rinhrap' ? "Ghi dấu vết" : activeCustomTheme === 'thientai' ? "Gửi chiến thuật" : "Gửi bình luận";
+  const tNoComment = activeCustomTheme === 'homer' ? "Chưa có phản hồi nào." : activeCustomTheme === 'giagoan' ? "Chưa có đề xuất và ý kiến nào cho tài liệu này." : activeCustomTheme === 'nhatky' ? "Trang ký ức này chưa lưu lại nét bút nào." : activeCustomTheme === 'thuytien' ? "Mặt hồ phẳng lặng chưa ghi nhận lời tự chiêm ngưỡng nào..." : activeCustomTheme === 'rinhrap' ? "Không có dấu vết nào được để lại..." : activeCustomTheme === 'thientai' ? "Chưa có báo cáo chiến thuật nào cho phó bản này." : "Chưa có bình luận nào cho chương này.";
 
   return (
     <div className={cn(
       "min-h-screen transition-colors duration-500 pb-32 font-medium flex flex-col items-center",
       isCustomThemeActive 
-        ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#C9B695] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#D5C2A5] via-[#C9B695] to-[#BCA782] text-[#2C1814] font-serif" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#2E251E] via-[#12110F] to-[#12110F] text-[#EADDC9] font-serif" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] text-[#000000] font-sans" : "bg-[#0B0505] text-[#D8B4B4] font-sans") : "bg-[#13120d] text-[#dbcec2]")
+        ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#C9B695] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#D5C2A5] via-[#C9B695] to-[#BCA782] text-[#2C1814] font-serif" : activeCustomTheme === 'thuytien' ? "bg-[#12110F] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#2E251E] via-[#12110F] to-[#12110F] text-[#EADDC9] font-serif" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] text-[#000000] font-sans" : "bg-[#0B0505] text-[#D8B4B4] font-sans") : activeCustomTheme === 'thientai' ? "bg-[#060406] text-[#d4c6c9] font-mono" : "bg-[#13120d] text-[#dbcec2]")
         : effectiveIsDark 
           ? "bg-[#1A1412] text-[#ECE5DC]" 
           : "bg-[#FDF6EC] text-[#3E2723]"
@@ -1174,28 +1194,22 @@ export function Reader() {
                   ? (rinhrapMode === 'thotrang'
                      ? 'repeating-linear-gradient(45deg, #facaca 0, #facaca 1px, transparent 1px, transparent 60px)'
                      : 'repeating-linear-gradient(45deg, #7F1D1D 0, #7F1D1D 1px, transparent 1px, transparent 60px)')
+                  : activeCustomTheme === 'thientai'
+                  ? 'repeating-linear-gradient(45deg, #34282d 0, #34282d 1px, transparent 1px, transparent 50px)'
                   : 'repeating-linear-gradient(45deg, #2e2a63 0, #2e2a63 1px, transparent 1px, transparent 50px)' }} />
            <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-30 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#D5C2A5' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#2E251E' } : activeCustomTheme === 'rinhrap' ? { backgroundColor: rinhrapMode === 'thotrang' ? '#facaca' : '#450A0A' } : { backgroundColor: '#2e2a63' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#47515f' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#D5C2A5' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#2E251E' } : activeCustomTheme === 'rinhrap' ? { backgroundColor: rinhrapMode === 'thotrang' ? '#facaca' : '#450A0A' } : activeCustomTheme === 'thientai' ? { backgroundColor: '#9a858d' } : { backgroundColor: '#2e2a63' }} />
            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[180px] opacity-10 pointer-events-none"
-                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#BCA782' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#9A8E7D' } : activeCustomTheme === 'rinhrap' ? { backgroundColor: rinhrapMode === 'thotrang' ? '#780606' : '#991B1B' } : { backgroundColor: '#bbee1f' }} />
+                style={activeCustomTheme === 'homer' ? { backgroundColor: '#67707e' } : activeCustomTheme === 'nhatky' ? { backgroundColor: '#BCA782' } : activeCustomTheme === 'thuytien' ? { backgroundColor: '#9A8E7D' } : activeCustomTheme === 'rinhrap' ? { backgroundColor: rinhrapMode === 'thotrang' ? '#780606' : '#991B1B' } : activeCustomTheme === 'thientai' ? { backgroundColor: '#645a6c' } : { backgroundColor: '#bbee1f' }} />
          </>
        )}
        {/* Top Navigation */}
        <header className={cn("w-full sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b-2 transition-all duration-300 shadow-sm relative",
           isCustomThemeActive
-            ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/90 border-[#47515f] backdrop-blur-md" : activeCustomTheme === 'nhatky' ? "bg-[#DFCEB4]/90 border-[#BCA782] text-[#2C1814] backdrop-blur-md" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/90 border-[#B6A996]/30 text-[#F2E6D0] backdrop-blur-md" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#FFF2F1]/90 border-[#facaca] text-[#780606] backdrop-blur-md" : "bg-[#0B0505]/90 border-[#7F1D1D] text-[#D8B4B4] backdrop-blur-md") : "bg-[#13120d]/90 border-[#2e2a63] backdrop-blur-md")
+            ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/90 border-[#47515f] backdrop-blur-md" : activeCustomTheme === 'nhatky' ? "bg-[#DFCEB4]/90 border-[#BCA782] text-[#2C1814] backdrop-blur-md" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/90 border-[#B6A996]/30 text-[#F2E6D0] backdrop-blur-md" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#FFF2F1]/90 border-[#facaca] text-[#780606] backdrop-blur-md" : "bg-[#0B0505]/90 border-[#7F1D1D] text-[#D8B4B4] backdrop-blur-md") : activeCustomTheme === 'thientai' ? "bg-[#060406]/90 border-[#34282d] text-[#d4c6c9] backdrop-blur-md" : "bg-[#13120d]/90 border-[#2e2a63] backdrop-blur-md")
             : effectiveIsDark ? "bg-[#1A1412]/90 border-[#3E2723] backdrop-blur-md" : "bg-[#FDF6EC]/90 border-[#D7CCC8] backdrop-blur-md"
        )}>
-          <button onClick={() => navigate(`/truyen/${story.slug || story.id}`)} className={cn("p-2 rounded-xl border-2 transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none",
-             isCustomThemeActive ? (
-                activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
-                   activeCustomTheme === 'nhatky' ? "border-[#BCA782]/50 bg-[#E8DCC4] hover:bg-[#DFCEB4] hover:border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" :
-                   activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" :
-                   activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "border-[#823323]/50 bg-[#facaca]/20 hover:bg-[#facaca]/40 hover:border-[#780606] text-[#780606] shadow-[2px_2px_0_0_#facaca]" : "border-[#7F1D1D]/50 bg-[#0B0505] hover:bg-[#7F1D1D]/20 hover:border-[#EF4444] text-[#D8B4B4] shadow-[2px_2px_0_0_#450A0A]") :
-                   "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
-             ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
-          )}>
+          <button onClick={() => navigate(`/truyen/${story.slug || story.id}`)} className={cn("p-2 rounded-xl border-2 transition-all cursor-pointer active:translate-y-0.5 active:shadow-none", btnThemeClass)}>
              <ArrowLeft className="w-5 h-5" />
           </button>
           
@@ -1205,15 +1219,7 @@ export function Reader() {
           </div>
           
           <div className="relative flex items-center gap-2">
-             <button onClick={() => setShowSettings(!showSettings)} className={cn("p-2 rounded-xl border-2 shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none transition-all cursor-pointer",
-                isCustomThemeActive ? (
-                   activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
-                   activeCustomTheme === 'nhatky' ? "border-[#BCA782]/50 bg-[#E8DCC4] hover:bg-[#DFCEB4] hover:border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" :
-                   activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" :
-                   activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "border-[#823323]/50 bg-[#facaca]/20 hover:bg-[#facaca]/40 hover:border-[#780606] text-[#780606] shadow-[2px_2px_0_0_#facaca]" : "border-[#7F1D1D]/50 bg-[#0B0505] hover:bg-[#7F1D1D]/20 hover:border-[#EF4444] text-[#D8B4B4] shadow-[2px_2px_0_0_#450A0A]") :
-                   "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
-                ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
-             )}>
+             <button onClick={() => setShowSettings(!showSettings)} className={cn("p-2 rounded-xl border-2 transition-all cursor-pointer active:translate-y-0.5 active:shadow-none", btnThemeClass)}>
                 <Settings2 className="w-5 h-5" />
              </button>
              
@@ -1225,16 +1231,16 @@ export function Reader() {
                        activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] text-[#2C1814] border-[#BCA782] font-reading-cormorant shadow-2xl" :
                        activeCustomTheme === 'thuytien' ? "bg-[#12110F] text-[#F2E6D0] border-[#B6A996] font-reading-cormorant shadow-lg outline outline-1 outline-[#B6A996]/20 outline-offset-[-4px]" :
                        activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#FFF2F1] text-[#780606] border-[#facaca] font-reading-garamond shadow-lg" : "bg-[#0B0505] text-[#D8B4B4] border-[#7F1D1D] font-reading-garamond shadow-lg") :
-                       "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] font-reading-garamond shadow-lg"
+                       activeCustomTheme === 'thientai' ? "bg-[#060406] text-[#d4c6c9] border-[#34282d] font-reading-iosevka shadow-lg" : "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] font-reading-garamond shadow-lg"
                     ) : effectiveIsDark ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723]" : "bg-[#FFFDF9] text-[#3E2723] border-[#3E2723]"
                 )}>
-                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#991B1B]") : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#ECE5DC]" : "text-[#3E2723]"))}>Cài đặt</h3>
+                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#991B1B]") : activeCustomTheme === 'thientai' ? "text-[#9a858d]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#ECE5DC]" : "text-[#3E2723]"))}>Cài đặt</h3>
                    <div className="flex flex-col gap-6">
                       {hasCustomTheme && (
-                         <div className={cn("flex flex-col gap-2 pb-4 border-b-2 border-dashed", activeCustomTheme === 'homer' ? 'border-[#47515f]/20' : activeCustomTheme === 'nhatky' ? 'border-[#BCA782]/30' : activeCustomTheme === 'thuytien' ? 'border-[#B6A996]/20' : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? 'border-[#facaca]/30' : 'border-[#7F1D1D]/30') : 'border-[#2e2a63]/20')}>
-                            <label className={cn("text-xs font-black uppercase flex items-center justify-between", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#991B1B]") : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>
+                         <div className={cn("flex flex-col gap-2 pb-4 border-b-2 border-dashed", activeCustomTheme === 'homer' ? 'border-[#47515f]/20' : activeCustomTheme === 'nhatky' ? 'border-[#BCA782]/30' : activeCustomTheme === 'thuytien' ? 'border-[#B6A996]/20' : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? 'border-[#facaca]/30' : 'border-[#7F1D1D]/30') : activeCustomTheme === 'thientai' ? 'border-[#34282d]/30' : 'border-[#2e2a63]/20')}>
+                            <label className={cn("text-xs font-black uppercase flex items-center justify-between", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#991B1B]") : activeCustomTheme === 'thientai' ? "text-[#9a858d]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>
                                Giao diện truyện
-                               {activeCustomTheme === 'homer' ? <span className="text-[9px] bg-[#a0a6b3] text-[#181f2d] font-bold px-1.5 py-0.5 rounded border border-[#a0a6b3]">PREMIUM</span> : activeCustomTheme === 'nhatky' ? <span className="text-[9px] bg-[#DFCEB4] text-[#2C1814] font-bold px-1.5 py-0.5 rounded border border-[#BCA782]">PREMIUM</span> : activeCustomTheme === 'thuytien' ? <span className="text-[9px] bg-[#B6A996] text-[#12110F] font-bold px-1.5 py-0.5 rounded border border-[#B6A996]">PREMIUM</span> : activeCustomTheme === 'rinhrap' ? <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded border", rinhrapMode === 'thotrang' ? "bg-[#facaca] text-[#780606] border-[#facaca]" : "bg-[#7F1D1D] text-white border-[#7F1D1D]")}>PREMIUM</span> : <span className="text-[9px] bg-[#bbee1f] text-[#13120d] font-bold px-1.5 py-0.5 rounded border border-[#bbee1f]">PREMIUM</span>}
+                               {activeCustomTheme === 'homer' ? <span className="text-[9px] bg-[#a0a6b3] text-[#181f2d] font-bold px-1.5 py-0.5 rounded border border-[#a0a6b3]">PREMIUM</span> : activeCustomTheme === 'nhatky' ? <span className="text-[9px] bg-[#DFCEB4] text-[#2C1814] font-bold px-1.5 py-0.5 rounded border border-[#BCA782]">PREMIUM</span> : activeCustomTheme === 'thuytien' ? <span className="text-[9px] bg-[#B6A996] text-[#12110F] font-bold px-1.5 py-0.5 rounded border border-[#B6A996]">PREMIUM</span> : activeCustomTheme === 'rinhrap' ? <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded border", rinhrapMode === 'thotrang' ? "bg-[#facaca] text-[#780606] border-[#facaca]" : "bg-[#7F1D1D] text-white border-[#7F1D1D]")}>PREMIUM</span> : activeCustomTheme === 'thientai' ? <span className="text-[9px] bg-[#9a858d] text-[#060406] font-bold px-1.5 py-0.5 rounded border border-[#9a858d]">VR GAME</span> : <span className="text-[9px] bg-[#bbee1f] text-[#13120d] font-bold px-1.5 py-0.5 rounded border border-[#bbee1f]">PREMIUM</span>}
                             </label>
                             <button 
                                type="button"
@@ -1335,13 +1341,13 @@ export function Reader() {
 
                            {activeParagraphIndex === idx && (
                                <div className={cn("mt-4 p-5 rounded-2xl border-2 transition-all", 
-                                    isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/95 border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/95 border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" : activeCustomTheme === 'rinhrap' ? "bg-[#100707]/95 border-[#7F1D1D] text-[#D8B4B4] shadow-[2px_2px_0_0_#450A0A]" : "bg-[#13120d]/95 border-[#2e2a63] text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]") 
+                                    isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/95 border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/95 border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1]/95 border-[#facaca] text-[#780606] shadow-[2px_2px_0_0_#facaca]" : "bg-[#100707]/95 border-[#7F1D1D] text-[#D8B4B4] shadow-[2px_2px_0_0_#450A0A]") : "bg-[#13120d]/95 border-[#2e2a63] text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]") 
                                        : effectiveIsDark 
                                           ? "bg-[#120E0C] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]" 
                                           : "bg-[#FFFDF9] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]"
                                 )}>
                                    <div className="flex justify-between items-center mb-3">
-                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? "text-[#991B1B]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>{tParagraphComment}</h4>
+                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#EF4444]") : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>{tParagraphComment}</h4>
                                        <button onClick={() => setActiveParagraphIndex(null)} className="text-xs uppercase font-bold opacity-50 hover:opacity-100">Đóng</button>
                                    </div>
                                    
