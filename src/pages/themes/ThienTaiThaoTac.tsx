@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, Heart, ArrowLeft, Sparkles, Terminal, Cpu, Shield, Zap, Sword, Award, Layers } from 'lucide-react';
+import { BookOpen, Gift, Send, Bookmark, Heart, ArrowLeft, Sparkles, Terminal, Cpu, Shield, Zap, Sword, Award, Layers, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { useStore } from '../../store';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -132,17 +132,47 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 <span className="text-emerald-500 font-bold animate-pulse">100%</span>
               </div>
             </div>
+
+            {/* Character Info */}
+            <div className="mt-4 flex flex-col gap-2 font-mono text-[10px]">
+              <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 flex flex-col gap-1 relative overflow-hidden group hover:border-[#9a858d]/50 transition-colors">
+                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-[#9a858d]/10 to-transparent"></div>
+                <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-1 mb-1 text-xs flex justify-between">
+                  <span>1. Chu Tùy - thụ</span>
+                  <span className="text-[8px] opacity-50">PLAYER 1</span>
+                </div>
+                <div className="text-[#d4c6c9] flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-[#d4c6c9]"></div> Sinh viên</div>
+                <div className="text-[#d4c6c9] flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-[#d4c6c9]"></div> ID: <span className="text-emerald-400 font-bold">[Chu Phi Nhục Thủy]</span></div>
+                <div className="text-[#645a6c] mt-1 pl-3 border-l border-[#645a6c]/30">- DPS bạo lực</div>
+                <div className="text-[#645a6c] pl-3 border-l border-[#645a6c]/30">- Thiên tài thao tác</div>
+                <div className="text-[#645a6c] pl-3 border-l border-[#645a6c]/30">- Healer sát thủ</div>
+              </div>
+              
+              <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 flex flex-col gap-1 relative overflow-hidden group hover:border-[#9a858d]/50 transition-colors">
+                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-[#9a858d]/10 to-transparent"></div>
+                <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-1 mb-1 text-xs flex justify-between">
+                  <span>2. Quý Tê Nguyên - công</span>
+                  <span className="text-[8px] opacity-50">PLAYER 2</span>
+                </div>
+                <div className="text-[#d4c6c9] flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-[#d4c6c9]"></div> Bác sĩ</div>
+                <div className="text-[#d4c6c9] flex flex-wrap items-center gap-x-2 gap-y-1"><div className="w-1 h-1 rounded-full bg-[#d4c6c9]"></div> ID: <span className="text-emerald-400 font-bold">[Nhất Độ Âm Dương]</span> <span className="text-emerald-400 font-bold">[Bé Thỏ Con 123]</span></div>
+                <div className="text-[#645a6c] mt-1 pl-3 border-l border-[#645a6c]/30">- Phái kỹ thuật đỉnh cao</div>
+                <div className="text-[#645a6c] pl-3 border-l border-[#645a6c]/30">- healer</div>
+              </div>
+            </div>
+
           </div>
 
           {/* RIGHT: DATA ARCHIVES */}
           <div className="flex-1 flex flex-col font-mono w-full">
-            <div className="flex items-center gap-3 text-[10px] text-[#9a858d] mb-2 border-b border-[#9a858d]/30 pb-2 uppercase tracking-widest">
-              <Shield className="w-4 h-4" /> THÔNG TIN NGƯỜI CHƠI
-            </div>
+            
             
             <h1 className="text-3xl md:text-5xl font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#d4c6c9] to-[#9a858d] leading-tight tracking-wider mb-4 drop-shadow-[0_0_10px_rgba(154,133,141,0.3)]">
               {story.title}
             </h1>
+            <div className="flex items-center gap-2 text-[#9a858d] mb-4 font-mono text-sm tracking-widest uppercase">
+              <User className="w-4 h-4" /> {story.author || 'Đang cập nhật'}
+            </div>
             
             <div className="flex flex-wrap gap-2 mb-6">
               {story.genres && story.genres.length > 0 ? (
@@ -166,6 +196,16 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
               <p className="text-sm md:text-base leading-loose text-[#d4c6c9]/80 font-sans text-justify">
                 {story.description ? story.description.split('\n').map((line, i) => <span key={i}>{line}<br/></span>) : "Dữ liệu truyện Thần Thụ đang nạp trực tuyến... Bước vào thế giới thực tế ảo cùng những pha thao tác thần sầu và bước nhảy cấp đầy sảng khoái."}
               </p>
+            </div>
+
+            {/* Giới thiệu truyện khác */}
+            <div className="mb-8 border border-[#645a6c]/30 bg-[#060406]/60 p-4">
+              <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-3 text-xs tracking-widest uppercase flex items-center gap-2">
+                <BookOpen className="w-4 h-4" /> GIỚI THIỆU TRUYỆN KHÁC
+              </div>
+              <div className="text-[#d4c6c9]/80 font-sans text-sm italic">
+                (Chưa có dữ liệu. Vui lòng cập nhật thêm từ hệ thống trung tâm.)
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-4 mt-auto">
