@@ -18,6 +18,7 @@ const getThemeBorderClass = (theme: string) => {
   if (theme === 'homer') return "border-[#47515f]/20";
   if (theme === 'nhatky') return "border-[#BCA782]/40";
   if (theme === 'thuytien') return "border-[#B6A996]/30";
+  if (theme === 'rinhrap') return "border-[#7F1D1D]/30";
   return "border-[#2e2a63]/20"; // giagoan
 };
 
@@ -25,6 +26,7 @@ const getThemeBgBorderTextClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d]/50 border-[#47515f]/50 text-[#a0a6b3] shadow-[1px_1px_0_0_#47515f]";
   if (theme === 'nhatky') return "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[1px_1px_0_0_#C9B695]";
   if (theme === 'thuytien') return "bg-[#3D362E]/60 border-[#B6A996]/50 text-[#F2E6D0] shadow-[1px_1px_0_0_#12110F] outline outline-1 outline-[#B6A996]/20 outline-offset-[-4px]";
+  if (theme === 'rinhrap') return "bg-[#0B0505]/60 border-[#7F1D1D]/50 text-[#D8B4B4] shadow-[1px_1px_0_0_#450A0A]";
   return "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]"; // giagoan
 };
 
@@ -32,6 +34,7 @@ const getThemeAvatarFallbackIconClass = (theme: string) => {
   if (theme === 'homer') return "w-4 h-4 text-[#a0a6b3]";
   if (theme === 'nhatky') return "w-4 h-4 text-[#2C1814]";
   if (theme === 'thuytien') return "w-4 h-4 text-[#F2E6D0]";
+  if (theme === 'rinhrap') return "w-4 h-4 text-[#EF4444]";
   return "w-4 h-4 text-[#bbee1f]"; // giagoan
 };
 
@@ -39,6 +42,7 @@ const getThemeAvatarBorderClass = (theme: string) => {
   if (theme === 'homer') return "border border-[#47515f]/50";
   if (theme === 'nhatky') return "border border-[#BCA782]/80";
   if (theme === 'thuytien') return "border border-[#B6A996]/50";
+  if (theme === 'rinhrap') return "border border-[#7F1D1D]/50";
   return "border border-[#2e2a63]/50"; // giagoan
 };
 
@@ -46,6 +50,7 @@ const getThemeAvatarBgClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d]";
   if (theme === 'nhatky') return "bg-[#DFCEB4]";
   if (theme === 'thuytien') return "bg-[#12110F]";
+  if (theme === 'rinhrap') return "bg-[#0B0505]";
   return "bg-[#13120d]"; // giagoan
 };
 
@@ -53,6 +58,7 @@ const getThemeAccentTextColor = (theme: string) => {
   if (theme === 'homer') return "#a0a6b3";
   if (theme === 'nhatky') return "#2C1814";
   if (theme === 'thuytien') return "#B6A996";
+  if (theme === 'rinhrap') return "#EF4444";
   return "#bbee1f"; // giagoan
 };
 
@@ -60,6 +66,7 @@ const getThemeTitleBadgeClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#47515f] text-[#a0a6b3] border-[#67707e]/40";
   if (theme === 'nhatky') return "bg-[#DFCEB4] text-[#2C1814] border-[#BCA782]/40";
   if (theme === 'thuytien') return "bg-[#3D362E] text-[#F2E6D0] border-[#B6A996]/30";
+  if (theme === 'rinhrap') return "bg-[#7F1D1D] text-white border-[#EF4444]/40";
   return "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40"; // giagoan
 };
 
@@ -67,6 +74,7 @@ const getThemeSubTextColor = (theme: string) => {
   if (theme === 'homer') return "text-[#67707e]";
   if (theme === 'nhatky') return "text-[#5C3627]/80";
   if (theme === 'thuytien') return "text-[#B6A996]";
+  if (theme === 'rinhrap') return "text-[#991B1B]";
   return "text-[#695b7f]"; // giagoan
 };
 
@@ -74,6 +82,7 @@ const getThemeGiftBadgeClass = (theme: string) => {
   if (theme === 'homer') return "text-[#181f2d] bg-[#a0a6b3] border-[#a0a6b3]/50";
   if (theme === 'nhatky') return "text-[#2C1814] bg-[#DFCEB4] border-[#BCA782]/50";
   if (theme === 'thuytien') return "text-[#12110F] bg-[#B6A996] border-[#B6A996]/50";
+  if (theme === 'rinhrap') return "text-white bg-[#7F1D1D] border-[#7F1D1D]/50";
   return "text-[#13120d] bg-[#bbee1f] border-[#bbee1f]/50"; // giagoan
 };
 
@@ -81,6 +90,7 @@ const getThemeContentTextColor = (theme: string) => {
   if (theme === 'homer') return "text-[#a0a6b3]";
   if (theme === 'nhatky') return "text-[#2C1814]";
   if (theme === 'thuytien') return "text-[#F2E6D0]";
+  if (theme === 'rinhrap') return "text-[#D8B4B4]";
   return "text-[#dbcec2]"; // giagoan
 };
 
@@ -88,6 +98,7 @@ const getThemeReplyButtonClass = (theme: string) => {
   if (theme === 'homer') return "text-[#67707e] hover:text-[#a0a6b3]";
   if (theme === 'nhatky') return "text-[#5C3627] hover:text-[#2C1814]";
   if (theme === 'thuytien') return "text-[#B6A996] hover:text-[#F2E6D0]";
+  if (theme === 'rinhrap') return "text-[#991B1B] hover:text-[#EF4444]";
   return "text-[#695b7f] hover:text-[#bbee1f]"; // giagoan
 };
 
@@ -95,6 +106,7 @@ const getThemeInputClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] focus:border-[#a0a6b3]";
   if (theme === 'nhatky') return "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] focus:border-[#C9B695]";
   if (theme === 'thuytien') return "bg-[#12110F] border-[#B6A996]/30 text-[#F2E6D0] focus:border-[#B6A996]";
+  if (theme === 'rinhrap') return "bg-[#0B0505] border-[#7F1D1D] text-[#D8B4B4] focus:border-[#EF4444]";
   return "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]"; // giagoan
 };
 
@@ -102,6 +114,7 @@ const getThemeSendButtonClass = (theme: string) => {
   if (theme === 'homer') return "bg-[#a0a6b3] hover:bg-white text-[#181f2d] border-[#47515f] disabled:bg-[#a0a6b3]/20 disabled:text-[#a0a6b3]/40 disabled:border-[#47515f]/50 disabled:shadow-none";
   if (theme === 'nhatky') return "bg-[#BCA782] hover:bg-[#C9B695] text-[#2C1814] border-[#C9B695] disabled:bg-[#BCA782]/20 disabled:text-[#2C1814]/40 disabled:border-[#C9B695]/50 disabled:shadow-none";
   if (theme === 'thuytien') return "bg-[#B6A996] hover:bg-[#F2E6D0] text-[#12110F] border-[#B6A996] disabled:opacity-30 disabled:shadow-none";
+  if (theme === 'rinhrap') return "bg-[#7F1D1D] hover:bg-[#991B1B] text-white border-[#450A0A] disabled:bg-[#7F1D1D]/20 disabled:text-white/40 disabled:border-[#450A0A]/50 disabled:shadow-none";
   return "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none"; // giagoan
 };
 
@@ -1108,15 +1121,16 @@ export function Reader() {
        {/* Top Navigation */}
        <header className={cn("w-full sticky top-0 z-10 px-4 py-3 flex items-center justify-between border-b-2 transition-all duration-300 shadow-sm relative",
           isCustomThemeActive
-            ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/90 border-[#47515f] backdrop-blur-md" : activeCustomTheme === 'nhatky' ? "bg-[#DFCEB4]/90 border-[#BCA782] text-[#2C1814] backdrop-blur-md" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/90 border-[#B6A996]/30 text-[#F2E6D0] backdrop-blur-md" : "bg-[#13120d]/90 border-[#2e2a63] backdrop-blur-md")
+            ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/90 border-[#47515f] backdrop-blur-md" : activeCustomTheme === 'nhatky' ? "bg-[#DFCEB4]/90 border-[#BCA782] text-[#2C1814] backdrop-blur-md" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/90 border-[#B6A996]/30 text-[#F2E6D0] backdrop-blur-md" : activeCustomTheme === 'rinhrap' ? "bg-[#0B0505]/90 border-[#7F1D1D] text-[#D8B4B4] backdrop-blur-md" : "bg-[#13120d]/90 border-[#2e2a63] backdrop-blur-md")
             : effectiveIsDark ? "bg-[#1A1412]/90 border-[#3E2723] backdrop-blur-md" : "bg-[#FDF6EC]/90 border-[#D7CCC8] backdrop-blur-md"
        )}>
           <button onClick={() => navigate(`/truyen/${story.slug || story.id}`)} className={cn("p-2 rounded-xl border-2 transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] active:translate-y-0.5 active:shadow-none",
              isCustomThemeActive ? (
                 activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
-                activeCustomTheme === 'nhatky' ? "border-[#BCA782]/50 bg-[#E8DCC4] hover:bg-[#DFCEB4] hover:border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" :
-                activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" :
-                "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
+                   activeCustomTheme === 'nhatky' ? "border-[#BCA782]/50 bg-[#E8DCC4] hover:bg-[#DFCEB4] hover:border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" :
+                   activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" :
+                   activeCustomTheme === 'rinhrap' ? "border-[#7F1D1D]/50 bg-[#0B0505] hover:bg-[#7F1D1D]/20 hover:border-[#EF4444] text-[#D8B4B4] shadow-[2px_2px_0_0_#450A0A]" :
+                   "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
              ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
           )}>
              <ArrowLeft className="w-5 h-5" />
@@ -1133,6 +1147,7 @@ export function Reader() {
                    activeCustomTheme === 'homer' ? "border-[#47515f]/50 bg-[#181f2d] hover:bg-[#47515f]/20 hover:border-[#a0a6b3] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" :
                    activeCustomTheme === 'nhatky' ? "border-[#BCA782]/50 bg-[#E8DCC4] hover:bg-[#DFCEB4] hover:border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" :
                    activeCustomTheme === 'thuytien' ? "border-[#B6A996]/40 bg-[#12110F] hover:bg-[#3D362E]/50 hover:border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" :
+                   activeCustomTheme === 'rinhrap' ? "border-[#7F1D1D]/50 bg-[#0B0505] hover:bg-[#7F1D1D]/20 hover:border-[#EF4444] text-[#D8B4B4] shadow-[2px_2px_0_0_#450A0A]" :
                    "border-[#2e2a63]/50 bg-[#13120d] hover:bg-[#2e2a63]/20 hover:border-[#bbee1f] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]"
                 ) : "border-[#3E2723] bg-white dark:bg-[#2C221D] hover:bg-stone-100 dark:hover:bg-[#1A1412]"
              )}>
@@ -1146,16 +1161,17 @@ export function Reader() {
                        activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3] border-[#47515f] font-reading-garamond shadow-lg" :
                        activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] text-[#2C1814] border-[#BCA782] font-reading-cormorant shadow-2xl" :
                        activeCustomTheme === 'thuytien' ? "bg-[#12110F] text-[#F2E6D0] border-[#B6A996] font-reading-cormorant shadow-lg outline outline-1 outline-[#B6A996]/20 outline-offset-[-4px]" :
+                       activeCustomTheme === 'rinhrap' ? "bg-[#0B0505] text-[#D8B4B4] border-[#7F1D1D] font-reading-garamond shadow-lg" :
                        "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] font-reading-garamond shadow-lg"
                     ) : effectiveIsDark ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723]" : "bg-[#FFFDF9] text-[#3E2723] border-[#3E2723]"
                 )}>
                    <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#E8DCB8]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? "text-[#991B1B]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#ECE5DC]" : "text-[#3E2723]"))}>Cài đặt</h3>
                    <div className="flex flex-col gap-6">
                       {hasCustomTheme && (
-                         <div className={cn("flex flex-col gap-2 pb-4 border-b-2 border-dashed", activeCustomTheme === 'homer' ? 'border-[#47515f]/20' : activeCustomTheme === 'nhatky' ? 'border-[#BCA782]/30' : activeCustomTheme === 'thuytien' ? 'border-[#B6A996]/20' : 'border-[#2e2a63]/20')}>
+                         <div className={cn("flex flex-col gap-2 pb-4 border-b-2 border-dashed", activeCustomTheme === 'homer' ? 'border-[#47515f]/20' : activeCustomTheme === 'nhatky' ? 'border-[#BCA782]/30' : activeCustomTheme === 'thuytien' ? 'border-[#B6A996]/20' : activeCustomTheme === 'rinhrap' ? 'border-[#7F1D1D]/30' : 'border-[#2e2a63]/20')}>
                             <label className={cn("text-xs font-black uppercase flex items-center justify-between", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#E8DCB8]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? "text-[#991B1B]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>
                                Giao diện truyện
-                               {activeCustomTheme === 'homer' ? <span className="text-[9px] bg-[#a0a6b3] text-[#181f2d] font-bold px-1.5 py-0.5 rounded border border-[#a0a6b3]">PREMIUM</span> : activeCustomTheme === 'nhatky' ? <span className="text-[9px] bg-[#DFCEB4] text-[#2C1814] font-bold px-1.5 py-0.5 rounded border border-[#BCA782]">PREMIUM</span> : activeCustomTheme === 'thuytien' ? <span className="text-[9px] bg-[#B6A996] text-[#12110F] font-bold px-1.5 py-0.5 rounded border border-[#B6A996]">PREMIUM</span> : <span className="text-[9px] bg-[#bbee1f] text-[#13120d] font-bold px-1.5 py-0.5 rounded border border-[#bbee1f]">PREMIUM</span>}
+                               {activeCustomTheme === 'homer' ? <span className="text-[9px] bg-[#a0a6b3] text-[#181f2d] font-bold px-1.5 py-0.5 rounded border border-[#a0a6b3]">PREMIUM</span> : activeCustomTheme === 'nhatky' ? <span className="text-[9px] bg-[#DFCEB4] text-[#2C1814] font-bold px-1.5 py-0.5 rounded border border-[#BCA782]">PREMIUM</span> : activeCustomTheme === 'thuytien' ? <span className="text-[9px] bg-[#B6A996] text-[#12110F] font-bold px-1.5 py-0.5 rounded border border-[#B6A996]">PREMIUM</span> : activeCustomTheme === 'rinhrap' ? <span className="text-[9px] bg-[#7F1D1D] text-white font-bold px-1.5 py-0.5 rounded border border-[#7F1D1D]">PREMIUM</span> : <span className="text-[9px] bg-[#bbee1f] text-[#13120d] font-bold px-1.5 py-0.5 rounded border border-[#bbee1f]">PREMIUM</span>}
                             </label>
                             <button 
                                type="button"
@@ -1172,18 +1188,18 @@ export function Reader() {
                          </div>
                       )}
                       <div className="flex items-center justify-between">
-                         <label className={cn("text-xs font-black uppercase", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Chế độ nền tối</label>
+                         <label className={cn("text-xs font-black uppercase", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'rinhrap' ? "text-[#7F1D1D]/80" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Chế độ nền tối</label>
                          <div className="flex items-center gap-2">
                             <button type="button" onClick={() => { setIsDark(false); if(isCustomThemeActive) setUseStoryTheme(false); }} style={{ backgroundColor: '#FDF6EC' }} className={cn("w-10 h-10 rounded-full border-3", !effectiveIsDark && !isCustomThemeActive ? "border-[#3E2723]" : "border-[#D7CCC8]")}></button>
                             <button type="button" onClick={() => { setIsDark(true); if(isCustomThemeActive) setUseStoryTheme(false); }} style={{ backgroundColor: '#1A1412' }} className={cn("w-10 h-10 rounded-full border-3", effectiveIsDark && !isCustomThemeActive ? "border-[#D4AF37]" : "border-[#3C2E27]")}></button>
                          </div>
                       </div>
                       <div>
-                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Cỡ chữ: {fontSize}px</label>
-                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className={cn("w-full accent-[#3E2723]", isCustomThemeActive && (activeCustomTheme === 'homer' ? "accent-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "accent-[#2C1814]" : "accent-[#bbee1f]"))} />
+                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'rinhrap' ? "text-[#7F1D1D]/80" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Cỡ chữ: {fontSize}px</label>
+                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className={cn("w-full accent-[#3E2723]", isCustomThemeActive && (activeCustomTheme === 'homer' ? "accent-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "accent-[#2C1814]" : activeCustomTheme === 'rinhrap' ? "accent-[#991B1B]" : "accent-[#bbee1f]"))} />
                       </div>
                       <div>
-                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Phông chữ</label>
+                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'rinhrap' ? "text-[#7F1D1D]/80" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Phông chữ</label>
                          <select 
                            value={fontFamily} 
                            disabled={isCustomThemeActive}
@@ -1193,6 +1209,7 @@ export function Reader() {
                              isCustomThemeActive ? (
                                activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3] border-[#47515f] cursor-not-allowed opacity-75" :
                                activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] text-[#2C1814] border-[#BCA782] cursor-not-allowed opacity-75" :
+                               activeCustomTheme === 'rinhrap' ? "bg-[#0B0505] text-[#D8B4B4] border-[#7F1D1D] cursor-not-allowed opacity-75" :
                                "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] cursor-not-allowed opacity-75"
                              ) : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]"
                            )}
@@ -1202,7 +1219,7 @@ export function Reader() {
                             <option value="font-reading-notoserif">Noto Serif (Truyền thống)</option>
                             <option value="font-reading-iosevka">Iosevka (Kỹ thuật)</option>
                          </select>
-                         {isCustomThemeActive && <span className={cn("text-[10px] mt-1 block", activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : "text-[#bbee1f]")}>{activeCustomTheme === 'homer' ? 'Khóa phông chữ Iosevka theo theme' : activeCustomTheme === 'nhatky' ? 'Khóa phông chữ Cormorant Garamond theo theme' : 'Khóa phông chữ EB Garamond theo theme'}</span>}
+                         {isCustomThemeActive && <span className={cn("text-[10px] mt-1 block", activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'rinhrap' ? "text-[#D8B4B4]" : "text-[#bbee1f]")}>{activeCustomTheme === 'homer' ? 'Khóa phông chữ Iosevka theo theme' : activeCustomTheme === 'nhatky' ? 'Khóa phông chữ Cormorant Garamond theo theme' : activeCustomTheme === 'rinhrap' ? 'Khóa phông chữ EB Garamond theo theme' : 'Khóa phông chữ EB Garamond theo theme'}</span>}
                       </div>
                    </div>
                 </div>
@@ -1246,7 +1263,7 @@ export function Reader() {
                                {p}
                                <button 
                                    onClick={(e) => { e.stopPropagation(); setActiveParagraphIndex(activeParagraphIndex === idx ? null : idx); }} 
-                                   className={cn("inline-flex ml-3 items-center justify-center opacity-40 md:opacity-0 md:group-hover/para:opacity-100 transition-opacity hover:opacity-100 align-baseline cursor-pointer", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "hover:text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "hover:text-[#E8DCB8]" : activeCustomTheme === 'thuytien' ? "hover:text-[#B6A996]" : "hover:text-[#bbee1f]") : "hover:text-[#8D6E63]", pComments.length > 0 && (isCustomThemeActive ? (activeCustomTheme === 'homer' ? "opacity-100 md:opacity-100 text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "opacity-100 md:opacity-100 text-[#E8DCB8]" : activeCustomTheme === 'thuytien' ? "opacity-100 md:opacity-100 text-[#B6A996]" : "opacity-100 md:opacity-100 text-[#bbee1f]") : "opacity-100 md:opacity-100 text-[#8D6E63]"))}
+                                   className={cn("inline-flex ml-3 items-center justify-center opacity-40 md:opacity-0 md:group-hover/para:opacity-100 transition-opacity hover:opacity-100 align-baseline cursor-pointer", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "hover:text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "hover:text-[#E8DCB8]" : activeCustomTheme === 'thuytien' ? "hover:text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? "hover:text-[#EF4444]" : "hover:text-[#bbee1f]") : "hover:text-[#8D6E63]", pComments.length > 0 && (isCustomThemeActive ? (activeCustomTheme === 'homer' ? "opacity-100 md:opacity-100 text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "opacity-100 md:opacity-100 text-[#E8DCB8]" : activeCustomTheme === 'thuytien' ? "opacity-100 md:opacity-100 text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? "opacity-100 md:opacity-100 text-[#EF4444]" : "opacity-100 md:opacity-100 text-[#bbee1f]") : "opacity-100 md:opacity-100 text-[#8D6E63]"))}
                                >
                                   <MessageSquare className="w-[0.8em] h-[0.8em] inline-block -translate-y-[0.15em]" />
                                   {pComments.length > 0 && <span className="text-[0.55em] font-bold ml-1 -translate-y-[0.3em]">{pComments.length}</span>}
