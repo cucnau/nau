@@ -1039,6 +1039,30 @@ export function Reader() {
           </div>
         </div>
       );
+    } else if (activeCustomTheme === 'thuytien') {
+      return (
+        <div className="min-h-screen bg-[#12110F] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#2E251E] via-[#12110F] to-[#12110F] text-[#EADDC9] flex flex-col items-center justify-center p-4 font-serif">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#3D362E] border-t-[#B6A996] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#B6A996] animate-pulse font-bold">
+              ĐANG KHỞI TẠO KHÚC TỰ LUYẾN...
+            </div>
+          </div>
+        </div>
+      );
+    } else if (activeCustomTheme === 'rinhrap') {
+      return (
+        <div className="min-h-screen bg-[#0B0505] text-[#D8B4B4] flex flex-col items-center justify-center p-4 font-sans relative overflow-hidden">
+          {/* Subtle toxic grid background effect */}
+          <div className="absolute inset-0 pointer-events-none opacity-5 bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:24px_24px]" />
+          <div className="flex flex-col items-center gap-4 relative z-10">
+            <div className="w-12 h-12 border-4 border-[#450A0A] border-t-[#EF4444] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#EF4444] animate-pulse font-bold">
+              ĐANG KẾT NỐI TÍN HIỆU RÌNH RẬP...
+            </div>
+          </div>
+        </div>
+      );
     }
 
     return (
@@ -1179,7 +1203,7 @@ export function Reader() {
                                className={cn(
                                   "w-full py-2 text-xs font-black uppercase rounded-xl border-2 transition-all cursor-pointer",
                                   useStoryTheme
-                                     ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[2px_2px_0_0_#C9B695] hover:bg-[#C9B695]" : activeCustomTheme === 'thuytien' ? "bg-[#B6A996] text-[#12110F] border-[#B6A996] shadow-[2px_2px_0_0_#12110F] hover:bg-[#F2E6D0]" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white") 
+                                     ? (activeCustomTheme === 'homer' ? "bg-[#a0a6b3] text-[#181f2d] border-[#47515f] shadow-[2px_2px_0_0_#47515f] hover:bg-white" : activeCustomTheme === 'nhatky' ? "bg-[#BCA782] text-[#2C1814] border-[#C9B695] shadow-[2px_2px_0_0_#C9B695] hover:bg-[#C9B695]" : activeCustomTheme === 'thuytien' ? "bg-[#B6A996] text-[#12110F] border-[#B6A996] shadow-[2px_2px_0_0_#12110F] hover:bg-[#F2E6D0]" : activeCustomTheme === 'rinhrap' ? "bg-[#991B1B] text-white border-[#7F1D1D] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#DC2626]" : "bg-[#bbee1f] text-[#13120d] border-[#2e2a63] shadow-[2px_2px_0_0_#2e2a63] hover:bg-white") 
                                      : (effectiveIsDark ? "bg-[#2C221D] text-[#ECE5DC] border-[#3E2723] hover:bg-[#3E2723]" : "bg-white text-[#3E2723] border-[#3E2723] hover:bg-stone-100")
                                )}
                             >
@@ -1219,7 +1243,7 @@ export function Reader() {
                             <option value="font-reading-notoserif">Noto Serif (Truyền thống)</option>
                             <option value="font-reading-iosevka">Iosevka (Kỹ thuật)</option>
                          </select>
-                         {isCustomThemeActive && <span className={cn("text-[10px] mt-1 block", activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'rinhrap' ? "text-[#D8B4B4]" : "text-[#bbee1f]")}>{activeCustomTheme === 'homer' ? 'Khóa phông chữ Iosevka theo theme' : activeCustomTheme === 'nhatky' ? 'Khóa phông chữ Cormorant Garamond theo theme' : activeCustomTheme === 'rinhrap' ? 'Khóa phông chữ EB Garamond theo theme' : 'Khóa phông chữ EB Garamond theo theme'}</span>}
+                         {isCustomThemeActive && <span className={cn("text-[10px] mt-1 block", activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#EADDC9]" : activeCustomTheme === 'rinhrap' ? "text-[#D8B4B4]" : "text-[#bbee1f]")}>{activeCustomTheme === 'homer' ? 'Khóa phông chữ Iosevka theo theme' : activeCustomTheme === 'nhatky' ? 'Khóa phông chữ Cormorant Garamond theo theme' : activeCustomTheme === 'thuytien' ? 'Khóa phông chữ Cormorant Garamond theo theme' : activeCustomTheme === 'rinhrap' ? 'Khóa phông chữ EB Garamond theo theme' : 'Khóa phông chữ EB Garamond theo theme'}</span>}
                       </div>
                    </div>
                 </div>
