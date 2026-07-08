@@ -392,7 +392,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                 <textarea
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Nhập tín hiệu cầu cứu hoặc lời nhắn hệ thống..."
+                  placeholder="Để lại âm thanh hoặc lời cầu cứu..."
                   rows={3}
                   className={`w-full p-3 rounded-xl border-2 focus:outline-none text-sm resize-none font-medium transition-all ${
                      rinhrapMode === 'thotrang'
@@ -405,7 +405,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                   <span className={`text-[10px] font-black uppercase tracking-wider transition-all ${
                      rinhrapMode === 'thotrang' ? 'text-[#780606]' : 'text-[#facaca]'
                   }`}>
-                    {isLoggedIn ? "> Tín hiệu sẵn sàng" : "> Yêu cầu đăng nhập để phát tín hiệu"}
+                    {isLoggedIn ? "> Tần số sẵn sàng" : "> Yêu cầu đăng nhập để kết nối tần số"}
                   </span>
                   <button 
                     onClick={handleSendComment}
@@ -425,7 +425,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                 {comments.length === 0 ? (
                   <div className="flex flex-col items-center justify-center p-10 bg-[#780606]/10 border-2 border-dashed border-[#823323] rounded-2xl text-center text-[#facaca] font-bold gap-3">
                     <Ghost className="w-8 h-8 text-[#9c0800] opacity-50" />
-                    <p>Chưa có tín hiệu nào được bắt lại.</p>
+                    <p>Không có tiếng động nào. Không gian hoàn toàn im lặng...</p>
                   </div>
                 ) : (
                   comments.map((comment) => {
