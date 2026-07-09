@@ -73,7 +73,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#060406] text-[#d4c6c9] font-sans selection:bg-[#9a858d]/30 selection:text-white pb-20 overflow-x-hidden">
+    <div className="min-h-screen bg-[#060406] text-[#d4c6c9] font-['Space_Grotesk'] selection:bg-[#9a858d]/30 selection:text-white pb-20 overflow-x-hidden">
       {/* Immersive Background */}
       <div className="fixed inset-0 pointer-events-none z-0">
         {story.coverUrl && (
@@ -109,7 +109,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                   <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#9a858d] z-30" />
                   <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#9a858d] z-30" />
 
-                  <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-[#060406]/90 border border-[#9a858d] text-[8px] font-mono font-bold text-[#9a858d] z-30 tracking-widest">
+                  <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-[#060406]/90 border border-[#9a858d] text-[8px] font-['JetBrains_Mono'] font-bold text-[#9a858d] z-30 tracking-widest">
                     SYS.V1.2
                   </div>
 
@@ -122,14 +122,14 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                     />
                   ) : (
                     <div className="w-full aspect-[2/3] flex items-center justify-center bg-[#34282d]/20 relative z-10">
-                      <span className="text-[#645a6c] font-mono text-xs tracking-widest">NO VISUAL DATA</span>
+                      <span className="text-[#645a6c] font-['JetBrains_Mono'] text-xs tracking-widest">NO VISUAL DATA</span>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Quick stats under cover */}
-              <div className="grid grid-cols-2 gap-2 font-mono text-[10px]">
+              <div className="grid grid-cols-2 gap-2 font-['JetBrains_Mono'] text-[10px]">
                 <div className="border border-[#645a6c]/30 bg-[#060406]/80 p-2 flex flex-col gap-0.5 text-center items-center justify-center">
                   <span className="text-[#645a6c] tracking-widest text-[8px]">TÌNH TRẠNG</span>
                   <span className="text-[#9a858d] font-bold">{story.isFull ? 'ĐÃ ĐÓNG' : 'ONLINE'}</span>
@@ -146,7 +146,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 {chapters.length > 0 && (
                   <button 
                     onClick={() => navigate(`/doc/${actualStoryId}/${chapters[0].id}`)}
-                    className="w-full py-3 bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] font-bold font-mono text-sm tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(154,133,141,0.2)] hover:shadow-[0_0_25px_rgba(154,133,141,0.5)] flex items-center justify-center gap-2"
+                    className="w-full py-3 bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] font-bold font-['JetBrains_Mono'] text-sm tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(154,133,141,0.2)] hover:shadow-[0_0_25px_rgba(154,133,141,0.5)] flex items-center justify-center gap-2"
                   >
                     <Zap className="w-4 h-4" /> BẮT ĐẦU
                   </button>
@@ -155,7 +155,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 {story.externalUrl && (
                   <button 
                     onClick={() => window.open(story.externalUrl, '_blank', 'noopener,noreferrer')}
-                    className="w-full py-3 font-bold font-mono text-sm tracking-widest uppercase transition-all flex items-center justify-center gap-2 border border-[#645a6c] text-[#d4c6c9] hover:border-[#9a858d] hover:bg-[#9a858d]/10"
+                    className="w-full py-3 font-bold font-['JetBrains_Mono'] text-sm tracking-widest uppercase transition-all flex items-center justify-center gap-2 border border-[#645a6c] text-[#d4c6c9] hover:border-[#9a858d] hover:bg-[#9a858d]/10"
                   >
                     <ExternalLink className="w-4 h-4" /> TRUY CẬP MÁY CHỦ GỐC
                   </button>
@@ -164,7 +164,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 <div className="grid grid-cols-2 gap-2">
                   <button 
                     onClick={handleSaveToggle}
-                    className={`py-2 font-bold font-mono text-[10px] tracking-widest uppercase transition-all flex items-center justify-center gap-1 border ${
+                    className={`py-2 font-bold font-['JetBrains_Mono'] text-[10px] tracking-widest uppercase transition-all flex items-center justify-center gap-1 border ${
                       isSaved 
                         ? 'border-[#9a858d] text-[#9a858d] bg-[#9a858d]/10' 
                         : 'border-[#645a6c] text-[#645a6c] hover:border-[#d4c6c9] hover:text-[#d4c6c9]'
@@ -175,7 +175,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
 
                   <button 
                     onClick={() => setShowGiftModal(true)}
-                    className="py-2 font-bold font-mono text-[10px] tracking-widest uppercase transition-all flex items-center justify-center gap-1 border border-[#645a6c] text-[#d4c6c9] hover:border-[#9a858d] hover:bg-[#9a858d]/10"
+                    className="py-2 font-bold font-['JetBrains_Mono'] text-[10px] tracking-widest uppercase transition-all flex items-center justify-center gap-1 border border-[#645a6c] text-[#d4c6c9] hover:border-[#9a858d] hover:bg-[#9a858d]/10"
                   >
                     <Gift className="w-3 h-3" /> TIẾP TẾ
                   </button>
@@ -184,11 +184,11 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
             </div>
 
             {/* MIDDLE COLUMN: INFO & DESC (Span 5) */}
-            <div className="lg:col-span-5 flex flex-col font-mono h-full">
+            <div className="lg:col-span-5 flex flex-col font-['JetBrains_Mono'] h-full">
               <h1 className="text-2xl md:text-4xl font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#d4c6c9] to-[#9a858d] leading-tight tracking-wider mb-2 drop-shadow-[0_0_10px_rgba(154,133,141,0.3)]">
                 {story.title}
               </h1>
-              <div className="flex items-center gap-2 text-[#9a858d] mb-4 font-mono text-sm tracking-widest uppercase border-b border-[#9a858d]/20 pb-4">
+              <div className="flex items-center gap-2 text-[#9a858d] mb-4 font-['JetBrains_Mono'] text-sm tracking-widest uppercase border-b border-[#9a858d]/20 pb-4">
                 <User className="w-4 h-4" /> {story.author || 'Đang cập nhật'}
               </div>
               
@@ -213,14 +213,14 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-3 text-xs tracking-widest uppercase flex items-center gap-2">
                   <Terminal className="w-4 h-4" /> TRÍCH XUẤT DỮ LIỆU
                 </div>
-                <div className="overflow-y-auto pr-2 custom-scrollbar text-sm md:text-base leading-relaxed text-[#d4c6c9]/80 font-sans text-justify space-y-2 flex-1 max-h-[300px] lg:max-h-[500px]">
+                <div className="overflow-y-auto pr-2 custom-scrollbar text-sm md:text-base leading-relaxed text-[#d4c6c9]/80 font-['Space_Grotesk'] text-justify space-y-2 flex-1 max-h-[300px] lg:max-h-[500px]">
                   {story.description ? story.description.split('\n').map((line, i) => <p key={i}>{line}</p>) : <p>Dữ liệu truyện Thần Thụ đang nạp trực tuyến... Bước vào thế giới thực tế ảo cùng những pha thao tác thần sầu và bước nhảy cấp đầy sảng khoái.</p>}
                 </div>
               </div>
             </div>
 
             {/* RIGHT COLUMN: PLAYERS & RECOMMENDATIONS (Span 4) */}
-            <div className="lg:col-span-4 flex flex-col gap-4 font-mono h-full">
+            <div className="lg:col-span-4 flex flex-col gap-4 font-['JetBrains_Mono'] h-full">
               
               {/* Player 1 */}
               <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 relative overflow-hidden group hover:border-[#9a858d]/50 transition-colors">
@@ -259,7 +259,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-2 text-xs tracking-widest uppercase flex items-center gap-2">
                   <BookOpen className="w-3 h-3" /> TRUYỆN KHÁC
                 </div>
-                <div className="text-[#d4c6c9]/80 font-sans text-xs italic leading-relaxed text-justify whitespace-pre-line overflow-y-auto pr-2 custom-scrollbar max-h-[150px] lg:max-h-[300px]">
+                <div className="text-[#d4c6c9]/80 font-['Space_Grotesk'] text-xs italic leading-relaxed text-justify whitespace-pre-line overflow-y-auto pr-2 custom-scrollbar max-h-[150px] lg:max-h-[300px]">
                   {(story as any).recommendations || '(Chưa có dữ liệu. Vui lòng cập nhật thêm từ hệ thống trung tâm.)'}
                 </div>
               </div>
@@ -274,11 +274,11 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
           <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#9a858d]" />
           <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#9a858d]" />
           
-          <div className="flex items-center gap-3 mb-6 font-mono text-lg font-black text-[#d4c6c9] tracking-widest uppercase border-b border-[#645a6c]/30 pb-3">
+          <div className="flex items-center gap-3 mb-6 font-['JetBrains_Mono'] text-lg font-black text-[#d4c6c9] tracking-widest uppercase border-b border-[#645a6c]/30 pb-3">
             <Sword className="w-6 h-6 text-[#9a858d]" /> BẢN ĐỒ KHU VỰC THẦN THỤ
           </div>
           
-          <p className="text-xs font-mono text-[#645a6c] mb-6">
+          <p className="text-xs font-['JetBrains_Mono'] text-[#645a6c] mb-6">
             *Người chơi đã mở khóa các khu vực dưới đây. Nhấp vào khu vực để dò tọa độ dữ liệu.
           </p>
 
@@ -294,10 +294,10 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 }`}
               >
                 <div className="absolute top-0 right-0 w-0 h-0 border-t-[10px] border-l-[10px] border-t-[#9a858d] border-l-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <span className="text-[9px] font-mono font-black text-[#9a858d] uppercase tracking-widest">
+                <span className="text-[9px] font-['JetBrains_Mono'] font-black text-[#9a858d] uppercase tracking-widest">
                   ZONE {idx + 1 < 10 ? `0${idx + 1}` : idx + 1}
                 </span>
-                <span className="line-clamp-2 w-full font-sans font-bold text-xs text-[#d4c6c9] leading-tight">
+                <span className="line-clamp-2 w-full font-['Space_Grotesk'] font-bold text-xs text-[#d4c6c9] leading-tight">
                   {dun.name}
                 </span>
               </button>
@@ -305,7 +305,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
           </div>
 
           {/* Dungeon details monitor */}
-          <div className="mt-6 p-5 bg-[#060406] border border-[#9a858d]/40 relative font-mono text-sm">
+          <div className="mt-6 p-5 bg-[#060406] border border-[#9a858d]/40 relative font-['JetBrains_Mono'] text-sm">
             {/* Corner brackets */}
             <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#9a858d]" />
             <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#9a858d]" />
@@ -318,7 +318,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                   <Layers className="w-5 h-5" /> 
                   {selectedDungeon !== null ? dungeons[selectedDungeon].name : "MÁY QUÉT DỮ LIỆU KHU VỰC"}
                 </div>
-                <p className="text-[#d4c6c9]/70 font-sans text-sm">
+                <p className="text-[#d4c6c9]/70 font-['Space_Grotesk'] text-sm">
                   {selectedDungeon !== null ? dungeons[selectedDungeon].desc : "Chọn khu vực bên trên để truy xuất thông tin hành trình."}
                 </p>
               </div>
@@ -336,7 +336,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
               )}
             </div>
 
-            <div className="mt-4 text-[10px] font-mono text-[#9a858d] flex items-center gap-2">
+            <div className="mt-4 text-[10px] font-['JetBrains_Mono'] text-[#9a858d] flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#9a858d] animate-pulse"></span>
               <span>HUD LOG: {interfaceLog}</span>
             </div>
@@ -358,10 +358,10 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                       {/* Scanline hover */}
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#9a858d]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                       
-                      <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-[#9a858d]">
+                      <span className="text-[9px] font-['JetBrains_Mono'] font-bold uppercase tracking-widest text-[#9a858d]">
                         STAGE {idx + 1}
                       </span>
-                      <span className="font-bold text-xs text-[#d4c6c9] group-hover:text-white line-clamp-1 font-mono">
+                      <span className="font-bold text-xs text-[#d4c6c9] group-hover:text-white line-clamp-1 font-['JetBrains_Mono']">
                         {chap.title}
                       </span>
                     </button>
@@ -371,7 +371,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                     const chapNum = match ? parseInt(match[1], 10) : 0;
                     return chapNum >= dungeons[selectedDungeon].min && chapNum <= dungeons[selectedDungeon].max;
                   }).length === 0 && (
-                    <p className="col-span-1 sm:col-span-2 md:col-span-3 text-center text-[11px] text-[#645a6c] font-mono italic py-4">
+                    <p className="col-span-1 sm:col-span-2 md:col-span-3 text-center text-[11px] text-[#645a6c] font-['JetBrains_Mono'] italic py-4">
                       Dữ liệu phân đoạn này chưa được cập nhật...
                     </p>
                   )}
@@ -387,7 +387,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
           <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#9a858d]" />
           
           <div className="flex flex-col gap-6">
-            <h3 className="font-extrabold text-sm md:text-base uppercase tracking-widest flex items-center gap-2 text-[#d4c6c9] font-mono border-b border-[#645a6c]/30 pb-3">
+            <h3 className="font-extrabold text-sm md:text-base uppercase tracking-widest flex items-center gap-2 text-[#d4c6c9] font-['JetBrains_Mono'] border-b border-[#645a6c]/30 pb-3">
               <Terminal className="w-5 h-5 text-[#9a858d]" /> KÊNH THẾ GIỚI
             </h3>
 
@@ -401,18 +401,18 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Gửi tin nhắn lên kênh thế giới của Người chơi..."
                 rows={3}
-                className="w-full p-3 border border-[#645a6c]/40 bg-[#060406] text-[#d4c6c9] placeholder-[#645a6c] focus:outline-none focus:border-[#9a858d] text-xs sm:text-sm resize-none font-mono transition-all"
+                className="w-full p-3 border border-[#645a6c]/40 bg-[#060406] text-[#d4c6c9] placeholder-[#645a6c] focus:outline-none focus:border-[#9a858d] text-xs sm:text-sm resize-none font-['JetBrains_Mono'] transition-all"
               />
               
               <div className="flex justify-between items-center">
-                <span className="text-[10px] font-mono text-[#645a6c] uppercase tracking-wider flex items-center gap-2">
+                <span className="text-[10px] font-['JetBrains_Mono'] text-[#645a6c] uppercase tracking-wider flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   {isLoggedIn ? "> LOG: SẴN SÀNG PHÁT TIN" : "> LOG: YÊU CẦU ĐĂNG NHẬP"}
                 </span>
                 <button 
                   onClick={handleSendComment}
                   disabled={submittingComment || !commentText.trim()}
-                  className="px-6 py-2.5 text-xs font-bold font-mono tracking-widest bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] disabled:opacity-50 flex items-center gap-2 cursor-pointer transition-colors"
+                  className="px-6 py-2.5 text-xs font-bold font-['JetBrains_Mono'] tracking-widest bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] disabled:opacity-50 flex items-center gap-2 cursor-pointer transition-colors"
                 >
                   PHÁT TIN <Send className="w-4 h-4" />
                 </button>
@@ -422,7 +422,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
             {/* CHAT MESSAGES FEED */}
             <div className="flex flex-col gap-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
               {comments.length === 0 ? (
-                <div className="text-center py-10 border border-dashed border-[#645a6c]/40 bg-[#060406] text-[#645a6c] font-mono">
+                <div className="text-center py-10 border border-dashed border-[#645a6c]/40 bg-[#060406] text-[#645a6c] font-['JetBrains_Mono']">
                   <p>Kênh thế giới đang trống... Hãy là người chơi đầu tiên để lại bút tích.</p>
                 </div>
               ) : (
@@ -460,7 +460,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                           className="w-10 h-10 shrink-0 border border-[#645a6c]/60 rounded-none bg-[#34282d]/50" 
                           fallbackIconSizeClass="w-5 h-5 text-[#645a6c]" 
                         />
-                        <div className="flex-1 min-w-0 font-mono">
+                        <div className="flex-1 min-w-0 font-['JetBrains_Mono']">
                           <div className="flex items-center gap-3 flex-wrap mb-2 border-b border-[#645a6c]/20 pb-2">
                             <span className="font-bold text-sm text-[#d4c6c9]">
                               {dName}
@@ -481,7 +481,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                             </div>
                           )}
 
-                          <p className="text-sm font-sans text-[#d4c6c9]/90 leading-relaxed text-justify">
+                          <p className="text-sm font-['Space_Grotesk'] text-[#d4c6c9]/90 leading-relaxed text-justify">
                             {comment.content}
                           </p>
                         </div>
@@ -502,30 +502,30 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
             <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#9a858d]" />
             <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#9a858d]" />
             
-            <h3 className="text-xl font-black font-mono mb-2 uppercase tracking-widest flex items-center gap-3 text-[#d4c6c9] border-b border-[#9a858d]/30 pb-4">
+            <h3 className="text-xl font-black font-['JetBrains_Mono'] mb-2 uppercase tracking-widest flex items-center gap-3 text-[#d4c6c9] border-b border-[#9a858d]/30 pb-4">
               <Sparkles className="w-6 h-6 text-[#9a858d]" /> TIẾP TẾ KHU VỰC
             </h3>
             
-            <p className="text-sm mb-6 mt-4 font-mono text-[#645a6c] leading-relaxed">
+            <p className="text-sm mb-6 mt-4 font-['JetBrains_Mono'] text-[#645a6c] leading-relaxed">
               Trang bị thêm vũ khí và năng lượng hỗ trợ Người chơi sinh tồn và tăng cấp bão táp trong Thần Thụ.
             </p>
             
             <div className="flex flex-col gap-5">
               <div>
-                <label className="text-xs font-mono font-bold mb-2 uppercase flex items-center gap-2 text-[#9a858d]">
+                <label className="text-xs font-['JetBrains_Mono'] font-bold mb-2 uppercase flex items-center gap-2 text-[#9a858d]">
                   <Gift className="w-4 h-4" /> CHỌN CC TIẾP TẾ (SỐ DƯ: {choco} CC)
                 </label>
                 <input 
                   type="number" 
                   value={giftAmount}
                   onChange={(e) => setGiftAmount(Math.max(1, parseInt(e.target.value) || 0))}
-                  className="w-full border border-[#645a6c]/60 p-3 text-sm font-mono font-bold focus:outline-none focus:border-[#9a858d] bg-[#060406] text-[#d4c6c9] transition-colors"
+                  className="w-full border border-[#645a6c]/60 p-3 text-sm font-['JetBrains_Mono'] font-bold focus:outline-none focus:border-[#9a858d] bg-[#060406] text-[#d4c6c9] transition-colors"
                   min="1"
                 />
               </div>
               
               <div>
-                <label className="text-xs font-mono font-bold mb-2 uppercase flex items-center gap-2 text-[#9a858d]">
+                <label className="text-xs font-['JetBrains_Mono'] font-bold mb-2 uppercase flex items-center gap-2 text-[#9a858d]">
                   <Terminal className="w-4 h-4" /> LỜI NHẮN HỆ THỐNG
                 </label>
                 <textarea
@@ -533,20 +533,20 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                   onChange={(e) => setGiftMessage(e.target.value)}
                   placeholder="Thần Thụ vĩ đại, cầu xin thả boss phó bản ra nhẹ tay..."
                   rows={3}
-                  className="w-full border border-[#645a6c]/60 p-3 text-sm font-sans focus:outline-none focus:border-[#9a858d] bg-[#060406] text-[#d4c6c9] resize-none transition-colors"
+                  className="w-full border border-[#645a6c]/60 p-3 text-sm font-['Space_Grotesk'] focus:outline-none focus:border-[#9a858d] bg-[#060406] text-[#d4c6c9] resize-none transition-colors"
                 />
               </div>
               
               <div className="flex gap-4 pt-4 mt-2 border-t border-[#645a6c]/30">
                 <button 
                   onClick={() => setShowGiftModal(false)}
-                  className="flex-1 py-3 text-sm font-bold font-mono uppercase border border-[#645a6c] text-[#645a6c] hover:border-[#d4c6c9] hover:text-[#d4c6c9] transition-colors"
+                  className="flex-1 py-3 text-sm font-bold font-['JetBrains_Mono'] uppercase border border-[#645a6c] text-[#645a6c] hover:border-[#d4c6c9] hover:text-[#d4c6c9] transition-colors"
                 >
                   HỦY BỎ
                 </button>
                 <button 
                   onClick={handleGiftSubmit}
-                  className="flex-1 py-3 text-sm font-bold font-mono uppercase bg-[#9a858d] text-[#060406] hover:bg-[#d4c6c9] transition-colors shadow-[0_0_15px_rgba(154,133,141,0.3)]"
+                  className="flex-1 py-3 text-sm font-bold font-['JetBrains_Mono'] uppercase bg-[#9a858d] text-[#060406] hover:bg-[#d4c6c9] transition-colors shadow-[0_0_15px_rgba(154,133,141,0.3)]"
                 >
                   GỬI CC
                 </button>
