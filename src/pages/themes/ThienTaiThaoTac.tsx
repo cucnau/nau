@@ -83,38 +83,40 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 mix-blend-overlay" />
       </div>
 
-      <div className="max-w-[1200px] mx-auto p-4 md:p-8 relative z-10 flex flex-col gap-12 mt-4 md:mt-12">
+      <div className="max-w-[1200px] mx-auto p-4 md:p-8 relative z-10 flex flex-col gap-12 mt-4 md:mt-6">
         
-        {/* HUD DECORATIVE SEPARATOR */}
-        <div className="w-full relative flex items-center justify-center opacity-80 pointer-events-none hidden md:flex -mb-4">
-          <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#9a858d]/40 to-transparent"></div>
-          <div className="w-full max-w-3xl flex justify-between items-center relative z-10 px-8">
-            <div className="flex items-center gap-2">
-              <div className="flex gap-1">
-                <div className="w-1 h-3 bg-[#9a858d]/80 animate-pulse"></div>
-                <div className="w-1 h-2 bg-[#9a858d]/40"></div>
-                <div className="w-1 h-1 bg-[#9a858d]/40"></div>
+        {/* HUD TOP WRAPPER */}
+        <div className="flex flex-col gap-4 md:gap-6">
+          {/* HUD DECORATIVE SEPARATOR */}
+          <div className="w-full relative flex items-center justify-center opacity-80 pointer-events-none hidden md:flex">
+            <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#9a858d]/40 to-transparent"></div>
+            <div className="w-full max-w-3xl flex justify-between items-center relative z-10 px-8">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div className="w-1 h-3 bg-[#9a858d]/80 animate-pulse"></div>
+                  <div className="w-1 h-2 bg-[#9a858d]/40"></div>
+                  <div className="w-1 h-1 bg-[#9a858d]/40"></div>
+                </div>
+                <div className="w-12 h-[1px] bg-[#9a858d]/60"></div>
               </div>
-              <div className="w-12 h-[1px] bg-[#9a858d]/60"></div>
-            </div>
-            <div className="font-mono text-[10px] text-[#9a858d] tracking-[0.2em] bg-[#060406] px-6 py-1.5 border-y border-[#9a858d]/30 flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 animate-ping"></span>
-              CONNECTING // HOLODECK_GAME
-              <span className="w-1.5 h-1.5 bg-[#9a858d]/40"></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-12 h-[1px] bg-[#9a858d]/60"></div>
-              <div className="flex gap-1 items-end">
-                <div className="w-1 h-1 bg-[#9a858d]/40"></div>
-                <div className="w-1 h-2 bg-[#9a858d]/40"></div>
-                <div className="w-1 h-3 bg-[#9a858d]/80 animate-pulse"></div>
+              <div className="font-mono text-[10px] text-[#9a858d] tracking-[0.2em] bg-[#060406] px-6 py-1.5 border-y border-[#9a858d]/30 flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 animate-ping"></span>
+                CONNECTING // HOLODECK_GAME
+                <span className="w-1.5 h-1.5 bg-[#9a858d]/40"></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-12 h-[1px] bg-[#9a858d]/60"></div>
+                <div className="flex gap-1 items-end">
+                  <div className="w-1 h-1 bg-[#9a858d]/40"></div>
+                  <div className="w-1 h-2 bg-[#9a858d]/40"></div>
+                  <div className="w-1 h-3 bg-[#9a858d]/80 animate-pulse"></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* HUD HEADER: CHARACTER / STORY DATA */}
-        <div className="w-full relative border border-[#9a858d]/20 bg-[#060406]/60 p-4 md:p-6 lg:p-8 backdrop-blur-md">
+          
+          {/* HUD HEADER: CHARACTER / STORY DATA */}
+          <div className="w-full relative border border-[#9a858d]/20 bg-[#060406]/60 p-4 md:p-6 lg:p-8 backdrop-blur-md">
           {/* Grid Layout HUD */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 w-full relative z-10">
             
@@ -293,6 +295,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
             </div>
 
           </div>
+        </div>
         </div>
         
         {/* BẢN ĐỒ HÀNH TRÌNH PHÓ BẢN THẦN THỤ */}
