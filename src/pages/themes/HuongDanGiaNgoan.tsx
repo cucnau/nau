@@ -692,6 +692,15 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                   <BookOpen className="w-4 h-4" /> BẮT ĐẦU PHÊ DUYỆT
                 </button>
 
+                {story.externalUrl && (
+                  <button 
+                    onClick={() => window.open(story.externalUrl, '_blank', 'noopener,noreferrer')}
+                    className="w-full py-3 border border-[#695b7f] text-[#dbcec2] uppercase text-xs font-bold tracking-widest hover:border-[#bbee1f] hover:text-[#bbee1f] transition-all flex items-center justify-center gap-2 bg-[#13120d]/50"
+                  >
+                    <ExternalLink className="w-4 h-4" /> TRUY XUẤT HỒ SƠ GỐC
+                  </button>
+                )}
+
                 <button 
                   onClick={handleSaveToggle}
                   className="w-full py-3 border border-[#695b7f] text-[#dbcec2] uppercase text-xs font-bold tracking-widest hover:border-[#bbee1f] hover:text-[#bbee1f] transition-all flex items-center justify-center gap-2 bg-[#13120d]/50"
