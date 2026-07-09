@@ -184,7 +184,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
             </div>
 
             {/* MIDDLE COLUMN: INFO & DESC (Span 5) */}
-            <div className="lg:col-span-5 flex flex-col font-mono h-full">
+            <div className="lg:col-span-5 flex flex-col font-mono h-auto lg:h-[550px]">
               <h1 className="text-2xl md:text-4xl font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#d4c6c9] to-[#9a858d] leading-tight tracking-wider mb-2 drop-shadow-[0_0_10px_rgba(154,133,141,0.3)]">
                 {story.title}
               </h1>
@@ -213,14 +213,14 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-3 text-xs tracking-widest uppercase flex items-center gap-2">
                   <Terminal className="w-4 h-4" /> TRÍCH XUẤT DỮ LIỆU
                 </div>
-                <div className="overflow-y-auto pr-2 custom-scrollbar text-[13px] md:text-sm leading-relaxed text-[#d4c6c9]/80 font-space text-justify space-y-2 flex-1 min-h-0 max-h-[300px] lg:max-h-[500px]">
+                <div className="overflow-y-auto pr-2 custom-scrollbar text-[13px] md:text-sm leading-relaxed text-[#d4c6c9]/80 font-space text-justify space-y-2 flex-1 min-h-0">
                   {story.description ? story.description.split('\n').map((line, i) => <p key={i}>{line}</p>) : <p>Dữ liệu truyện Thần Thụ đang nạp trực tuyến... Bước vào thế giới thực tế ảo cùng những pha thao tác thần sầu và bước nhảy cấp đầy sảng khoái.</p>}
                 </div>
               </div>
             </div>
 
             {/* RIGHT COLUMN: PLAYERS & RECOMMENDATIONS (Span 4) */}
-            <div className="lg:col-span-4 flex flex-col gap-4 font-mono h-full">
+            <div className="lg:col-span-4 flex flex-col gap-4 font-mono h-auto lg:h-[550px]">
               
               {/* Player 1 */}
               <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 relative overflow-hidden group hover:border-[#9a858d]/50 transition-colors">
@@ -259,7 +259,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-2 text-xs tracking-widest uppercase flex items-center gap-2">
                   <BookOpen className="w-3 h-3" /> HỒ SƠ TƯƠNG ĐỒNG
                 </div>
-                <div className="text-[#d4c6c9]/80 font-space text-xs italic leading-relaxed text-justify overflow-y-auto pr-2 custom-scrollbar max-h-[300px] lg:max-h-[500px] space-y-2 flex-1 min-h-0">
+                <div className="text-[#d4c6c9]/80 font-space text-xs italic leading-relaxed text-justify overflow-y-auto pr-2 custom-scrollbar space-y-2 flex-1 min-h-0">
                   {(story as any).recommendations ? (story as any).recommendations.split('\n').map((line: string, i: number) => line.trim() ? <p key={i} className="mb-3">{line}</p> : null) : <p>(Chưa có dữ liệu. Vui lòng cập nhật thêm từ hệ thống trung tâm.)</p>}
                 </div>
               </div>
