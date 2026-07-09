@@ -49,18 +49,18 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
 
   // Danh sách các phó bản cực đỉnh từ cốt truyện "Thần Thụ"
   const dungeons = [
-    { name: "3145 · Server tân thủ", desc: "Chương 1-12", diff: "Tân Thủ", boss: "Không có", min: 1, max: 12 },
-    { name: "3145 · Miếu Thần Thiên Địa", desc: "Chương 13-23", diff: "Dễ", boss: "Thiên Địa Thủ Vệ", min: 13, max: 23 },
-    { name: "3145 · Khu vực lang thang hoang dã", desc: "Chương 24-28", diff: "Thường", boss: "Thương Lang Vương", min: 24, max: 28 },
-    { name: "Khám phá · Thị Trấn Mê Cung Gương", desc: "Chương 29-37", diff: "Khó", boss: "Kính Ảnh Ma Thần", min: 29, max: 37 },
-    { name: "Thần Thụ Thiên Không · Thị Trấn Lưu Ly", desc: "Chương 38-44", diff: "Khó", boss: "Lưu Ly Tinh Thể Long", min: 38, max: 44 },
-    { name: "Trận chiến liên minh bang hội · Bạch Thủy Cốc", desc: "Chương 45-55", diff: "Cực Khó", boss: "Bạch Vụ Thần Điêu", min: 45, max: 55 },
-    { name: "Khám phá · Trại Nhà Trần", desc: "Chương 56-69", diff: "Khó", boss: "Trần Đại Thủ Lĩnh", min: 56, max: 69 },
-    { name: "Lối chơi đặc biệt · Tỉ Thí Kén Rể", desc: "Chương 70-90", diff: "Thường", boss: "Trấn Vũ Lôi Chủ", min: 70, max: 90 },
-    { name: "Khám phá · Lĩnh Vực Thần Tài", desc: "Chương 91-114", diff: "Huyền Thoại", boss: "Kim Bảo Thần Tài", min: 91, max: 114 },
-    { name: "Khám phá · Vùng Đất Sụp Đổ", desc: "Chương 115-135", diff: "Cực Khó", boss: "Vua Sụp Đổ", min: 115, max: 135 },
-    { name: "Khám phá · Kỳ Quan Sơn Dã", desc: "Chương 136-157", diff: "Huyền Thoại", boss: "Cổ Thụ Thần Long", min: 136, max: 157 },
-    { name: "Tiến độ thế giới · Bí Mật Trường Phái", desc: "Chương 158-184", diff: "Bí Ẩn", boss: "Trưởng Lão Trường Phái", min: 158, max: 184 },
+    { name: "3145 · Server tân thủ", desc: "Chương 1-12", diff: "★★★", boss: "Thủ Thư Thư Viện", min: 1, max: 12 },
+    { name: "3145 · Miếu Thần Thiên Địa", desc: "Chương 13-23", diff: "★★★★★★", boss: "Tượng Thần Hỗn Loạn", min: 13, max: 23 },
+    { name: "3145 · Khu vực lang thang hoang dã", desc: "Chương 24-28", diff: "Không rõ", boss: "Không rõ", min: 24, max: 28 },
+    { name: "Khám phá · Thị Trấn Mê Cung Gương", desc: "Chương 29-37", diff: "★★★★★★", boss: "Thần Sương", min: 29, max: 37 },
+    { name: "Thần Thụ Thiên Không · Thị Trấn Lưu Ly", desc: "Chương 38-44", diff: "Không rõ", boss: "Không rõ", min: 38, max: 44 },
+    { name: "Trận chiến liên minh bang hội · Bạch Thủy Cốc", desc: "Chương 45-55", diff: "★★★★★★", boss: "Thú dữ trấn giữ thung lũng", min: 45, max: 55 },
+    { name: "Khám phá · Trại Nhà Trần", desc: "Chương 56-69", diff: "★★★★★★", boss: "Đại ca Trần", min: 56, max: 69 },
+    { name: "Lối chơi đặc biệt · Tỉ Thí Kén Rể", desc: "Chương 70-90", diff: "★★★★★★", boss: "Thần Giả", min: 70, max: 90 },
+    { name: "Khám phá · Lĩnh Vực Thần Tài", desc: "Chương 91-114", diff: "★★★★★★★", boss: "Thần Dục", min: 91, max: 114 },
+    { name: "Khám phá · Vùng Đất Sụp Đổ", desc: "Chương 115-135", diff: "★★★★★★★", boss: "Thần Ảo", min: 115, max: 135 },
+    { name: "Khám phá · Kỳ Quan Sơn Dã", desc: "Chương 136-157", diff: "★★★★★★★", boss: "Thần Cảnh", min: 136, max: 157 },
+    { name: "Tiến độ thế giới · Bí Mật Trường Phái", desc: "Chương 158-184", diff: "★★★★★★★★", boss: "Không rõ", min: 158, max: 184 },
     { name: "Còn tiếp...", desc: "Hành trình vẫn đang được cập nhật...", diff: "Chưa Rõ", boss: "Chưa Rõ", min: 185, max: 9999 }
   ];
 
