@@ -43,7 +43,7 @@ const getThemeAvatarFallbackIconClass = (theme: string) => {
   if (theme === 'rinhrap-thotrang') return "w-4 h-4 text-[#780606]";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "w-4 h-4 text-[#EF4444]";
   if (theme === 'thientai') return "w-4 h-4 text-[#9a858d]";
-  if (theme === 'nguoidep') return "w-4 h-4 text-[#c5ad97]";
+  if (theme === 'nguoidep') return "w-4 h-4 text-[#808499]";
   return "w-4 h-4 text-[#bbee1f]"; // giagoan
 };
 
@@ -54,7 +54,7 @@ const getThemeAvatarBorderClass = (theme: string) => {
   if (theme === 'rinhrap-thotrang') return "border border-[#823323]/50";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "border border-[#7F1D1D]/50";
   if (theme === 'thientai') return "border border-[#9a858d]/50";
-  if (theme === 'nguoidep') return "border border-[#c5ad97]/50";
+  if (theme === 'nguoidep') return "border border-[#808499]/30";
   return "border border-[#2e2a63]/50"; // giagoan
 };
 
@@ -87,7 +87,7 @@ const getThemeTitleBadgeClass = (theme: string) => {
   if (theme === 'rinhrap-thotrang') return "bg-[#facaca] text-[#780606] border-[#823323]/40";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#7F1D1D] text-white border-[#EF4444]/40";
   if (theme === 'thientai') return "bg-[#9a858d]/20 text-[#9a858d] border-[#9a858d]/30";
-  if (theme === 'nguoidep') return "bg-[#808499]/20 text-[#c5ad97] border-[#808499]/30";
+  if (theme === 'nguoidep') return "bg-[#808499]/20 text-[#dfdee0] border-[#808499]/30";
   return "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40"; // giagoan
 };
 
@@ -131,7 +131,7 @@ const getThemeReplyButtonClass = (theme: string) => {
   if (theme === 'rinhrap-thotrang') return "text-[#823323] hover:text-[#9c0800]";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-[#991B1B] hover:text-[#EF4444]";
   if (theme === 'thientai') return "text-[#9a858d]/70 hover:text-[#9a858d]";
-  if (theme === 'nguoidep') return "text-[#808499] hover:text-[#c5ad97]";
+  if (theme === 'nguoidep') return "text-[#808499] hover:text-[#dfdee0]";
   return "text-[#695b7f] hover:text-[#bbee1f]"; // giagoan
 };
 
@@ -142,7 +142,7 @@ const getThemeInputClass = (theme: string) => {
   if (theme === 'rinhrap-thotrang') return "bg-[#fff2f1] border-[#823323] text-[#000000] focus:border-[#9c0800]";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#0B0505] border-[#7F1D1D] text-[#D8B4B4] focus:border-[#EF4444]";
   if (theme === 'thientai') return "bg-[#060406] border-[#9a858d]/30 text-[#d4c6c9] focus:border-[#9a858d]";
-  if (theme === 'nguoidep') return "bg-[#251e23] border-[#808499]/30 text-[#dfdee0] focus:border-[#c5ad97]";
+  if (theme === 'nguoidep') return "bg-[#251e23] border-[#808499]/30 text-[#dfdee0] focus:border-[#dfdee0]";
   return "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]"; // giagoan
 };
 
@@ -153,7 +153,7 @@ const getThemeSendButtonClass = (theme: string) => {
   if (theme === 'rinhrap-thotrang') return "bg-[#facaca] hover:bg-[#fff2f1] text-[#780606] border-[#823323] disabled:bg-[#facaca]/20 disabled:text-[#780606]/40 disabled:border-[#823323]/50 disabled:shadow-none";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#7F1D1D] hover:bg-[#991B1B] text-white border-[#450A0A] disabled:bg-[#7F1D1D]/20 disabled:text-white/40 disabled:border-[#450A0A]/50 disabled:shadow-none";
   if (theme === 'thientai') return "bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] border-[#34282d] disabled:bg-[#9a858d]/20 disabled:text-[#d4c6c9]/40 disabled:border-[#34282d]/50 disabled:shadow-none";
-  if (theme === 'nguoidep') return "bg-[#c5ad97] hover:bg-[#dfdee0] text-[#251e23] border-[#808499] disabled:opacity-30 disabled:shadow-none";
+  if (theme === 'nguoidep') return "bg-[#604239] hover:bg-[#c5ad97] text-[#dfdee0] hover:text-[#251e23] border-[#808499] disabled:opacity-30 disabled:shadow-none";
   return "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none"; // giagoan
 };
 
