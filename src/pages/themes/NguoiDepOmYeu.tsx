@@ -228,7 +228,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
   );
 
   return (
-    <div className="w-full min-h-screen bg-[#251e23] text-[#dfdee0] font-sans selection:bg-[#c5ad97]/30 selection:text-[#dfdee0] relative overflow-hidden pb-16">
+    <div className="w-full min-h-screen bg-[#808499] text-[#dfdee0] font-sans selection:bg-[#c5ad97]/30 selection:text-[#dfdee0] relative overflow-hidden pb-16">
       
       {/* Abstract elegant background design with subtle lines */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#604239]/15 via-transparent to-transparent pointer-events-none" />
