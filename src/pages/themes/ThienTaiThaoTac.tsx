@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, Heart, ArrowLeft, Sparkles, Terminal, Cpu, Shield, Zap, Sword, Award, Layers, User } from 'lucide-react';
+import { BookOpen, ExternalLink, Gift, Send, Bookmark, Heart, ArrowLeft, Sparkles, Terminal, Cpu, Shield, Zap, Sword, Award, Layers, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { useStore } from '../../store';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -140,6 +140,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 </div>
               </div>
 
+              
               {/* Action buttons (Stacked) */}
               <div className="flex flex-col gap-2 mt-2">
                 {chapters.length > 0 && (
@@ -148,6 +149,15 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                     className="w-full py-3 bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] font-bold font-mono text-sm tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(154,133,141,0.2)] hover:shadow-[0_0_25px_rgba(154,133,141,0.5)] flex items-center justify-center gap-2"
                   >
                     <Zap className="w-4 h-4" /> BẮT ĐẦU
+                  </button>
+                )}
+
+                {story.externalUrl && (
+                  <button 
+                    onClick={() => window.open(story.externalUrl, '_blank', 'noopener,noreferrer')}
+                    className="w-full py-3 font-bold font-mono text-sm tracking-widest uppercase transition-all flex items-center justify-center gap-2 border border-[#645a6c] text-[#d4c6c9] hover:border-[#9a858d] hover:bg-[#9a858d]/10"
+                  >
+                    <ExternalLink className="w-4 h-4" /> TRUY CẬP MÁY CHỦ GỐC
                   </button>
                 )}
                 
@@ -160,7 +170,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                         : 'border-[#645a6c] text-[#645a6c] hover:border-[#d4c6c9] hover:text-[#d4c6c9]'
                     }`}
                   >
-                    <Bookmark className="w-3 h-3" /> {isSaved ? 'ĐÃ LƯU' : 'LƯU LẠI'}
+                    <Bookmark className="w-3 h-3" /> {isSaved ? 'ĐÃ ĐỒNG BỘ' : 'ĐỒNG BỘ DỮ LIỆU'}
                   </button>
 
                   <button 
