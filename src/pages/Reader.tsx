@@ -20,6 +20,7 @@ const getThemeBorderClass = (theme: string) => {
   if (theme === 'thuytien') return "border-[#B6A996]/30";
   if (theme === 'rinhrap-thotrang') return "border-[#823323]/30";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "border-[#7F1D1D]/30";
+  if (theme === 'thientai') return "border-[#9a858d]/30";
   return "border-[#2e2a63]/20"; // giagoan
 };
 
@@ -29,6 +30,7 @@ const getThemeBgBorderTextClass = (theme: string) => {
   if (theme === 'thuytien') return "bg-[#3D362E]/60 border-[#B6A996]/50 text-[#F2E6D0] shadow-[1px_1px_0_0_#12110F] outline outline-1 outline-[#B6A996]/20 outline-offset-[-4px]";
   if (theme === 'rinhrap-thotrang') return "bg-[#fde0e0]/80 border-[#823323]/50 text-[#000000] shadow-[1px_1px_0_0_#facaca]";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#0B0505]/60 border-[#7F1D1D]/50 text-[#D8B4B4] shadow-[1px_1px_0_0_#450A0A]";
+  if (theme === 'thientai') return "bg-[#060406]/60 border-[#9a858d]/50 text-[#d4c6c9] shadow-[1px_1px_0_0_#9a858d]";
   return "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]"; // giagoan
 };
 
@@ -38,6 +40,7 @@ const getThemeAvatarFallbackIconClass = (theme: string) => {
   if (theme === 'thuytien') return "w-4 h-4 text-[#F2E6D0]";
   if (theme === 'rinhrap-thotrang') return "w-4 h-4 text-[#780606]";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "w-4 h-4 text-[#EF4444]";
+  if (theme === 'thientai') return "w-4 h-4 text-[#9a858d]";
   return "w-4 h-4 text-[#bbee1f]"; // giagoan
 };
 
@@ -47,6 +50,7 @@ const getThemeAvatarBorderClass = (theme: string) => {
   if (theme === 'thuytien') return "border border-[#B6A996]/50";
   if (theme === 'rinhrap-thotrang') return "border border-[#823323]/50";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "border border-[#7F1D1D]/50";
+  if (theme === 'thientai') return "border border-[#9a858d]/50";
   return "border border-[#2e2a63]/50"; // giagoan
 };
 
@@ -56,6 +60,7 @@ const getThemeAvatarBgClass = (theme: string) => {
   if (theme === 'thuytien') return "bg-[#12110F]";
   if (theme === 'rinhrap-thotrang') return "bg-[#fff2f1]";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#0B0505]";
+  if (theme === 'thientai') return "bg-[#060406]";
   return "bg-[#13120d]"; // giagoan
 };
 
@@ -65,6 +70,7 @@ const getThemeAccentTextColor = (theme: string) => {
   if (theme === 'thuytien') return "#B6A996";
   if (theme === 'rinhrap-thotrang') return "#9c0800";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "#EF4444";
+  if (theme === 'thientai') return "#9a858d";
   return "#bbee1f"; // giagoan
 };
 
@@ -74,6 +80,7 @@ const getThemeTitleBadgeClass = (theme: string) => {
   if (theme === 'thuytien') return "bg-[#3D362E] text-[#F2E6D0] border-[#B6A996]/30";
   if (theme === 'rinhrap-thotrang') return "bg-[#facaca] text-[#780606] border-[#823323]/40";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#7F1D1D] text-white border-[#EF4444]/40";
+  if (theme === 'thientai') return "bg-[#9a858d]/20 text-[#9a858d] border-[#9a858d]/30";
   return "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40"; // giagoan
 };
 
@@ -83,6 +90,7 @@ const getThemeSubTextColor = (theme: string) => {
   if (theme === 'thuytien') return "text-[#B6A996]";
   if (theme === 'rinhrap-thotrang') return "text-[#780606]";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-[#991B1B]";
+  if (theme === 'thientai') return "text-[#9a858d]/80";
   return "text-[#695b7f]"; // giagoan
 };
 
@@ -92,6 +100,7 @@ const getThemeGiftBadgeClass = (theme: string) => {
   if (theme === 'thuytien') return "text-[#12110F] bg-[#B6A996] border-[#B6A996]/50";
   if (theme === 'rinhrap-thotrang') return "text-[#780606] bg-[#facaca] border-[#823323]/50";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-white bg-[#7F1D1D] border-[#7F1D1D]/50";
+  if (theme === 'thientai') return "text-[#060406] bg-[#9a858d] border-[#9a858d]/50";
   return "text-[#13120d] bg-[#bbee1f] border-[#bbee1f]/50"; // giagoan
 };
 
@@ -101,6 +110,7 @@ const getThemeContentTextColor = (theme: string) => {
   if (theme === 'thuytien') return "text-[#F2E6D0]";
   if (theme === 'rinhrap-thotrang') return "text-[#000000]";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-[#D8B4B4]";
+  if (theme === 'thientai') return "text-[#d4c6c9]";
   return "text-[#dbcec2]"; // giagoan
 };
 
@@ -110,6 +120,7 @@ const getThemeReplyButtonClass = (theme: string) => {
   if (theme === 'thuytien') return "text-[#B6A996] hover:text-[#F2E6D0]";
   if (theme === 'rinhrap-thotrang') return "text-[#823323] hover:text-[#9c0800]";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-[#991B1B] hover:text-[#EF4444]";
+  if (theme === 'thientai') return "text-[#9a858d]/70 hover:text-[#9a858d]";
   return "text-[#695b7f] hover:text-[#bbee1f]"; // giagoan
 };
 
@@ -119,6 +130,7 @@ const getThemeInputClass = (theme: string) => {
   if (theme === 'thuytien') return "bg-[#12110F] border-[#B6A996]/30 text-[#F2E6D0] focus:border-[#B6A996]";
   if (theme === 'rinhrap-thotrang') return "bg-[#fff2f1] border-[#823323] text-[#000000] focus:border-[#9c0800]";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#0B0505] border-[#7F1D1D] text-[#D8B4B4] focus:border-[#EF4444]";
+  if (theme === 'thientai') return "bg-[#060406] border-[#9a858d]/30 text-[#d4c6c9] focus:border-[#9a858d]";
   return "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]"; // giagoan
 };
 
@@ -128,6 +140,7 @@ const getThemeSendButtonClass = (theme: string) => {
   if (theme === 'thuytien') return "bg-[#B6A996] hover:bg-[#F2E6D0] text-[#12110F] border-[#B6A996] disabled:opacity-30 disabled:shadow-none";
   if (theme === 'rinhrap-thotrang') return "bg-[#facaca] hover:bg-[#fff2f1] text-[#780606] border-[#823323] disabled:bg-[#facaca]/20 disabled:text-[#780606]/40 disabled:border-[#823323]/50 disabled:shadow-none";
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#7F1D1D] hover:bg-[#991B1B] text-white border-[#450A0A] disabled:bg-[#7F1D1D]/20 disabled:text-white/40 disabled:border-[#450A0A]/50 disabled:shadow-none";
+  if (theme === 'thientai') return "bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] border-[#34282d] disabled:bg-[#9a858d]/20 disabled:text-[#d4c6c9]/40 disabled:border-[#34282d]/50 disabled:shadow-none";
   return "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none"; // giagoan
 };
 
@@ -1341,13 +1354,13 @@ export function Reader() {
 
                            {activeParagraphIndex === idx && (
                                <div className={cn("mt-4 p-5 rounded-2xl border-2 transition-all", 
-                                    isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/95 border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/95 border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1]/95 border-[#facaca] text-[#780606] shadow-[2px_2px_0_0_#facaca]" : "bg-[#100707]/95 border-[#7F1D1D] text-[#D8B4B4] shadow-[2px_2px_0_0_#450A0A]") : "bg-[#13120d]/95 border-[#2e2a63] text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]") 
+                                    isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d]/95 border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "bg-[#12110F]/95 border-[#B6A996] text-[#F2E6D0] shadow-[2px_2px_0_0_#12110F]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1]/95 border-[#facaca] text-[#780606] shadow-[2px_2px_0_0_#facaca]" : "bg-[#100707]/95 border-[#7F1D1D] text-[#D8B4B4] shadow-[2px_2px_0_0_#450A0A]") : activeCustomTheme === 'thientai' ? "bg-[#060406]/95 border-[#9a858d] text-[#d4c6c9] shadow-[2px_2px_0_0_#9a858d]" : "bg-[#13120d]/95 border-[#2e2a63] text-[#dbcec2] shadow-[2px_2px_0_0_#2e2a63]") 
                                        : effectiveIsDark 
                                           ? "bg-[#120E0C] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]" 
                                           : "bg-[#FFFDF9] border-[#3E2723] shadow-[2px_2px_0_0_#3E2723]"
                                 )}>
                                    <div className="flex justify-between items-center mb-3">
-                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#EF4444]") : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>{tParagraphComment}</h4>
+                                       <h4 className={cn("text-sm font-bold uppercase tracking-wider", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#EF4444]") : activeCustomTheme === 'thientai' ? "text-[#9a858d]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>{tParagraphComment}</h4>
                                        <button onClick={() => setActiveParagraphIndex(null)} className="text-xs uppercase font-bold opacity-50 hover:opacity-100">Đóng</button>
                                    </div>
                                    
