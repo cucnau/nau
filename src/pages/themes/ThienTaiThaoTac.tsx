@@ -347,7 +347,9 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                   {selectedDungeon !== null ? dungeons[selectedDungeon].name : "MÁY QUÉT DỮ LIỆU KHU VỰC"}
                 </div>
                 <p className="text-[#d4c6c9]/70 font-space text-sm">
-                  {selectedDungeon !== null ? dungeons[selectedDungeon].desc : "Chọn khu vực bên trên để truy xuất thông tin hành trình."}
+                  {selectedDungeon !== null 
+                    ? (dungeons[selectedDungeon].desc.startsWith("Chương") ? "" : dungeons[selectedDungeon].desc) 
+                    : "Chọn khu vực bên trên để truy xuất thông tin hành trình."}
                 </p>
               </div>
               {selectedDungeon !== null && (
