@@ -304,20 +304,20 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 35.8°C
               </div>
               <h2 className="text-xs font-mono tracking-widest text-[#c5ad97] uppercase border-b border-[#808499]/20 pb-2 mb-4 flex items-center gap-2">
-                <Heart className="w-3.5 h-3.5 text-red-500 animate-pulse" /> CHỈ SỐ SINH MỆNH
+                <Heart className="w-3.5 h-3.5 text-[#c5ad97] animate-pulse" /> CHỈ SỐ SINH MỆNH
               </h2>
               
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-[#808499] font-mono">Nhịp tim (Heart Rate):</span>
                   <span className="text-sm font-mono font-bold text-[#dfdee0] flex items-center gap-1">
-                    <Activity className="w-3.5 h-3.5 text-red-500 animate-pulse" />
+                    <Activity className="w-3.5 h-3.5 text-[#c5ad97] animate-pulse" />
                     {heartRate} BPM
                   </span>
                 </div>
                 <div className="w-full bg-[#808499]/10 h-1.5 rounded-full overflow-hidden">
                   <div 
-                    className="bg-red-500 h-full transition-all duration-1000" 
+                    className="bg-[#604239] h-full transition-all duration-1000" 
                     style={{ width: `${Math.min(Math.max((heartRate - 50) * 3, 20), 100)}%` }} 
                   />
                 </div>
@@ -371,7 +371,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
             {/* REVENGE CHECKLIST CARD */}
             <div className="border border-[#808499]/30 bg-[#251e23]/80 backdrop-blur-sm p-4 rounded-xl relative shadow-lg">
               <h2 className="text-xs font-mono tracking-widest text-[#c5ad97] uppercase border-b border-[#808499]/20 pb-2 mb-3 flex items-center gap-2">
-                <Skull className="w-3.5 h-3.5 text-red-400" /> SỔ TAY PHỤC THÙ
+                <Skull className="w-3.5 h-3.5 text-[#c5ad97]" /> SỔ TAY PHỤC THÙ
               </h2>
               
               <div className="flex flex-col gap-2.5">
@@ -387,7 +387,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-[#dfdee0]">{t.name}</span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-rose-300">
+                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 ${t.id === 'thamtruc' ? 'text-[#c5ad97]' : 'text-[#808499]'}`}>
                         {t.status}
                       </span>
                     </div>
@@ -426,8 +426,8 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
           <section className="lg:col-span-6 flex flex-col gap-6">
             
             {/* NOVEL BANNER & ADMISSIONS COVER */}
-            <div className="relative border border-[#808499]/30 bg-gradient-to-br from-[#604239]/20 via-[#251e23] to-black/40 p-6 md:p-8 rounded-xl overflow-hidden shadow-2xl flex flex-col items-center text-center">
-              <div className="absolute top-2 right-2 border border-[#c5ad97]/30 text-[#c5ad97] text-[10px] font-mono px-2 py-0.5 uppercase tracking-widest bg-black/40">
+            <div className="relative border border-[#808499]/30 bg-gradient-to-br from-[#604239]/20 via-[#251e23] to-black/40 p-6 md:p-8 rounded-xl overflow-hidden shadow-2xl flex flex-col md:flex-row gap-6 md:gap-8 items-center text-center md:text-left">
+              <div className="absolute top-2 right-2 border border-[#c5ad97]/30 text-[#c5ad97] text-[10px] font-mono px-2 py-0.5 uppercase tracking-widest bg-black/40 z-10">
                 TRÙNG SINH CHI LỘ
               </div>
 
@@ -435,39 +435,53 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
               <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-[#c5ad97]/40" />
               <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-[#c5ad97]/40" />
 
-              <div className="mb-4">
-                <span className="inline-block px-3 py-1 bg-[#604239]/40 border border-[#c5ad97]/30 rounded-full text-xs text-[#c5ad97] font-serif italic">
-                  Đại học Hoa Hạ • Học bá trùng sinh báo thù
-                </span>
-              </div>
-
-              <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-black text-[#dfdee0] tracking-tight leading-tight mb-4">
-                NGƯỜI ĐẸP ỐM YẾU KHÔNG GIÃY GIỤA NỮA
-              </h2>
-
-              <p className="text-xs text-[#808499] max-w-lg mb-6 leading-relaxed">
-                Đời trước bị cha ruột hãm hại, chị kế cướp đoạt sản nghiệp, chết thảm trong bệnh viện. Quay lại năm 17 tuổi, cầm trên tay bản kế hoạch báo thù tối mật cùng bộ não học bá tuyệt đỉnh, ta sẽ lấy lại tất cả những gì vốn thuộc về mình!
-              </p>
-
-              {/* Author and stats metadata row */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full pt-4 border-t border-[#808499]/20 text-xs">
-                <div>
-                  <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Tác giả</span>
-                  <span className="font-bold text-[#c5ad97]">{story?.author || "Đang cập nhật"}</span>
+              {/* Cover Image Block */}
+              {story.coverUrl && (
+                <div className="w-40 md:w-48 flex-shrink-0 flex justify-center md:block relative z-10">
+                  <img 
+                    src={story.coverUrl} 
+                    alt={story.title} 
+                    className="w-full aspect-[2/3] object-cover rounded-xl border-2 border-[#808499]/40 shadow-[4px_4px_0_0_#604239] hover:shadow-[6px_6px_0_0_#c5ad97] transition-all duration-300" 
+                    referrerPolicy="no-referrer"
+                  />
                 </div>
-                <div>
-                  <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Số chương</span>
-                  <span className="font-bold text-[#dfdee0]">{chapters.length} chương</span>
-                </div>
-                <div>
-                  <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Chương đọc sớm</span>
-                  <span className="font-bold text-[#c5ad97]">
-                    {chapters.filter(c => c.isEarlyAccess).length} chương
+              )}
+
+              <div className="flex-1 flex flex-col items-center md:items-start relative z-10">
+                <div className="mb-3">
+                  <span className="inline-block px-3 py-1 bg-[#604239]/40 border border-[#c5ad97]/30 rounded-full text-xs text-[#c5ad97] font-serif italic">
+                    Đại học Hoa Hạ • Học bá trùng sinh báo thù
                   </span>
                 </div>
-                <div>
-                  <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Mã tuyển sinh</span>
-                  <span className="font-bold text-[#dfdee0] font-mono">华夏-2026</span>
+
+                <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-black text-[#dfdee0] tracking-tight leading-tight mb-4">
+                  NGƯỜI ĐẸP ỐM YẾU KHÔNG GIÃY GIỤA NỮA
+                </h2>
+
+                <p className="text-xs text-[#dfdee0]/80 max-w-lg mb-6 leading-relaxed">
+                  Đời trước bị cha ruột hãm hại, chị kế cướp đoạt sản nghiệp, chết thảm trong bệnh viện. Quay lại năm 17 tuổi, cầm trên tay bản kế hoạch báo thù tối mật cùng bộ não học bá tuyệt đỉnh, ta sẽ lấy lại tất cả những gì vốn thuộc về mình!
+                </p>
+
+                {/* Author and stats metadata row */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full pt-4 border-t border-[#808499]/20 text-xs text-left">
+                  <div>
+                    <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Tác giả</span>
+                    <span className="font-bold text-[#c5ad97]">{story?.author || "Đang cập nhật"}</span>
+                  </div>
+                  <div>
+                    <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Số chương</span>
+                    <span className="font-bold text-[#dfdee0]">{chapters.length} chương</span>
+                  </div>
+                  <div>
+                    <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Chương đọc sớm</span>
+                    <span className="font-bold text-[#c5ad97]">
+                      {chapters.filter(c => c.isEarlyAccess).length} chương
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Mã tuyển sinh</span>
+                    <span className="font-bold text-[#dfdee0] font-mono">华夏-2026</span>
+                  </div>
                 </div>
               </div>
             </div>
