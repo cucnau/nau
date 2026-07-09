@@ -170,7 +170,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                         : 'border-[#645a6c] text-[#645a6c] hover:border-[#d4c6c9] hover:text-[#d4c6c9]'
                     }`}
                   >
-                    <Bookmark className="w-3 h-3" /> {isSaved ? 'ĐÃ ĐỒNG BỘ' : 'ĐỒNG BỘ DỮ LIỆU'}
+                    <Bookmark className="w-3 h-3" /> {isSaved ? 'ĐÃ ĐỒNG BỘ' : 'ĐỒNG BỘ'}
                   </button>
 
                   <button 
@@ -213,7 +213,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-3 text-xs tracking-widest uppercase flex items-center gap-2">
                   <Terminal className="w-4 h-4" /> TRÍCH XUẤT DỮ LIỆU
                 </div>
-                <div className="overflow-y-auto pr-2 custom-scrollbar text-sm md:text-base leading-relaxed text-[#d4c6c9]/80 font-space text-justify space-y-2 flex-1 max-h-[300px] lg:max-h-[500px]">
+                <div className="overflow-y-auto pr-2 custom-scrollbar text-[13px] md:text-sm leading-relaxed text-[#d4c6c9]/80 font-space text-justify space-y-2 flex-1 max-h-[300px] lg:max-h-[500px]">
                   {story.description ? story.description.split('\n').map((line, i) => <p key={i}>{line}</p>) : <p>Dữ liệu truyện Thần Thụ đang nạp trực tuyến... Bước vào thế giới thực tế ảo cùng những pha thao tác thần sầu và bước nhảy cấp đầy sảng khoái.</p>}
                 </div>
               </div>
@@ -257,10 +257,10 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
               <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 flex-1 flex flex-col relative group">
                 <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-[#9a858d]/5 to-transparent pointer-events-none"></div>
                 <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-2 text-xs tracking-widest uppercase flex items-center gap-2">
-                  <BookOpen className="w-3 h-3" /> TRUYỆN KHÁC
+                  <BookOpen className="w-3 h-3" /> HỒ SƠ TƯƠNG ĐỒNG
                 </div>
-                <div className="text-[#d4c6c9]/80 font-space text-xs italic leading-relaxed text-justify whitespace-pre-line overflow-y-auto pr-2 custom-scrollbar max-h-[150px] lg:max-h-[300px]">
-                  {(story as any).recommendations || '(Chưa có dữ liệu. Vui lòng cập nhật thêm từ hệ thống trung tâm.)'}
+                <div className="text-[#d4c6c9]/80 font-space text-xs italic leading-relaxed text-justify overflow-y-auto pr-2 custom-scrollbar max-h-[150px] lg:max-h-[300px] space-y-2">
+                  {(story as any).recommendations ? (story as any).recommendations.split('\n').map((line: string, i: number) => line.trim() ? <p key={i}>{line}</p> : null) : <p>(Chưa có dữ liệu. Vui lòng cập nhật thêm từ hệ thống trung tâm.)</p>}
                 </div>
               </div>
 
