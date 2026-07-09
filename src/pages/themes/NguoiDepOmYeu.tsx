@@ -106,7 +106,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
       name: "Lâm Hải", 
       role: "Nhạc phụ hiểm độc (Bố đẻ kiếp trước hại chết mẹ)", 
       status: "Đã phá sản & Thụ án giam", 
-      color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/5",
+      color: "text-[#808499] border-[#808499]/30 bg-[#808499]/5",
       detail: "Lâm Hải đã bị phanh phui tội danh trốn thuế và hối lộ. Toàn bộ tài sản công ty bị niêm phong. Đang thụ án 18 năm tù giam. Kế hoạch báo thù giai đoạn 1 hoàn tất viên mãn!" 
     },
     { 
@@ -114,7 +114,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
       name: "Lâm Thục", 
       role: "Chị kế thâm hiểm (Cướp đoạt vị trí, hãm hại danh dự)", 
       status: "Trục xuất & Thân bại danh liệt", 
-      color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/5",
+      color: "text-[#808499] border-[#808499]/30 bg-[#808499]/5",
       detail: "Bị vạch trần vụ gian lận thi cử và ăn cắp bản thiết kế ngay trước toàn trường. Đã bị đuổi học khỏi trường chuyên, bị dư luận xã hội lên án dữ dội, không thể ngẩng đầu lên được." 
     },
     { 
@@ -130,7 +130,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
       name: "Tập đoàn Lâm Thị", 
       role: "Sản nghiệp vốn thuộc về mẹ ta", 
       status: "Đã thu mua ngầm 65%", 
-      color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/5",
+      color: "text-[#c5ad97] border-[#c5ad97]/30 bg-[#c5ad97]/5",
       detail: "Đã âm thầm dùng pháp nhân nước ngoài FarEast thu gom toàn bộ cổ phần trôi nổi trên thị trường chứng khoán. Hiện nắm giữ 65% quyền biểu quyết, sẵn sàng tước quyền điều hành Lâm thị bất cứ lúc nào." 
     }
   ];
@@ -298,6 +298,29 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
           {/* ================= COLUMN 1: SICKLY BEAUTY HEALTH CABINET & REVENGE SYSTEM (LG: 3/12) ================= */}
           <section className="lg:col-span-3 flex flex-col gap-6 lg:sticky lg:top-[74px]">
             
+            {/* NOVEL COVER CARD */}
+            {story?.coverUrl && (
+              <div className="border border-[#808499]/30 bg-[#251e23]/80 backdrop-blur-sm p-4 rounded-xl relative shadow-lg flex flex-col items-center">
+                <div className="absolute top-2 right-2 border border-[#c5ad97]/20 text-[#c5ad97]/60 text-[8px] font-mono px-1.5 py-0.5 uppercase tracking-widest bg-black/40">
+                  MẪU BÌA CHÍNH THỨC
+                </div>
+                <div className="w-full aspect-[2/3] overflow-hidden rounded-lg border border-[#808499]/30 shadow-inner relative group">
+                  <img 
+                    src={story.coverUrl} 
+                    alt={story.title} 
+                    className="w-full h-full object-cover rounded-lg shadow-[2px_2px_0_0_#604239] group-hover:shadow-[4px_4px_0_0_#c5ad97] transition-all duration-300" 
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#251e23] via-transparent to-transparent opacity-60" />
+                </div>
+                <div className="mt-3 text-center">
+                  <span className="text-[10px] font-mono text-[#c5ad97] uppercase tracking-wider">
+                    HỒ SƠ TUYỂN SINH HOA HẠ
+                  </span>
+                </div>
+              </div>
+            )}
+            
             {/* INDICATORS CARD */}
             <div className="border border-[#808499]/30 bg-[#251e23]/80 backdrop-blur-sm p-4 rounded-xl relative shadow-lg">
               <div className="absolute top-0 right-0 p-2 text-[#c5ad97]/20 font-serif text-3xl font-bold select-none pointer-events-none">
@@ -400,7 +423,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
               {selectedTarget && activeTargetObj && (
                 <div className="mt-3 p-3 bg-black/30 border border-[#c5ad97]/30 rounded text-xs leading-relaxed animate-fade-in">
                   <p className="text-[#c5ad97] font-bold mb-1 uppercase tracking-wider text-[10px]">Nhật Ký Thực Thi:</p>
-                  <p className="text-stone-300 italic">"{activeTargetObj.detail}"</p>
+                  <p className="text-[#dfdee0] italic">"{activeTargetObj.detail}"</p>
                 </div>
               )}
             </div>
@@ -426,7 +449,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
           <section className="lg:col-span-6 flex flex-col gap-6">
             
             {/* NOVEL BANNER & ADMISSIONS COVER */}
-            <div className="relative border border-[#808499]/30 bg-gradient-to-br from-[#604239]/20 via-[#251e23] to-black/40 p-6 md:p-8 rounded-xl overflow-hidden shadow-2xl flex flex-col md:flex-row gap-6 md:gap-8 items-center text-center md:text-left">
+            <div className="relative border border-[#808499]/30 bg-gradient-to-br from-[#604239]/20 via-[#251e23] to-black/40 p-6 md:p-8 rounded-xl overflow-hidden shadow-2xl flex flex-col items-center text-center">
               <div className="absolute top-2 right-2 border border-[#c5ad97]/30 text-[#c5ad97] text-[10px] font-mono px-2 py-0.5 uppercase tracking-widest bg-black/40 z-10">
                 TRÙNG SINH CHI LỘ
               </div>
@@ -435,53 +458,39 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
               <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-[#c5ad97]/40" />
               <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-[#c5ad97]/40" />
 
-              {/* Cover Image Block */}
-              {story.coverUrl && (
-                <div className="w-40 md:w-48 flex-shrink-0 flex justify-center md:block relative z-10">
-                  <img 
-                    src={story.coverUrl} 
-                    alt={story.title} 
-                    className="w-full aspect-[2/3] object-cover rounded-xl border-2 border-[#808499]/40 shadow-[4px_4px_0_0_#604239] hover:shadow-[6px_6px_0_0_#c5ad97] transition-all duration-300" 
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              )}
+              <div className="mb-4">
+                <span className="inline-block px-3 py-1 bg-[#604239]/40 border border-[#c5ad97]/30 rounded-full text-xs text-[#c5ad97] font-serif italic">
+                  Đại học Hoa Hạ • Học bá trùng sinh báo thù
+                </span>
+              </div>
 
-              <div className="flex-1 flex flex-col items-center md:items-start relative z-10">
-                <div className="mb-3">
-                  <span className="inline-block px-3 py-1 bg-[#604239]/40 border border-[#c5ad97]/30 rounded-full text-xs text-[#c5ad97] font-serif italic">
-                    Đại học Hoa Hạ • Học bá trùng sinh báo thù
+              <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-black text-[#dfdee0] tracking-tight leading-tight mb-4">
+                NGƯỜI ĐẸP ỐM YẾU KHÔNG GIÃY GIỤA NỮA
+              </h2>
+
+              <p className="text-xs text-[#dfdee0]/80 max-w-lg mb-6 leading-relaxed text-center">
+                Đời trước bị cha ruột hãm hại, chị kế cướp đoạt sản nghiệp, chết thảm trong bệnh viện. Quay lại năm 17 tuổi, cầm trên tay bản kế hoạch báo thù tối mật cùng bộ não học bá tuyệt đỉnh, ta sẽ lấy lại tất cả những gì vốn thuộc về mình!
+              </p>
+
+              {/* Author and stats metadata row */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full pt-4 border-t border-[#808499]/20 text-xs text-center">
+                <div>
+                  <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Tác giả</span>
+                  <span className="font-bold text-[#c5ad97]">{story?.author || "Đang cập nhật"}</span>
+                </div>
+                <div>
+                  <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Số chương</span>
+                  <span className="font-bold text-[#dfdee0]">{chapters.length} chương</span>
+                </div>
+                <div>
+                  <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Chương đọc sớm</span>
+                  <span className="font-bold text-[#c5ad97]">
+                    {chapters.filter(c => c.isEarlyAccess).length} chương
                   </span>
                 </div>
-
-                <h2 className="font-serif text-2xl md:text-3xl lg:text-4xl font-black text-[#dfdee0] tracking-tight leading-tight mb-4">
-                  NGƯỜI ĐẸP ỐM YẾU KHÔNG GIÃY GIỤA NỮA
-                </h2>
-
-                <p className="text-xs text-[#dfdee0]/80 max-w-lg mb-6 leading-relaxed">
-                  Đời trước bị cha ruột hãm hại, chị kế cướp đoạt sản nghiệp, chết thảm trong bệnh viện. Quay lại năm 17 tuổi, cầm trên tay bản kế hoạch báo thù tối mật cùng bộ não học bá tuyệt đỉnh, ta sẽ lấy lại tất cả những gì vốn thuộc về mình!
-                </p>
-
-                {/* Author and stats metadata row */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full pt-4 border-t border-[#808499]/20 text-xs text-left">
-                  <div>
-                    <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Tác giả</span>
-                    <span className="font-bold text-[#c5ad97]">{story?.author || "Đang cập nhật"}</span>
-                  </div>
-                  <div>
-                    <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Số chương</span>
-                    <span className="font-bold text-[#dfdee0]">{chapters.length} chương</span>
-                  </div>
-                  <div>
-                    <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Chương đọc sớm</span>
-                    <span className="font-bold text-[#c5ad97]">
-                      {chapters.filter(c => c.isEarlyAccess).length} chương
-                    </span>
-                  </div>
-                  <div>
-                    <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Mã tuyển sinh</span>
-                    <span className="font-bold text-[#dfdee0] font-mono">华夏-2026</span>
-                  </div>
+                <div>
+                  <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Mã tuyển sinh</span>
+                  <span className="font-bold text-[#dfdee0] font-mono">华夏-2026</span>
                 </div>
               </div>
             </div>
@@ -553,7 +562,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                             </span>
                             
                             {isLocked ? (
-                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300">
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#604239]/20 border border-[#604239]/30 text-[#c5ad97]">
                                 CHƯA PHÊ DUYỆT
                               </span>
                             ) : isEarly ? (
@@ -561,7 +570,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                                 ĐỌC SỚM
                               </span>
                             ) : (
-                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#808499]/15 border border-[#808499]/30 text-[#dfdee0]">
                                 MIỄN PHÍ
                               </span>
                             )}
@@ -677,98 +686,98 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                                 />
                                 <div>
                                   <h4 className="text-xs font-bold text-[#c5ad97]">
-                                    {comm.authorName || "Nhà đầu tư ẩn danh"}
+                                    {comm.displayName || comm.authorName || "Nhà lữ hành ẩn danh"}
                                   </h4>
-                                <span className="text-[9px] font-mono text-[#808499]">
-                                  {comm.createdAt ? format(new Date(comm.createdAt), 'dd/MM/yyyy HH:mm') : "Đang cập nhật"}
-                                </span>
-                              </div>
-                            </div>
-
-                            <span className="text-[9px] font-mono text-[#808499] tracking-widest uppercase">
-                              #{comm.id?.slice(-4) || "MSG"}
-                            </span>
-                          </div>
-
-                          <p className="text-xs leading-relaxed text-stone-200 pl-11">
-                            {comm.text}
-                          </p>
-
-                          {/* REPLIES CONTAINER */}
-                          {comm.replies && comm.replies.length > 0 && (
-                            <div className="mt-3.5 pl-11 flex flex-col gap-3 border-l border-[#808499]/25 ml-3.5">
-                              {comm.replies.map((rep: any, idx: number) => {
-                                const cacheRepUser = profilesCache[rep.uid] || {};
-                                const repAvatar = cacheRepUser.avatarUrl || rep.avatarUrl || '';
-                                return (
-                                  <div key={rep.id || idx} className="text-xs">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <UserAvatar 
-                                        avatarUrl={repAvatar}
-                                        equippedAccessory={cacheRepUser.equippedAccessory || rep.equippedAccessory}
-                                        accessoryPosition={cacheRepUser.accessoryPosition || rep.accessoryPosition}
-                                        className="w-5 h-5 rounded-full border border-[#c5ad97]/20"
-                                      />
-                                      <span className="font-bold text-[#c5ad97] text-[11px]">{rep.authorName || "Cố vấn ẩn danh"}</span>
-                                      <span className="text-[9px] font-mono text-[#808499]">
-                                        {rep.createdAt ? format(new Date(rep.createdAt), 'dd/MM HH:mm') : ""}
-                                      </span>
-                                    </div>
-                                    <p className="text-stone-300 pl-6 leading-relaxed">
-                                      {rep.text}
-                                    </p>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
-
-                          {/* Inline reply action */}
-                          <div className="mt-2.5 pl-11 flex justify-end">
-                            {replyingToId === comm.id ? (
-                              <div className="w-full flex flex-col gap-2 bg-black/10 p-2 rounded-lg border border-[#808499]/15">
-                                <textarea
-                                  value={replyText}
-                                  onChange={(e) => setReplyText(e.target.value)}
-                                  placeholder="Nhập phản hồi cố vấn..."
-                                  rows={2}
-                                  className="w-full p-2 bg-[#251e23]/80 text-xs text-[#dfdee0] placeholder-[#808499] focus:outline-none focus:border-[#c5ad97] border border-[#808499]/30 rounded"
-                                />
-                                <div className="flex justify-end gap-2 text-[10px]">
-                                  <button
-                                    onClick={() => setReplyingToId(null)}
-                                    className="px-2 py-1 text-[#808499] hover:text-[#dfdee0]"
-                                  >
-                                    Hủy
-                                  </button>
-                                  <button
-                                    onClick={() => handleSendReply(comm)}
-                                    disabled={submittingReply || !replyText.trim()}
-                                    className="px-3 py-1 bg-[#c5ad97] text-[#251e23] font-bold uppercase rounded disabled:opacity-40"
-                                  >
-                                    Gửi cố vấn
-                                  </button>
+                                  <span className="text-[9px] font-mono text-[#808499]">
+                                    {comm.createdAt ? format(new Date(comm.createdAt?.seconds ? comm.createdAt.seconds * 1000 : (comm.createdAt?.toMillis ? comm.createdAt.toMillis() : comm.createdAt)), 'dd/MM/yyyy HH:mm') : "Đang cập nhật"}
+                                  </span>
                                 </div>
                               </div>
-                            ) : (
-                              <button
-                                onClick={() => {
-                                  if (!isLoggedIn) {
-                                    addLog("Bạn cần đăng nhập để tham gia phản hồi cố vấn!");
-                                    return;
-                                  }
-                                  setReplyingToId(comm.id);
-                                }}
-                                className="text-[10px] font-mono text-[#c5ad97] hover:text-[#dfdee0] flex items-center gap-1"
-                              >
-                                Phản hồi cố vấn <Send className="w-3 h-3" />
-                              </button>
-                            )}
-                          </div>
 
-                        </div>
-                      );
-                    })}
+                              <span className="text-[9px] font-mono text-[#808499] tracking-widest uppercase">
+                                #{comm.id?.slice(-4) || "MSG"}
+                              </span>
+                            </div>
+
+                            <p className="text-xs leading-relaxed text-[#dfdee0] pl-11">
+                              {comm.content || comm.text}
+                            </p>
+
+                            {/* REPLIES CONTAINER */}
+                            {comm.replies && comm.replies.length > 0 && (
+                              <div className="mt-3.5 pl-11 flex flex-col gap-3 border-l border-[#808499]/25 ml-3.5">
+                                {comm.replies.map((rep: any, idx: number) => {
+                                  const cacheRepUser = profilesCache[rep.uid] || {};
+                                  const repAvatar = cacheRepUser.avatarUrl || rep.avatarUrl || '';
+                                  return (
+                                    <div key={rep.id || idx} className="text-xs">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <UserAvatar 
+                                          avatarUrl={repAvatar}
+                                          equippedAccessory={cacheRepUser.equippedAccessory || rep.equippedAccessory}
+                                          accessoryPosition={cacheRepUser.accessoryPosition || rep.accessoryPosition}
+                                          className="w-5 h-5 rounded-full border border-[#c5ad97]/20"
+                                        />
+                                        <span className="font-bold text-[#c5ad97] text-[11px]">{rep.displayName || rep.authorName || "Cố vấn ẩn danh"}</span>
+                                        <span className="text-[9px] font-mono text-[#808499]">
+                                          {rep.createdAt ? format(new Date(rep.createdAt?.seconds ? rep.createdAt.seconds * 1000 : (rep.createdAt?.toMillis ? rep.createdAt.toMillis() : rep.createdAt)), 'dd/MM HH:mm') : ""}
+                                        </span>
+                                      </div>
+                                      <p className="text-[#dfdee0]/80 pl-6 leading-relaxed">
+                                        {rep.content || rep.text}
+                                      </p>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* Inline reply action */}
+                            <div className="mt-2.5 pl-11 flex justify-end">
+                              {replyingToId === comm.id ? (
+                                <div className="w-full flex flex-col gap-2 bg-black/10 p-2 rounded-lg border border-[#808499]/15">
+                                  <textarea
+                                    value={replyText}
+                                    onChange={(e) => setReplyText(e.target.value)}
+                                    placeholder="Nhập phản hồi cố vấn..."
+                                    rows={2}
+                                    className="w-full p-2 bg-[#251e23]/80 text-xs text-[#dfdee0] placeholder-[#808499] focus:outline-none focus:border-[#c5ad97] border border-[#808499]/30 rounded"
+                                  />
+                                  <div className="flex justify-end gap-2 text-[10px]">
+                                    <button
+                                      onClick={() => setReplyingToId(null)}
+                                      className="px-2 py-1 text-[#808499] hover:text-[#dfdee0]"
+                                    >
+                                      Hủy
+                                    </button>
+                                    <button
+                                      onClick={() => handleSendReply(comm)}
+                                      disabled={submittingReply || !replyText.trim()}
+                                      className="px-3 py-1 bg-[#c5ad97] text-[#251e23] font-bold uppercase rounded disabled:opacity-40"
+                                    >
+                                      Gửi cố vấn
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => {
+                                    if (!isLoggedIn) {
+                                      addLog("Bạn cần đăng nhập để tham gia phản hồi cố vấn!");
+                                      return;
+                                    }
+                                    setReplyingToId(comm.id);
+                                  }}
+                                  className="text-[10px] font-mono text-[#c5ad97] hover:text-[#dfdee0] flex items-center gap-1"
+                                >
+                                  Phản hồi cố vấn <Send className="w-3 h-3" />
+                                </button>
+                              )}
+                            </div>
+
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -820,7 +829,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
                 <div className="mt-2.5 pt-3 border-t border-[#808499]/20 flex justify-between items-center">
                   <span className="text-[#808499] text-[10px] uppercase font-mono">Xếp hạng ôn tập:</span>
-                  <span className="font-bold font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded text-[10px]">
+                  <span className="font-bold font-mono text-[#c5ad97] bg-[#c5ad97]/10 px-2 py-0.5 rounded text-[10px] border border-[#c5ad97]/20">
                     Thủ khoa khối tự nhiên
                   </span>
                 </div>
@@ -842,7 +851,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                   >
                     <span className="mt-0.5 text-[#c5ad97]">
                       {item.completed ? (
-                        <CheckSquare className="w-4 h-4 text-emerald-400" />
+                        <CheckSquare className="w-4 h-4 text-[#c5ad97]" />
                       ) : (
                         <Square className="w-4 h-4 text-[#808499]" />
                       )}
@@ -864,8 +873,8 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
             {/* COMMERCE / INVESTMENT WATCH */}
             <div className="border border-[#808499]/30 bg-[#251e23]/80 backdrop-blur-sm p-4 rounded-xl relative shadow-lg">
-              <div className="absolute top-2 right-2 border border-emerald-500/30 text-emerald-400 text-[9px] font-mono px-1.5 py-0.1 rounded bg-emerald-500/10 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="absolute top-2 right-2 border border-[#c5ad97]/30 text-[#c5ad97] text-[9px] font-mono px-1.5 py-0.1 rounded bg-[#c5ad97]/10 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#c5ad97] animate-pulse" />
                 MỞ CỬA
               </div>
 
@@ -881,7 +890,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 
                 <div className="flex items-center justify-between">
                   <span className="text-[#808499]">Biến động ngày:</span>
-                  <span className={`font-bold font-mono flex items-center ${stockChange >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  <span className={`font-bold font-mono flex items-center ${stockChange >= 0 ? 'text-[#c5ad97]' : 'text-[#808499]'}`}>
                     {stockChange >= 0 ? "+" : ""}{stockChange}%
                   </span>
                 </div>
