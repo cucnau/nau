@@ -16,6 +16,7 @@ import { NhatKyKhongTenTheme } from './themes/NhatKyKhongTen';
 import { TinhYeuThuyTienTheme } from './themes/TinhYeuThuyTien';
 import { RinhRapTheme } from './themes/RinhRap';
 import { ThienTaiThaoTacTheme } from './themes/ThienTaiThaoTac';
+import { NguoiDepOmYeuTheme } from './themes/NguoiDepOmYeu';
 import { detectStoryTheme } from '../lib/themeHelper';
 
 interface CommentNodeProps {
@@ -753,7 +754,7 @@ export function StoryView() {
   }
 
   const currentTheme = detectStoryTheme(story.title, id);
-  if (currentTheme === 'nhatky' || currentTheme === 'thuytien' || currentTheme === 'rinhrap' || currentTheme === 'thientai') {
+  if (currentTheme === 'nhatky' || currentTheme === 'thuytien' || currentTheme === 'rinhrap' || currentTheme === 'thientai' || currentTheme === 'nguoidep') {
     const themeProps: ThemeProps = {
       story,
       actualStoryId,
@@ -805,6 +806,9 @@ export function StoryView() {
     }
     if (currentTheme === 'thientai') {
       return <ThienTaiThaoTacTheme {...themeProps} />;
+    }
+    if (currentTheme === 'nguoidep') {
+      return <NguoiDepOmYeuTheme {...themeProps} />;
     }
     return <NhatKyKhongTenTheme {...themeProps} />;
   }
