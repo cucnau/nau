@@ -184,7 +184,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
             </div>
 
             {/* MIDDLE COLUMN: INFO & DESC (Span 5) */}
-            <div className="lg:col-span-5 flex flex-col font-mono h-auto lg:h-[550px]">
+            <div className="lg:col-span-5 flex flex-col font-mono h-auto lg:h-0 lg:min-h-full">
               <h1 className="text-2xl md:text-4xl font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#d4c6c9] to-[#9a858d] leading-tight tracking-wider mb-2 drop-shadow-[0_0_10px_rgba(154,133,141,0.3)]">
                 {story.title}
               </h1>
@@ -209,7 +209,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
               </div>
 
               {/* Description box */}
-              <div className="relative border border-[#645a6c]/30 bg-[#060406]/60 p-4 flex-1 flex flex-col">
+              <div className="relative border border-[#645a6c]/30 bg-[#060406]/60 p-4 flex-1 flex flex-col min-h-0">
                 <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-3 text-xs tracking-widest uppercase flex items-center gap-2">
                   <Terminal className="w-4 h-4" /> TRÍCH XUẤT DỮ LIỆU
                 </div>
@@ -220,7 +220,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
             </div>
 
             {/* RIGHT COLUMN: PLAYERS & RECOMMENDATIONS (Span 4) */}
-            <div className="lg:col-span-4 flex flex-col gap-4 font-mono h-auto lg:h-[550px]">
+            <div className="lg:col-span-4 flex flex-col gap-4 font-mono h-auto lg:h-0 lg:min-h-full">
               
               {/* Player 1 */}
               <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 relative overflow-hidden group hover:border-[#9a858d]/50 transition-colors">
@@ -254,7 +254,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
               </div>
 
               {/* Recommendations */}
-              <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 flex-1 flex flex-col relative group">
+              <div className="border border-[#645a6c]/30 bg-[#060406]/60 p-3 flex-1 flex flex-col min-h-0 relative group">
                 <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-[#9a858d]/5 to-transparent pointer-events-none"></div>
                 <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-2 text-xs tracking-widest uppercase flex items-center gap-2">
                   <BookOpen className="w-3 h-3" /> HỒ SƠ TƯƠNG ĐỒNG
@@ -269,36 +269,37 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
           </div>
         </div>
         
-        {/* HUD DECORATIVE SEPARATOR */}
-        <div className="w-full relative flex items-center justify-center opacity-80 pointer-events-none -my-4 hidden md:flex">
-          <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#9a858d]/40 to-transparent"></div>
-          <div className="w-full max-w-3xl flex justify-between items-center relative z-10 px-8">
-            <div className="flex items-center gap-2">
-              <div className="flex gap-1">
-                <div className="w-1 h-3 bg-[#9a858d]/80 animate-pulse"></div>
-                <div className="w-1 h-2 bg-[#9a858d]/40"></div>
-                <div className="w-1 h-1 bg-[#9a858d]/40"></div>
+        {/* BẢN ĐỒ HÀNH TRÌNH PHÓ BẢN THẦN THỤ */}
+        <div className="flex flex-col relative">
+          {/* HUD DECORATIVE SEPARATOR */}
+          <div className="w-full relative flex items-center justify-center opacity-80 pointer-events-none hidden md:flex mb-6">
+            <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#9a858d]/40 to-transparent"></div>
+            <div className="w-full max-w-3xl flex justify-between items-center relative z-10 px-8">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1">
+                  <div className="w-1 h-3 bg-[#9a858d]/80 animate-pulse"></div>
+                  <div className="w-1 h-2 bg-[#9a858d]/40"></div>
+                  <div className="w-1 h-1 bg-[#9a858d]/40"></div>
+                </div>
+                <div className="w-12 h-[1px] bg-[#9a858d]/60"></div>
               </div>
-              <div className="w-12 h-[1px] bg-[#9a858d]/60"></div>
-            </div>
-            <div className="font-mono text-[10px] text-[#9a858d] tracking-[0.2em] bg-[#060406] px-6 py-1.5 border-y border-[#9a858d]/30 flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 animate-ping"></span>
-              CONNECTING // HOLODECK_GAME
-              <span className="w-1.5 h-1.5 bg-[#9a858d]/40"></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-12 h-[1px] bg-[#9a858d]/60"></div>
-              <div className="flex gap-1 items-end">
-                <div className="w-1 h-1 bg-[#9a858d]/40"></div>
-                <div className="w-1 h-2 bg-[#9a858d]/40"></div>
-                <div className="w-1 h-3 bg-[#9a858d]/80 animate-pulse"></div>
+              <div className="font-mono text-[10px] text-[#9a858d] tracking-[0.2em] bg-[#060406] px-6 py-1.5 border-y border-[#9a858d]/30 flex items-center gap-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 animate-ping"></span>
+                CONNECTING // HOLODECK_GAME
+                <span className="w-1.5 h-1.5 bg-[#9a858d]/40"></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-12 h-[1px] bg-[#9a858d]/60"></div>
+                <div className="flex gap-1 items-end">
+                  <div className="w-1 h-1 bg-[#9a858d]/40"></div>
+                  <div className="w-1 h-2 bg-[#9a858d]/40"></div>
+                  <div className="w-1 h-3 bg-[#9a858d]/80 animate-pulse"></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* BẢN ĐỒ HÀNH TRÌNH PHÓ BẢN THẦN THỤ */}
-        <div className="mt-8 border border-[#9a858d]/30 bg-[#060406]/80 p-6 relative">
+          
+          <div className="border border-[#9a858d]/30 bg-[#060406]/80 p-6 relative">
           <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#9a858d]" />
           <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#9a858d]" />
           
@@ -407,6 +408,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
               </div>
             )}
           </div>
+        </div>
         </div>
 
         {/* KÊNH THẾ GIỚI (COMMENTS) */}
