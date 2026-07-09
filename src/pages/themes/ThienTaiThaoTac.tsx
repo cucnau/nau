@@ -213,7 +213,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-3 text-xs tracking-widest uppercase flex items-center gap-2">
                   <Terminal className="w-4 h-4" /> TRÍCH XUẤT DỮ LIỆU
                 </div>
-                <div className="overflow-y-auto pr-2 custom-scrollbar text-[13px] md:text-sm leading-relaxed text-[#d4c6c9]/80 font-space text-justify space-y-2 flex-1 max-h-[300px] lg:max-h-[500px]">
+                <div className="overflow-y-auto pr-2 custom-scrollbar text-[13px] md:text-sm leading-relaxed text-[#d4c6c9]/80 font-space text-justify space-y-2 flex-1 min-h-0 max-h-[300px] lg:max-h-[500px]">
                   {story.description ? story.description.split('\n').map((line, i) => <p key={i}>{line}</p>) : <p>Dữ liệu truyện Thần Thụ đang nạp trực tuyến... Bước vào thế giới thực tế ảo cùng những pha thao tác thần sầu và bước nhảy cấp đầy sảng khoái.</p>}
                 </div>
               </div>
@@ -259,8 +259,8 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                 <div className="text-[#9a858d] font-bold border-b border-[#645a6c]/30 pb-2 mb-2 text-xs tracking-widest uppercase flex items-center gap-2">
                   <BookOpen className="w-3 h-3" /> HỒ SƠ TƯƠNG ĐỒNG
                 </div>
-                <div className="text-[#d4c6c9]/80 font-space text-xs italic leading-relaxed text-justify overflow-y-auto pr-2 custom-scrollbar max-h-[150px] lg:max-h-[300px] space-y-2">
-                  {(story as any).recommendations ? (story as any).recommendations.split('\n').map((line: string, i: number) => line.trim() ? <p key={i}>{line}</p> : null) : <p>(Chưa có dữ liệu. Vui lòng cập nhật thêm từ hệ thống trung tâm.)</p>}
+                <div className="text-[#d4c6c9]/80 font-space text-xs italic leading-relaxed text-justify overflow-y-auto pr-2 custom-scrollbar max-h-[300px] lg:max-h-[500px] space-y-2 flex-1 min-h-0">
+                  {(story as any).recommendations ? (story as any).recommendations.split('\n').map((line: string, i: number) => line.trim() ? <p key={i} className="mb-3">{line}</p> : null) : <p>(Chưa có dữ liệu. Vui lòng cập nhật thêm từ hệ thống trung tâm.)</p>}
                 </div>
               </div>
 
