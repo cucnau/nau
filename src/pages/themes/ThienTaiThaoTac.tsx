@@ -55,7 +55,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
     { name: "Khám phá · Thị Trấn Mê Cung Gương", desc: "Chương 29-37", diff: "★★★★★★", boss: "Thần Sương", min: 29, max: 37 },
     { name: "Thần Thụ Thiên Không · Thị Trấn Lưu Ly", desc: "Chương 38-44", diff: "Không rõ", boss: "Không rõ", min: 38, max: 44 },
     { name: "Trận chiến liên minh bang hội · Bạch Thủy Cốc", desc: "Chương 45-55", diff: "★★★★★★", boss: "Thú dữ trấn giữ thung lũng", min: 45, max: 55 },
-    { name: "Khám phá · Trại Nhà Trần", desc: "Chương 56-69", diff: "★★★★★★", boss: "Đại ca Trần", min: 56, max: 69 },
+    { name: "Khám phá · Trại Nhà Trần", desc: "Chương 56-69", diff: "★★★★★★", boss: "Thần Cổ", min: 56, max: 69 },
     { name: "Lối chơi đặc biệt · Tỉ Thí Kén Rể", desc: "Chương 70-90", diff: "★★★★★★", boss: "Thần Giả", min: 70, max: 90 },
     { name: "Khám phá · Lĩnh Vực Thần Tài", desc: "Chương 91-114", diff: "★★★★★★★", boss: "Thần Dục", min: 91, max: 114 },
     { name: "Khám phá · Vùng Đất Sụp Đổ", desc: "Chương 115-135", diff: "★★★★★★★", boss: "Thần Ảo", min: 115, max: 135 },
