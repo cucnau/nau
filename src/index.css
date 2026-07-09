@@ -1,11 +1,20 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:wght@100..800&display=swap');
+
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Patrick+Hand&family=Roboto:wght@300;400;500;700;900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap');
+
 @import url('https://cdn.jsdelivr.net/npm/@fontsource/iosevka/index.css');
+
 @import "tailwindcss";
 
+
 @theme {
+  --font-space: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --font-sans: "Quicksand", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Cormorant Garamond", "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
+
 
 /* Custom font utilities for readers */
 .font-reading-nunito {
@@ -124,6 +133,7 @@ body {
 .dark .bg-gray-50:not([class*="dark:bg-"]) { background-color: #211B18 !important; }
 .dark .bg-gray-100:not([class*="dark:bg-"]) { background-color: #2C221D !important; }
 .dark .bg-gray-200:not([class*="dark:bg-"]) { background-color: #3C2E27 !important; }
+
 
 /* Custom Scrollbar */
 * {
