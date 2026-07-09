@@ -65,7 +65,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
   ];
 
   const [selectedDungeon, setSelectedDungeon] = useState<number | null>(null);
-  const [interfaceLog, setInterfaceLog] = useState<string>("Đã khởi tạo bảng điều khiển Thần Thụ. Chờ thao tác...");
+  const [interfaceLog, setInterfaceLog] = useState<string>("Đã khởi tạo giao diện hệ thống Thần Thụ. Chờ thao tác...");
 
   const handleDungeonClick = (idx: number) => {
     setSelectedDungeon(idx);
@@ -110,7 +110,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                   <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#9a858d] z-30" />
 
                   <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-[#060406]/90 border border-[#9a858d] text-[8px] font-mono font-bold text-[#9a858d] z-30 tracking-widest">
-                    SYS.V1.2
+                    PATCH 1.0.2
                   </div>
 
                   {story.coverUrl ? (
@@ -269,6 +269,34 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
           </div>
         </div>
         
+        {/* HUD DECORATIVE SEPARATOR */}
+        <div className="w-full relative flex items-center justify-center opacity-80 pointer-events-none -my-4 hidden md:flex">
+          <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#9a858d]/40 to-transparent"></div>
+          <div className="w-full max-w-3xl flex justify-between items-center relative z-10 px-8">
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                <div className="w-1 h-3 bg-[#9a858d]/80 animate-pulse"></div>
+                <div className="w-1 h-2 bg-[#9a858d]/40"></div>
+                <div className="w-1 h-1 bg-[#9a858d]/40"></div>
+              </div>
+              <div className="w-12 h-[1px] bg-[#9a858d]/60"></div>
+            </div>
+            <div className="font-mono text-[10px] text-[#9a858d] tracking-[0.2em] bg-[#060406] px-6 py-1.5 border-y border-[#9a858d]/30 flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/50 animate-ping"></span>
+              CONNECTING // HOLODECK_GAME
+              <span className="w-1.5 h-1.5 bg-[#9a858d]/40"></span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-12 h-[1px] bg-[#9a858d]/60"></div>
+              <div className="flex gap-1 items-end">
+                <div className="w-1 h-1 bg-[#9a858d]/40"></div>
+                <div className="w-1 h-2 bg-[#9a858d]/40"></div>
+                <div className="w-1 h-3 bg-[#9a858d]/80 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* BẢN ĐỒ HÀNH TRÌNH PHÓ BẢN THẦN THỤ */}
         <div className="mt-8 border border-[#9a858d]/30 bg-[#060406]/80 p-6 relative">
           <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#9a858d]" />
