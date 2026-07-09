@@ -241,14 +241,14 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
           <div className="flex items-center gap-3">
             <button 
               onClick={() => navigate('/')}
-              className="p-1.5 rounded-lg border border-[#808499]/30 hover:border-[#c5ad97] text-[#808499] hover:text-[#c5ad97] transition-all bg-[#251e23]"
+              className="p-1.5 rounded-lg border border-[#808499]/30 hover:border-[#dfdee0] text-[#808499] hover:text-[#dfdee0] transition-all bg-[#251e23]"
               title="Quay lại Trang chủ"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div>
-              <span className="text-[10px] font-mono tracking-widest text-[#c5ad97] uppercase flex items-center gap-1.5">
-                <Clock className="w-3 h-3 text-[#c5ad97] animate-spin-slow" /> HỒ SƠ KHỞI ĐỘNG TRÙNG SINH NĂM 17 TUỔI
+              <span className="text-[10px] font-mono tracking-widest text-[#808499] uppercase flex items-center gap-1.5">
+                <Clock className="w-3 h-3 text-[#808499] animate-spin-slow" /> HỒ SƠ KHỞI ĐỘNG TRÙNG SINH NĂM 17 TUỔI
               </span>
               <h1 className="font-serif text-lg font-bold text-[#dfdee0] leading-tight">
                 {story?.title || "Người Đẹp Ốm Yếu Không Giãy Giụa Nữa"}
@@ -258,9 +258,9 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
           <div className="flex items-center gap-4 text-xs">
             {/* Choco display */}
-            <div className="hidden sm:flex items-center gap-2 bg-[#604239]/20 border border-[#c5ad97]/20 px-3 py-1.5 rounded-md">
-              <Gift className="w-4 h-4 text-[#c5ad97]" />
-              <span>Choco của bạn: <strong className="text-[#c5ad97]">{choco}</strong></span>
+            <div className="hidden sm:flex items-center gap-2 bg-[#808499]/5 border border-[#808499]/30 px-3 py-1.5 rounded-md">
+              <Gift className="w-4 h-4 text-[#808499]" />
+              <span>Choco của bạn: <strong className="text-[#dfdee0]">{choco}</strong></span>
             </div>
 
             {/* Save story button */}
@@ -268,8 +268,8 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
               onClick={handleSaveToggle}
               className={`px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-all font-medium text-xs border ${
                 savedStories.includes(story.id)
-                  ? 'bg-[#c5ad97]/20 border-[#c5ad97] text-[#c5ad97]'
-                  : 'border-[#808499]/30 text-[#808499] hover:border-[#c5ad97] hover:text-[#c5ad97]'
+                  ? 'bg-[#604239]/20 border-[#808499]/50 text-[#dfdee0]'
+                  : 'border-[#808499]/30 text-[#808499] hover:border-[#dfdee0] hover:text-[#dfdee0]'
               }`}
             >
               <Bookmark className="w-3.5 h-3.5 fill-current" />
@@ -281,7 +281,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 href={story.externalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-md flex items-center gap-1.5 bg-[#604239] text-[#dfdee0] border border-[#c5ad97]/40 hover:bg-[#c5ad97] hover:text-[#251e23] transition-all font-medium text-xs"
+                className="px-3 py-1.5 rounded-md flex items-center gap-1.5 bg-black/40 text-[#dfdee0] border border-[#808499]/40 hover:bg-[#604239]/40 hover:text-[#dfdee0] transition-all font-medium text-xs"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span className="hidden md:inline">Đọc bản gốc</span>
@@ -301,20 +301,20 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
             {/* NOVEL COVER CARD */}
             {story?.coverUrl && (
               <div className="border border-[#808499]/30 bg-[#251e23]/80 backdrop-blur-sm p-4 rounded-xl relative shadow-lg flex flex-col items-center">
-                <div className="absolute top-2 right-2 border border-[#c5ad97]/20 text-[#c5ad97]/60 text-[8px] font-mono px-1.5 py-0.5 uppercase tracking-widest bg-black/40">
+                <div className="absolute top-2 right-2 border border-[#808499]/30 text-[#808499] text-[8px] font-mono px-1.5 py-0.5 uppercase tracking-widest bg-black/40">
                   MẪU BÌA CHÍNH THỨC
                 </div>
                 <div className="w-full aspect-[2/3] overflow-hidden rounded-lg border border-[#808499]/30 shadow-inner relative group">
                   <img 
                     src={story.coverUrl} 
                     alt={story.title} 
-                    className="w-full h-full object-cover rounded-lg shadow-[2px_2px_0_0_#604239] group-hover:shadow-[4px_4px_0_0_#c5ad97] transition-all duration-300" 
+                    className="w-full h-full object-cover rounded-lg shadow-[2px_2px_0_0_#604239] group-hover:shadow-[4px_4px_0_0_#808499] transition-all duration-300" 
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#251e23] via-transparent to-transparent opacity-60" />
                 </div>
                 <div className="mt-3 text-center">
-                  <span className="text-[10px] font-mono text-[#c5ad97] uppercase tracking-wider">
+                  <span className="text-[10px] font-mono text-[#808499] uppercase tracking-wider">
                     HỒ SƠ TUYỂN SINH HOA HẠ
                   </span>
                 </div>
@@ -323,18 +323,18 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
             
             {/* INDICATORS CARD */}
             <div className="border border-[#808499]/30 bg-[#251e23]/80 backdrop-blur-sm p-4 rounded-xl relative shadow-lg">
-              <div className="absolute top-0 right-0 p-2 text-[#c5ad97]/20 font-serif text-3xl font-bold select-none pointer-events-none">
+              <div className="absolute top-0 right-0 p-2 text-[#808499]/20 font-serif text-3xl font-bold select-none pointer-events-none">
                 35.8°C
               </div>
-              <h2 className="text-xs font-mono tracking-widest text-[#c5ad97] uppercase border-b border-[#808499]/20 pb-2 mb-4 flex items-center gap-2">
-                <Heart className="w-3.5 h-3.5 text-[#c5ad97] animate-pulse" /> CHỈ SỐ SINH MỆNH
+              <h2 className="text-xs font-mono tracking-widest text-[#dfdee0] uppercase border-b border-[#808499]/20 pb-2 mb-4 flex items-center gap-2">
+                <Heart className="w-3.5 h-3.5 text-[#808499] animate-pulse" /> CHỈ SỐ SINH MỆNH
               </h2>
               
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-[#808499] font-mono">Nhịp tim (Heart Rate):</span>
                   <span className="text-sm font-mono font-bold text-[#dfdee0] flex items-center gap-1">
-                    <Activity className="w-3.5 h-3.5 text-[#c5ad97] animate-pulse" />
+                    <Activity className="w-3.5 h-3.5 text-[#808499] animate-pulse" />
                     {heartRate} BPM
                   </span>
                 </div>
@@ -352,12 +352,12 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-xs text-[#808499] font-mono">Dược phẩm (Medicine):</span>
-                  <span className="text-xs font-mono font-bold text-[#c5ad97]">{medPills} viên</span>
+                  <span className="text-xs font-mono font-bold text-[#dfdee0]">{medPills} viên</span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-[#808499] font-mono">Chén trà hoa cúc:</span>
-                  <span className="text-xs font-mono font-bold text-[#c5ad97]">{teaTemp}°C</span>
+                  <span className="text-xs font-mono font-bold text-[#dfdee0]">{teaTemp}°C</span>
                 </div>
               </div>
 
@@ -365,26 +365,26 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
               <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-[#808499]/20">
                 <button
                   onClick={handleTakeMedicine}
-                  className="px-2 py-1.5 text-[10px] font-bold font-mono text-center border border-[#c5ad97]/40 bg-[#c5ad97]/5 hover:bg-[#c5ad97] hover:text-[#251e23] transition-all uppercase rounded text-[#c5ad97]"
+                  className="px-2 py-1.5 text-[10px] font-bold font-mono text-center border border-[#808499]/30 bg-[#808499]/5 hover:border-[#dfdee0] hover:bg-[#604239]/20 transition-all uppercase rounded text-[#dfdee0]"
                 >
                   Uống thuốc
                 </button>
                 <button
                   onClick={handleBrewMedicine}
                   disabled={isBrewing}
-                  className="px-2 py-1.5 text-[10px] font-bold font-mono text-center border border-[#808499]/30 hover:border-[#c5ad97] bg-[#808499]/5 transition-all uppercase rounded text-[#dfdee0] disabled:opacity-40"
+                  className="px-2 py-1.5 text-[10px] font-bold font-mono text-center border border-[#808499]/30 hover:border-[#dfdee0] bg-[#808499]/5 transition-all uppercase rounded text-[#dfdee0] disabled:opacity-40"
                 >
                   {isBrewing ? "Đang sắc..." : "Sắc thuốc"}
                 </button>
                 <button
                   onClick={handleBlowTea}
-                  className="px-2 py-1.5 text-[10px] font-bold font-mono text-center border border-[#808499]/30 hover:border-[#c5ad97] bg-[#808499]/5 transition-all uppercase rounded text-[#dfdee0]"
+                  className="px-2 py-1.5 text-[10px] font-bold font-mono text-center border border-[#808499]/30 hover:border-[#dfdee0] bg-[#808499]/5 transition-all uppercase rounded text-[#dfdee0]"
                 >
                   Thổi trà
                 </button>
                 <button
                   onClick={handleReheatTea}
-                  className="px-2 py-1.5 text-[10px] font-bold font-mono text-center border border-[#c5ad97]/40 bg-[#c5ad97]/5 hover:bg-[#c5ad97] hover:text-[#251e23] transition-all uppercase rounded text-[#c5ad97]"
+                  className="px-2 py-1.5 text-[10px] font-bold font-mono text-center border border-[#808499]/30 bg-[#808499]/5 hover:border-[#dfdee0] hover:bg-[#604239]/20 transition-all uppercase rounded text-[#dfdee0]"
                 >
                   Hâm trà
                 </button>
@@ -393,8 +393,8 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
             {/* REVENGE CHECKLIST CARD */}
             <div className="border border-[#808499]/30 bg-[#251e23]/80 backdrop-blur-sm p-4 rounded-xl relative shadow-lg">
-              <h2 className="text-xs font-mono tracking-widest text-[#c5ad97] uppercase border-b border-[#808499]/20 pb-2 mb-3 flex items-center gap-2">
-                <Skull className="w-3.5 h-3.5 text-[#c5ad97]" /> SỔ TAY PHỤC THÙ
+              <h2 className="text-xs font-mono tracking-widest text-[#dfdee0] uppercase border-b border-[#808499]/20 pb-2 mb-3 flex items-center gap-2">
+                <Skull className="w-3.5 h-3.5 text-[#808499]" /> SỔ TAY PHỤC THÙ
               </h2>
               
               <div className="flex flex-col gap-2.5">
@@ -404,13 +404,13 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     onClick={() => setSelectedTarget(selectedTarget === t.id ? null : t.id)}
                     className={`w-full text-left p-2.5 rounded border transition-all text-xs flex flex-col gap-1 ${
                       selectedTarget === t.id
-                        ? 'border-[#c5ad97] bg-[#604239]/20'
+                        ? 'border-[#808499] bg-[#604239]/20'
                         : 'border-[#808499]/15 hover:border-[#808499]/40 bg-white/[0.01]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-[#dfdee0]">{t.name}</span>
-                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 ${t.id === 'thamtruc' ? 'text-[#c5ad97]' : 'text-[#808499]'}`}>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-[#808499]">
                         {t.status}
                       </span>
                     </div>
@@ -421,8 +421,8 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
               {/* Expansion Details */}
               {selectedTarget && activeTargetObj && (
-                <div className="mt-3 p-3 bg-black/30 border border-[#c5ad97]/30 rounded text-xs leading-relaxed animate-fade-in">
-                  <p className="text-[#c5ad97] font-bold mb-1 uppercase tracking-wider text-[10px]">Nhật Ký Thực Thi:</p>
+                <div className="mt-3 p-3 bg-black/30 border border-[#808499]/20 rounded text-xs leading-relaxed animate-fade-in">
+                  <p className="text-[#808499] font-bold mb-1 uppercase tracking-wider text-[10px]">Nhật Ký Thực Thi:</p>
                   <p className="text-[#dfdee0] italic">"{activeTargetObj.detail}"</p>
                 </div>
               )}
@@ -430,14 +430,14 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
             {/* REAL-TIME LOG */}
             <div className="border border-[#808499]/20 bg-black/20 p-3 rounded-lg text-[11px] font-mono text-[#808499]">
-              <div className="flex items-center gap-1.5 text-[#c5ad97] font-bold mb-1.5 uppercase text-[9px] tracking-wider">
-                <span className="w-1.5 h-1.5 bg-[#c5ad97] rounded-full animate-ping" />
+              <div className="flex items-center gap-1.5 text-[#dfdee0] font-bold mb-1.5 uppercase text-[9px] tracking-wider">
+                <span className="w-1.5 h-1.5 bg-[#808499] rounded-full animate-ping" />
                 DÒNG THỜI GIAN HÀNH ĐỘNG
               </div>
               <div className="flex flex-col gap-1.5 max-h-[120px] overflow-y-auto pr-1">
                 {systemLog.map((log, i) => (
                   <p key={i} className="leading-normal">
-                    <span className="text-[#c5ad97]">&gt;</span> {log}
+                    <span className="text-[#808499]">&gt;</span> {log}
                   </p>
                 ))}
               </div>
@@ -449,17 +449,17 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
           <section className="lg:col-span-6 flex flex-col gap-6">
             
             {/* NOVEL BANNER & ADMISSIONS COVER */}
-            <div className="relative border border-[#808499]/30 bg-gradient-to-br from-[#604239]/20 via-[#251e23] to-black/40 p-6 md:p-8 rounded-xl overflow-hidden shadow-2xl flex flex-col items-center text-center">
-              <div className="absolute top-2 right-2 border border-[#c5ad97]/30 text-[#c5ad97] text-[10px] font-mono px-2 py-0.5 uppercase tracking-widest bg-black/40 z-10">
+            <div className="relative border border-[#808499]/30 bg-[#251e23] p-6 md:p-8 rounded-xl overflow-hidden shadow-2xl flex flex-col items-center text-center">
+              <div className="absolute top-2 right-2 border border-[#808499]/30 text-[#808499] text-[10px] font-mono px-2 py-0.5 uppercase tracking-widest bg-black/40 z-10">
                 TRÙNG SINH CHI LỘ
               </div>
 
               {/* Delicate lace-like corners */}
-              <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-[#c5ad97]/40" />
-              <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-[#c5ad97]/40" />
+              <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-[#808499]/30" />
+              <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-[#808499]/30" />
 
               <div className="mb-4">
-                <span className="inline-block px-3 py-1 bg-[#604239]/40 border border-[#c5ad97]/30 rounded-full text-xs text-[#c5ad97] font-serif italic">
+                <span className="inline-block px-3 py-1 bg-[#808499]/10 border border-[#808499]/20 rounded-full text-xs text-[#dfdee0] font-serif italic">
                   Đại học Hoa Hạ • Học bá trùng sinh báo thù
                 </span>
               </div>
@@ -476,7 +476,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full pt-4 border-t border-[#808499]/20 text-xs text-center">
                 <div>
                   <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Tác giả</span>
-                  <span className="font-bold text-[#c5ad97]">{story?.author || "Đang cập nhật"}</span>
+                  <span className="font-bold text-[#dfdee0]">{story?.author || "Đang cập nhật"}</span>
                 </div>
                 <div>
                   <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Số chương</span>
@@ -484,7 +484,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 </div>
                 <div>
                   <span className="block text-[#808499] text-[10px] uppercase font-mono mb-1">Chương đọc sớm</span>
-                  <span className="font-bold text-[#c5ad97]">
+                  <span className="font-bold text-[#dfdee0]">
                     {chapters.filter(c => c.isEarlyAccess).length} chương
                   </span>
                 </div>
@@ -501,7 +501,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 onClick={() => setActiveTab('chapters')}
                 className={`flex-1 py-3 text-center text-xs font-mono tracking-widest uppercase transition-all border-b-2 font-bold flex items-center justify-center gap-2 ${
                   activeTab === 'chapters'
-                    ? 'border-[#c5ad97] text-[#c5ad97] bg-[#c5ad97]/5'
+                    ? 'border-[#dfdee0] text-[#dfdee0] bg-[#808499]/10'
                     : 'border-transparent text-[#808499] hover:text-[#dfdee0] hover:bg-white/[0.01]'
                 }`}
               >
@@ -511,7 +511,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 onClick={() => setActiveTab('comments')}
                 className={`flex-1 py-3 text-center text-xs font-mono tracking-widest uppercase transition-all border-b-2 font-bold flex items-center justify-center gap-2 ${
                   activeTab === 'comments'
-                    ? 'border-[#c5ad97] text-[#c5ad97] bg-[#c5ad97]/5'
+                    ? 'border-[#dfdee0] text-[#dfdee0] bg-[#808499]/10'
                     : 'border-transparent text-[#808499] hover:text-[#dfdee0] hover:bg-white/[0.01]'
                 }`}
               >
@@ -526,12 +526,12 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 {/* Search & Sort Row */}
                 <div className="flex items-center justify-between gap-4 flex-wrap bg-[#251e23]/40 p-2 border border-[#808499]/20 rounded-lg">
                   <div className="text-xs text-[#808499] font-mono pl-2">
-                    Tổng số: <strong className="text-[#c5ad97]">{chapters.length}</strong> bài ôn luyện
+                    Tổng số: <strong className="text-[#dfdee0]">{chapters.length}</strong> bài ôn luyện
                   </div>
                   
                   <button
                     onClick={() => setChapterSortDesc(!chapterSortDesc)}
-                    className="px-3 py-1.5 text-[10px] font-mono uppercase bg-[#604239]/20 border border-[#c5ad97]/30 text-[#c5ad97] rounded hover:bg-[#c5ad97] hover:text-[#251e23] transition-colors"
+                    className="px-3 py-1.5 text-[10px] font-mono uppercase bg-[#808499]/10 border border-[#808499]/30 text-[#dfdee0] rounded hover:bg-[#808499]/20 hover:text-[#dfdee0] transition-colors"
                   >
                     Sắp xếp: {chapterSortDesc ? "Chương mới nhất" : "Chương đầu tiên"}
                   </button>
@@ -553,20 +553,20 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                         <button
                           key={chap.id}
                           onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
-                          className="group text-left p-4 rounded-xl border border-[#808499]/20 hover:border-[#c5ad97] bg-gradient-to-br from-[#251e23] to-[#251e23]/40 hover:from-[#604239]/10 hover:to-[#251e23]/80 transition-all shadow hover:shadow-lg flex flex-col justify-between h-[120px] relative overflow-hidden"
+                          className="group text-left p-4 rounded-xl border border-[#808499]/20 hover:border-[#dfdee0] bg-gradient-to-br from-[#251e23] to-[#251e23]/40 hover:from-[#808499]/5 hover:to-[#251e23]/80 transition-all shadow hover:shadow-lg flex flex-col justify-between h-[120px] relative overflow-hidden"
                         >
                           {/* Top Tag row */}
                           <div className="flex justify-between items-start w-full gap-2 z-10">
-                            <span className="text-[9px] font-mono text-[#c5ad97] tracking-wider uppercase">
+                            <span className="text-[9px] font-mono text-[#808499] tracking-wider uppercase">
                               MÃ ĐỀ LUYỆN {absoluteIndex.toString().padStart(2, '0')}
                             </span>
                             
                             {isLocked ? (
-                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#604239]/20 border border-[#604239]/30 text-[#c5ad97]">
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#808499]/10 border border-[#808499]/20 text-[#808499]">
                                 CHƯA PHÊ DUYỆT
                               </span>
                             ) : isEarly ? (
-                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#c5ad97]/20 border border-[#c5ad97]/40 text-[#c5ad97]">
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#604239]/20 border border-[#808499]/30 text-[#dfdee0]">
                                 ĐỌC SỚM
                               </span>
                             ) : (
@@ -578,7 +578,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
                           {/* Chapter Title */}
                           <div className="my-2 z-10">
-                            <h3 className="font-serif text-sm font-bold text-[#dfdee0] group-hover:text-[#c5ad97] transition-colors line-clamp-2">
+                            <h3 className="font-serif text-sm font-bold text-[#dfdee0] group-hover:text-[#dfdee0] transition-colors line-clamp-2">
                               {chap.title}
                             </h3>
                           </div>
@@ -589,7 +589,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                               {chap.createdAt ? format(new Date(chap.createdAt), 'dd/MM/yyyy') : "09/07/2026"}
                             </span>
                             
-                            <span className="text-[10px] text-[#c5ad97] font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                            <span className="text-[10px] text-[#808499] group-hover:text-[#dfdee0] font-semibold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                               Luyện đề <ChevronRight className="w-3.5 h-3.5" />
                             </span>
                           </div>
@@ -605,7 +605,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     <button
                       onClick={() => setChapterPage(Math.max(0, chapterPage - 1))}
                       disabled={chapterPage === 0}
-                      className="px-3 py-1.5 rounded border border-[#808499]/30 text-[#808499] hover:border-[#c5ad97] hover:text-[#c5ad97] transition-colors disabled:opacity-30 disabled:pointer-events-none text-xs flex items-center gap-1"
+                      className="px-3 py-1.5 rounded border border-[#808499]/30 text-[#808499] hover:border-[#dfdee0] hover:text-[#dfdee0] transition-colors disabled:opacity-30 disabled:pointer-events-none text-xs flex items-center gap-1"
                     >
                       <ChevronLeft className="w-4 h-4" /> Trang trước
                     </button>
@@ -617,7 +617,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     <button
                       onClick={() => setChapterPage(Math.min(Math.ceil(chapters.length / CHAPTERS_PER_PAGE) - 1, chapterPage + 1))}
                       disabled={(chapterPage + 1) * CHAPTERS_PER_PAGE >= chapters.length}
-                      className="px-3 py-1.5 rounded border border-[#808499]/30 text-[#808499] hover:border-[#c5ad97] hover:text-[#c5ad97] transition-colors disabled:opacity-30 disabled:pointer-events-none text-xs flex items-center gap-1"
+                      className="px-3 py-1.5 rounded border border-[#808499]/30 text-[#808499] hover:border-[#dfdee0] hover:text-[#dfdee0] transition-colors disabled:opacity-30 disabled:pointer-events-none text-xs flex items-center gap-1"
                     >
                       Trang sau <ChevronRight className="w-4 h-4" />
                     </button>
@@ -633,7 +633,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 
                 {/* COMMENT BOX */}
                 <div className="border border-[#808499]/20 bg-[#251e23]/60 p-4 rounded-xl relative">
-                  <h3 className="text-xs font-mono tracking-widest text-[#c5ad97] uppercase mb-3 flex items-center gap-1.5">
+                  <h3 className="text-xs font-mono tracking-widest text-[#dfdee0] uppercase mb-3 flex items-center gap-1.5">
                     <Send className="w-3.5 h-3.5" /> Gửi Công Văn Thảo Luận
                   </h3>
 
@@ -644,7 +644,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                       placeholder={isLoggedIn ? "Nhập ý kiến đóng góp cho thương hội tại đây..." : "Bạn cần đăng nhập để tham gia thảo luận!"}
                       rows={3}
                       disabled={!isLoggedIn}
-                      className="w-full p-3 border border-[#808499]/30 bg-black/20 text-[#dfdee0] placeholder-[#808499] focus:outline-none focus:border-[#c5ad97] rounded-lg text-xs sm:text-sm resize-none transition-all disabled:opacity-40"
+                      className="w-full p-3 border border-[#808499]/30 bg-black/20 text-[#dfdee0] placeholder-[#808499] focus:outline-none focus:border-[#dfdee0] rounded-lg text-xs sm:text-sm resize-none transition-all disabled:opacity-40"
                     />
                     
                     <div className="flex justify-between items-center">
@@ -654,7 +654,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                       <button
                         type="submit"
                         disabled={submittingComment || !commentText.trim() || !isLoggedIn}
-                        className="px-5 py-2 rounded font-bold font-mono tracking-wider bg-[#c5ad97] text-[#251e23] hover:bg-[#dfdee0] transition-colors text-xs uppercase disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="px-5 py-2 rounded font-bold font-mono tracking-wider bg-[#604239] text-[#dfdee0] hover:bg-[#c5ad97] hover:text-[#251e23] transition-colors text-xs uppercase disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         {submittingComment ? "Đang gửi..." : "Trình duyệt ý kiến"}
                       </button>
@@ -682,10 +682,10 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                                   avatarUrl={avatar}
                                   equippedAccessory={cacheUser.equippedAccessory || comm.equippedAccessory}
                                   accessoryPosition={cacheUser.accessoryPosition || comm.accessoryPosition}
-                                  className="w-8 h-8 rounded-full border border-[#c5ad97]/30"
+                                  className="w-8 h-8 rounded-full border border-[#808499]/30"
                                 />
                                 <div>
-                                  <h4 className="text-xs font-bold text-[#c5ad97]">
+                                  <h4 className="text-xs font-bold text-[#dfdee0]">
                                     {comm.displayName || comm.authorName || "Nhà lữ hành ẩn danh"}
                                   </h4>
                                   <span className="text-[9px] font-mono text-[#808499]">
@@ -716,9 +716,9 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                                           avatarUrl={repAvatar}
                                           equippedAccessory={cacheRepUser.equippedAccessory || rep.equippedAccessory}
                                           accessoryPosition={cacheRepUser.accessoryPosition || rep.accessoryPosition}
-                                          className="w-5 h-5 rounded-full border border-[#c5ad97]/20"
+                                          className="w-5 h-5 rounded-full border border-[#808499]/20"
                                         />
-                                        <span className="font-bold text-[#c5ad97] text-[11px]">{rep.displayName || rep.authorName || "Cố vấn ẩn danh"}</span>
+                                        <span className="font-bold text-[#dfdee0] text-[11px]">{rep.displayName || rep.authorName || "Cố vấn ẩn danh"}</span>
                                         <span className="text-[9px] font-mono text-[#808499]">
                                           {rep.createdAt ? format(new Date(rep.createdAt?.seconds ? rep.createdAt.seconds * 1000 : (rep.createdAt?.toMillis ? rep.createdAt.toMillis() : rep.createdAt)), 'dd/MM HH:mm') : ""}
                                         </span>
@@ -741,7 +741,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                                     onChange={(e) => setReplyText(e.target.value)}
                                     placeholder="Nhập phản hồi cố vấn..."
                                     rows={2}
-                                    className="w-full p-2 bg-[#251e23]/80 text-xs text-[#dfdee0] placeholder-[#808499] focus:outline-none focus:border-[#c5ad97] border border-[#808499]/30 rounded"
+                                    className="w-full p-2 bg-[#251e23]/80 text-xs text-[#dfdee0] placeholder-[#808499] focus:outline-none focus:border-[#dfdee0] border border-[#808499]/30 rounded"
                                   />
                                   <div className="flex justify-end gap-2 text-[10px]">
                                     <button
@@ -753,7 +753,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                                     <button
                                       onClick={() => handleSendReply(comm)}
                                       disabled={submittingReply || !replyText.trim()}
-                                      className="px-3 py-1 bg-[#c5ad97] text-[#251e23] font-bold uppercase rounded disabled:opacity-40"
+                                      className="px-3 py-1 bg-[#604239] text-[#dfdee0] hover:bg-[#c5ad97] hover:text-[#251e23] font-bold uppercase rounded disabled:opacity-40"
                                     >
                                       Gửi cố vấn
                                     </button>
@@ -768,7 +768,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                                     }
                                     setReplyingToId(comm.id);
                                   }}
-                                  className="text-[10px] font-mono text-[#c5ad97] hover:text-[#dfdee0] flex items-center gap-1"
+                                  className="text-[10px] font-mono text-[#808499] hover:text-[#dfdee0] flex items-center gap-1"
                                 >
                                   Phản hồi cố vấn <Send className="w-3 h-3" />
                                 </button>
@@ -792,7 +792,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
             
             {/* EXAM REVISION BOARD */}
             <div className="border border-[#808499]/30 bg-[#251e23]/80 backdrop-blur-sm p-4 rounded-xl relative shadow-lg">
-              <h2 className="text-xs font-mono tracking-widest text-[#c5ad97] uppercase border-b border-[#808499]/20 pb-2 mb-3.5 flex items-center gap-2">
+              <h2 className="text-xs font-mono tracking-widest text-[#dfdee0] uppercase border-b border-[#808499]/20 pb-2 mb-3.5 flex items-center gap-2">
                 <GraduationCap className="w-4 h-4" /> BẢNG ÔN THI ĐẠI HỌC
               </h2>
 
@@ -803,7 +803,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     <span className="font-bold font-mono text-[#dfdee0]">148 <span className="text-[10px] font-normal text-[#808499]">/ 150</span></span>
                   </div>
                   <div className="w-full h-1.5 bg-[#808499]/20 rounded-full overflow-hidden">
-                    <div className="bg-[#c5ad97] h-full" style={{ width: '98.6%' }} />
+                    <div className="bg-[#808499] h-full" style={{ width: '98.6%' }} />
                   </div>
                 </div>
 
@@ -813,7 +813,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     <span className="font-bold font-mono text-[#dfdee0]">135 <span className="text-[10px] font-normal text-[#808499]">/ 150</span></span>
                   </div>
                   <div className="w-full h-1.5 bg-[#808499]/20 rounded-full overflow-hidden">
-                    <div className="bg-[#c5ad97] h-full" style={{ width: '90%' }} />
+                    <div className="bg-[#808499] h-full" style={{ width: '90%' }} />
                   </div>
                 </div>
 
@@ -823,13 +823,13 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     <span className="font-bold font-mono text-[#dfdee0]">147 <span className="text-[10px] font-normal text-[#808499]">/ 150</span></span>
                   </div>
                   <div className="w-full h-1.5 bg-[#808499]/20 rounded-full overflow-hidden">
-                    <div className="bg-[#c5ad97] h-full" style={{ width: '98%' }} />
+                    <div className="bg-[#808499] h-full" style={{ width: '98%' }} />
                   </div>
                 </div>
 
                 <div className="mt-2.5 pt-3 border-t border-[#808499]/20 flex justify-between items-center">
                   <span className="text-[#808499] text-[10px] uppercase font-mono">Xếp hạng ôn tập:</span>
-                  <span className="font-bold font-mono text-[#c5ad97] bg-[#c5ad97]/10 px-2 py-0.5 rounded text-[10px] border border-[#c5ad97]/20">
+                  <span className="font-bold font-mono text-[#dfdee0] bg-[#808499]/10 px-2 py-0.5 rounded text-[10px] border border-[#808499]/20">
                     Thủ khoa khối tự nhiên
                   </span>
                 </div>
@@ -838,7 +838,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
             {/* INTERACTIVE STUDY SCHEDULE */}
             <div className="border border-[#808499]/30 bg-[#251e23]/80 backdrop-blur-sm p-4 rounded-xl relative shadow-lg">
-              <h2 className="text-xs font-mono tracking-widest text-[#c5ad97] uppercase border-b border-[#808499]/20 pb-2 mb-3 flex items-center gap-2">
+              <h2 className="text-xs font-mono tracking-widest text-[#dfdee0] uppercase border-b border-[#808499]/20 pb-2 mb-3 flex items-center gap-2">
                 <Calendar className="w-3.5 h-3.5" /> LỊCH TRÌNH ÔN THI
               </h2>
 
@@ -849,9 +849,9 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     onClick={() => toggleTask(item.id)}
                     className="w-full text-left flex items-start gap-2.5 p-2 rounded hover:bg-[#808499]/5 transition-all text-xs"
                   >
-                    <span className="mt-0.5 text-[#c5ad97]">
+                    <span className="mt-0.5 text-[#808499]">
                       {item.completed ? (
-                        <CheckSquare className="w-4 h-4 text-[#c5ad97]" />
+                        <CheckSquare className="w-4 h-4 text-[#808499]" />
                       ) : (
                         <Square className="w-4 h-4 text-[#808499]" />
                       )}
@@ -873,12 +873,12 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
             {/* COMMERCE / INVESTMENT WATCH */}
             <div className="border border-[#808499]/30 bg-[#251e23]/80 backdrop-blur-sm p-4 rounded-xl relative shadow-lg">
-              <div className="absolute top-2 right-2 border border-[#c5ad97]/30 text-[#c5ad97] text-[9px] font-mono px-1.5 py-0.1 rounded bg-[#c5ad97]/10 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#c5ad97] animate-pulse" />
+              <div className="absolute top-2 right-2 border border-[#808499]/30 text-[#808499] text-[9px] font-mono px-1.5 py-0.1 rounded bg-[#808499]/10 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#808499] animate-pulse" />
                 MỞ CỬA
               </div>
 
-              <h2 className="text-xs font-mono tracking-widest text-[#c5ad97] uppercase border-b border-[#808499]/20 pb-2 mb-3.5 flex items-center gap-2">
+              <h2 className="text-xs font-mono tracking-widest text-[#dfdee0] uppercase border-b border-[#808499]/20 pb-2 mb-3.5 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" /> THƯƠNG TRƯỜNG BIẾN ĐỘNG
               </h2>
 
@@ -890,7 +890,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 
                 <div className="flex items-center justify-between">
                   <span className="text-[#808499]">Biến động ngày:</span>
-                  <span className={`font-bold font-mono flex items-center ${stockChange >= 0 ? 'text-[#c5ad97]' : 'text-[#808499]'}`}>
+                  <span className={`font-bold font-mono flex items-center ${stockChange >= 0 ? 'text-[#dfdee0]' : 'text-[#808499]'}`}>
                     {stockChange >= 0 ? "+" : ""}{stockChange}%
                   </span>
                 </div>
@@ -901,7 +901,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
                 <button
                   onClick={updateMarketPrice}
-                  className="w-full mt-2 py-2 border border-[#c5ad97]/30 hover:border-[#c5ad97] text-xs font-mono text-[#c5ad97] hover:text-[#dfdee0] hover:bg-[#c5ad97]/10 transition-all rounded uppercase"
+                  className="w-full mt-2 py-2 border border-[#808499]/30 hover:border-[#dfdee0] text-xs font-mono text-[#808499] hover:text-[#dfdee0] hover:bg-[#808499]/10 transition-all rounded uppercase"
                 >
                   Cập nhật thị trường
                 </button>
