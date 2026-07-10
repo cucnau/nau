@@ -78,69 +78,12 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
     navigate,
   } = props;
 
-  // 1. Easter Egg States for Sickly Beauty Theme
+  // 1. Easter Egg States for Sickly Beauty Theme (Chỉ giữ lại các chỉ số sức khoẻ cơ bản)
   const [heartRate, setHeartRate] = useState(72);
-  const [medPills, setMedPills] = useState(3);
-  const [teaTemp, setTeaTemp] = useState(45);
   const [bodyTemp, setBodyTemp] = useState(35.8);
-  const [isBrewing, setIsBrewing] = useState(false);
-  const [systemLog, setSystemLog] = useState<string[]>([
-    "Trùng sinh thành công về năm 17 tuổi.",
-    "Khởi động tiến trình ôn thi đại học & âm thầm thu gom cổ phiếu.",
-    "Bắt đầu thiết lập mạng lưới báo thù Lâm gia."
-  ]);
-
-  // 2. Interactive Schedule Tasks
-  const [schedule, setSchedule] = useState([
-    { id: 1, time: "06:00", text: "Uống một ngụm thuốc đắng, đọc từ vựng Tiếng Anh", completed: true },
-    { id: 2, time: "08:00", text: "Luyện đề thi đại học môn Toán (Mục tiêu 150 điểm)", completed: true },
-    { id: 3, time: "14:00", text: "Đọc báo cáo tài chính Thẩm thị, thu mua cổ phiếu ngầm", completed: false },
-    { id: 4, time: "20:00", text: "Thực thi kế hoạch thanh trừng Lâm gia từng bước", completed: false }
-  ]);
-
-  // 3. Interactive Revenge targets
-  const [selectedTarget, setSelectedTarget] = useState<string | null>(null);
-  const targets = [
-    { 
-      id: "lamhai", 
-      name: "Lâm Hải", 
-      role: "Nhạc phụ hiểm độc (Bố đẻ kiếp trước hại chết mẹ)", 
-      status: "Đã phá sản & Thụ án giam", 
-      color: "text-[#808499] border-[#808499]/30 bg-[#808499]/5",
-      detail: "Lâm Hải đã bị phanh phui tội danh trốn thuế và hối lộ. Toàn bộ tài sản công ty bị niêm phong. Đang thụ án 18 năm tù giam. Kế hoạch báo thù giai đoạn 1 hoàn tất viên mãn!" 
-    },
-    { 
-      id: "lamthuc", 
-      name: "Lâm Thục", 
-      role: "Chị kế thâm hiểm (Cướp đoạt vị trí, hãm hại danh dự)", 
-      status: "Trục xuất & Thân bại danh liệt", 
-      color: "text-[#808499] border-[#808499]/30 bg-[#808499]/5",
-      detail: "Bị vạch trần vụ gian lận thi cử và ăn cắp bản thiết kế ngay trước toàn trường. Đã bị đuổi học khỏi trường chuyên, bị dư luận xã hội lên án dữ dội, không thể ngẩng đầu lên được." 
-    },
-    { 
-      id: "thamtruc", 
-      name: "Thẩm Trực", 
-      role: "Định hôn phu bội bạc (Kiếp trước cấu kết hại chết ta)", 
-      status: "Đang bị dồn vào chân tường", 
-      color: "text-[#c5ad97] border-[#c5ad97]/30 bg-[#c5ad97]/5",
-      detail: "Dự án đầu tư trung tâm thương mại của Thẩm gia bị FarEast (công ty con của ta) nẫng tay trên. Thẩm thị đang đứng trước nguy cơ gánh khoản nợ xấu 500 tỷ đồng, chuẩn bị tuyên bố phá sản." 
-    },
-    { 
-      id: "lamthi", 
-      name: "Tập đoàn Lâm Thị", 
-      role: "Sản nghiệp vốn thuộc về mẹ ta", 
-      status: "Đã thu mua ngầm 65%", 
-      color: "text-[#c5ad97] border-[#c5ad97]/30 bg-[#c5ad97]/5",
-      detail: "Đã âm thầm dùng pháp nhân nước ngoài FarEast thu gom toàn bộ cổ phần trôi nổi trên thị trường chứng khoán. Hiện nắm giữ 65% quyền biểu quyết, sẵn sàng tước quyền điều hành Lâm thị bất cứ lúc nào." 
-    }
-  ];
-
-  // 4. Stock Market Live Simulator
-  const [stockPrice, setStockPrice] = useState(142.5);
-  const [stockChange, setStockChange] = useState(5.4);
 
   useEffect(() => {
-    // Fluctuating heartbeat slightly
+    // Biến động nhịp tim ngẫu nhiên nhẹ nhàng để tạo hiệu ứng sinh động
     const interval = setInterval(() => {
       setHeartRate(prev => {
         const delta = Math.random() > 0.5 ? 1 : -1;
@@ -151,81 +94,158 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
     return () => clearInterval(interval);
   }, []);
 
-  const addLog = (msg: string) => {
-    setSystemLog(prev => [msg, ...prev.slice(0, 5)]);
-  };
-
-  const handleTakeMedicine = () => {
-    if (medPills <= 0) {
-      addLog("Hết thuốc đông y đã sắc! Hãy bắt đầu sắc mẻ thuốc mới.");
-      return;
-    }
-    setMedPills(prev => prev - 1);
-    setHeartRate(72);
-    setBodyTemp(36.5);
-    setTeaTemp(prev => Math.min(prev + 5, 60));
-    addLog("Bạn vừa uống một ngụm thuốc đông y đắng ngắt. Chỉ số nhịp tim ổn định ở mức 72 BPM, cơ thể ấm áp hơn.");
-  };
-
-  const handleBrewMedicine = () => {
-    if (isBrewing) return;
-    setIsBrewing(true);
-    addLog("Bắt đầu sắc mẻ thuốc đông y bổ khí dưỡng huyết...");
-    setTimeout(() => {
-      setMedPills(3);
-      setIsBrewing(false);
-      addLog("Sắc thuốc hoàn tất! Bạn có thêm 3 liều thuốc duy trì thể chất.");
-    }, 3000);
-  };
-
-  const handleBlowTea = () => {
-    if (teaTemp <= 30) {
-      addLog("Trà đã nguội lạnh. Hãy hâm nóng lại để tránh gây lạnh bụng.");
-      return;
-    }
-    setTeaTemp(prev => Math.max(prev - 4, 30));
-    addLog("Bạn khẽ thổi chén trà nóng nghi ngút khói. Hương thơm nhẹ dịu lan tỏa.");
-  };
-
-  const handleReheatTea = () => {
-    setTeaTemp(55);
-    addLog("Hâm nóng lại chén trà hoa cúc tuyết. Nhiệt độ hiện tại: 55°C.");
-  };
+  // 2. Lịch trình ôn thi lớp 12 thực tế ngoài đời vô cùng hiệu quả
+  const [schedule, setSchedule] = useState([
+    { id: 1, time: "05:30 - 06:30", text: "Thức dậy sớm, ôn tập lý thuyết, học từ vựng (Anh/Văn) khi trí não minh mẫn nhất.", completed: false },
+    { id: 2, time: "08:00 - 11:30", text: "Tập trung giải đề thi thử các môn tự nhiên (Toán/Lý/Hóa) nâng cao tư duy phản xạ.", completed: false },
+    { id: 3, time: "14:00 - 17:00", text: "Hệ thống hóa kiến thức bằng sơ đồ tư duy, rèn luyện kỹ năng viết văn nghị luận xã hội.", completed: false },
+    { id: 4, time: "19:30 - 22:00", text: "Luyện giải đề chính thức các năm trước dưới áp lực thời gian thật để phân bổ thời gian hợp lý.", completed: false },
+    { id: 5, time: "22:00 - 22:30", text: "Review và ghi chép lại các lỗi sai thường gặp vào sổ tay cá nhân để rút kinh nghiệm sâu sắc.", completed: false },
+    { id: 6, time: "22:30 - 23:00", text: "Thư giãn nhẹ nhàng, thả lỏng tinh thần, chuẩn bị đi ngủ sớm trước 23:00 để phục hồi não bộ.", completed: false }
+  ]);
 
   const toggleTask = (id: number) => {
     setSchedule(prev => prev.map(item => {
       if (item.id === id) {
-        const nextState = !item.completed;
-        addLog(`Đã cập nhật mục lịch trình: [${nextState ? "X" : " "}] ${item.text}`);
-        return { ...item, completed: nextState };
+        return { ...item, completed: !item.completed };
       }
       return item;
     }));
   };
 
-  const updateMarketPrice = () => {
-    const deltaPercent = (Math.random() * 6 - 2.5); // -2.5% to +3.5%
-    const change = parseFloat((stockChange + deltaPercent / 2).toFixed(1));
-    const factor = 1 + deltaPercent / 100;
-    const price = parseFloat((stockPrice * factor).toFixed(3));
-    setStockPrice(price);
-    setStockChange(change);
-    addLog(`Thị trường biến động: Cổ phiếu FarEast giao dịch ở mức ${price.toFixed(3)} VND (${change >= 0 ? "+" : ""}${change}%)`);
+  // 3. Câu hỏi ôn thi đại học tương tác thực tế cho độc giả tích điểm
+  const EXAM_QUESTIONS = [
+    {
+      question: "Trong bài thơ 'Tây Tiến' của Quang Dũng, hình ảnh đoàn quân được khắc họa độc đáo qua chi tiết nào?",
+      options: [
+        "A. Quân đi điệp điệp trùng trùng",
+        "B. Tây Tiến đoàn binh không mọc tóc",
+        "C. Áo chàm đưa buổi phân ly",
+        "D. Đường ra trận mùa này đẹp lắm"
+      ],
+      correct: 1,
+      explanation: "Hình ảnh 'không mọc tóc' phản ánh thực tế khốc liệt của căn bệnh sốt rét rừng nhưng vẫn toát lên vẻ kiêu hùng, lẫm liệt của người lính Tây Tiến."
+    },
+    {
+      question: "Đạo hàm của hàm số y = ln(x) (với x > 0) là gì?",
+      options: [
+        "A. y' = 1/x",
+        "B. y' = e^x",
+        "C. y' = -1/x^2",
+        "D. y' = ln(x)"
+      ],
+      correct: 0,
+      explanation: "Theo công thức đạo hàm cơ bản của hàm số logarit tự nhiên, đạo hàm của y = ln(x) là y' = 1/x."
+    },
+    {
+      question: "Từ nào sau đây viết ĐÚNG chính tả Tiếng Anh?",
+      options: [
+        "A. Pronunciation",
+        "B. Pronounciation",
+        "C. Pronunsiation",
+        "D. Prononciation"
+      ],
+      correct: 0,
+      explanation: "Từ đúng chính tả tiếng Anh là 'Pronunciation' (danh từ chỉ sự phát âm, động từ là pronounce)."
+    },
+    {
+      question: "Ai là tác giả của tác phẩm văn học hiện thực xuất sắc 'Tắt Đèn'?",
+      options: [
+        "A. Nam Cao",
+        "B. Ngô Tất Tố",
+        "C. Vũ Trọng Phụng",
+        "D. Nguyễn Công Hoan"
+      ],
+      correct: 1,
+      explanation: "'Tắt Đèn' là tiểu thuyết tiêu biểu nhất khắc họa cuộc sống khốn khổ của người nông dân dưới chế độ phong kiến thực dân của Ngô Tất Tố."
+    },
+    {
+      question: "Kim loại nào sau đây là kim loại nhẹ nhất trong bảng tuần hoàn hóa học?",
+      options: [
+        "A. Natri (Na)",
+        "B. Nhôm (Al)",
+        "C. Liti (Li)",
+        "D. Kali (K)"
+      ],
+      correct: 2,
+      explanation: "Liti (Li) là kim loại nhẹ nhất và có khối lượng riêng nhỏ nhất trong tất cả các kim loại."
+    },
+    {
+      question: "Chiến dịch Điện Biên Phủ lừng lẫy năm châu chấn động địa cầu kết thúc thắng lợi vào năm nào?",
+      options: [
+        "A. Năm 1945",
+        "B. Năm 1954",
+        "C. Năm 1975",
+        "D. Năm 1930"
+      ],
+      correct: 1,
+      explanation: "Chiến thắng Điện Biên Phủ lịch sử kết thúc thắng lợi vẻ vang vào ngày 7 tháng 5 năm 1954."
+    }
+  ];
+
+  const [currentQIdx, setCurrentQIdx] = useState(0);
+  const [selectedAns, setSelectedAns] = useState<number | null>(null);
+  const [hasAnswered, setHasAnswered] = useState(false);
+  const [examScore, setExamScore] = useState(() => Number(localStorage.getItem('user_exam_score') || '0'));
+
+  const handleAnswerClick = (index: number) => {
+    if (hasAnswered) return;
+    setSelectedAns(index);
+    setHasAnswered(true);
+    if (index === EXAM_QUESTIONS[currentQIdx].correct) {
+      const newScore = examScore + 10;
+      setExamScore(newScore);
+      localStorage.setItem('user_exam_score', String(newScore));
+    }
   };
 
-  const activeTargetObj = targets.find(t => t.id === selectedTarget);
+  const handleNextQuestion = () => {
+    setSelectedAns(null);
+    setHasAnswered(false);
+    let nextIdx = Math.floor(Math.random() * EXAM_QUESTIONS.length);
+    if (nextIdx === currentQIdx) {
+      nextIdx = (nextIdx + 1) % EXAM_QUESTIONS.length;
+    }
+    setCurrentQIdx(nextIdx);
+  };
 
-  // Pagination for chapters
+  // 4. Giả lập thị trường tài chính đơn giản cho sĩ tử tự học
+  const [marketPrices, setMarketPrices] = useState([
+    { code: "HBA", name: "Chỉ số Học Bá", price: 15.20, change: 3.5, desc: "Đo lường mức độ tiếp thu kiến thức và luyện đề của bạn." },
+    { code: "SKH", name: "Chỉ số Sức Khỏe", price: 12.80, change: 1.2, desc: "Đo lường chế độ sinh hoạt và mức độ cân bằng thể chất." },
+    { code: "TLY", name: "Tâm Lý Sĩ Tử", price: 10.50, change: -0.5, desc: "Đo lường mức độ vững vàng trước áp lực thi cử lớp 12." }
+  ]);
+
+  const updateMarketPrice = () => {
+    setMarketPrices(prev => prev.map(stock => {
+      const deltaPercent = (Math.random() * 6 - 2.8); // -2.8% to +3.2%
+      const newChange = parseFloat((stock.change + deltaPercent / 1.5).toFixed(1));
+      const newPrice = parseFloat((stock.price * (1 + deltaPercent / 100)).toFixed(2));
+      return {
+        ...stock,
+        price: newPrice < 1 ? 1.00 : newPrice,
+        change: newChange
+      };
+    }));
+  };
+
+  // 5. Gom cụm chương cho danh sách chương cực kỳ nhiều
+  const GROUP_SIZE = 50;
+  const numGroups = Math.ceil(chapters.length / GROUP_SIZE);
+  const [selectedGroup, setSelectedGroup] = useState(0);
+  const [searchChapterNum, setSearchChapterNum] = useState('');
+
+  // Sắp xếp chương
   const sortedChapters = [...chapters].sort((a, b) => {
     const orderA = a.order !== undefined ? a.order : 0;
     const orderB = b.order !== undefined ? b.order : 0;
     return chapterSortDesc ? orderB - orderA : orderA - orderB;
   });
 
-  const displayedChapters = sortedChapters.slice(
-    chapterPage * CHAPTERS_PER_PAGE,
-    (chapterPage + 1) * CHAPTERS_PER_PAGE
-  );
+  // Lấy danh sách chương hiển thị (hỗ trợ tìm kiếm nhanh & gom cụm)
+  const displayedChapters = searchChapterNum.trim()
+    ? sortedChapters.filter(chap => chap.title?.toLowerCase().includes(searchChapterNum.trim().toLowerCase()))
+    : sortedChapters.slice(selectedGroup * GROUP_SIZE, (selectedGroup + 1) * GROUP_SIZE);
 
   return (
     <div className="w-full min-h-screen bg-[#0D121D] text-[#ECEFF4] font-lora selection:bg-[#A2B6CD]/30 selection:text-[#ECEFF4] relative overflow-hidden pb-16">
@@ -349,97 +369,79 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                   <span className="text-xs text-[#ECEFF4]/70 font-lora">Thân nhiệt (Body Temp):</span>
                   <span className="text-xs font-lora font-bold text-[#ECEFF4]">{bodyTemp.toFixed(1)}°C</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-[#ECEFF4]/70 font-lora">Dược phẩm (Medicine):</span>
-                  <span className="text-xs font-lora font-bold text-[#A2B6CD]">{medPills} viên</span>
+                  <span className="text-xs text-[#ECEFF4]/70 font-lora">Thể trạng cốt nhục:</span>
+                  <span className="text-xs font-lora font-bold text-[#A2B6CD]">Duy trì ổn định</span>
                 </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#ECEFF4]/70 font-lora">Chén trà hoa cúc:</span>
-                  <span className="text-xs font-lora font-bold text-[#A2B6CD]">{teaTemp}°C</span>
-                </div>
-              </div>
-
-              {/* ACTION BUTTONS (Easter eggs!) */}
-              <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-[#2D3D54]/40">
-                <button
-                  onClick={handleTakeMedicine}
-                  className="px-2 py-1.5 text-[10px] font-bold font-lora text-center border border-[#A2B6CD]/40 bg-[#A2B6CD]/10 hover:bg-[#A2B6CD] hover:text-[#101622] transition-all uppercase rounded text-[#A2B6CD]"
-                >
-                  Uống thuốc
-                </button>
-                <button
-                  onClick={handleBrewMedicine}
-                  disabled={isBrewing}
-                  className="px-2 py-1.5 text-[10px] font-bold font-lora text-center border border-[#2D3D54]/40 hover:border-[#ECEFF4] bg-[#233145]/20 transition-all uppercase rounded text-[#A2B6CD] disabled:opacity-40"
-                >
-                  {isBrewing ? "Đang sắc..." : "Sắc thuốc"}
-                </button>
-                <button
-                  onClick={handleBlowTea}
-                  className="px-2 py-1.5 text-[10px] font-bold font-lora text-center border border-[#2D3D54]/40 hover:border-[#ECEFF4] bg-[#233145]/20 transition-all uppercase rounded text-[#ECEFF4]"
-                >
-                  Thổi trà
-                </button>
-                <button
-                  onClick={handleReheatTea}
-                  className="px-2 py-1.5 text-[10px] font-bold font-lora text-center border border-[#A2B6CD]/40 bg-[#A2B6CD]/10 hover:bg-[#A2B6CD] hover:text-[#101622] transition-all uppercase rounded text-[#A2B6CD]"
-                >
-                  Hâm trà
-                </button>
               </div>
             </div>
 
-            {/* REVENGE CHECKLIST CARD */}
+            {/* REVENGE CHECKLIST CARD -> CHUYỂN THÀNH 4 CHƯƠNG MỚI NHẤT */}
             <div className="border border-[#2D3D54]/30 bg-[#151C28] p-4 rounded-xl relative shadow-lg text-[#ECEFF4]">
               <h2 className="text-xs font-lora tracking-widest text-[#A2B6CD] uppercase border-b border-[#2D3D54]/40 pb-2 mb-3 flex items-center gap-2 font-bold">
-                <Skull className="w-3.5 h-3.5 text-[#A2B6CD]" /> SỔ TAY PHỤC THÙ
+                <BookOpen className="w-3.5 h-3.5 text-[#A2B6CD]" /> SỔ TAY PHỤC THÙ (4 CHƯƠNG MỚI NHẤT)
               </h2>
               
               <div className="flex flex-col gap-2.5">
-                {targets.map(t => (
-                  <button
-                    key={t.id}
-                    onClick={() => setSelectedTarget(selectedTarget === t.id ? null : t.id)}
-                    className={`w-full text-left p-2.5 rounded border transition-all text-xs flex flex-col gap-1 ${
-                      selectedTarget === t.id
-                        ? 'border-[#A2B6CD] bg-[#233145]/30'
-                        : 'border-[#2D3D54]/20 hover:border-[#A2B6CD]/40 bg-[#233145]/10'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-[#ECEFF4]">{t.name}</span>
-                      <span className={`text-[10px] font-lora px-1.5 py-0.5 rounded bg-black/40 ${t.id === 'thamtruc' ? 'text-[#A2B6CD]' : 'text-[#ECEFF4]/60'}`}>
-                        {t.status}
+                {[...chapters]
+                  .sort((a, b) => {
+                    const orderA = a.order !== undefined ? a.order : 0;
+                    const orderB = b.order !== undefined ? b.order : 0;
+                    return orderB - orderA;
+                  })
+                  .slice(0, 4)
+                  .map(ch => (
+                    <button
+                      key={ch.id}
+                      onClick={() => navigate(`/doc/${story.id}/${ch.id}`)}
+                      className="w-full text-left p-2 rounded border border-[#2D3D54]/20 hover:border-[#A2B6CD]/60 bg-[#233145]/10 hover:bg-[#233145]/30 transition-all text-xs flex flex-col gap-0.5"
+                    >
+                      <span className="font-bold text-[#ECEFF4] line-clamp-1 group-hover:text-[#A2B6CD]">
+                        {ch.title}
                       </span>
-                    </div>
-                    <span className="text-[11px] text-[#ECEFF4]/60 line-clamp-1">{t.role}</span>
-                  </button>
-                ))}
+                      <span className="text-[10px] text-[#A2B6CD] flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> Đọc ngay &rarr;
+                      </span>
+                    </button>
+                  ))}
+                {chapters.length === 0 && (
+                  <p className="text-xs text-[#ECEFF4]/50 italic">Chưa có chương mới nào.</p>
+                )}
               </div>
-
-              {/* Expansion Details */}
-              {selectedTarget && activeTargetObj && (
-                <div className="mt-3 p-3 bg-black/30 border border-[#2D3D54]/30 rounded text-xs leading-relaxed animate-fade-in">
-                  <p className="text-[#A2B6CD] font-bold mb-1 uppercase tracking-wider text-[10px]">Nhật Ký Thực Thi:</p>
-                  <p className="text-[#ECEFF4] italic">"{activeTargetObj.detail}"</p>
-                </div>
-              )}
             </div>
 
-            {/* REAL-TIME LOG */}
+            {/* REAL-TIME LOG -> CHUYỂN THÀNH 4 COMMENT MỚI NHẤT */}
             <div className="border border-[#2D3D54]/30 bg-[#151C28] p-3 rounded-lg text-[11px] font-lora text-[#ECEFF4]">
-              <div className="flex items-center gap-1.5 text-[#A2B6CD] font-bold mb-1.5 uppercase text-[9px] tracking-wider">
+              <div className="flex items-center gap-1.5 text-[#A2B6CD] font-bold mb-2.5 uppercase text-[9px] tracking-wider border-b border-[#2D3D54]/30 pb-1.5">
                 <span className="w-1.5 h-1.5 bg-[#A2B6CD] rounded-full animate-ping" />
-                DÒNG THỜI GIAN HÀNH ĐỘNG
+                DÒNG THỜI GIAN HÀNH ĐỘNG (BÌNH LUẬN MỚI)
               </div>
-              <div className="flex flex-col gap-1.5 max-h-[120px] overflow-y-auto pr-1">
-                {systemLog.map((log, i) => (
-                  <p key={i} className="leading-normal">
-                    <span className="text-[#A2B6CD]">&gt;</span> {log}
-                  </p>
-                ))}
+              <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
+                {[...comments]
+                  .sort((a, b) => {
+                    const getCommentTime = (c: any) => {
+                      if (!c.createdAt) return 0;
+                      if (c.createdAt.seconds) return c.createdAt.seconds * 1000;
+                      if (typeof c.createdAt.toMillis === 'function') return c.createdAt.toMillis();
+                      return new Date(c.createdAt).getTime();
+                    };
+                    return getCommentTime(b) - getCommentTime(a);
+                  })
+                  .slice(0, 4)
+                  .map((c, i) => (
+                    <div key={c.id || i} className="border-l border-[#A2B6CD]/30 pl-2 pb-1 last:pb-0">
+                      <p className="font-bold text-[#A2B6CD] text-[10px] leading-tight">
+                        {c.displayName || c.authorName || "Độc giả ẩn danh"}
+                      </p>
+                      <p className="text-[10px] text-[#ECEFF4]/85 leading-normal mt-0.5 line-clamp-2">
+                        {c.content || c.text}
+                      </p>
+                    </div>
+                  ))}
+                {comments.length === 0 && (
+                  <p className="text-[10px] text-[#ECEFF4]/40 italic">Chưa có bình luận nào thảo luận.</p>
+                )}
               </div>
             </div>
 
@@ -464,12 +466,12 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 </span>
               </div>
 
-              <h2 className="font-alegreya text-2xl md:text-3xl lg:text-4xl font-black text-[#ECEFF4] tracking-tight leading-tight mb-4">
-                NGƯỜI ĐẸP ỐM YẾU KHÔNG GIẠY GIỤA NỮA
+              <h2 className="font-alegreya text-2xl md:text-3xl lg:text-4xl font-bold text-[#ECEFF4] tracking-tight leading-tight mb-4">
+                {story?.title || "NGƯỜI ĐẸP ỐM YẾU KHÔNG GIẠY GIỤA NỮA"}
               </h2>
 
-              <p className="text-xs text-[#ECEFF4]/80 max-w-lg mb-6 leading-relaxed text-center">
-                Đời trước bị cha ruột hãm hại, chị kế cướp đoạt sản nghiệp, chết thảm trong bệnh viện. Quay lại năm 17 tuổi, cầm trên tay bản kế hoạch báo thù tối mật cùng bộ não học bá tuyệt đỉnh, ta sẽ lấy lại tất cả những gì vốn thuộc về mình!
+              <p className="text-xs text-[#ECEFF4]/80 max-w-lg mb-6 leading-relaxed text-center whitespace-pre-line">
+                {story?.description || story?.summary || "Đời trước bị cha ruột hãm hại, chị kế cướp đoạt sản nghiệp, chết thảm trong bệnh viện. Quay lại năm 17 tuổi, cầm trên tay bản kế hoạch báo thù tối mật cùng bộ não học bá tuyệt đỉnh, ta sẽ lấy lại tất cả những gì vốn thuộc về mình!"}
               </p>
 
               {/* Author and stats metadata row */}
@@ -523,29 +525,65 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
             {activeTab === 'chapters' && (
               <div className="flex flex-col gap-4">
                 
-                {/* Search & Sort Row */}
-                <div className="flex items-center justify-between gap-4 flex-wrap bg-[#151C28] p-2.5 border border-[#2D3D54]/30 rounded-lg text-[#ECEFF4]">
-                  <div className="text-xs text-[#ECEFF4]/80 font-lora pl-2">
-                    Tổng số: <strong className="text-[#A2B6CD]">{chapters.length}</strong> bài ôn luyện
+                {/* Search & Sort & Group Selection Row */}
+                <div className="flex flex-col gap-3 bg-[#151C28] p-3 border border-[#2D3D54]/30 rounded-lg text-[#ECEFF4]">
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div className="text-xs text-[#ECEFF4]/80 font-lora pl-1">
+                      Tổng số: <strong className="text-[#A2B6CD]">{chapters.length}</strong> bài ôn luyện
+                    </div>
+                    
+                    <button
+                      onClick={() => setChapterSortDesc(!chapterSortDesc)}
+                      className="px-3 py-1.5 text-[10px] font-lora uppercase bg-[#233145]/30 border border-[#2D3D54]/30 text-[#A2B6CD] rounded hover:bg-[#A2B6CD] hover:text-[#101622] transition-colors font-bold"
+                    >
+                      Sắp xếp: {chapterSortDesc ? "Chương mới nhất" : "Chương đầu tiên"}
+                    </button>
                   </div>
-                  
-                  <button
-                    onClick={() => setChapterSortDesc(!chapterSortDesc)}
-                    className="px-3 py-1.5 text-[10px] font-lora uppercase bg-[#233145]/30 border border-[#2D3D54]/30 text-[#A2B6CD] rounded hover:bg-[#A2B6CD] hover:text-[#101622] transition-colors font-bold"
-                  >
-                    Sắp xếp: {chapterSortDesc ? "Chương mới nhất" : "Chương đầu tiên"}
-                  </button>
+
+                  {/* Thanh tìm kiếm nhanh chương */}
+                  <div className="w-full relative mt-1">
+                    <input
+                      type="text"
+                      placeholder="Tìm nhanh theo số chương hoặc tiêu đề (ví dụ: 'Chương 42', '42')..."
+                      value={searchChapterNum}
+                      onChange={(e) => setSearchChapterNum(e.target.value)}
+                      className="w-full px-3 py-2 bg-black/35 border border-[#2D3D54]/30 focus:border-[#A2B6CD] rounded text-xs text-[#ECEFF4] placeholder-[#4B5E78] focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Chọn cụm chương gom gọn (Ví dụ: Cụm 50 chương) */}
+                  {!searchChapterNum.trim() && numGroups > 1 && (
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-[#2D3D54]/50 scrollbar-track-transparent mt-1">
+                      {Array.from({ length: numGroups }).map((_, idx) => {
+                        const start = idx * GROUP_SIZE + 1;
+                        const end = Math.min((idx + 1) * GROUP_SIZE, chapters.length);
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => setSelectedGroup(idx)}
+                            className={`px-3 py-1.5 rounded text-[10px] font-semibold whitespace-nowrap border transition-all ${
+                              selectedGroup === idx
+                                ? 'bg-[#A2B6CD] text-[#101622] border-[#A2B6CD] font-bold'
+                                : 'border-[#2D3D54]/25 text-[#A2B6CD] hover:bg-[#233145]/30 bg-[#233145]/10'
+                            }`}
+                          >
+                            Chương {start} - {end}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 {/* Chapter list layout */}
                 {displayedChapters.length === 0 ? (
                   <div className="text-center py-12 border border-dashed border-[#2D3D54]/30 rounded-xl bg-[#151C28]">
-                    <p className="text-[#ECEFF4]/70 text-sm font-alegreya italic">Đề thi mẫu đang được biên soạn, hãy quay lại sau...</p>
+                    <p className="text-[#ECEFF4]/70 text-sm font-alegreya italic">Không tìm thấy bài ôn thi nào phù hợp với yêu cầu tìm kiếm của bạn...</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                    {displayedChapters.map((chap, i) => {
-                      const absoluteIndex = (chapterPage * CHAPTERS_PER_PAGE) + i + 1;
+                    {displayedChapters.map((chap) => {
+                      const absoluteIndex = chapters.findIndex(c => c.id === chap.id) + 1;
                       const isLocked = chap.isLocked && !unlockedPassChapters.includes(chap.id);
                       const isEarly = chap.isEarlyAccess && !unlockedEarlyAccessChapters.includes(chap.id);
                       
@@ -599,28 +637,10 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                   </div>
                 )}
 
-                {/* Pagination footer */}
-                {chapters.length > CHAPTERS_PER_PAGE && (
-                  <div className="flex justify-between items-center mt-6 pt-4 border-t border-[#2D3D54]/40">
-                    <button
-                      onClick={() => setChapterPage(Math.max(0, chapterPage - 1))}
-                      disabled={chapterPage === 0}
-                      className="px-3 py-1.5 rounded border border-[#2D3D54]/30 text-[#A2B6CD] bg-[#151C28] hover:bg-[#233145] hover:text-[#ECEFF4] transition-colors disabled:opacity-30 disabled:pointer-events-none text-xs flex items-center gap-1"
-                    >
-                      <ChevronLeft className="w-4 h-4" /> Trang trước
-                    </button>
-                    
-                    <span className="text-xs font-lora text-[#ECEFF4] font-bold">
-                      Trang <strong className="text-[#101622] bg-[#A2B6CD] px-2 py-0.5 rounded">{chapterPage + 1}</strong> / {Math.ceil(chapters.length / CHAPTERS_PER_PAGE)}
-                    </span>
-
-                    <button
-                      onClick={() => setChapterPage(Math.min(Math.ceil(chapters.length / CHAPTERS_PER_PAGE) - 1, chapterPage + 1))}
-                      disabled={(chapterPage + 1) * CHAPTERS_PER_PAGE >= chapters.length}
-                      className="px-3 py-1.5 rounded border border-[#2D3D54]/30 text-[#A2B6CD] bg-[#151C28] hover:bg-[#233145] hover:text-[#ECEFF4] transition-colors disabled:opacity-30 disabled:pointer-events-none text-xs flex items-center gap-1"
-                    >
-                      Trang sau <ChevronRight className="w-4 h-4" />
-                    </button>
+                {/* Phân trang footer nếu đang tìm kiếm hoặc khi số chương hiển thị dài */}
+                {searchChapterNum.trim() && displayedChapters.length > 20 && (
+                  <div className="text-center py-2 text-[10px] text-[#ECEFF4]/50 italic">
+                    Hiển thị tối đa {displayedChapters.length} kết quả tìm kiếm thích hợp
                   </div>
                 )}
 
@@ -762,10 +782,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                               ) : (
                                 <button
                                   onClick={() => {
-                                    if (!isLoggedIn) {
-                                      addLog("Bạn cần đăng nhập để tham gia phản hồi cố vấn!");
-                                      return;
-                                    }
+                                    if (!isLoggedIn) return;
                                     setReplyingToId(comm.id);
                                   }}
                                   className="text-[10px] font-lora text-[#A2B6CD] hover:text-[#ECEFF4] flex items-center gap-1"
@@ -790,56 +807,74 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
           {/* ================= COLUMN 3: ACADEMIC GRADES & STOCK MARKET LEDGER (LG: 3/12) ================= */}
           <section className="lg:col-span-3 flex flex-col gap-6 lg:sticky lg:top-[74px]">
             
-            {/* EXAM REVISION BOARD */}
+            {/* EXAM REVISION BOARD (CHUYỂN THÀNH CÂU HỎI TRẮC NGHIỆM ĐƠN GIẢN NGẪU NHIÊN) */}
             <div className="border border-[#2D3D54]/30 bg-[#151C28] p-4 rounded-xl relative shadow-lg text-[#ECEFF4]">
-              <h2 className="text-xs font-lora tracking-widest text-[#A2B6CD] uppercase border-b border-[#2D3D54]/40 pb-2 mb-3.5 flex items-center gap-2 font-bold">
-                <GraduationCap className="w-4 h-4 text-[#A2B6CD]" /> BẢNG ÔN THI ĐẠI HỌC
-              </h2>
+              <div className="flex justify-between items-center border-b border-[#2D3D54]/40 pb-2 mb-3.5">
+                <h2 className="text-xs font-lora tracking-widest text-[#A2B6CD] uppercase flex items-center gap-2 font-bold">
+                  <GraduationCap className="w-4 h-4 text-[#A2B6CD]" /> CÂU HỎI ÔN THI ĐẠI HỌC
+                </h2>
+                <span className="text-[10px] font-lora text-[#A2B6CD] bg-[#A2B6CD]/10 px-1.5 py-0.5 rounded font-bold">
+                  {examScore} Điểm
+                </span>
+              </div>
 
               <div className="flex flex-col gap-3 text-xs">
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[#ECEFF4]/75">Toán học:</span>
-                    <span className="font-bold font-lora text-[#ECEFF4]">148 <span className="text-[10px] font-normal text-[#ECEFF4]/50">/ 150</span></span>
-                  </div>
-                  <div className="w-full h-1.5 bg-[#233145]/30 rounded-full overflow-hidden">
-                    <div className="bg-[#A2B6CD] h-full" style={{ width: '98.6%' }} />
-                  </div>
+                {/* Câu hỏi */}
+                <p className="font-bold text-[#ECEFF4] leading-relaxed mb-1">
+                  Câu {currentQIdx + 1}: {EXAM_QUESTIONS[currentQIdx].question}
+                </p>
+
+                {/* Các đáp án */}
+                <div className="flex flex-col gap-2">
+                  {EXAM_QUESTIONS[currentQIdx].options.map((opt, idx) => {
+                    let btnStyle = "border-[#2D3D54]/30 bg-[#233145]/10 text-[#ECEFF4]/90 hover:bg-[#233145]/30 hover:border-[#A2B6CD]/50";
+                    if (hasAnswered) {
+                      if (idx === EXAM_QUESTIONS[currentQIdx].correct) {
+                        btnStyle = "bg-[#A2B6CD]/20 border-[#A2B6CD] text-[#A2B6CD] font-semibold";
+                      } else if (selectedAns === idx) {
+                        btnStyle = "bg-red-950/20 border-red-500/40 text-red-300";
+                      } else {
+                        btnStyle = "opacity-40 border-[#2D3D54]/10 bg-[#233145]/5 text-[#ECEFF4]/60";
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={idx}
+                        disabled={hasAnswered}
+                        onClick={() => handleAnswerClick(idx)}
+                        className={`w-full text-left p-2.5 rounded border transition-all text-[11px] leading-snug ${btnStyle}`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[#ECEFF4]/75">Ngữ văn:</span>
-                    <span className="font-bold font-lora text-[#ECEFF4]">135 <span className="text-[10px] font-normal text-[#ECEFF4]/50">/ 150</span></span>
+                {/* Giải thích câu hỏi */}
+                {hasAnswered && (
+                  <div className="mt-2 p-2.5 bg-black/35 border border-[#2D3D54]/35 rounded text-[10px] text-[#ECEFF4]/80 leading-relaxed animate-fade-in">
+                    <p className="text-[#A2B6CD] font-bold mb-0.5 uppercase tracking-wider text-[9px]">Lý giải đáp án:</p>
+                    <p className="italic">{EXAM_QUESTIONS[currentQIdx].explanation}</p>
                   </div>
-                  <div className="w-full h-1.5 bg-[#233145]/30 rounded-full overflow-hidden">
-                    <div className="bg-[#A2B6CD] h-full" style={{ width: '90%' }} />
-                  </div>
-                </div>
+                )}
 
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[#ECEFF4]/75">Ngoại ngữ:</span>
-                    <span className="font-bold font-lora text-[#ECEFF4]">147 <span className="text-[10px] font-normal text-[#ECEFF4]/50">/ 150</span></span>
-                  </div>
-                  <div className="w-full h-1.5 bg-[#233145]/30 rounded-full overflow-hidden">
-                    <div className="bg-[#A2B6CD] h-full" style={{ width: '98%' }} />
-                  </div>
-                </div>
-
-                <div className="mt-2.5 pt-3 border-t border-[#2D3D54]/40 flex justify-between items-center">
-                  <span className="text-[#ECEFF4]/50 text-[10px] uppercase font-lora">Xếp hạng:</span>
-                  <span className="font-bold font-lora text-[#A2B6CD] bg-[#A2B6CD]/10 px-2 py-0.5 rounded text-[10px] border border-[#2D3D54]/20">
-                    Thủ khoa khối tự nhiên
-                  </span>
-                </div>
+                {/* Nút câu tiếp theo */}
+                {hasAnswered && (
+                  <button
+                    onClick={handleNextQuestion}
+                    className="w-full mt-1.5 py-1.5 border border-[#A2B6CD]/40 hover:border-[#A2B6CD] text-[10px] font-lora text-[#A2B6CD] hover:bg-[#A2B6CD] hover:text-[#101622] bg-[#A2B6CD]/5 transition-all rounded uppercase font-bold"
+                  >
+                    Luyện câu hỏi tiếp theo &rarr;
+                  </button>
+                )}
               </div>
             </div>
 
             {/* INTERACTIVE STUDY SCHEDULE */}
             <div className="border border-[#2D3D54]/30 bg-[#151C28] p-4 rounded-xl relative shadow-lg text-[#ECEFF4]">
               <h2 className="text-xs font-lora tracking-widest text-[#A2B6CD] uppercase border-b border-[#2D3D54]/40 pb-2 mb-3 flex items-center gap-2 font-bold">
-                <Calendar className="w-3.5 h-3.5 text-[#A2B6CD]" /> LỊCH TRÌNH ÔN THI
+                <Calendar className="w-3.5 h-3.5 text-[#A2B6CD]" /> LỊCH TRÌNH ÔN THI HIỆU QUẢ
               </h2>
 
               <div className="flex flex-col gap-2">
@@ -871,39 +906,42 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
               </div>
             </div>
 
-            {/* COMMERCE / INVESTMENT WATCH */}
+            {/* COMMERCE / INVESTMENT WATCH (THƯƠNG TRƯỜNG BIẾN ĐỘNG CỦA SĨ TỬ) */}
             <div className="border border-[#2D3D54]/30 bg-[#151C28] p-4 rounded-xl relative shadow-lg text-[#ECEFF4]">
               <div className="absolute top-2 right-2 border border-[#2D3D54]/40 text-[#A2B6CD] text-[9px] font-lora px-1.5 py-0.1 rounded bg-[#A2B6CD]/10 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#A2B6CD] animate-pulse" />
-                MỞ CỬA
+                ĐANG CHẠY
               </div>
 
               <h2 className="text-xs font-lora tracking-widest text-[#A2B6CD] uppercase border-b border-[#2D3D54]/40 pb-2 mb-3.5 flex items-center gap-2 font-bold">
                 <TrendingUp className="w-4 h-4 text-[#A2B6CD]" /> THƯƠNG TRƯỜNG BIẾN ĐỘNG
               </h2>
 
-              <div className="flex flex-col gap-2.5 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-[#ECEFF4]/70">Chỉ số FarEast:</span>
-                  <span className="font-bold font-lora text-[#A2B6CD]">{stockPrice.toFixed(3)} VND</span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-[#ECEFF4]/70">Biến động ngày:</span>
-                  <span className={`font-bold font-lora flex items-center ${stockChange >= 0 ? 'text-[#A2B6CD]' : 'text-[#ECEFF4]/70'}`}>
-                    {stockChange >= 0 ? "+" : ""}{stockChange}%
-                  </span>
-                </div>
-
-                <div className="w-full bg-[#233145]/20 p-2.5 rounded border border-[#2D3D54]/40 text-[#ECEFF4]/70 italic mt-1.5">
-                  "Ủy thác đầu tư ngầm, thâu tóm cổ phiếu Lâm Thị từ 17 tuổi là quân cờ then chốt."
-                </div>
+              <div className="flex flex-col gap-3 text-xs">
+                {marketPrices.map((stock) => (
+                  <div key={stock.code} className="flex flex-col gap-0.5 border-b border-[#2D3D54]/10 pb-2 last:border-0 last:pb-0">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-[#ECEFF4] font-lora flex items-center gap-1.5">
+                        <span className="text-[10px] bg-[#A2B6CD]/10 text-[#A2B6CD] border border-[#A2B6CD]/20 px-1 py-0.1 rounded font-bold">
+                          {stock.code}
+                        </span>
+                        {stock.name}
+                      </span>
+                      <span className={`font-bold font-lora text-[11px] ${stock.change >= 0 ? "text-[#A2B6CD]" : "text-red-400"}`}>
+                        {stock.price.toFixed(2)} ({stock.change >= 0 ? "+" : ""}{stock.change}%)
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-[#ECEFF4]/50 leading-normal">
+                      {stock.desc}
+                    </span>
+                  </div>
+                ))}
 
                 <button
                   onClick={updateMarketPrice}
-                  className="w-full mt-2 py-2 border border-[#2D3D54]/30 hover:border-[#A2B6CD] text-xs font-lora text-[#101622] bg-[#A2B6CD] hover:bg-[#ECEFF4] transition-all rounded uppercase font-bold"
+                  className="w-full mt-1.5 py-2 border border-[#2D3D54]/30 hover:border-[#A2B6CD] text-xs font-lora text-[#101622] bg-[#A2B6CD] hover:bg-[#ECEFF4] transition-all rounded uppercase font-bold"
                 >
-                  Cập nhật thị trường
+                  Cập nhật các chỉ số tự học
                 </button>
               </div>
             </div>
