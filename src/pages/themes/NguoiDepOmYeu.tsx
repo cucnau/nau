@@ -268,7 +268,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
             </button>
             <div>
               <span className="text-[10px] font-lora tracking-widest text-[#A2B6CD] uppercase flex items-center gap-1.5 font-bold">
-                <Clock className="w-3 h-3 text-[#A2B6CD] animate-spin-slow" /> HỒ SƠ KHỞI ĐỘNG TRÙNG SINH NĂM 17 TUỔI
+                <Clock className="w-3 h-3 text-[#A2B6CD] animate-spin-slow" />
               </span>
               <h1 className="font-alegreya text-lg font-bold text-[#ECEFF4] leading-tight">
                 {story?.title || "Người Đẹp Ốm Yếu Không Giãy Giụa Nữa"}
@@ -333,11 +333,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#151C28] via-transparent to-transparent opacity-60" />
                 </div>
-                <div className="mt-3 text-center">
-                  <span className="text-[10px] font-lora text-[#A2B6CD] uppercase tracking-wider">
-                    HỒ SƠ TUYỂN SINH HOA HẠ
-                  </span>
-                </div>
+                  {/* No admission header */}
               </div>
             )}
             
@@ -371,7 +367,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 </div>
 
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-[#ECEFF4]/70 font-lora">Thể trạng cốt nhục:</span>
+                  <span className="text-xs text-[#ECEFF4]/70 font-lora">Thể trạng:</span>
                   <span className="text-xs font-lora font-bold text-[#A2B6CD]">Duy trì ổn định</span>
                 </div>
               </div>
@@ -380,7 +376,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
             {/* REVENGE CHECKLIST CARD -> CHUYỂN THÀNH 4 CHƯƠNG MỚI NHẤT */}
             <div className="border border-[#2D3D54]/30 bg-[#151C28] p-4 rounded-xl relative shadow-lg text-[#ECEFF4]">
               <h2 className="text-xs font-lora tracking-widest text-[#A2B6CD] uppercase border-b border-[#2D3D54]/40 pb-2 mb-3 flex items-center gap-2 font-bold">
-                <BookOpen className="w-3.5 h-3.5 text-[#A2B6CD]" /> SỔ TAY PHỤC THÙ (4 CHƯƠNG MỚI NHẤT)
+                <BookOpen className="w-3.5 h-3.5 text-[#A2B6CD]" /> SỔ TAY PHỤC THÙ
               </h2>
               
               <div className="flex flex-col gap-2.5">
@@ -415,7 +411,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
             <div className="border border-[#2D3D54]/30 bg-[#151C28] p-3 rounded-lg text-[11px] font-lora text-[#ECEFF4]">
               <div className="flex items-center gap-1.5 text-[#A2B6CD] font-bold mb-2.5 uppercase text-[9px] tracking-wider border-b border-[#2D3D54]/30 pb-1.5">
                 <span className="w-1.5 h-1.5 bg-[#A2B6CD] rounded-full animate-ping" />
-                DÒNG THỜI GIAN HÀNH ĐỘNG (BÌNH LUẬN MỚI)
+                DÒNG THỜI GIAN HÀNH ĐỘNG
               </div>
               <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto pr-1">
                 {[...comments]
@@ -452,30 +448,24 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
             
             {/* NOVEL BANNER & ADMISSIONS COVER */}
             <div className="relative border border-[#2D3D54]/30 bg-[#151C28] p-6 md:p-8 rounded-xl overflow-hidden shadow-2xl flex flex-col items-center text-center text-[#ECEFF4]">
-              <div className="absolute top-2 right-2 border border-[#2D3D54]/40 text-[#A2B6CD]/80 text-[10px] font-lora px-2 py-0.5 uppercase tracking-widest bg-black/40 z-10">
-                TRÙNG SINH CHI LỘ
-              </div>
+              {/* Ribbon removed */}
 
               {/* Delicate lace-like corners */}
               <div className="absolute top-4 left-4 w-4 h-4 border-t border-l border-[#2D3D54]/30" />
               <div className="absolute bottom-4 right-4 w-4 h-4 border-b border-r border-[#2D3D54]/30" />
 
-              <div className="mb-4">
-                <span className="inline-block px-3 py-1 bg-[#233145]/40 border border-[#2D3D54]/30 rounded-full text-xs text-[#A2B6CD] font-alegreya italic">
-                  Đại học Hoa Hạ • Học bá trùng sinh báo thù
-                </span>
-              </div>
+              {/* Subtitle badge removed */}
 
               <h2 className="font-alegreya text-2xl md:text-3xl lg:text-4xl font-bold text-[#ECEFF4] tracking-tight leading-tight mb-4">
                 {story?.title || "NGƯỜI ĐẸP ỐM YẾU KHÔNG GIẠY GIỤA NỮA"}
               </h2>
 
-              <p className="text-xs text-[#ECEFF4]/80 max-w-lg mb-6 leading-relaxed text-center whitespace-pre-line">
+              <p className="text-xs text-[#ECEFF4]/80 max-w-lg mb-6 leading-relaxed text-left w-full whitespace-pre-line">
                 {story?.description || story?.summary || "Đời trước bị cha ruột hãm hại, chị kế cướp đoạt sản nghiệp, chết thảm trong bệnh viện. Quay lại năm 17 tuổi, cầm trên tay bản kế hoạch báo thù tối mật cùng bộ não học bá tuyệt đỉnh, ta sẽ lấy lại tất cả những gì vốn thuộc về mình!"}
               </p>
 
               {/* Author and stats metadata row */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full pt-4 border-t border-[#2D3D54]/40 text-xs text-center">
+              <div className="grid grid-cols-2 gap-4 w-full pt-4 border-t border-[#2D3D54]/40 text-xs text-center">
                 <div>
                   <span className="block text-[#ECEFF4]/50 text-[10px] uppercase font-lora mb-1">Tác giả</span>
                   <span className="font-bold text-[#A2B6CD]">{story?.author || "Đang cập nhật"}</span>
@@ -483,16 +473,6 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 <div>
                   <span className="block text-[#ECEFF4]/50 text-[10px] uppercase font-lora mb-1">Số chương</span>
                   <span className="font-bold text-[#ECEFF4]">{chapters.length} chương</span>
-                </div>
-                <div>
-                  <span className="block text-[#ECEFF4]/50 text-[10px] uppercase font-lora mb-1">Chương đọc sớm</span>
-                  <span className="font-bold text-[#A2B6CD]">
-                    {chapters.filter(c => c.isEarlyAccess).length} chương
-                  </span>
-                </div>
-                <div>
-                  <span className="block text-[#ECEFF4]/50 text-[10px] uppercase font-lora mb-1">Mã tuyển sinh</span>
-                  <span className="font-bold text-[#ECEFF4] font-lora">华夏-2026</span>
                 </div>
               </div>
             </div>
@@ -507,7 +487,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     : 'border-transparent text-[#ECEFF4]/70 hover:text-[#A2B6CD] hover:bg-[#151C28]/50'
                 }`}
               >
-                <BookOpen className="w-4 h-4" /> ĐỀ THI ÔN LUYỆN (DANH SÁCH CHƯƠNG)
+                <BookOpen className="w-4 h-4" /> ĐỀ THI ÔN LUYỆN
               </button>
               <button
                 onClick={() => setActiveTab('comments')}
@@ -517,7 +497,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     : 'border-transparent text-[#ECEFF4]/70 hover:text-[#A2B6CD] hover:bg-[#151C28]/50'
                 }`}
               >
-                <Users className="w-4 h-4" /> THẢO LUẬN THƯƠNG HỘI (BÌNH LUẬN)
+                <Users className="w-4 h-4" /> THẢO LUẬN THƯƠNG HỘI
               </button>
             </div>
 
@@ -607,11 +587,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                               <span className="text-[9px] font-lora px-1.5 py-0.5 rounded bg-[#A2B6CD]/20 border border-[#A2B6CD]/30 text-[#A2B6CD]">
                                 ĐỌC SỚM
                               </span>
-                            ) : (
-                              <span className="text-[9px] font-lora px-1.5 py-0.5 rounded bg-[#233145]/30 border border-[#2D3D54]/20 text-[#A2B6CD]">
-                                MIỄN PHÍ
-                              </span>
-                            )}
+                            ) : null}
                           </div>
 
                           {/* Chapter Title */}
