@@ -447,6 +447,18 @@ export function StoryView() {
           </div>
         </div>
       );
+    } else if (activeCustomTheme === 'nguoidep') {
+      return (
+        <div className="min-h-screen bg-[#101622] text-[#ECEFF4] flex flex-col items-center justify-center p-4 font-sans animate-fade-in relative overflow-hidden">
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-10 bg-[#A2B6CD] pointer-events-none" />
+          <div className="flex flex-col items-center gap-4 relative z-10">
+            <div className="w-12 h-12 border-4 border-[#2D3D54]/40 border-t-[#A2B6CD] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#A2B6CD] animate-pulse font-extrabold">
+              ĐANG TẢI HỒ SƠ THÍ SINH...
+            </div>
+          </div>
+        </div>
+      );
     }
     return (
       <div className="min-h-screen bg-[#1A1412] text-[#E0D4C3] flex flex-col items-center justify-center p-4 font-sans">
