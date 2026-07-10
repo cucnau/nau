@@ -81,6 +81,8 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
   // 1. Easter Egg States for Sickly Beauty Theme (Chỉ giữ lại các chỉ số sức khoẻ cơ bản)
   const [heartRate, setHeartRate] = useState(72);
   const [bodyTemp, setBodyTemp] = useState(35.8);
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
+  const [isCompactMode, setIsCompactMode] = useState(true);
 
   useEffect(() => {
     // Biến động nhịp tim ngẫu nhiên nhẹ nhàng để tạo hiệu ứng sinh động
@@ -267,9 +269,6 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div>
-              <span className="text-[10px] font-lora tracking-widest text-[#A2B6CD] uppercase flex items-center gap-1.5 font-bold">
-                <Clock className="w-3 h-3 text-[#A2B6CD] animate-spin-slow" />
-              </span>
               <h1 className="font-alegreya text-lg font-bold text-[#ECEFF4] leading-tight">
                 {story?.title || "Người Đẹp Ốm Yếu Không Giãy Giụa Nữa"}
               </h1>
@@ -277,12 +276,6 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
           </div>
 
           <div className="flex items-center gap-4 text-xs">
-            {/* Choco display */}
-            <div className="hidden sm:flex items-center gap-2 bg-[#233145]/30 border border-[#2D3D54]/40 px-3 py-1.5 rounded-md">
-              <Gift className="w-4 h-4 text-[#A2B6CD]" />
-              <span>Choco của bạn: <strong className="text-[#A2B6CD] font-bold">{choco}</strong></span>
-            </div>
-
             {/* Save story button */}
             <button
               onClick={handleSaveToggle}
@@ -460,9 +453,28 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 {story?.title || "NGƯỜI ĐẸP ỐM YẾU KHÔNG GIẠY GIỤA NỮA"}
               </h2>
 
-              <p className="text-xs text-[#ECEFF4]/80 max-w-lg mb-6 leading-relaxed text-left w-full whitespace-pre-line">
-                {story?.description || story?.summary || "Đời trước bị cha ruột hãm hại, chị kế cướp đoạt sản nghiệp, chết thảm trong bệnh viện. Quay lại năm 17 tuổi, cầm trên tay bản kế hoạch báo thù tối mật cùng bộ não học bá tuyệt đỉnh, ta sẽ lấy lại tất cả những gì vốn thuộc về mình!"}
-              </p>
+              {(() => {
+                const desc = story?.description || story?.summary || "Đời trước bị cha ruột hãm hại, chị kế cướp đoạt sản nghiệp, chết thảm trong bệnh viện. Quay lại năm 17 tuổi, cầm trên tay bản kế hoạch báo thù tối mật cùng bộ não học bá tuyệt đỉnh, ta sẽ lấy lại tất cả những gì vốn thuộc về mình!";
+                const needsTruncate = desc.length > 200;
+                const displayText = (needsTruncate && !isDescExpanded) 
+                  ? `${desc.slice(0, 200).trim()}...` 
+                  : desc;
+                return (
+                  <>
+                    <p className="text-xs text-[#ECEFF4]/80 max-w-lg mb-4 leading-relaxed text-left w-full whitespace-pre-line transition-all duration-300">
+                      {displayText}
+                    </p>
+                    {needsTruncate && (
+                      <button
+                        onClick={() => setIsDescExpanded(!isDescExpanded)}
+                        className="text-[10px] text-[#A2B6CD] font-bold uppercase tracking-wider hover:text-[#ECEFF4] hover:underline mb-4 transition-colors flex items-center gap-1 focus:outline-none"
+                      >
+                        {isDescExpanded ? "Thu gọn giới thiệu ↑" : "Xem thêm giới thiệu ↓"}
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
 
               {/* Author and stats metadata row */}
               <div className="grid grid-cols-2 gap-4 w-full pt-4 border-t border-[#2D3D54]/40 text-xs text-center">
@@ -512,12 +524,26 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                       Tổng số: <strong className="text-[#A2B6CD]">{chapters.length}</strong> bài ôn luyện
                     </div>
                     
-                    <button
-                      onClick={() => setChapterSortDesc(!chapterSortDesc)}
-                      className="px-3 py-1.5 text-[10px] font-lora uppercase bg-[#233145]/30 border border-[#2D3D54]/30 text-[#A2B6CD] rounded hover:bg-[#A2B6CD] hover:text-[#101622] transition-colors font-bold"
-                    >
-                      Sắp xếp: {chapterSortDesc ? "Chương mới nhất" : "Chương đầu tiên"}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setIsCompactMode(!isCompactMode)}
+                        className={`px-3 py-1.5 text-[10px] font-lora uppercase border rounded transition-colors font-bold ${
+                          isCompactMode 
+                            ? "bg-[#A2B6CD] text-[#101622] border-[#A2B6CD]" 
+                            : "bg-[#233145]/30 border-[#2D3D54]/30 text-[#A2B6CD] hover:bg-[#A2B6CD] hover:text-[#101622]"
+                        }`}
+                        title={isCompactMode ? "Chuyển sang dạng card đầy đủ thông tin" : "Chuyển sang dạng danh sách đề thi siêu gọn"}
+                      >
+                        {isCompactMode ? "Bản siêu gọn ✓" : "Bản đầy đủ"}
+                      </button>
+
+                      <button
+                        onClick={() => setChapterSortDesc(!chapterSortDesc)}
+                        className="px-3 py-1.5 text-[10px] font-lora uppercase bg-[#233145]/30 border border-[#2D3D54]/30 text-[#A2B6CD] rounded hover:bg-[#A2B6CD] hover:text-[#101622] transition-colors font-bold"
+                      >
+                        {chapterSortDesc ? "Mới nhất" : "Cũ nhất"}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Thanh tìm kiếm nhanh chương */}
@@ -560,7 +586,41 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                   <div className="text-center py-12 border border-dashed border-[#2D3D54]/30 rounded-xl bg-[#151C28]">
                     <p className="text-[#ECEFF4]/70 text-sm font-alegreya italic">Không tìm thấy bài ôn thi nào phù hợp với yêu cầu tìm kiếm của bạn...</p>
                   </div>
+                ) : isCompactMode ? (
+                  /* COMPACT MODE: Giao diện siêu gọn tiết kiệm diện tích */
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-2.5">
+                    {displayedChapters.map((chap) => {
+                      const absoluteIndex = chapters.findIndex(c => c.id === chap.id) + 1;
+                      const isLocked = chap.isLocked && !unlockedPassChapters.includes(chap.id);
+                      const isEarly = chap.isEarlyAccess && !unlockedEarlyAccessChapters.includes(chap.id);
+                      
+                      return (
+                        <button
+                          key={chap.id}
+                          onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
+                          className="group text-left p-2.5 rounded-lg border border-[#2D3D54]/15 hover:border-[#A2B6CD]/80 bg-[#151C28] hover:bg-[#233145]/20 transition-all flex flex-col justify-between h-[66px] relative overflow-hidden shadow-sm"
+                          title={chap.title}
+                        >
+                          <div className="flex justify-between items-center w-full">
+                            <span className="text-[8px] md:text-[9px] font-mono text-[#A2B6CD]/80 font-bold tracking-wider">
+                              MÃ ĐỀ {absoluteIndex.toString().padStart(2, '0')}
+                            </span>
+                            {isLocked ? (
+                              <span className="text-[8px] bg-red-900/30 px-1 rounded text-red-300 scale-90 origin-right">KHÓA</span>
+                            ) : isEarly ? (
+                              <span className="text-[8px] bg-[#A2B6CD]/20 px-1 rounded text-[#A2B6CD] scale-90 origin-right">SỚM</span>
+                            ) : null}
+                          </div>
+
+                          <div className="text-[11px] md:text-xs font-alegreya font-bold text-[#ECEFF4] group-hover:text-[#A2B6CD] transition-colors truncate mt-1 leading-tight w-full">
+                            {chap.title}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 ) : (
+                  /* FULL MODE: Giao diện card đầy đủ thông tin */
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                     {displayedChapters.map((chap) => {
                       const absoluteIndex = chapters.findIndex(c => c.id === chap.id) + 1;
