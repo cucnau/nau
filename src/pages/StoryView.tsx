@@ -1276,6 +1276,8 @@ export function StoryView() {
                   </button>
                </div>
 
+
+
                {/* Choco balance stats */}
                <div className="bg-[#FDF6EC] p-4 rounded-2xl border border-[#F5E6D3] mb-5 flex items-center justify-between">
                   <div>
