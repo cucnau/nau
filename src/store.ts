@@ -724,14 +724,16 @@ export const useStore = create<UserState>()(
             const allUnlocked = state.allUsersUnlockedAchievements || {};
             const allClaimed = state.allUsersClaimedAchievements || {};
             
-            const userMissions = allMs[uid] || [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()];
-            const userProgress = allSp[uid] || {};
-            const userHistory = allHl[uid] || [];
-            const userSaved = allSaved[uid] || [];
-            const userOwnedStickers = allOwnedStickers[uid] || [];
-            const userOwnedAccessories = allOwnedAccessories[uid] || [];
-            const userUnlocked = allUnlocked[uid] || [];
-            const userClaimed = allClaimed[uid] || [];
+            const isSameUser = state.uid === uid;
+            
+            const userMissions = allMs[uid] || (isSameUser && state.missions && state.missions.length > 0 ? state.missions : [...getDailyMissions(), ...getWeeklyMissions(), ...getPermanentMissions()]);
+            const userProgress = allSp[uid] || (isSameUser && state.storyProgress ? state.storyProgress : {});
+            const userHistory = allHl[uid] || (isSameUser && state.readHistoryList ? state.readHistoryList : []);
+            const userSaved = allSaved[uid] || (isSameUser && state.savedStories ? state.savedStories : []);
+            const userOwnedStickers = allOwnedStickers[uid] || (isSameUser && state.ownedStickers ? state.ownedStickers : []);
+            const userOwnedAccessories = allOwnedAccessories[uid] || (isSameUser && state.ownedAccessories ? state.ownedAccessories : []);
+            const userUnlocked = allUnlocked[uid] || (isSameUser && state.unlockedAchievements ? state.unlockedAchievements : []);
+            const userClaimed = allClaimed[uid] || (isSameUser && state.claimedAchievements ? state.claimedAchievements : []);
 
             set({ 
                isFirebaseSynced: false,
