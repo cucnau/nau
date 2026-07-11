@@ -103,7 +103,7 @@ export function CanhCuaHomerTheme(props: ThemeProps) {
             {/* Action Module */}
             <div className="flex flex-col gap-2">
               <button 
-                onClick={() => chapters.length > 0 && navigate(`/doc/${story.id}/${chapters[0].id}`)}
+                onClick={() => chapters.length > 0 && navigate(`/doc/${story.slug || story.id}/chuong-${chapters[0].order + 1}`)}
                 className="w-full py-4 bg-[#a0a6b3] text-[#181f2d] uppercase text-xs font-bold tracking-widest hover:bg-[#67707e] hover:text-[#181f2d] transition-all flex justify-center items-center gap-3 border border-[#a0a6b3]"
               >
                 KHỞI ĐỘNG VƯỢT CỔNG <Zap className="w-4 h-4" />
@@ -234,7 +234,7 @@ export function CanhCuaHomerTheme(props: ThemeProps) {
                   {displayedChapters.map((chap, i) => (
                     <button
                       key={chap.id}
-                      onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
+                      onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
                       className="flex items-center text-left p-3 bg-[#2d3745] border border-[#47515f] hover:border-[#a0a6b3] transition-colors group"
                     >
                       <div className="w-12 text-[#67707e] group-hover:text-[#a0a6b3] text-xl font-light border-r border-[#47515f] mr-3 pr-3 text-center">
