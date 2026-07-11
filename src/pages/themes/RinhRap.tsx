@@ -248,7 +248,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
             <div className="flex flex-wrap gap-3 pt-4">
               {chapters.length > 0 && (
                 <button
-                  onClick={() => navigate(`/doc/${actualStoryId}/${chapters[0].id}`)}
+                  onClick={() => navigate(`/doc/${story.slug || actualStoryId}/chuong-${chapters[0].order + 1}`)}
                   className={`flex-1 py-3 px-4 rounded-xl text-sm font-black tracking-wider uppercase border-2 transition-all flex items-center justify-center gap-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)] ${
                      rinhrapMode === 'thotrang'
                         ? 'bg-[#facaca] hover:bg-[#fff2f1] text-[#780606] border-[#823323]'
@@ -345,7 +345,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                   chapters.slice(chapterPage * CHAPTERS_PER_PAGE, (chapterPage + 1) * CHAPTERS_PER_PAGE).map((chap, idx) => (
                     <button
                       key={chap.id}
-                      onClick={() => navigate(`/doc/${actualStoryId}/${chap.id}`)}
+                      onClick={() => navigate(`/doc/${story.slug || actualStoryId}/chuong-${chap.order + 1}`)}
                       className={`group relative p-4 rounded-2xl transition-all text-left flex justify-between items-center overflow-hidden border-2 ${
                          rinhrapMode === 'thotrang'
                             ? 'bg-[#facaca]/20 border-[#facaca] hover:bg-[#facaca]/40 hover:border-[#823323]'
