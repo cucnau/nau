@@ -1868,7 +1868,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                   .map(ch => (
                     <button
                       key={ch.id}
-                      onClick={() => navigate(`/doc/${story.id}/${ch.id}`)}
+                      onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${ch.order + 1}`)}
                       className="w-full text-left p-2 rounded border border-[#2D3D54]/20 hover:border-[#A2B6CD]/60 bg-[#233145]/10 hover:bg-[#233145]/30 transition-all text-xs flex flex-col gap-0.5"
                     >
                       <span className="font-bold text-[#ECEFF4] line-clamp-1 group-hover:text-[#A2B6CD]">
@@ -2021,7 +2021,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                         const orderB = b.order !== undefined ? b.order : 0;
                         return orderA - orderB;
                       });
-                      navigate(`/doc/${story.id}/${sorted[0]?.id}`);
+                      navigate(`/doc/${story.slug || story.id}/chuong-${sorted[0]?.order + 1}`);
                     }
                   }}
                   className="px-6 py-2.5 rounded-lg bg-[#A2B6CD] text-[#101622] hover:bg-[#ECEFF4] transition-all font-lora font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-md"
@@ -2159,7 +2159,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                         return (
                           <button
                             key={chap.id}
-                            onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
+                            onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
                             className="group text-left p-2.5 rounded-lg border border-[#2D3D54]/15 hover:border-[#A2B6CD]/80 bg-[#151C28] hover:bg-[#233145]/20 transition-all flex flex-col justify-between h-[66px] relative overflow-hidden shadow-sm"
                             title={chap.title}
                           >
@@ -2194,7 +2194,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                         return (
                           <button
                             key={chap.id}
-                            onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
+                            onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
                             className="group text-left p-4 rounded-xl border border-[#2D3D54]/15 hover:border-[#A2B6CD]/80 bg-gradient-to-br from-[#151C28] to-[#151C28]/90 hover:from-[#233145]/40 hover:to-[#151C28] transition-all shadow hover:shadow-xl flex flex-col justify-between h-[120px] relative overflow-hidden"
                           >
                             {/* Top Tag row */}
