@@ -466,7 +466,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                       return (
                         <div 
                           key={chap.id} 
-                          onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
+                          onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
                           className="bg-[#2e2a63]/10 border border-[#2e2a63]/50 hover:border-[#bbee1f] p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 relative rounded-lg"
                         >
                           {/* Top Info */}
@@ -683,7 +683,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
               {/* Action Suite */}
               <div className="space-y-3 font-sans">
                 <button 
-                  onClick={() => chapters.length > 0 && navigate(`/doc/${story.id}/${chapters[0].id}`)}
+                  onClick={() => chapters.length > 0 && navigate(`/doc/${story.slug || story.id}/chuong-${chapters[0].order + 1}`)}
                   className="w-full py-3.5 bg-[#bbee1f] text-[#13120d] font-black uppercase text-xs tracking-widest hover:bg-white hover:shadow-[0_0_20px_rgba(187,238,31,0.4)] transition-all flex items-center justify-center gap-2 border border-[#bbee1f]"
                 >
                   <BookOpen className="w-4 h-4" /> BẮT ĐẦU PHÊ DUYỆT
