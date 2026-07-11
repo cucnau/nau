@@ -159,7 +159,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
           <div className="flex flex-col gap-2">
             {chapters.length > 0 && (
               <button 
-                onClick={() => navigate(`/doc/${story.id}/${chapters[0].id}`)}
+                onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chapters[0].order + 1}`)}
                 className="w-full py-3 bg-[#741611] text-[#d7cac1] hover:bg-[#8e1d17] font-sans font-bold tracking-[0.15em] uppercase text-xs rounded transition-all duration-300 shadow-lg flex items-center justify-center gap-2 cursor-pointer"
               >
                 <BookOpen className="w-4 h-4" /> KHỞI QUYỂN ĐỌC NGAY
@@ -379,7 +379,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                       return (
                         <div 
                           key={chap.id} 
-                          onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
+                          onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
                           className="bg-[#1b1715]/70 border border-[#473a36]/40 hover:border-[#741611] p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 rounded-lg relative"
                         >
                           <div className="flex items-center justify-between mb-2">
