@@ -696,7 +696,7 @@ export function Reader() {
 
     // Nếu chapters đã tải xong, kiểm tra xem chương này ở file tĩnh đã được mở khóa/không khóa chưa
     if (chapters.length > 0) {
-      const idx = chapters.findIndex(c => c.id === chapterId);
+      const idx = chapters.findIndex(c => c.id === chapterId || `chuong-${c.order + 1}` === chapterId || c.order.toString() === chapterId);
       if (idx !== -1) {
         const base = chapters[idx];
         const isStaticLocked = base.isLockedRead || base.requiresPass || base.requiresEarlyAccess;
@@ -709,13 +709,23 @@ export function Reader() {
     }
 
     const fetchLiveChapter = async () => {
+      if (chapters.length === 0 && (chapterId.startsWith('chuong-') || !isNaN(Number(chapterId)))) {
+         return; // wait for chapters to load
+      }
       try {
         let resolvedStoryId = storyId;
         const foundStory = await getStoryByIdOrSlug(storyId);
         if (foundStory) {
           resolvedStoryId = foundStory.id;
         }
-        const docRef = doc(db, `stories/${resolvedStoryId}/chapters`, chapterId);
+        let resolvedChapterId = chapterId;
+        if (chapters.length > 0) {
+          const idx = chapters.findIndex(c => c.id === chapterId || `chuong-${c.order + 1}` === chapterId || c.order.toString() === chapterId);
+          if (idx !== -1) {
+            resolvedChapterId = chapters[idx].id;
+          }
+        }
+        const docRef = doc(db, `stories/${resolvedStoryId}/chapters`, resolvedChapterId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setLiveChapter({ id: docSnap.id, ...docSnap.data() });
@@ -727,7 +737,7 @@ export function Reader() {
     fetchLiveChapter();
   }, [storyId, chapterId, chapters]);
 
-  const currentChapterIndex = chapters.findIndex(c => c.id === chapterId);
+  const currentChapterIndex = chapters.findIndex(c => c.id === chapterId || `chuong-${c.order + 1}` === chapterId || c.order.toString() === chapterId);
   const baseChapter = chapters[currentChapterIndex];
   const currentChapter = liveChapter ? { ...baseChapter, ...liveChapter } : baseChapter;
   
@@ -1460,13 +1470,13 @@ pComments.map(c => (
            {/* Navigation Buttons */}
            <div className="mt-16 mb-8 flex items-center justify-between">
               {prevChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${prevChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#0E0C0A] border-[#9A8E7D]/40 text-[#EADDC9] shadow-[2px_2px_0_0_#0E0C0A] hover:bg-[#1C1A17]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] border-[#823323] text-[#780606] shadow-[2px_2px_0_0_#facaca] hover:bg-[#fde0e0]" : "bg-[#0B0505] border-[#7F1D1D] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#100707]") : activeCustomTheme === 'thientai' ? "bg-[#060406] border-[#34282d] text-[#9a858d] shadow-[2px_2px_0_0_#34282d] hover:border-[#9a858d]" : activeCustomTheme === 'nguoidep' ? "bg-[#101622] border-[#2D3D54]/30 text-[#ECEFF4] shadow-[2px_2px_0_0_#2D3D54] hover:bg-[#151C28]" : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
+                 <button onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${prevChapter.order + 1}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#0E0C0A] border-[#9A8E7D]/40 text-[#EADDC9] shadow-[2px_2px_0_0_#0E0C0A] hover:bg-[#1C1A17]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] border-[#823323] text-[#780606] shadow-[2px_2px_0_0_#facaca] hover:bg-[#fde0e0]" : "bg-[#0B0505] border-[#7F1D1D] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#100707]") : activeCustomTheme === 'thientai' ? "bg-[#060406] border-[#34282d] text-[#9a858d] shadow-[2px_2px_0_0_#34282d] hover:border-[#9a858d]" : activeCustomTheme === 'nguoidep' ? "bg-[#101622] border-[#2D3D54]/30 text-[#ECEFF4] shadow-[2px_2px_0_0_#2D3D54] hover:bg-[#151C28]" : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
                     <ArrowLeft className="w-5 h-5"/> {tPrevChapter}
                  </button>
               ) : <div></div>}
               
               {nextChapter ? (
-                 <button onClick={() => navigate(`/doc/${story.id}/${nextChapter.id}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#0E0C0A] border-[#9A8E7D]/40 text-[#EADDC9] shadow-[2px_2px_0_0_#0E0C0A] hover:bg-[#1C1A17]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] border-[#823323] text-[#780606] shadow-[2px_2px_0_0_#facaca] hover:bg-[#fde0e0]" : "bg-[#0B0505] border-[#7F1D1D] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#100707]") : activeCustomTheme === 'thientai' ? "bg-[#060406] border-[#34282d] text-[#9a858d] shadow-[2px_2px_0_0_#34282d] hover:border-[#9a858d]" : activeCustomTheme === 'nguoidep' ? "bg-[#251e23] border-[#808499]/30 text-[#dfdee0] shadow-[2px_2px_0_0_#808499] hover:bg-[#1f191d]" : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
+                 <button onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${nextChapter.order + 1}`)} className={cn("px-4 py-2 border-2 rounded-xl flex items-center gap-2 font-black uppercase text-xs tracking-wider transition-all cursor-pointer shadow-[2px_2px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f] hover:border-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782] hover:bg-[#DFCEB4]" : activeCustomTheme === 'thuytien' ? "bg-[#0E0C0A] border-[#9A8E7D]/40 text-[#EADDC9] shadow-[2px_2px_0_0_#0E0C0A] hover:bg-[#1C1A17]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] border-[#823323] text-[#780606] shadow-[2px_2px_0_0_#facaca] hover:bg-[#fde0e0]" : "bg-[#0B0505] border-[#7F1D1D] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A] hover:bg-[#100707]") : activeCustomTheme === 'thientai' ? "bg-[#060406] border-[#34282d] text-[#9a858d] shadow-[2px_2px_0_0_#34282d] hover:border-[#9a858d]" : activeCustomTheme === 'nguoidep' ? "bg-[#251e23] border-[#808499]/30 text-[#dfdee0] shadow-[2px_2px_0_0_#808499] hover:bg-[#1f191d]" : "bg-[#13120d] border-[#2e2a63] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63] hover:border-[#bbee1f]") : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]")}>
                     {tNextChapter} <ArrowRight className="w-5 h-5"/>
                  </button>
               ) : <div className="text-sm opacity-50 uppercase font-bold tracking-widest">Hết truyện</div>}
