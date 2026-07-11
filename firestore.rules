@@ -77,6 +77,11 @@ service cloud.firestore {
       allow write: if true; // allow guest uploads to secure and gamify highscores
     }
 
+    match /exam_leaderboard/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
     match /radioTracks/{trackId} {
       allow read: if true;
       allow write: if request.auth != null && (
