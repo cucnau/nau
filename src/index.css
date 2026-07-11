@@ -41,6 +41,12 @@
 .font-reading-notoserif {
   font-family: "Noto Serif", Georgia, serif;
 }
+.font-reading-lora {
+  font-family: "Lora", serif;
+}
+.font-reading-alegreya {
+  font-family: "Alegreya", serif;
+}
 
 @custom-variant dark (&:where(.dark, .dark *));
 
