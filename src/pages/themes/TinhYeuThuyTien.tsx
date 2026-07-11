@@ -227,7 +227,7 @@ export function TinhYeuThuyTienTheme(props: ThemeProps) {
               {/* Horizontal Altar Action Buttons */}
               <div className="w-full max-w-xl mt-8 flex flex-col sm:flex-row gap-3">
                 <button 
-                  onClick={() => chapters.length > 0 && navigate(`/doc/${story.id}/${chapters[0].id}`)}
+                  onClick={() => chapters.length > 0 && navigate(`/doc/${story.slug || story.id}/chuong-${chapters[0].order + 1}`)}
                   className="flex-1 py-4 bg-[#B6A996] hover:bg-[#F2E6D0] text-[#12110F] uppercase text-xs font-sans font-black tracking-[0.2em] rounded-xl transition-all duration-300 flex justify-center items-center gap-2 border-2 border-[#B6A996] shadow-[0_4px_15px_rgba(154,142,125,0.2)] cursor-pointer"
                 >
                   XEM SỬ THI <BookOpen className="w-4 h-4" />
@@ -367,7 +367,7 @@ export function TinhYeuThuyTienTheme(props: ThemeProps) {
                 displayedChapters.map((chap) => (
                   <div 
                     key={chap.id}
-                    onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
+                    onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
                     className="group p-4 bg-[#3D362E]/50 hover:bg-[#3D362E] border border-[#B6A996]/10 hover:border-[#B6A996] rounded-xl cursor-pointer transition-all duration-300 flex items-center justify-between shadow-md"
                   >
                     <div className="flex items-center gap-4 min-w-0 flex-1 mr-3">
