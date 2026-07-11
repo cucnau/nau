@@ -200,7 +200,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
             <div className="flex items-center gap-2 mb-4 px-3 py-1 bg-[#2e2a63] border border-[#695b7f]/50 text-[9px] font-sans tracking-[0.15em] text-[#bbee1f] uppercase rounded relative z-10 select-none">
               <span className="w-1.5 h-1.5 bg-[#bbee1f] rounded-full animate-ping absolute" />
               <span className="w-1.5 h-1.5 bg-[#bbee1f] rounded-full" />
-              SECURE DOSSIER // PROJECT CODE: GIA_NGOAN_REBIRTH_08
+              HỒ SƠ THƯƠNG VỤ MẬT
             </div>
 
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-5 relative z-10 font-sans">
@@ -451,18 +451,15 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                   </button>
                 </div>
                 
-                {/* The Ledger Table */}
-                <div className="border border-[#2e2a63] bg-[#13120d] overflow-hidden shadow-lg">
-                  {/* Header */}
-                  <div className="hidden md:grid grid-cols-12 bg-[#2e2a63]/50 border-b border-[#2e2a63] p-3 text-[10px] font-sans uppercase font-black tracking-widest text-[#695b7f] select-none">
-                    <div className="col-span-2">MÃ HỒ SƠ</div>
-                    <div className="col-span-6">TÊN BẢN CHỨNG THƯ</div>
-                    <div className="col-span-2">ĐỊNH DẠNG</div>
-                    <div className="col-span-2 text-right">HÀNH ĐỘNG</div>
-                  </div>
-
-                  {/* Rows */}
-                  <div className="divide-y divide-[#2e2a63]/60">
+                {/* The Ledger Table redesigned as Scrollable Grid of Folders */}
+                <div 
+                  className="max-h-[480px] overflow-y-auto pr-1 select-none"
+                  style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#2e2a63 #13120d'
+                  }}
+                >
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {displayedChapters.map((chap, i) => {
                       const absoluteIndex = (chapterPage * CHAPTERS_PER_PAGE) + i + 1;
                       const recordCode = `SEC-GNC-${absoluteIndex.toString().padStart(3, '0')}`;
@@ -470,31 +467,31 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                         <div 
                           key={chap.id} 
                           onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
-                          className="grid grid-cols-1 md:grid-cols-12 items-center p-4 md:p-3 hover:bg-[#2e2a63]/35 cursor-pointer group transition-all duration-200"
+                          className="bg-[#2e2a63]/10 border border-[#2e2a63]/50 hover:border-[#bbee1f] p-4 flex flex-col justify-between cursor-pointer group transition-all duration-300 relative rounded-lg"
                         >
-                          {/* Code */}
-                          <div className="col-span-2 text-xs font-mono font-bold text-[#695b7f] group-hover:text-[#bbee1f] mb-1 md:mb-0 select-none">
-                            {recordCode}
-                          </div>
-
-                          {/* Title */}
-                          <div className="col-span-6 text-sm lg:text-base font-semibold text-[#dbcec2] group-hover:text-white leading-relaxed pr-2 font-reading-garamond">
-                            <span className="md:hidden font-sans text-[#695b7f] text-[10px] mr-1">[TÀI LIỆU]</span> {chap.title}
-                          </div>
-
-                          {/* Format/Security level */}
-                          <div className="col-span-2 text-[10px] font-sans tracking-wider text-[#695b7f] mb-3 md:mb-0 select-none">
-                            <span className="md:hidden text-[#695b7f] text-[10px] mr-1">[ĐỊNH DẠNG]:</span>
-                            <span className="px-2 py-0.5 border border-[#2e2a63] bg-[#2e2a63]/20 rounded text-[9px] font-semibold">
+                          {/* Top Info */}
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] font-mono font-bold text-[#695b7f] group-hover:text-[#bbee1f] transition-colors">
+                              {recordCode}
+                            </span>
+                            <span className="px-1.5 py-0.5 border border-[#2e2a63] bg-[#2e2a63]/30 rounded text-[8px] font-semibold text-[#695b7f] group-hover:text-[#dbcec2] group-hover:border-[#bbee1f]/40 transition-colors">
                               SECURED PDF
                             </span>
                           </div>
 
-                          {/* Trigger Action */}
-                          <div className="col-span-2 text-right flex md:block justify-end">
-                            <button className="px-3 py-1.5 bg-[#2e2a63]/40 border border-[#695b7f] group-hover:bg-[#bbee1f] group-hover:text-[#13120d] group-hover:border-[#bbee1f] text-[9px] font-sans font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-1">
+                          {/* Chapter Title */}
+                          <h4 className="text-sm font-bold text-[#dbcec2] group-hover:text-white line-clamp-2 leading-snug mb-3 font-reading-garamond transition-colors">
+                            {chap.title}
+                          </h4>
+
+                          {/* Bottom Action */}
+                          <div className="flex items-center justify-between pt-2 border-t border-[#2e2a63]/30">
+                            <span className="text-[9px] text-[#695b7f] font-sans uppercase tracking-wider group-hover:text-[#dbcec2]/70 transition-colors">
+                              CHỨNG THƯ KHẢ DỤNG
+                            </span>
+                            <span className="text-[9px] font-sans font-black uppercase tracking-wider text-[#bbee1f] group-hover:translate-x-1 transition-transform duration-200 flex items-center gap-0.5">
                               XUẤT BẢN <ChevronRight className="w-3 h-3" />
-                            </button>
+                            </span>
                           </div>
                         </div>
                       );
