@@ -1179,7 +1179,7 @@ export function Reader() {
     activeCustomTheme === 'thuytien' ? 'font-reading-cormorant' : 
     activeCustomTheme === 'rinhrap' ? 'font-reading-quicksand' : 
     activeCustomTheme === 'thientai' ? 'font-reading-iosevka' : 
-    activeCustomTheme === 'nguoidep' ? 'font-reading-quicksand' : 'font-reading-garamond'
+    activeCustomTheme === 'nguoidep' ? 'font-reading-lora' : 'font-reading-garamond'
   ) : fontFamily;
   const tChapterLabel = activeCustomTheme === 'homer' ? "Tọa độ" : activeCustomTheme === 'giagoan' ? "Tài liệu" : activeCustomTheme === 'nhatky' ? "Trang" : activeCustomTheme === 'thuytien' ? "Khúc tự luyến" : activeCustomTheme === 'rinhrap' ? "Màn" : activeCustomTheme === 'thientai' ? "Phó bản" : activeCustomTheme === 'nguoidep' ? "Bài luyện" : "Chương";
   const tChapterCapLabel = activeCustomTheme === 'homer' ? "TỌA ĐỘ" : activeCustomTheme === 'giagoan' ? "TÀI LIỆU" : activeCustomTheme === 'nhatky' ? "TRANG NHẬT KÝ" : activeCustomTheme === 'thuytien' ? "KHÚC TỰ LUYẾN" : activeCustomTheme === 'rinhrap' ? "MÀN CHƠI" : activeCustomTheme === 'thientai' ? "PHÓ BẢN" : activeCustomTheme === 'nguoidep' ? "BÀI ÔN LUYỆN" : "CHƯƠNG";
@@ -1217,6 +1217,8 @@ export function Reader() {
               effectiveFontFamily === 'font-reading-cormorant' ? '"Cormorant Garamond", Georgia, serif' :
               effectiveFontFamily === 'font-reading-notoserif' ? '"Noto Serif", Georgia, serif' :
               effectiveFontFamily === 'font-reading-quicksand' ? '"Quicksand", sans-serif' :
+              effectiveFontFamily === 'font-reading-lora' ? '"Lora", serif' :
+              effectiveFontFamily === 'font-reading-alegreya' ? '"Alegreya", serif' :
               '"Quicksand", sans-serif'
             } !important;
           }
@@ -1257,7 +1259,7 @@ export function Reader() {
           
           <div className="flex-1 min-w-0 text-center px-4">
              <div className="text-xs font-black uppercase tracking-widest opacity-60 mb-0.5 truncate">{story.title}</div>
-             <h1 className="text-base sm:text-lg font-black tracking-tight">{currentChapter.title}</h1>
+             <h1 className={cn("text-base sm:text-lg font-black tracking-tight", isCustomThemeActive && activeCustomTheme === 'nguoidep' && "font-alegreya font-bold")}>{currentChapter.title}</h1>
           </div>
           
           <div className="relative flex items-center gap-2">
@@ -1273,10 +1275,10 @@ export function Reader() {
                        activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] text-[#2C1814] border-[#BCA782] font-reading-cormorant shadow-2xl" :
                        activeCustomTheme === 'thuytien' ? "bg-[#12110F] text-[#F2E6D0] border-[#B6A996] font-reading-cormorant shadow-lg outline outline-1 outline-[#B6A996]/20 outline-offset-[-4px]" :
                        activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#FFF2F1] text-[#780606] border-[#facaca] font-reading-garamond shadow-lg" : "bg-[#0B0505] text-[#D8B4B4] border-[#7F1D1D] font-reading-garamond shadow-lg") :
-                       activeCustomTheme === 'thientai' ? "bg-[#060406] text-[#d4c6c9] border-[#34282d] font-reading-iosevka shadow-lg" : activeCustomTheme === 'nguoidep' ? "bg-[#101622] text-[#ECEFF4] border-[#2D3D54]/40 font-reading-quicksand shadow-lg" : "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] font-reading-garamond shadow-lg"
+                       activeCustomTheme === 'thientai' ? "bg-[#060406] text-[#d4c6c9] border-[#34282d] font-reading-iosevka shadow-lg" : activeCustomTheme === 'nguoidep' ? "bg-[#101622] text-[#ECEFF4] border-[#2D3D54]/40 font-reading-lora shadow-lg" : "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] font-reading-garamond shadow-lg"
                     ) : effectiveIsDark ? "bg-[#211B18] text-[#ECE5DC] border-[#3E2723]" : "bg-[#FFFDF9] text-[#3E2723] border-[#3E2723]"
                 )}>
-                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#991B1B]") : activeCustomTheme === 'thientai' ? "text-[#9a858d]" : activeCustomTheme === 'nguoidep' ? "text-[#c5ad97]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#ECE5DC]" : "text-[#3E2723]"))}>Cài đặt</h3>
+                   <h3 className={cn("font-black mb-4 uppercase tracking-wider text-sm", isCustomThemeActive && activeCustomTheme === 'nguoidep' && "font-alegreya font-black text-base text-[#c5ad97]", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#991B1B]") : activeCustomTheme === 'thientai' ? "text-[#9a858d]" : activeCustomTheme === 'nguoidep' ? "text-[#c5ad97]" : "text-[#bbee1f]") : (effectiveIsDark ? "text-[#ECE5DC]" : "text-[#3E2723]"))}>Cài đặt</h3>
                    <div className="flex flex-col gap-6">
                       {hasCustomTheme && (
                          <div className={cn("flex flex-col gap-2 pb-4 border-b-2 border-dashed", activeCustomTheme === 'homer' ? 'border-[#47515f]/20' : activeCustomTheme === 'nhatky' ? 'border-[#BCA782]/30' : activeCustomTheme === 'thuytien' ? 'border-[#B6A996]/20' : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? 'border-[#facaca]/30' : 'border-[#7F1D1D]/30') : activeCustomTheme === 'thientai' ? 'border-[#34282d]/30' : activeCustomTheme === 'nguoidep' ? 'border-[#2D3D54]/30' : 'border-[#2e2a63]/20')}>
@@ -1299,18 +1301,18 @@ export function Reader() {
                          </div>
                       )}
                       <div className="flex items-center justify-between">
-                         <label className={cn("text-xs font-black uppercase", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]/80" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]/80" : "text-[#7F1D1D]/80") : activeCustomTheme === 'thientai' ? "text-[#9a858d]/80" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Chế độ nền tối</label>
+                         <label className={cn("text-xs font-black uppercase", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]/80" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]/80" : "text-[#7F1D1D]/80") : activeCustomTheme === 'thientai' ? "text-[#9a858d]/80" : activeCustomTheme === 'nguoidep' ? "text-[#A2B6CD]" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Chế độ nền tối</label>
                          <div className="flex items-center gap-2">
                             <button type="button" onClick={() => { setIsDark(false); if(isCustomThemeActive) setUseStoryTheme(false); }} style={{ backgroundColor: '#FDF6EC' }} className={cn("w-10 h-10 rounded-full border-3", !effectiveIsDark && !isCustomThemeActive ? "border-[#3E2723]" : "border-[#D7CCC8]")}></button>
                             <button type="button" onClick={() => { setIsDark(true); if(isCustomThemeActive) setUseStoryTheme(false); }} style={{ backgroundColor: '#1A1412' }} className={cn("w-10 h-10 rounded-full border-3", effectiveIsDark && !isCustomThemeActive ? "border-[#D4AF37]" : "border-[#3C2E27]")}></button>
                          </div>
                       </div>
                       <div>
-                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]/80" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]/80" : "text-[#7F1D1D]/80") : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Cỡ chữ: {fontSize}px</label>
-                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className={cn("w-full accent-[#3E2723]", isCustomThemeActive && (activeCustomTheme === 'homer' ? "accent-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "accent-[#2C1814]" : activeCustomTheme === 'thuytien' ? "accent-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "accent-[#780606]" : "accent-[#991B1B]") : activeCustomTheme === 'thientai' ? "accent-[#9a858d]" : "accent-[#bbee1f]"))} />
+                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]/80" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]/80" : "text-[#7F1D1D]/80") : activeCustomTheme === 'thientai' ? "text-[#9a858d]/80" : activeCustomTheme === 'nguoidep' ? "text-[#A2B6CD]" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Cỡ chữ: {fontSize}px</label>
+                         <input type="range" min="14" max="28" value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className={cn("w-full accent-[#3E2723]", isCustomThemeActive && (activeCustomTheme === 'homer' ? "accent-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "accent-[#2C1814]" : activeCustomTheme === 'thuytien' ? "accent-[#B6A996]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "accent-[#780606]" : "accent-[#991B1B]") : activeCustomTheme === 'thientai' ? "accent-[#9a858d]" : activeCustomTheme === 'nguoidep' ? "accent-[#A2B6CD]" : "accent-[#bbee1f]"))} />
                       </div>
                       <div>
-                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]/80" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]/80" : "text-[#7F1D1D]/80") : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Phông chữ</label>
+                         <label className={cn("text-xs font-black uppercase mb-3 block", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "text-[#67707e]" : activeCustomTheme === 'nhatky' ? "text-[#5C3627]/80" : activeCustomTheme === 'thuytien' ? "text-[#B6A996]/80" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]/80" : "text-[#7F1D1D]/80") : activeCustomTheme === 'thientai' ? "text-[#9a858d]/80" : activeCustomTheme === 'nguoidep' ? "text-[#A2B6CD]" : "text-[#695b7f]") : (effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"))}>Phông chữ</label>
                          <select 
                            value={fontFamily} 
                            disabled={isCustomThemeActive}
@@ -1321,6 +1323,8 @@ export function Reader() {
                                activeCustomTheme === 'homer' ? "bg-[#181f2d] text-[#a0a6b3] border-[#47515f] cursor-not-allowed opacity-75" :
                                activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] text-[#2C1814] border-[#BCA782] cursor-not-allowed opacity-75" :
                                activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#FFF2F1] text-[#780606] border-[#facaca] cursor-not-allowed opacity-75" : "bg-[#0B0505] text-[#D8B4B4] border-[#7F1D1D] cursor-not-allowed opacity-75") :
+                               activeCustomTheme === 'thientai' ? "bg-[#060406] text-[#d4c6c9] border-[#34282d] cursor-not-allowed opacity-75" :
+                               activeCustomTheme === 'nguoidep' ? "bg-[#101622] text-[#ECEFF4] border-[#2D3D54]/50 cursor-not-allowed opacity-75" :
                                "bg-[#13120d] text-[#dbcec2] border-[#2e2a63] cursor-not-allowed opacity-75"
                              ) : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#ECE5DC]" : "bg-white border-[#3E2723] text-[#3E2723]"
                            )}
@@ -1330,7 +1334,7 @@ export function Reader() {
                             <option value="font-reading-notoserif">Noto Serif (Truyền thống)</option>
                             <option value="font-reading-iosevka">Iosevka (Kỹ thuật)</option>
                          </select>
-                         {isCustomThemeActive && <span className={cn("text-[10px] mt-1 block", activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#EADDC9]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#D8B4B4]") : activeCustomTheme === 'thientai' ? "text-[#9a858d]" : "text-[#bbee1f]")}>{activeCustomTheme === 'homer' ? 'Khóa phông chữ Iosevka theo theme' : activeCustomTheme === 'nhatky' ? 'Khóa phông chữ Cormorant Garamond theo theme' : activeCustomTheme === 'thuytien' ? 'Khóa phông chữ Cormorant Garamond theo theme' : activeCustomTheme === 'rinhrap' ? 'Khóa phông chữ Quicksand theo theme' : activeCustomTheme === 'thientai' ? 'Khóa phông chữ Iosevka theo theme' : 'Khóa phông chữ EB Garamond theo theme'}</span>}
+                         {isCustomThemeActive && <span className={cn("text-[10px] mt-1 block", activeCustomTheme === 'homer' ? "text-[#a0a6b3]" : activeCustomTheme === 'nhatky' ? "text-[#2C1814]" : activeCustomTheme === 'thuytien' ? "text-[#EADDC9]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#D8B4B4]") : activeCustomTheme === 'thientai' ? "text-[#9a858d]" : activeCustomTheme === 'nguoidep' ? "text-[#A2B6CD]" : "text-[#bbee1f]")}>{activeCustomTheme === 'homer' ? 'Khóa phông chữ Iosevka theo theme' : activeCustomTheme === 'nhatky' ? 'Khóa phông chữ Cormorant Garamond theo theme' : activeCustomTheme === 'thuytien' ? 'Khóa phông chữ Cormorant Garamond theo theme' : activeCustomTheme === 'rinhrap' ? 'Khóa phông chữ Quicksand theo theme' : activeCustomTheme === 'thientai' ? 'Khóa phông chữ Iosevka theo theme' : activeCustomTheme === 'nguoidep' ? 'Khóa phông chữ Lora & Alegreya theo theme' : 'Khóa phông chữ EB Garamond theo theme'}</span>}
                       </div>
                    </div>
                 </div>
