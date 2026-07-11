@@ -159,27 +159,142 @@ function generateQuestion(subjectId: string, index: number) {
         correct = 0;
         explanation = `Câu điều kiện loại 2 diễn tả điều kiện trái thực tế ở hiện tại: If + S + V-quá khứ giả định (dùng 'were' cho mọi ngôi).`;
       }
-    } else {
+    } else if (subjectId === 'tieng-phap') {
       if (qIdx === 0) {
-        question = `[Ngoại ngữ - ${subjectId.toUpperCase()}] Chọn trật tự tính từ/từ vựng đúng để tạo thành một câu hoàn chỉnh?`;
-        options = [`A. Phương án có cấu trúc từ loại bổ nghĩa chuẩn xác nhất`, `B. Phương án bị đảo lộn trật tự cú pháp`, `C. Phương án dùng sai giới từ kết nối`, `D. Phương án thiếu thành phần chủ ngữ chính`];
+        question = `[Ngoại ngữ - Tiếng Pháp] Chọn mạo từ thích hợp: "Elle aime _______ chocolat."`;
+        options = [`A. le`, `B. la`, `C. de l'`, `D. un`];
         correct = 0;
-        explanation = `Trong cấu trúc ngữ pháp ngoại ngữ, việc sắp xếp trật tự tính từ và danh từ tuân thủ nghiêm ngặt quy tắc ngữ pháp của quốc gia đó.`;
+        explanation = `Sau các động từ chỉ sự yêu thích (aimer, adorer, préférer, détester), ta dùng mạo từ xác định (le, la, les). 'Chocolat' là danh từ giống đực số ít nên dùng 'le'.`;
       } else if (qIdx === 1) {
-        question = `[Ngoại ngữ - ${subjectId.toUpperCase()}] Cấu trúc câu hỏi xác nhận / câu hỏi đuôi thông dụng nhất là gì?`;
-        options = [`A. Sử dụng trợ từ / trợ động từ phủ định ở cuối câu`, `B. Lặp lại hoàn toàn cấu trúc câu khẳng định gốc`, `C. Sử dụng trạng từ chỉ thời gian tương lai`, `D. Chỉ cần thêm dấu chấm hỏi mà không thay đổi từ ngữ`];
+        question = `[Ngoại ngữ - Tiếng Pháp] Chia động từ "être" ở thì hiện tại với ngôi "nous": "Nous _______ étudiants."`;
+        options = [`A. sommes`, `B. êtes`, `C. sont`, `D. suis`];
         correct = 0;
-        explanation = `Cú pháp câu hỏi xác nhận giúp người nói kiểm tra thông tin một cách tự nhiên và lịch sự.`;
+        explanation = `Động từ 'être' ở thì hiện tại chia với ngôi 'nous' là 'nous sommes'.`;
       } else if (qIdx === 2) {
-        question = `[Ngoại ngữ - ${subjectId.toUpperCase()}] Cách phối hợp các thì giữa một hành động đang xảy ra và một hành động xen vào là?`;
-        options = [`A. Hành động đang xảy ra dùng tiếp diễn, hành động xen vào dùng đơn`, `B. Cả hai hành động đều dùng thì tương lai đơn`, `C. Cả hai hành động đều dùng thì quá khứ hoàn thành`, `D. Hành động đang xảy ra dùng đơn, hành động xen vào dùng hoàn thành`];
+        question = `[Ngoại ngữ - Tiếng Pháp] Tìm từ trái nghĩa với "grand" (to lớn) trong tiếng Pháp?`;
+        options = [`A. petit`, `B. mauvais`, `C. jeune`, `D. joli`];
         correct = 0;
-        explanation = `Sự phối hợp thì giúp diễn tả trình tự thời gian chính xác của các sự kiện trong quá khứ.`;
+        explanation = `'Grand' có nghĩa là to lớn, cao lớn. Từ trái nghĩa của nó là 'petit' (nhỏ bé, lùn).`;
       } else {
-        question = `[Ngoại ngữ - ${subjectId.toUpperCase()}] Trong câu giả định trái thực tế ở hiện tại, động từ tobe thường được chia là gì?`;
-        options = [`A. Chia ở dạng giả định quá khứ (tương ứng với 'were')`, `B. Chia ở thì hiện tại đơn giản thông thường`, `C. Chia ở dạng nguyên mẫu có 'to'`, `D. Biến đổi hoàn toàn thành phân từ hai`];
+        question = `[Ngoại ngữ - Tiếng Pháp] "Comment ça va ?" có nghĩa là gì trong tiếng Việt?`;
+        options = [`A. Bạn khỏe không?`, `B. Bạn tên là gì?`, `C. Bạn bao nhiêu tuổi?`, `D. Bạn từ đâu đến?`];
         correct = 0;
-        explanation = `Thể giả định diễn tả một giả thuyết không có thực ở hiện tại, thể hiện mong muốn hoặc khuyến nghị.`;
+        explanation = `'Comment ça va ?' là câu hỏi thăm sức khỏe thông dụng trong tiếng Pháp, tương đương với 'How are you?' trong tiếng Anh.`;
+      }
+    } else if (subjectId === 'tieng-trung') {
+      if (qIdx === 0) {
+        question = `[Ngoại ngữ - Tiếng Trung] Đại từ nhân xưng ngôi thứ hai số ít "bạn, anh, chị" trong tiếng Trung viết là gì?`;
+        options = [`A. 你 (nǐ)`, `B. 我 (wǒ)`, `C. 他 (tā)`, `D. 们 (men)`];
+        correct = 0;
+        explanation = `'Liệt kê': '你' (nǐ) có nghĩa là bạn, anh, chị (ngôi thứ hai số ít). '我' là tôi, '他' là anh ấy, '们' là hậu tố số nhiều.`;
+      } else if (qIdx === 1) {
+        question = `[Ngoại ngữ - Tiếng Trung] Từ nào sau đây có nghĩa là "học tập" trong tiếng Trung?`;
+        options = [`A. 学习 (xuéxí)`, `B. 谢谢 (xièxie)`, `C. 老师 (lǎoshī)`, `D. 朋友 (péngyou)`];
+        correct = 0;
+        explanation = `'学习' (xuéxí) có nghĩa là học tập. '谢谢' là cảm ơn, '老师' là giáo viên, '朋友' là bạn bè.`;
+      } else if (qIdx === 2) {
+        question = `[Ngoại ngữ - Tiếng Trung] Phiên âm "mǎ" (con ngựa - 马) mang thanh điệu (thanh) thứ mấy?`;
+        options = [`A. Thanh 3 (hỏi)`, `B. Thanh 1 (ngang)`, `C. Thanh 2 (sắc)`, `D. Thanh 4 (huyền/nặng)`];
+        correct = 0;
+        explanation = `Từ 'mǎ' (mã - con ngựa) mang thanh điệu thứ 3 (thanh hỏi), phát âm đi xuống rồi đi lên.`;
+      } else {
+        question = `[Ngoại ngữ - Tiếng Trung] "早上好" (zǎoshang hǎo) có nghĩa là gì?`;
+        options = [`A. Chào buổi sáng`, `B. Tạm biệt`, `C. Chúc ngủ ngon`, `D. Không có chi`];
+        correct = 0;
+        explanation = `'早上好' (zǎoshang hǎo) là câu chào buổi sáng thông dụng trong tiếng Trung.`;
+      }
+    } else if (subjectId === 'tieng-duc') {
+      if (qIdx === 0) {
+        question = `[Ngoại ngữ - Tiếng Đức] Từ nào sau đây là mạo từ xác định giống đực (nominative) trong tiếng Đức?`;
+        options = [`A. der`, `B. die`, `C. das`, `D. den`];
+        correct = 0;
+        explanation = `Trong tiếng Đức, mạo từ xác định giống đực là 'der', giống cái là 'die', và giống trung là 'das' (ở cách 1 nominative).`;
+      } else if (qIdx === 1) {
+        question = `[Ngoại ngữ - Tiếng Đức] Từ "Guten Tag" có nghĩa là gì trong tiếng Việt?`;
+        options = [`A. Chào ngày mới / Chào buổi chiều`, `B. Chúc ngủ ngon`, `C. Tạm biệt`, `D. Cảm ơn`];
+        correct = 0;
+        explanation = `'Guten Tag' là câu chào xã giao ban ngày (thường từ 11h sáng đến tối muộn) trong tiếng Đức, có nghĩa là 'Chào bạn / Chào ngày mới'.`;
+      } else if (qIdx === 2) {
+        question = `[Ngoại ngữ - Tiếng Đức] Động từ "sein" (thì, là, ở) chia với ngôi "ich" (tôi) ở hiện tại là gì?`;
+        options = [`A. bin`, `B. bist`, `C. ist`, `D. sind`];
+        correct = 0;
+        explanation = `Động từ bất quy tắc 'sein' chia với ngôi 'ich' ở hiện tại là 'ich bin'.`;
+      } else {
+        question = `[Ngoại ngữ - Tiếng Đức] Số "mười" (10) trong tiếng Đức được viết là gì?`;
+        options = [`A. zehn`, `B. eins`, `C. zwei`, `D. drei`];
+        correct = 0;
+        explanation = `Số 1 là 'eins', số 2 là 'zwei', số 3 là 'drei', và số 10 trong tiếng Đức là 'zehn'.`;
+      }
+    } else if (subjectId === 'tieng-nhat') {
+      if (qIdx === 0) {
+        question = `[Ngoại ngữ - Tiếng Nhật] Chữ cái Hiragana "あ" phát âm là gì?`;
+        options = [`A. a`, `B. i`, `C. u`, `D. e`];
+        correct = 0;
+        explanation = `Chữ 'あ' là chữ cái đầu tiên trong bảng chữ cái tiếng Nhật Hiragana, phát âm là 'a'.`;
+      } else if (qIdx === 1) {
+        question = `[Ngoại ngữ - Tiếng Nhật] "Arigatou gozaimasu" (ありがとうございます) có nghĩa là gì?`;
+        options = [`A. Xin cảm ơn rất nhiều`, `B. Xin lỗi`, `C. Chào buổi sáng`, `D. Tạm biệt`];
+        correct = 0;
+        explanation = `'ありがとうございます' là lời cảm ơn lịch sự và trang trọng nhất trong tiếng Nhật.`;
+      } else if (qIdx === 2) {
+        question = `[Ngoại ngữ - Tiếng Nhật] Trợ từ nào thường dùng để đứng sau chủ ngữ chính trong câu tiếng Nhật?`;
+        options = [`A. は (phát âm là wa)`, `B. を (wo)`, `C. に (ni)`, `D. で (de)`];
+        correct = 0;
+        explanation = `Trợ từ 'は' (viết là ha nhưng phát âm là wa) là trợ từ biểu thị chủ đề hoặc chủ ngữ của câu.`;
+      } else {
+        question = `[Ngoại ngữ - Tiếng Nhật] Từ "Sensei" (せんせい) dùng để gọi ai tôn kính?`;
+        options = [`A. Thầy cô giáo / Bác sĩ`, `B. Học sinh / Sinh viên`, `C. Công nhân xây dựng`, `D. Giám đốc điều hành`];
+        correct = 0;
+        explanation = `'先生' (Sensei) là danh xưng tôn kính dùng để gọi thầy cô giáo, bác sĩ, hoặc những người có học vấn, chuyên môn cao.`;
+      }
+    } else if (subjectId === 'tieng-nga') {
+      if (qIdx === 0) {
+        question = `[Ngoại ngữ - Tiếng Nga] Chữ cái thứ nhất trong bảng chữ cái tiếng Nga (Cyrillic) là chữ nào?`;
+        options = [`A. А`, `B. Б`, `C. В`, `D. Г`];
+        correct = 0;
+        explanation = `Bảng chữ cái tiếng Nga bắt đầu bằng chữ 'А' và kết thúc bằng chữ 'Я'.`;
+      } else if (qIdx === 1) {
+        question = `[Ngoại ngữ - Tiếng Nga] Từ "Спасибо" (Spasibo) có nghĩa là gì trong tiếng Việt?`;
+        options = [`A. Cảm ơn`, `B. Xin chào`, `C. Tạm biệt`, `D. Làm ơn`];
+        correct = 0;
+        explanation = `'Спасибо' (phát âm: Spasibo) là từ cảm ơn thông dụng và phổ biến nhất trong tiếng Nga.`;
+      } else if (qIdx === 2) {
+        question = `[Ngoại ngữ - Tiếng Nga] Từ chào hỏi trang trọng, lịch sự nhất trong tiếng Nga là gì?`;
+        options = [`A. Здравствуйте (Zdravstvuyte)`, `B. Привет (Privet)`, `C. Пока (Poka)`, `D. До свидания (Do svidaniya)`];
+        correct = 0;
+        explanation = `'Здравствуйте' (Zdravstvuyte) là lời chào lịch sự nhất dùng cho người lớn tuổi, đối tác hoặc người mới gặp. 'Привет' là lời chào thân mật với bạn bè.`;
+      } else {
+        question = `[Ngoại ngữ - Tiếng Nga] Đại từ nhân xưng ngôi thứ nhất số ít "Tôi" trong tiếng Nga là gì?`;
+        options = [`A. Я (Ya)`, `B. Ty (Ty)`, `C. Он (On)`, `D. Мы (My)`];
+        correct = 0;
+        explanation = `Trong tiếng Nga, 'Я' nghĩa là tôi, 'Ty' là bạn, 'Он' là anh ấy, và 'Мы' là chúng tôi.`;
+      }
+    } else if (subjectId === 'tieng-han') {
+      if (qIdx === 0) {
+        question = `[Ngoại ngữ - Tiếng Hàn] Chữ cái phụ âm cơ bản "ㄱ" trong tiếng Hàn (Hangeul) được gọi là gì?`;
+        options = [`A. Gi-yeok`, `B. Ni-eun`, `C. Di-geut`, `D. Ri-eul`];
+        correct = 0;
+        explanation = `Phụ âm đầu tiên trong bảng chữ cái tiếng Hàn là 'ㄱ', được gọi là 'gi-yeok'.`;
+      } else if (qIdx === 1) {
+        question = `[Ngoại ngữ - Tiếng Hàn] Câu chào hỏi "Xin chào" lịch sự và thông dụng nhất là gì?`;
+        options = [`A. 안녕하세요 (Annyeonghaseyo)`, `B. 감사합니다 (Gamsahamnida)`, `C. 사랑해요 (Saranghaeyo)`, `D. 죄송합니다 (Joesonghamnida)`];
+        correct = 0;
+        explanation = `'안녕하세요' (Annyeonghaseyo) là câu chào xã giao thông dụng, lịch sự và tự nhiên nhất dùng trong mọi tình huống hằng ngày.`;
+      } else if (qIdx === 2) {
+        question = `[Ngoại ngữ - Tiếng Hàn] Từ "Saranghae" (사랑해) có ý nghĩa là gì?`;
+        options = [`A. Tôi yêu bạn / Anh yêu em`, `B. Xin cảm ơn`, `C. Xin lỗi nhé`, `D. Chúc ngủ ngon`];
+        correct = 0;
+        explanation = `'사랑해' (Saranghae) xuất phát từ động từ '사랑하다' (yêu), có nghĩa là Anh yêu em / Em yêu anh / Tôi yêu bạn.`;
+      } else {
+        question = `[Ngoại ngữ - Tiếng Hàn] Từ xưng hô "Oppa" (오빠) được sử dụng chính xác khi nào?`;
+        options = [
+          `A. Khi em gái gọi anh trai (hoặc bạn trai lớn tuổi hơn)`,
+          `B. Khi em trai gọi anh trai ruột`,
+          `C. Khi em gái gọi chị gái ruột`,
+          `D. Khi em trai gọi chị gái ruột`
+        ];
+        correct = 0;
+        explanation = `Trong văn hóa Hàn Quốc, '오빠' (Oppa) chỉ được dùng bởi phái nữ để gọi người đàn ông/anh trai lớn tuổi hơn có mối quan hệ thân thiết.`;
       }
     }
   } else if (subjectId === 'lich-su') {
@@ -1306,6 +1421,25 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
     return map;
   });
 
+  const [completedMap, setCompletedMap] = useState<Record<string, number[]>>(() => {
+    const map: Record<string, number[]> = {};
+    SUBJECTS.forEach(sub => {
+      try {
+        const savedCompleted = localStorage.getItem(`user_completed_questions_${sub.id}`);
+        if (savedCompleted) {
+          map[sub.id] = JSON.parse(savedCompleted);
+        } else {
+          // Fallback lấy từ answeredMap (những câu đúng đã làm trước đó)
+          const savedAnswered = localStorage.getItem(`user_answered_questions_${sub.id}`);
+          map[sub.id] = savedAnswered ? JSON.parse(savedAnswered) : [];
+        }
+      } catch {
+        map[sub.id] = [];
+      }
+    });
+    return map;
+  });
+
   const [attemptsMap, setAttemptsMap] = useState<Record<string, number>>(() => {
     const map: Record<string, number> = {};
     SUBJECTS.forEach(sub => {
@@ -1325,12 +1459,12 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
   const [examScore, setExamScore] = useState(() => Number(localStorage.getItem('user_exam_score') || '0'));
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
 
-  // Lắng nghe thay đổi answeredMap và selectedSubject để cập nhật câu hỏi chưa làm tiếp theo
+  // Lắng nghe thay đổi completedMap và selectedSubject để cập nhật câu hỏi chưa làm tiếp theo
   useEffect(() => {
-    const answered = answeredMap[selectedSubject] || [];
+    const completed = completedMap[selectedSubject] || [];
     let foundIndex = -1;
     for (let i = 0; i < 50; i++) {
-      if (!answered.includes(i)) {
+      if (!completed.includes(i)) {
         foundIndex = i;
         break;
       }
@@ -1338,7 +1472,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
     setCurrentQuestionIndex(foundIndex);
     setSelectedAns(null);
     setHasAnswered(false);
-  }, [selectedSubject, answeredMap]);
+  }, [selectedSubject, completedMap]);
 
   // Đồng bộ điểm lên Firestore
   useEffect(() => {
@@ -1378,6 +1512,18 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
     setSelectedAns(index);
     setHasAnswered(true);
     
+    // Đánh dấu câu hỏi này đã hoàn thành (dù đúng hay sai)
+    const currentCompleted = completedMap[selectedSubject] || [];
+    if (!currentCompleted.includes(currentQuestionIndex)) {
+      const updatedCompleted = [...currentCompleted, currentQuestionIndex];
+      const newCompletedMap = {
+        ...completedMap,
+        [selectedSubject]: updatedCompleted
+      };
+      setCompletedMap(newCompletedMap);
+      localStorage.setItem(`user_completed_questions_${selectedSubject}`, JSON.stringify(updatedCompleted));
+    }
+
     // Tăng tổng số câu đã làm của môn này lên 1
     const currentAttempts = attemptsMap[selectedSubject] || 0;
     const newAttempts = currentAttempts + 1;
@@ -1407,10 +1553,10 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
   const handleNextQuestion = () => {
     setSelectedAns(null);
     setHasAnswered(false);
-    const answered = answeredMap[selectedSubject] || [];
+    const completed = completedMap[selectedSubject] || [];
     let foundIndex = -1;
     for (let i = 0; i < 50; i++) {
-      if (!answered.includes(i)) {
+      if (!completed.includes(i)) {
         foundIndex = i;
         break;
       }
@@ -1419,6 +1565,13 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
   };
 
   const handleResetSubject = () => {
+    const newCompletedMap = {
+      ...completedMap,
+      [selectedSubject]: []
+    };
+    setCompletedMap(newCompletedMap);
+    localStorage.setItem(`user_completed_questions_${selectedSubject}`, JSON.stringify([]));
+
     const newMap = {
       ...answeredMap,
       [selectedSubject]: []
@@ -1492,17 +1645,24 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
   // Tính toán chỉ số đúng sai cho môn học đang chọn
   const selectedSubjectCorrect = (answeredMap[selectedSubject] || []).length;
-  const selectedSubjectAttempts = attemptsMap[selectedSubject] || 0;
-  const selectedSubjectWrong = selectedSubjectAttempts - selectedSubjectCorrect;
+  const selectedSubjectCompleted = (completedMap[selectedSubject] || []).length;
+  const selectedSubjectAttempts = Math.max(attemptsMap[selectedSubject] || 0, selectedSubjectCompleted);
+  const selectedSubjectWrong = Math.max(0, selectedSubjectAttempts - selectedSubjectCorrect);
   const selectedSubjectRate = selectedSubjectAttempts > 0 ? parseFloat(((selectedSubjectCorrect / selectedSubjectAttempts) * 100).toFixed(1)) : 0.0;
   const selectedSubjectWrongRate = selectedSubjectAttempts > 0 ? parseFloat((100 - selectedSubjectRate).toFixed(1)) : 0.0;
 
   // Tính tổng quan tất cả các môn
   let totalAllCorrect = 0;
+  let totalAllCompleted = 0;
   let totalAllAttempts = 0;
   SUBJECTS.forEach(sub => {
-    totalAllCorrect += (answeredMap[sub.id] || []).length;
-    totalAllAttempts += attemptsMap[sub.id] || 0;
+    const subCorrect = (answeredMap[sub.id] || []).length;
+    const subCompleted = (completedMap[sub.id] || []).length;
+    const subAttempts = Math.max(attemptsMap[sub.id] || 0, subCompleted);
+
+    totalAllCorrect += subCorrect;
+    totalAllCompleted += subCompleted;
+    totalAllAttempts += subAttempts;
   });
   const totalAllRate = totalAllAttempts > 0 ? parseFloat(((totalAllCorrect / totalAllAttempts) * 100).toFixed(1)) : 0.0;
 
@@ -1554,7 +1714,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 className="px-3 py-1.5 rounded-md flex items-center gap-1.5 bg-[#233145] text-[#ECEFF4] border border-[#233145] hover:bg-[#A2B6CD] hover:text-[#101622] transition-all font-medium text-xs"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">Đọc bản gốc</span>
+                <span className="hidden md:inline">Đọc sách gốc</span>
               </a>
             )}
           </div>
@@ -1571,9 +1731,6 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
             {/* NOVEL COVER CARD */}
             {story?.coverUrl && (
               <div className="border border-[#2D3D54]/30 bg-[#151C28] p-4 rounded-xl relative shadow-lg flex flex-col items-center">
-                <div className="absolute top-2 right-2 border border-[#2D3D54]/40 text-[#A2B6CD] text-[8px] font-lora px-1.5 py-0.5 uppercase tracking-widest bg-black/40">
-                  MẪU BÌA CHÍNH THỨC
-                </div>
                 <div className="w-full aspect-[2/3] overflow-hidden rounded-lg border border-[#2D3D54]/20 shadow-inner relative group">
                   <img 
                     src={story.coverUrl} 
@@ -1852,6 +2009,32 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     <p>Khuyên vợ phải tiết chế</p>
                   </div>
                 </div>
+              </div>
+
+              {/* Nút hành động hợp theme Người Đẹp Ốm Yêu */}
+              <div className="flex flex-wrap gap-4 w-full justify-center mb-6 pt-5 border-t border-[#2D3D54]/30">
+                <button
+                  onClick={() => {
+                    if (chapters && chapters.length > 0) {
+                      const sorted = [...chapters].sort((a, b) => {
+                        const orderA = a.order !== undefined ? a.order : 0;
+                        const orderB = b.order !== undefined ? b.order : 0;
+                        return orderA - orderB;
+                      });
+                      navigate(`/doc/${story.id}/${sorted[0]?.id}`);
+                    }
+                  }}
+                  className="px-6 py-2.5 rounded-lg bg-[#A2B6CD] text-[#101622] hover:bg-[#ECEFF4] transition-all font-lora font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-md"
+                >
+                  <BookOpen className="w-4 h-4" /> Bắt đầu ôn luyện
+                </button>
+
+                <button
+                  onClick={() => setShowGiftModal(true)}
+                  className="px-6 py-2.5 rounded-lg border border-[#A2B6CD]/40 text-[#A2B6CD] hover:bg-[#A2B6CD]/10 hover:border-[#A2B6CD] transition-all font-lora font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-md"
+                >
+                  <Gift className="w-4 h-4" /> Tiếp sức sĩ tử
+                </button>
               </div>
 
               {/* Author and stats metadata row */}
@@ -2251,7 +2434,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                   ))}
                 </select>
                 <div className="flex justify-between items-center mt-1.5 text-[9px] text-[#A2B6CD] font-medium font-lora">
-                  <span>Tiến độ: {(answeredMap[selectedSubject] || []).length}/50 câu</span>
+                  <span>Tiến độ: {(completedMap[selectedSubject] || []).length}/50 câu</span>
                   <button 
                     onClick={handleResetSubject}
                     className="hover:underline text-red-400 hover:text-red-300 flex items-center gap-0.5"
@@ -2422,6 +2605,62 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
 
         </div>
       </main>
+
+      {/* GIFT MODAL (TIẾP SỨC SĨ TỬ) */}
+      {showGiftModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 font-sans">
+          <div className="bg-[#151C28] border-2 border-[#2D3D54]/50 w-full max-w-md p-6 rounded-2xl shadow-2xl relative text-[#ECEFF4]">
+            <div className="absolute top-2 right-2 text-xs text-[#A2B6CD]">✦</div>
+            <h3 className="font-alegreya text-[#A2B6CD] text-xl font-bold mb-1 uppercase tracking-wider">Tiếp sức sĩ tử</h3>
+            <p className="text-xs text-[#ECEFF4]/70 mb-4 font-lora">
+              Mỗi mẩu Choco ngọt ngào sẽ hóa thành nguồn năng lượng tuyệt vời, sưởi ấm tâm hồn và tiếp sức tinh thần bền bỉ cho sĩ tử bứt phá mọi kỳ thi.
+            </p>
+            
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="text-[10px] text-[#A2B6CD] font-bold block mb-1 font-lora uppercase tracking-wider">
+                  Số lượng Choco gửi tặng (Bạn đang có: {choco} CC)
+                </label>
+                <input 
+                  type="number" 
+                  value={giftAmount}
+                  onChange={(e) => setGiftAmount(Math.max(1, parseInt(e.target.value) || 0))}
+                  className="w-full bg-[#101622] text-[#ECEFF4] border border-[#2D3D54]/40 p-3 rounded-xl text-sm focus:outline-none focus:border-[#A2B6CD] transition-all"
+                  min="1"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] text-[#A2B6CD] font-bold block mb-1 font-lora uppercase tracking-wider">
+                  Lời nhắn tiếp sức học tập
+                </label>
+                <textarea
+                  value={giftMessage}
+                  onChange={(e) => setGiftMessage(e.target.value)}
+                  placeholder="Gửi gắm lời chúc chân thành, tiếp thêm động lực học tập cho sĩ tử..."
+                  rows={3}
+                  className="w-full bg-[#101622] text-[#ECEFF4] border border-[#2D3D54]/40 p-3 rounded-xl text-xs focus:outline-none resize-none font-lora italic focus:border-[#A2B6CD] transition-all"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button 
+                  onClick={() => setShowGiftModal(false)}
+                  className="px-4 py-2 border border-[#2D3D54]/40 text-[#ECEFF4]/70 hover:text-[#ECEFF4] hover:border-[#A2B6CD] rounded-xl text-xs font-bold transition-all cursor-pointer"
+                >
+                  HUỶ BỎ
+                </button>
+                <button 
+                  onClick={handleGiftSubmit}
+                  className="px-4 py-2 bg-[#A2B6CD] text-[#101622] hover:bg-[#ECEFF4] rounded-xl text-xs font-black tracking-wider transition-all cursor-pointer uppercase"
+                >
+                  GỬI QUÀ TIẾP SỨC
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
