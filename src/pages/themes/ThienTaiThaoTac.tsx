@@ -171,7 +171,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
               <div className="flex flex-col gap-2 mt-2">
                 {chapters.length > 0 && (
                   <button 
-                    onClick={() => navigate(`/doc/${actualStoryId}/${chapters[0].id}`)}
+                    onClick={() => navigate(`/doc/${story.slug || actualStoryId}/chuong-${chapters[0].order + 1}`)}
                     className="w-full py-3 bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] font-bold font-mono text-sm tracking-widest uppercase transition-all shadow-[0_0_15px_rgba(154,133,141,0.2)] hover:shadow-[0_0_25px_rgba(154,133,141,0.5)] flex items-center justify-center gap-2"
                   >
                     <Zap className="w-4 h-4" /> BẮT ĐẦU
@@ -385,7 +385,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                   }).map((chap, idx) => (
                     <button
                       key={chap.id}
-                      onClick={() => navigate(`/doc/${actualStoryId}/${chap.id}`)}
+                      onClick={() => navigate(`/doc/${story.slug || actualStoryId}/chuong-${chap.order + 1}`)}
                       className="group relative p-3 border border-[#645a6c]/40 bg-[#060406] hover:border-[#9a858d] hover:bg-[#9a858d]/10 transition-all text-left flex flex-col gap-1 cursor-pointer overflow-hidden"
                     >
                       {/* Scanline hover */}
