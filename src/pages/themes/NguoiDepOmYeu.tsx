@@ -33,7 +33,9 @@ import {
   Plus,
   RotateCcw,
   User,
-  Users
+  Users,
+  Check,
+  X
 } from 'lucide-react';
 
 interface Subject {
@@ -63,6 +65,447 @@ const SUBJECTS: Subject[] = [
 ];
 
 function generateQuestion(subjectId: string, index: number) {
+  let question = "";
+  let options: string[] = [];
+  let correct = 0;
+  let explanation = "";
+
+  const qIdx = index % 4; // Mỗi môn có 4 câu hỏi phong phú chuẩn chương trình thi THPT lớp 11 (nửa cuối) + cả năm lớp 12
+
+  if (subjectId === 'toan') {
+    if (qIdx === 0) {
+      question = `[Toán 12 - Giải tích] Tìm số điểm cực trị của hàm số bậc ba y = x³ - 3x² + 2?`;
+      options = [`A. 2`, `B. 0`, `C. 1`, `D. 3`];
+      correct = 0;
+      explanation = `Ta có y' = 3x² - 6x. Phương trình y' = 0 <=> 3x(x - 2) = 0 có 2 nghiệm phân biệt. Vì y' đổi dấu khi đi qua các nghiệm này nên hàm số có 2 điểm cực trị.`;
+    } else if (qIdx === 1) {
+      question = `[Toán 12 - Giải tích] Đồ thị hàm số y = (2x + 1)/(x - 1) có phương trình đường tiệm cận đứng là gì?`;
+      options = [`A. x = 1`, `B. y = 2`, `C. x = -1`, `D. y = 1`];
+      correct = 0;
+      explanation = `Đường tiệm cận đứng của đồ thị hàm số phân thức bậc nhất trên bậc nhất là nghiệm của mẫu số: x - 1 = 0 => x = 1.`;
+    } else if (qIdx === 2) {
+      question = `[Toán 11 - Giải tích] Tính đạo hàm của hàm số lượng giác y = sin(2x) tại điểm x = 0?`;
+      options = [`A. y'(0) = 2`, `B. y'(0) = 0`, `C. y'(0) = 1`, `D. y'(0) = -2`];
+      correct = 0;
+      explanation = `Đạo hàm của hàm số là y' = [sin(2x)]' = 2cos(2x). Thay x = 0 vào ta được y'(0) = 2*cos(0) = 2*1 = 2.`;
+    } else {
+      question = `[Toán 11 - Đại số] Từ một tổ gồm 10 học sinh, có bao nhiêu cách chọn ra một nhóm gồm 3 học sinh để đi làm nhiệm vụ trực nhật?`;
+      options = [`A. C_10^3 = 120 cách`, `B. A_10^3 = 720 cách`, `C. 10³ = 1000 cách`, `D. 30 cách`];
+      correct = 0;
+      explanation = `Chọn ngẫu nhiên 3 học sinh từ 10 học sinh không phân biệt thứ tự là một tổ hợp chập 3 của 10 phần tử: C_10^3 = 10! / (3! * 7!) = 120 cách.`;
+    }
+  } else if (subjectId === 'van') {
+    if (qIdx === 0) {
+      question = `[Ngữ văn 12] Hoàn cảnh sáng tác và bối cảnh lịch sử của truyện ngắn "Vợ nhặt" của nhà văn Kim Lân là gì?`;
+      options = [
+        `A. Nạn đói khủng khiếp năm 1945 tại Việt Nam`,
+        `B. Cuộc kháng chiến chống thực dân Pháp xâm lược (1946 - 1954)`,
+        `C. Phong trào Đồng khởi ở Bến Tre những năm 1959 - 1960`,
+        `D. Giai đoạn xây dựng chủ nghĩa xã hội ở miền Bắc sau năm 1954`
+      ];
+      correct = 0;
+      explanation = `Truyện ngắn "Vợ nhặt" có tiền thân là tiểu thuyết "Xóm ngụ cư", được viết ngay sau Cách mạng tháng Tám nhưng bị mất bản thảo, sau hòa bình lặp lại (1954) tác giả viết lại dựa trên bối cảnh nạn đói khủng khiếp năm 1945.`;
+    } else if (qIdx === 1) {
+      question = `[Ngữ văn 12] Trong bài thơ "Tây Tiến" của Quang Dũng, vẻ đẹp của hình tượng người lính Tây Tiến được khắc họa như thế nào?`;
+      options = [
+        `A. Vừa hào hoa, lãng mạn, vừa kiêu hùng, bi tráng thấm đượm tình đồng chí`,
+        `B. Khắc khổ, chịu đựng, mộc mạc và chân chất mang dáng dấp nông dân nông thôn`,
+        `C. Sang trọng, quý phái, luôn bộc lộ tư tưởng bi quan trước cái chết cận kề`,
+        `D. Sôi nổi, ồn ào và mang đậm màu sắc cá nhân chủ nghĩa thời bấy giờ`
+      ];
+      correct = 0;
+      explanation = `Người lính Tây Tiến đa phần là học sinh, sinh viên trí thức Hà Nội, do đó họ mang vẻ đẹp tâm hồn hào hoa, lãng mạn, đồng thời có ý chí kiêu hùng, sẵn sàng hy sinh bi tráng vì Tổ quốc.`;
+    } else if (qIdx === 2) {
+      question = `[Ngữ văn 11] Khát vọng cốt lõi được thể hiện qua bài thơ "Vội vàng" của nhà thơ Xuân Diệu là gì?`;
+      options = [
+        `A. Khát vọng sống mãnh liệt, cuồng nhiệt, trân trọng từng phút giây của tuổi trẻ và tình yêu`,
+        `B. Khát vọng lánh đời thoát tục, tìm về chốn sơn lâm tĩnh lặng yên bình`,
+        `C. Khát vọng đấu tranh giai cấp quyết liệt nhằm lật đổ ách thống trị phong kiến`,
+        `D. Niềm hoài cổ tiếc thương những giá trị xưa cũ đang dần mai một trôi qua`
+      ];
+      correct = 0;
+      explanation = `"Vội vàng" là tiếng lòng của một tâm hồn yêu sống, khát khao giao cảm với đời, thể hiện một quan niệm nhân sinh mới mẻ, tích cực về thời gian, tuổi trẻ và hạnh phúc trần thế.`;
+    } else {
+      question = `[Ngữ văn 11] Bi kịch sâu sắc nhất của nhân vật Chí Phèo trong truyện ngắn cùng tên của nhà văn Nam Cao là gì?`;
+      options = [
+        `A. Bi kịch bị lưu manh hóa và bị cự tuyệt quyền làm người lương thiện`,
+        `B. Bi kịch bị nghèo đói túng quẫn bủa vây không có cơm ăn áo mặc`,
+        `C. Bi kịch gia đình tan vỡ và không có người thân thiết bên cạnh`,
+        `D. Bi kịch bị bọn cường hào địa chủ cướp đoạt hết ruộng đất canh tác`
+      ];
+      correct = 0;
+      explanation = `Cái chết của Chí Phèo ở cuối tác phẩm là lời tố cáo đanh thép xã hội cũ đã cướp đi nhân hình lẫn nhân tính của người nông dân nghèo, đẩy họ vào con đường lưu manh hóa rồi tước đoạt quyền sống lương thiện của họ.`;
+    }
+  } else if (['tieng-anh', 'tieng-phap', 'tieng-trung', 'tieng-duc', 'tieng-nhat', 'tieng-nga', 'tieng-han'].includes(subjectId)) {
+    if (subjectId === 'tieng-anh') {
+      if (qIdx === 0) {
+        question = `[Ngoại ngữ - Tiếng Anh 12] He bought a _______ car yesterday.`;
+        options = [`A. beautiful new Japanese`, `B. Japanese beautiful new`, `C. new beautiful Japanese`, `D. beautiful Japanese new`];
+        correct = 0;
+        explanation = `Trật tự tính từ chuẩn trong tiếng Anh: Opinion (beautiful) - Age (new) - Origin (Japanese) -> Công thức OSASCOMP.`;
+      } else if (qIdx === 1) {
+        question = `[Ngoại ngữ - Tiếng Anh 12] You are coming to the party tonight, _______?`;
+        options = [`A. aren't you`, `B. don't you`, `C. won't you`, `D. are you`];
+        correct = 0;
+        explanation = `Câu hỏi đuôi (Tag question): Mệnh đề chính khẳng định dùng động từ 'to be' là 'are' -> Đuôi phủ định tương ứng là 'aren't you'.`;
+      } else if (qIdx === 2) {
+        question = `[Ngoại ngữ - Tiếng Anh 11] When we arrived at the cinema, the movie _______ already started.`;
+        options = [`A. had`, `B. has`, `C. was`, `D. did`];
+        correct = 0;
+        explanation = `Thì quá khứ hoàn thành (Past Perfect) dùng diễn tả hành động xảy ra và hoàn thành trước một hành động khác trong quá khứ (arrived).`;
+      } else {
+        question = `[Ngoại ngữ - Tiếng Anh 11] If I _______ you, I would take that advanced vocabulary course.`;
+        options = [`A. were`, `B. am`, `C. had been`, `D. was`];
+        correct = 0;
+        explanation = `Câu điều kiện loại 2 diễn tả điều kiện trái thực tế ở hiện tại: If + S + V-quá khứ giả định (dùng 'were' cho mọi ngôi).`;
+      }
+    } else {
+      if (qIdx === 0) {
+        question = `[Ngoại ngữ - ${subjectId.toUpperCase()}] Chọn trật tự tính từ/từ vựng đúng để tạo thành một câu hoàn chỉnh?`;
+        options = [`A. Phương án có cấu trúc từ loại bổ nghĩa chuẩn xác nhất`, `B. Phương án bị đảo lộn trật tự cú pháp`, `C. Phương án dùng sai giới từ kết nối`, `D. Phương án thiếu thành phần chủ ngữ chính`];
+        correct = 0;
+        explanation = `Trong cấu trúc ngữ pháp ngoại ngữ, việc sắp xếp trật tự tính từ và danh từ tuân thủ nghiêm ngặt quy tắc ngữ pháp của quốc gia đó.`;
+      } else if (qIdx === 1) {
+        question = `[Ngoại ngữ - ${subjectId.toUpperCase()}] Cấu trúc câu hỏi xác nhận / câu hỏi đuôi thông dụng nhất là gì?`;
+        options = [`A. Sử dụng trợ từ / trợ động từ phủ định ở cuối câu`, `B. Lặp lại hoàn toàn cấu trúc câu khẳng định gốc`, `C. Sử dụng trạng từ chỉ thời gian tương lai`, `D. Chỉ cần thêm dấu chấm hỏi mà không thay đổi từ ngữ`];
+        correct = 0;
+        explanation = `Cú pháp câu hỏi xác nhận giúp người nói kiểm tra thông tin một cách tự nhiên và lịch sự.`;
+      } else if (qIdx === 2) {
+        question = `[Ngoại ngữ - ${subjectId.toUpperCase()}] Cách phối hợp các thì giữa một hành động đang xảy ra và một hành động xen vào là?`;
+        options = [`A. Hành động đang xảy ra dùng tiếp diễn, hành động xen vào dùng đơn`, `B. Cả hai hành động đều dùng thì tương lai đơn`, `C. Cả hai hành động đều dùng thì quá khứ hoàn thành`, `D. Hành động đang xảy ra dùng đơn, hành động xen vào dùng hoàn thành`];
+        correct = 0;
+        explanation = `Sự phối hợp thì giúp diễn tả trình tự thời gian chính xác của các sự kiện trong quá khứ.`;
+      } else {
+        question = `[Ngoại ngữ - ${subjectId.toUpperCase()}] Trong câu giả định trái thực tế ở hiện tại, động từ tobe thường được chia là gì?`;
+        options = [`A. Chia ở dạng giả định quá khứ (tương ứng với 'were')`, `B. Chia ở thì hiện tại đơn giản thông thường`, `C. Chia ở dạng nguyên mẫu có 'to'`, `D. Biến đổi hoàn toàn thành phân từ hai`];
+        correct = 0;
+        explanation = `Thể giả định diễn tả một giả thuyết không có thực ở hiện tại, thể hiện mong muốn hoặc khuyến nghị.`;
+      }
+    }
+  } else if (subjectId === 'lich-su') {
+    if (qIdx === 0) {
+      question = `[Lịch sử 12] Ý nghĩa quyết định và vĩ đại nhất của Hội nghị thành lập Đảng Cộng sản Việt Nam (đầu năm 1930) là gì?`;
+      options = [
+        `A. Chấm dứt thời kỳ khủng hoảng sâu sắc về đường lối và giai cấp lãnh đạo cách mạng Việt Nam`,
+        `B. Thành lập Mặt trận dân tộc thống nhất đầu tiên chống đế quốc`,
+        `C. Đánh dấu sự thất bại hoàn toàn của thực dân Pháp xâm lược`,
+        `D. Khai sinh ra nước Việt Nam Dân chủ Cộng hòa độc lập`
+      ];
+      correct = 0;
+      explanation = `Đảng ra đời đầu năm 1930 với Cương lĩnh chính trị đầu tiên đúng đắn đã giải quyết triệt để tình trạng khủng hoảng đường lối cứu nước kéo dài, đưa cách mạng bước vào giai đoạn phát triển tự giác.`;
+    } else if (qIdx === 1) {
+      question = `[Lịch sử 12] Thắng lợi quân sự nào của quân và dân ta đã đập tan hoàn toàn kế hoạch Nava của thực dân Pháp, quyết định thắng lợi kháng chiến?`;
+      options = [
+        `A. Chiến dịch lịch sử Điện Biên Phủ năm 1954`,
+        `B. Chiến dịch Biên giới Thu - Đông năm 1950`,
+        `C. Chiến dịch Việt Bắc Thu - Đông năm 1947`,
+        `D. Cuộc tổng tiến công và nổi dậy Xuân 1975`
+      ];
+      correct = 0;
+      explanation = `Chiến thắng Điện Biên Phủ "lừng lẫy năm châu, chấn động địa cầu" năm 1954 đã giáng đòn quyết định đập tan hoàn toàn kế hoạch Nava, buộc Pháp phải ký Hiệp định Giơ-ne-vơ lập lại hòa bình ở Đông Dương.`;
+    } else if (qIdx === 2) {
+      question = `[Lịch sử 11] Phong trào Cần Vương chống Pháp cuối thế kỷ XIX bùng nổ trực tiếp sau sự kiện lịch sử nào?`;
+      options = [
+        `A. Cuộc phản công tại kinh thành Huế của phe chủ chiến và Chiếu Cần Vương được ban dụ năm 1885`,
+        `B. Thực dân Pháp nổ súng tấn công bán đảo Sơn Trà (Đà Nẵng) năm 1858`,
+        `C. Triều đình nhà Nguyễn ký Hiệp ước Giáp Tuất đầu hàng Pháp năm 1874`,
+        `D. Cuộc khởi nghĩa Yên Thế bùng nổ mạnh mẽ tại Bắc Giang năm 1884`
+      ];
+      correct = 0;
+      explanation = `Sau cuộc phản công kinh thành Huế thất bại, Tôn Thất Thuyết đưa vua Hàm Nghi ra Tân Sở (Quảng Trị) và nhân danh nhà vua ban dụ Cần Vương kêu gọi văn thân, sĩ phu và nhân dân giúp vua cứu nước.`;
+    } else {
+      question = `[Lịch sử 12] Thắng lợi nào đã buộc Mỹ phải tuyên bố ngừng hoàn toàn mọi hoạt động chống phá miền Bắc và ký Hiệp định Paris (1973)?`;
+      options = [
+        `A. Chiến thắng "Điện Biên Phủ trên không" cuối năm 1972`,
+        `B. Cuộc Tổng tiến công và nổi dậy Tết Mậu Thân năm 1968`,
+        `C. Cuộc Tiến công chiến lược năm 1972 trên toàn miền Nam`,
+        `D. Chiến dịch giải phóng Tây Nguyên mùa xuân năm 1975`
+      ];
+      correct = 0;
+      explanation = `Đập tan cuộc tập kích đường không bằng pháo đài bay B-52 của Mỹ vào Hà Nội, Hải Phòng (12 ngày đêm cuối năm 1972), quân dân ta đã lập nên kỳ tích "Điện Biên Phủ trên không", buộc Mỹ phải ký Hiệp định Paris rút quân về nước.`;
+    }
+  } else if (subjectId === 'vat-ly') {
+    if (qIdx === 0) {
+      question = `[Vật lý 12] Một vật dao động điều hòa theo phương trình x = A*cos(ωt + φ). Đại lượng ω được gọi là gì?`;
+      options = [`A. Tần số góc của dao động`, `B. Pha ban đầu của dao động`, `C. Chu kỳ của dao động`, `D. Biên độ của dao động`];
+      correct = 0;
+      explanation = `Trong phương trình dao động điều hòa x = A*cos(ωt + φ), A là biên độ, ω là tần số góc, (ωt + φ) là pha dao động tại thời điểm t, φ là pha ban đầu.`;
+    } else if (qIdx === 1) {
+      question = `[Vật lý 11] Phát biểu nào sau đây biểu diễn đúng đắn nội dung Định luật Ôm đối với toàn mạch?`;
+      options = [
+        `A. Cường độ dòng điện tỉ lệ thuận with suất điện động của nguồn và tỉ lệ nghịch với điện trở toàn phần của mạch`,
+        `B. Cường độ dòng điện chỉ tỉ lệ nghịch với điện trở trong của nguồn điện`,
+        `C. Cường độ dòng điện tỉ lệ nghịch với suất điện động của nguồn điện`,
+        `D. Cường độ dòng điện tỉ lệ thuận với điện trở ngoài của mạch kín`
+      ];
+      correct = 0;
+      explanation = `Công thức định luật Ôm toàn mạch: I = ℰ / (R_ngoai + r_trong), nghĩa là cường độ dòng điện tỉ lệ thuận với suất điện động ℰ và tỉ lệ nghịch với điện trở toàn phần.`;
+    } else if (qIdx === 2) {
+      question = `[Vật lý 12] Trong thí nghiệm giao thoa ánh sáng Young, khoảng cách giữa hai vân sáng liên tiếp (khoảng vân i) được tính bằng công thức nào?`;
+      options = [`A. i = λD / a`, `B. i = λa / D`, `C. i = aD / λ`, `D. i = λ / (aD)`];
+      correct = 0;
+      explanation = `Khoảng vân i là khoảng cách giữa hai vân sáng hoặc hai vân tối liên tiếp trên màn quan sát, có công thức tính là: i = λD/a.`;
+    } else {
+      question = `[Vật lý 11] Theo định luật cảm ứng điện từ Faraday, độ lớn của suất điện động cảm ứng xuất hiện trong mạch kín tỉ lệ thuận với đại lượng nào?`;
+      options = [
+        `A. Tốc độ biến thiên từ thông qua mạch kín đó`,
+        `B. Độ lớn của từ trường bao quanh mạch kín`,
+        `C. Diện tích mặt phẳng của vòng dây dẫn`,
+        `D. Điện trở thuần của đoạn dây dẫn làm mạch`
+      ];
+      correct = 0;
+      explanation = `Hệ thức Faraday: |e_c| = |ΔΦ / Δt|, suất điện động cảm ứng tỉ lệ thuận với tốc độ biến thiên từ thông qua mạch kín (ΔΦ/Δt là tốc độ biến thiên từ thông).`;
+    }
+  } else if (subjectId === 'hoa-hoc') {
+    if (qIdx === 0) {
+      question = `[Hóa học 12] Chất hữu cơ nào sau đây thuộc nhóm este, có mùi thơm quả chín và có công thức CH₃COOC₂H₅?`;
+      options = [`A. Etyl axetat`, `B. Metyl fomat`, `C. Metyl axetat`, `D. Vinyl axetat`];
+      correct = 0;
+      explanation = `CH₃COOC₂H₅ là công thức của este Etyl axetat, thủy phân tạo ra axit axetic (CH₃COOH) và ancol etylic (C₂H₅OH).`;
+    } else if (qIdx === 1) {
+      question = `[Hóa học 12] Thí nghiệm nào sau đây dùng để chứng minh glucozơ (C₆H₁₂O₆) có chứa nhóm chức anđehit (-CHO) trong phân tử?`;
+      options = [
+        `A. Thực hiện phản ứng tráng bạc với dung dịch AgNO₃ trong NH₃`,
+        `B. Cho glucozơ phản ứng với kim loại kiềm Natri giải phóng H₂`,
+        `C. Đun nóng dung dịch glucozơ với axit sunfuric loãng`,
+        `D. Thực hiện phản ứng lên men rượu tạo ra khí cacbonic`
+      ];
+      correct = 0;
+      explanation = `Glucozơ có chứa nhóm chức anđehit (-CHO) ở dạng mạch hở nên có khả năng khử phức bạc amoniac tạo ra kết tủa bạc bám vào thành ống nghiệm (phản ứng tráng bạc).`;
+    } else if (qIdx === 2) {
+      question = `[Hóa học 11] Axit nitric (HNO₃) đặc, nguội có thể bị thụ động hóa (không phản ứng) với những kim loại nào sau đây?`;
+      options = [`A. Al, Fe, Cr`, `B. Cu, Ag, Au`, `C. Na, K, Ca`, `D. Mg, Zn, Pb`];
+      correct = 0;
+      explanation = `Các kim loại Nhôm (Al), Sắt (Fe) và Crom (Cr) bị thụ động hóa trong dung dịch axit HNO₃ đặc, nguội và H₂SO₄ đặc, nguội do tạo ra màng oxit bền vững bảo vệ bề mặt kim loại.`;
+    } else {
+      question = `[Hóa học 11] Khi cho ancol etylic (C₂H₅OH) tác dụng trực tiếp với kim loại kiềm Natri (Na) dư, hiện tượng quan sát được là gì?`;
+      options = [
+        `A. Kim loại Na tan dần và có bọt khí không màu thoát ra mạnh mẽ`,
+        `B. Xuất hiện kết tủa màu xanh lam dưới đáy ống nghiệm`,
+        `C. Dung dịch chuyển sang màu đỏ sẫm và tỏa nhiều khói đen`,
+        `D. Không xảy ra bất kỳ hiện tượng hay phản ứng hóa học nào`
+      ];
+      correct = 0;
+      explanation = `Ancol etylic có nhóm -OH linh động nên phản ứng thế nguyên tử H của nhóm -OH bằng kim loại kiềm giải phóng khí hiđrô: 2C₂H₅OH + 2Na -> 2C₂H₅ONa + H₂↑.`;
+    }
+  } else if (subjectId === 'sinh-hoc') {
+    if (qIdx === 0) {
+      question = `[Sinh học 12] Quá trình tự nhân đôi (tái bản) của phân tử ADN kép diễn ra dựa trên những nguyên tắc cốt lõi nào?`;
+      options = [
+        `A. Nguyên tắc bổ sung và nguyên tắc bán bảo toàn`,
+        `B. Nguyên tắc một chiều và nguyên tắc tự do`,
+        `C. Nguyên tắc phân ly độc lập và tổ hợp tự do`,
+        `D. Nguyên tắc bổ sung và nguyên tắc thoái hóa`
+      ];
+      correct = 0;
+      explanation = `Nhân đôi ADN diễn ra theo nguyên tắc bổ sung (A-T, G-X) và bán bảo toàn (giữ lại một nửa: trong mỗi phân tử ADN con có một mạch của ADN mẹ và một mạch mới tổng hợp).`;
+    } else if (qIdx === 1) {
+      question = `[Sinh học 12] Theo thuyết tiến hóa hiện đại, nhân tố tiến hóa nào sau đây có vai trò định hướng quá trình tích lũy biến dị có lợi?`;
+      options = [`A. Chọn lọc tự nhiên`, `B. Các yếu tố ngẫu nhiên`, `C. Đột biến gen`, `D. Di - nhập gen`];
+      correct = 0;
+      explanation = `Chọn lọc tự nhiên là nhân tố tiến hóa duy nhất có hướng, giữ lại các kiểu gen thích nghi và đào thải kiểu gen kém thích nghi, định hướng tiến hóa thích nghi.`;
+    } else if (qIdx === 2) {
+      question = `[Sinh học 11] Vai trò cốt lõi của quá trình quang hợp ở thực vật đối với toàn bộ sự sống trên Trái Đất là gì?`;
+      options = [
+        `A. Chuyển hóa quang năng thành hóa năng trong chất hữu cơ, cung cấp nguồn thức ăn và O₂ giải phóng ra khí quyển`,
+        `B. Chuyển hóa toàn bộ năng lượng ATP thành năng lượng nhiệt tỏa ra không gian`,
+        `C. Phân giải các chất hữu cơ phức tạp thành chất vô cơ đơn giản trả lại môi trường`,
+        `D. Hấp thụ khí ôxi và giải phóng khí cacbonic duy trì chu trình tuần hoàn khí`
+      ];
+      correct = 0;
+      explanation = `Quang hợp sử dụng năng lượng ánh sáng mặt trời để tổng hợp chất hữu cơ (cacbohiđrat) từ CO₂ và H₂O, đồng thời giải phóng O₂, cung cấp năng lượng và dưỡng khí nuôi sống sinh giới.`;
+    } else {
+      question = `[Sinh học 11] Ở động vật có hệ tuần hoàn kép (như thú, chim), máu đi nuôi cơ thể là loại máu nào và xuất phát từ đâu?`;
+      options = [
+        `A. Máu giàu O₂ (đỏ tươi), xuất phát từ tâm thất trái`,
+        `B. Máu giàu CO₂ (đỏ thẫm), xuất phát từ tâm nhĩ phải`,
+        `C. Máu pha trộn, xuất phát từ tâm thất chung của tim`,
+        `D. Máu nghèo dinh dưỡng, xuất phát từ tâm thất phải`
+      ];
+      correct = 0;
+      explanation = `Ở chim và thú, tim có 4 ngăn hoàn chỉnh, máu đi nuôi cơ thể là máu đỏ tươi giàu O₂ đi ra từ tâm thất trái qua động mạch chủ, bảo đảm hiệu suất trao đổi chất cao nhất.`;
+    }
+  } else if (subjectId === 'dia-ly') {
+    if (qIdx === 0) {
+      question = `[Địa lý 12] Lãnh thổ nước ta nằm hoàn toàn trong vùng nội chí tuyến bán cầu Bắc nên khí hậu có đặc điểm nào?`;
+      options = [
+        `A. Tổng bức xạ lớn, cán cân bức xạ luôn dương và nhiệt độ trung bình năm cao`,
+        `B. Thường xuyên chịu ảnh hưởng của các khối khí cực lạnh giá từ phương Bắc`,
+        `C. Lượng mưa cực kỳ thấp dẫn đến hình thành các hoang mạc cát lớn`,
+        `D. Biên độ nhiệt ngày đêm và các mùa trong năm hoàn toàn bằng không`
+      ];
+      correct = 0;
+      explanation = `Nằm trong vùng nội chí tuyến bán cầu Bắc mang lại cho nước ta nguồn nhiệt dồi dào, cán cân bức xạ quanh năm dương và nhiệt độ trung bình năm vượt trên 20°C (trừ vùng núi cao).`;
+    } else if (qIdx === 1) {
+      question = `[Địa lý 12] Vùng kinh tế nào của nước ta hiện nay đang dẫn đầu về giá trị sản xuất công nghiệp và thu hút vốn đầu tư FDI lớn nhất?`;
+      options = [`A. Đông Nam Bộ`, `B. Đồng bằng sông Hồng`, `C. Duyên hải Nam Trung Bộ`, `D. Đồng bằng sông Cửu Long`];
+      correct = 0;
+      explanation = `Đông Nam Bộ là vùng kinh tế động lực phát triển năng động nhất cả nước, hội tụ đầy đủ thế mạnh về vị trí, hạ tầng, lao động kỹ thuật và chính sách thu hút FDI vượt trội.`;
+    } else if (qIdx === 2) {
+      question = `[Địa lý 11] Mục tiêu cốt lõi của Hiệp hội các quốc gia Đông Nam Á (ASEAN) khi thành lập và phát triển là gì?`;
+      options = [
+        `A. Thúc đẩy hòa bình, ổn định, hợp tác kinh tế, văn hóa và phát triển tiến bộ xã hội giữa các nước thành viên`,
+        `B. Xây dựng một liên minh quân sự khép kín nhằm đối đầu trực tiếp với các khối ngoài khu vực`,
+        `C. Thiết lập một quốc gia liên bang duy nhất sử dụng chung một hiến pháp và đồng tiền`,
+        `D. Xóa bỏ hoàn toàn biên giới hành chính quốc gia của tất cả các nước thành viên`
+      ];
+      correct = 0;
+      explanation = `ASEAN được thành lập nhằm thúc đẩy sự tăng trưởng kinh tế, tiến bộ xã hội và phát triển văn hóa trong khu vực thông qua các nỗ lực chung trên tinh thần bình đẳng và hợp tác hữu nghị.`;
+    } else {
+      question = `[Địa lý 11] Tổ chức liên kết kinh tế - chính trị khu vực nào được đánh giá là thành công và chặt chẽ nhất thế giới hiện nay?`;
+      options = [
+        `A. Liên minh châu Âu (EU)`,
+        `B. Diễn đàn Hợp tác Kinh tế châu Á - Thái Bình Dương (APEC)`,
+        `C. Hiệp hội các quốc gia Đông Nam Á (ASEAN)`,
+        `D. Tổ chức Thương mại Thế giới (WTO)`
+      ];
+      correct = 0;
+      explanation = `Liên minh châu Âu (EU) là mô hình liên kết toàn diện từ kinh tế, tiền tệ (đồng Euro), pháp luật đến chính trị xã hội, hình thành một thị trường chung tự do lưu thông hàng hóa, dịch vụ, con người và tiền tệ.`;
+    }
+  } else if (subjectId === 'gdktepl') {
+    if (qIdx === 0) {
+      question = `[GD Kinh tế & Pháp luật 11] Quy luật kinh tế nào chi phối trực tiếp mối quan hệ giữa người bán và người mua, quyết định giá cả thị trường?`;
+      options = [`A. Quy luật cung - cầu`, `B. Quy luật giá trị thặng dư`, `C. Quy luật lưu thông tiền tệ`, `D. Quy luật cạnh tranh độc quyền`];
+      correct = 0;
+      explanation = `Quy luật cung - cầu điều tiết trực tiếp hành vi kinh doanh của người bán và nhu cầu mua sắm của người mua, từ đó hình thành nên giá cả cân bằng trên thị trường tự do.`;
+    } else if (qIdx === 1) {
+      question = `[GD Kinh tế & Pháp luật 12] Theo quy định pháp luật, không ai bị bắt nếu không có quyết định của Tòa án hoặc phê chuẩn của Viện kiểm sát thể hiện quyền nào?`;
+      options = [
+        `A. Quyền bất khả xâm phạm về thân thể của công dân`,
+        `B. Quyền được pháp luật bảo hộ về tính mạng, sức khỏe`,
+        `C. Quyền tự do cư trú và đi lại hợp pháp của công dân`,
+        `D. Quyền bình đẳng trước pháp luật không phân biệt đối xử`
+      ];
+      correct = 0;
+      explanation = `Quyền bất khả xâm phạm về thân thể quy định rõ: không một cơ quan, cá nhân nào được tự ý bắt, giam giữ người nếu không có quyết định phê chuẩn đúng thẩm quyền tố tụng tư pháp pháp luật.`;
+    } else if (qIdx === 2) {
+      question = `[GD Kinh tế & Pháp luật 12] Quyền dân chủ cơ bản nào giúp công dân từ đủ 18 tuổi trở lên trực tiếp tham gia vào việc thành lập các cơ quan quyền lực nhà nước?`;
+      options = [`A. Quyền bầu cử`, `B. Quyền ứng cử tự do`, `C. Quyền khiếu nại, tố cáo`, `D. Quyền tự do ngôn luận`];
+      correct = 0;
+      explanation = `Quyền bầu cử là quyền dân chủ cơ bản của công dân Việt Nam từ đủ 18 tuổi trở lên, thể hiện ý chí và quyền làm chủ của nhân dân đối với đất nước.`;
+    } else {
+      question = `[GD Kinh tế & Pháp luật 11] Hiện tượng mức giá chung của các mặt hàng và dịch vụ tăng lên một cách liên tục theo thời gian được gọi là gì?`;
+      options = [`A. Lạm phát`, `B. Giảm phát`, `C. Thất nghiệp`, `D. Khủng hoảng kinh tế`];
+      correct = 0;
+      explanation = `Lạm phát là hiện tượng tăng mức giá chung một cách liên tục của hàng hóa và dịch vụ theo thời gian, làm giảm sức mua của đồng tiền tệ xã hội.`;
+    }
+  } else if (subjectId === 'tin-hoc') {
+    if (qIdx === 0) {
+      question = `[Tin học 12] Trong một bảng dữ liệu của hệ CSDL quan hệ, thuộc tính dùng để xác định duy nhất một bản ghi được gọi là gì?`;
+      options = [`A. Khóa chính (Primary Key)`, `B. Khóa ngoài (Foreign Key)`, `C. Trường dữ liệu chính`, `D. Chỉ mục liên kết`];
+      correct = 0;
+      explanation = `Khóa chính (Primary Key) là một hoặc một tập hợp thuộc tính có giá trị không rỗng và duy nhất trong một bảng, dùng để định danh duy nhất cho từng bản ghi (dòng).`;
+    } else if (qIdx === 1) {
+      question = `[Tin học 12] Hệ quản trị cơ sở dữ liệu quan hệ (RDBMS) là loại phần mềm có chức năng cốt lõi nào?`;
+      options = [
+        `A. Cung cấp môi trường để tạo lập, lưu trữ, cập nhật và khai thác thông tin từ cơ sở dữ liệu quan hệ`,
+        `B. Là hệ điều hành dùng để điều khiển hoạt động của các máy tính thế hệ mới`,
+        `C. Dùng để biên dịch các chương trình ngôn ngữ Python sang mã máy trực tiếp`,
+        `D. Công cụ thiết kế đồ họa 3D chuyển động chuyên nghiệp cho kỹ sư phần mềm`
+      ];
+      correct = 0;
+      explanation = `Hệ quản trị CSDL quan hệ cung cấp các công cụ khai thác thông tin, bảo mật dữ liệu, xử lý tranh chấp dữ liệu và đảm bảo tính toàn vẹn thông tin một cách tối ưu.`;
+    } else if (qIdx === 2) {
+      question = `[Tin học 11] Trong ngôn ngữ lập trình Python, vòng lặp "while" được sử dụng tối ưu trong trường hợp nào?`;
+      options = [
+        `A. Khi số lần lặp của khối lệnh chưa được biết trước và phụ thuộc vào điều kiện kiểm tra`,
+        `B. Khi số lần lặp của khối lệnh đã được xác định trước một cách cố định`,
+        `C. Khi cần định nghĩa một hàm chức năng mới trong thư viện`,
+        `D. Khi cần khai báo danh sách các biến số nguyên cục bộ`
+      ];
+      correct = 0;
+      explanation = `Vòng lặp "while" liên tục thực thi khối lệnh bên trong chừng nào điều kiện kiểm tra còn nhận giá trị True. Phù hợp cho bài toán lặp với số lần chưa biết trước.`;
+    } else {
+      question = `[Tin học 11] Giao thức chuẩn TCP/IP hoạt động trên mạng Internet giữ vai trò quan trọng nào sau đây?`;
+      options = [
+        `A. Định nghĩa quy tắc truyền tải, đóng gói dữ liệu và định tuyến gói tin chính xác giữa các thiết bị trên mạng`,
+        `B. Tự động nâng cấp cấu hình phần cứng máy tính lên phiên bản mạnh mẽ hơn`,
+        `C. Diệt trừ tất cả các mã độc ẩn chứa trong các tệp tin lưu trữ cục bộ`,
+        `D. Tạo ra kết nối mạng có tốc độ ánh sáng truyền qua dây dẫn đồng bình thường`
+      ];
+      correct = 0;
+      explanation = `TCP/IP là bộ giao thức truyền thông chuẩn giúp thiết lập quy chuẩn kết nối, truyền tải dữ liệu, phân mảnh và đóng gói các gói tin để chuyển đi chính xác trong mạng toàn cầu.`;
+    }
+  } else if (subjectId === 'cn-cong-nghiep') {
+    if (qIdx === 0) {
+      question = `[Công nghệ 11 - Cơ khí] Trong động cơ đốt trong 4 kỳ kì nào là kì duy nhất sinh công lực đẩy pittông chuyển động?`;
+      options = [`A. Kỳ cháy - giãn nở (Kỳ nổ)`, `B. Kỳ nạp nhiên liệu`, `C. Kỳ nén hỗn hợp`, `D. Kỳ thải khí sạch`];
+      correct = 0;
+      explanation = `Chu trình hoạt động của động cơ 4 kỳ gồm: Nạp - Nén - Nổ (cháy giãn nở) - Thải. Trong đó, chỉ có kỳ Nổ là kỳ sinh công lực đẩy pít-tông đi xuống làm quay trục khuỷu.`;
+    } else if (qIdx === 1) {
+      question = `[Công nghệ 12 - Điện] Linh kiện điện tử bán dẫn có tiếp giáp p-n, chỉ cho dòng điện đi qua một chiều duy nhất là linh kiện nào?`;
+      options = [`A. Điốt bán dẫn (Diode)`, `B. Điện trở thuần`, `C. Tụ điện hóa học`, `D. Tranzito bán dẫn`];
+      correct = 0;
+      explanation = `Điốt bán dẫn cấu tạo từ một lớp tiếp giáp p-n, có đặc tính dẫn điện đơn hướng (chỉ cho dòng điện chạy từ Anốt sang Catốt), thường dùng chỉnh lưu dòng điện xoay chiều.`;
+    } else if (qIdx === 2) {
+      question = `[Công nghệ 11 - Vẽ kỹ thuật] Trong phương pháp chiếu góc thứ nhất của bản vẽ kỹ thuật, vị trí của hình chiếu bằng được bố trí ở đâu?`;
+      options = [
+        `A. Ở dưới hình chiếu đứng`,
+        `B. Ở trên hình chiếu đứng`,
+        `C. Ở bên phải hình chiếu đứng`,
+        `D. Ở bên trái hình chiếu đứng`
+      ];
+      correct = 0;
+      explanation = `Tiêu chuẩn vẽ kỹ thuật quy định: trong chiếu góc thứ nhất, hình chiếu bằng nằm dưới hình chiếu đứng, hình chiếu cạnh nằm bên phải hình chiếu đứng.`;
+    } else {
+      question = `[Công nghệ 12 - Điện] Thiết bị điện tự động đóng ngắt mạch điện khi xảy ra sự cố quá tải hoặc ngắn mạch trong gia đình là?`;
+      options = [`A. Aptomat (Cầu dao tự động)`, `B. Công tắc xoay chiều`, `C. Biến áp tự ngẫu`, `D. Rơle thời gian`];
+      correct = 0;
+      explanation = `Aptomat (MCB/MCCB) là thiết bị bảo vệ tối ưu, tự động ngắt nguồn điện khi phát hiện dòng điện vượt ngưỡng an toàn (quá tải) hoặc có chập mạch (ngắn mạch).`;
+    }
+  } else {
+    if (qIdx === 0) {
+      question = `[Công nghệ 10 - Nông nghiệp] Phân bón vô cơ hỗn hợp NPK cung cấp cho cây trồng những nguyên tố dinh dưỡng đa lượng thiết yếu nào?`;
+      options = [
+        `A. Nitơ (Đạm), Phốtpho (Lân), Kali`,
+        `B. Natri, Phốtpho, Canxi`,
+        `C. Cacbon, Hiđrô, Ôxi`,
+        `D. Sắt, Đồng, Kẽm`
+      ];
+      correct = 0;
+      explanation = `NPK là viết tắt ký hiệu hóa học của Đạm (N), Lân (P) và Kali (K). Đây là ba nguyên tố đa lượng quan trọng nhất thúc đẩy cây sinh trưởng, đẻ nhánh và ra hoa nuôi trái.`;
+    } else if (qIdx === 1) {
+      question = `[Công nghệ 11 - Nông nghiệp] Ưu điểm lớn nhất của phương pháp giâm cành so với gieo hạt truyền thống trong nhân giống cây trồng là gì?`;
+      options = [
+        `A. Giữ nguyên vẹn các đặc tính di truyền quý báu của cây mẹ và cho thu hoạch nhanh hơn`,
+        `B. Tạo ra nhiều biến dị tổ hợp mới lạ phục vụ chọn giống nâng cao`,
+        `C. Cây giống có bộ rễ cọc cắm sâu vào lòng đất chắc chắn hơn`,
+        `D. Không cần tốn công tưới nước chăm sóc giai đoạn đầu gieo trồng`
+      ];
+      correct = 0;
+      explanation = `Giâm cành là phương thức sinh sản vô tính, cây con được sinh ra từ tế bào sinh dưỡng của cây mẹ nên bảo tồn hoàn hảo kiểu gen và tính trạng tốt của cây mẹ.`;
+    } else if (qIdx === 2) {
+      question = `[Công nghệ 10 - Nông nghiệp] Biện pháp đấu tranh sinh học bảo vệ thực vật sử dụng loài sinh vật nào dưới đây để tiêu diệt sâu hại vườn?`;
+      options = [
+        `A. Các loài thiên địch tự nhiên (như bọ rùa, ong ký sinh, chim ăn sâu)`,
+        `B. Các giống sâu bọ có khả năng kháng thuốc trừ sâu hóa học`,
+        `C. Các sinh vật ngoại lai có tốc độ sinh sản cực nhanh xâm lấn`,
+        `D. Các loài vi khuẩn gây thối rễ hàng loạt trên diện rộng`
+      ];
+      correct = 0;
+      explanation = `Đấu tranh sinh học dùng thiên địch khống chế số lượng sâu hại dưới ngưỡng gây hại, đây là xu hướng nông nghiệp sạch bền vững, không gây ô nhiễm môi trường và nông sản.`;
+    } else {
+      question = `[Công nghệ 11 - Nông nghiệp] Mô hình canh tác rau sạch trong nhà màng mang lại lợi ích công nghệ nổi bật nào sau đây?`;
+      options = [
+        `A. Tránh các tác động bất lợi của thời tiết bão gió và ngăn chặn côn trùng phá hoại, giảm tối đa phun thuốc hóa học`,
+        `B. Giúp cây trồng phát triển hoàn toàn mà không cần đến ánh sáng mặt trời tự nhiên`,
+        `C. Loại bỏ hoàn toàn sự cần thiết của việc bón phân vi sinh định kỳ`,
+        `D. Thích hợp cho việc trồng cây đại thụ lâu năm lấy gỗ xuất khẩu`
+      ];
+      correct = 0;
+      explanation = `Nhà màng (nhà kính) tạo ra môi trường vi khí hậu tối ưu, ngăn chặn chim thú và côn trùng phá hoại hiệu quả, giúp sản xuất rau quả hữu cơ sạch, an toàn chất lượng cao.`;
+    }
+  }
+
+  // Để tránh cảnh báo no-unused-vars khi build
+  if (false) {
+    _generateQuestion_old(subjectId, index);
+  }
+
+  return { question, options, correct, explanation };
+}
+
+function _generateQuestion_old(subjectId: string, index: number) {
   let question = "";
   let options: string[] = [];
   let correct = 0;
@@ -863,6 +1306,19 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
     return map;
   });
 
+  const [attemptsMap, setAttemptsMap] = useState<Record<string, number>>(() => {
+    const map: Record<string, number> = {};
+    SUBJECTS.forEach(sub => {
+      try {
+        const saved = localStorage.getItem(`user_attempts_${sub.id}`);
+        map[sub.id] = saved ? Number(saved) : 0;
+      } catch {
+        map[sub.id] = 0;
+      }
+    });
+    return map;
+  });
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [selectedAns, setSelectedAns] = useState<number | null>(null);
   const [hasAnswered, setHasAnswered] = useState(false);
@@ -890,7 +1346,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
       const userRef = doc(db, 'exam_leaderboard', uid);
       setDoc(userRef, {
         uid,
-        displayName: displayName || "Học bá ẩn danh",
+        displayName: displayName || "Sĩ tử ẩn danh",
         avatarUrl: avatarUrl || "",
         score: examScore,
         updatedAt: new Date()
@@ -907,33 +1363,11 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
         list.push(docSnap.data());
       });
       
-      const mockData = [
-        { displayName: "Hạ Thiên (Học Bá)", score: 480, avatarUrl: "" },
-        { displayName: "Mộ Dung Tuyết (Hội Trưởng)", score: 450, avatarUrl: "" },
-        { displayName: "Lâm Nhất (Thủ Khoa)", score: 420, avatarUrl: "" },
-        { displayName: "Diệp Giao (Lớp Trưởng)", score: 390, avatarUrl: "" },
-        { displayName: "Chucu đáng yêu", score: 300, avatarUrl: "" }
-      ];
-
-      const merged = [...list];
-      mockData.forEach(mock => {
-        if (!merged.some(m => m.displayName === mock.displayName || m.uid === mock.displayName)) {
-          merged.push(mock);
-        }
-      });
-
-      merged.sort((a, b) => b.score - a.score);
-      setLeaderboard(merged.slice(0, 5));
+      list.sort((a, b) => b.score - a.score);
+      setLeaderboard(list.slice(0, 10));
     }, (err) => {
       console.error("Error loading leaderboard:", err);
-      const mockData = [
-        { displayName: "Hạ Thiên (Học Bá)", score: 480, avatarUrl: "" },
-        { displayName: "Mộ Dung Tuyết (Hội Trưởng)", score: 450, avatarUrl: "" },
-        { displayName: "Lâm Nhất (Thủ Khoa)", score: 420, avatarUrl: "" },
-        { displayName: "Diệp Giao (Lớp Trưởng)", score: 390, avatarUrl: "" },
-        { displayName: "Chucu đáng yêu", score: 300, avatarUrl: "" }
-      ];
-      setLeaderboard(mockData);
+      setLeaderboard([]);
     });
 
     return () => unsubscribe();
@@ -944,6 +1378,16 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
     setSelectedAns(index);
     setHasAnswered(true);
     
+    // Tăng tổng số câu đã làm của môn này lên 1
+    const currentAttempts = attemptsMap[selectedSubject] || 0;
+    const newAttempts = currentAttempts + 1;
+    const updatedAttemptsMap = {
+      ...attemptsMap,
+      [selectedSubject]: newAttempts
+    };
+    setAttemptsMap(updatedAttemptsMap);
+    localStorage.setItem(`user_attempts_${selectedSubject}`, String(newAttempts));
+
     const currentQ = generateQuestion(selectedSubject, currentQuestionIndex);
     if (index === currentQ.correct) {
       const newScore = examScore + 10;
@@ -981,29 +1425,51 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
     };
     setAnsweredMap(newMap);
     localStorage.setItem(`user_answered_questions_${selectedSubject}`, JSON.stringify([]));
+
+    const newAttemptsMap = {
+      ...attemptsMap,
+      [selectedSubject]: 0
+    };
+    setAttemptsMap(newAttemptsMap);
+    localStorage.setItem(`user_attempts_${selectedSubject}`, '0');
+
     setCurrentQuestionIndex(0);
     setSelectedAns(null);
     setHasAnswered(false);
   };
 
-  // 4. Giả lập thị trường tài chính đơn giản cho sĩ tử tự học
-  const [marketPrices, setMarketPrices] = useState([
-    { code: "HBA", name: "Chỉ số Học Bá", price: 15.20, change: 3.5, desc: "Đo lường mức độ tiếp thu kiến thức và luyện đề của bạn." },
-    { code: "SKH", name: "Chỉ số Sức Khỏe", price: 12.80, change: 1.2, desc: "Đo lường chế độ sinh hoạt và mức độ cân bằng thể chất." },
-    { code: "TLY", name: "Tâm Lý Sĩ Tử", price: 10.50, change: -0.5, desc: "Đo lường mức độ vững vàng trước áp lực thi cử lớp 12." }
-  ]);
+  // 4. Biến động điểm số của sĩ tử tự học ở các môn ÔN THI ĐẠI HỌC
+  const mainSubjectsList = [
+    { id: 'toan', code: 'TOÁN', name: 'Môn Toán' },
+    { id: 'van', code: 'VĂN', name: 'Ngữ văn' },
+    { id: 'tieng-anh', code: 'ANH', name: 'Tiếng Anh' },
+    { id: 'lich-su', code: 'SỬ', name: 'Lịch sử' },
+    { id: 'vat-ly', code: 'LÝ', name: 'Vật lý' },
+    { id: 'hoa-hoc', code: 'HÓA', name: 'Hóa học' },
+    { id: 'sinh-hoc', code: 'SINH', name: 'Sinh học' },
+    { id: 'dia-ly', code: 'ĐỊA', name: 'Địa lý' },
+  ];
+
+  const [forecastTrends, setForecastTrends] = useState<Record<string, number>>({
+    toan: 1.2,
+    van: 0.5,
+    'tieng-anh': 2.1,
+    'lich-su': 1.0,
+    'vat-ly': -0.8,
+    'hoa-hoc': 1.5,
+    'sinh-hoc': 0.8,
+    'dia-ly': 1.1,
+  });
 
   const updateMarketPrice = () => {
-    setMarketPrices(prev => prev.map(stock => {
-      const deltaPercent = (Math.random() * 6 - 2.8); // -2.8% to +3.2%
-      const newChange = parseFloat((stock.change + deltaPercent / 1.5).toFixed(1));
-      const newPrice = parseFloat((stock.price * (1 + deltaPercent / 100)).toFixed(2));
-      return {
-        ...stock,
-        price: newPrice < 1 ? 1.00 : newPrice,
-        change: newChange
-      };
-    }));
+    setForecastTrends(prev => {
+      const next: Record<string, number> = {};
+      mainSubjectsList.forEach(sub => {
+        const delta = parseFloat((Math.random() * 5 - 2.3).toFixed(1)); // -2.3% đến +2.7%
+        next[sub.id] = parseFloat((Math.min(Math.max((prev[sub.id] || 0) + delta, -15), 15)).toFixed(1));
+      });
+      return next;
+    });
   };
 
   // 5. Gom cụm chương cho danh sách chương cực kỳ nhiều
@@ -1023,6 +1489,22 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
   const displayedChapters = searchChapterNum.trim()
     ? sortedChapters.filter(chap => chap.title?.toLowerCase().includes(searchChapterNum.trim().toLowerCase()))
     : sortedChapters.slice(selectedGroup * GROUP_SIZE, (selectedGroup + 1) * GROUP_SIZE);
+
+  // Tính toán chỉ số đúng sai cho môn học đang chọn
+  const selectedSubjectCorrect = (answeredMap[selectedSubject] || []).length;
+  const selectedSubjectAttempts = attemptsMap[selectedSubject] || 0;
+  const selectedSubjectWrong = selectedSubjectAttempts - selectedSubjectCorrect;
+  const selectedSubjectRate = selectedSubjectAttempts > 0 ? parseFloat(((selectedSubjectCorrect / selectedSubjectAttempts) * 100).toFixed(1)) : 0.0;
+  const selectedSubjectWrongRate = selectedSubjectAttempts > 0 ? parseFloat((100 - selectedSubjectRate).toFixed(1)) : 0.0;
+
+  // Tính tổng quan tất cả các môn
+  let totalAllCorrect = 0;
+  let totalAllAttempts = 0;
+  SUBJECTS.forEach(sub => {
+    totalAllCorrect += (answeredMap[sub.id] || []).length;
+    totalAllAttempts += attemptsMap[sub.id] || 0;
+  });
+  const totalAllRate = totalAllAttempts > 0 ? parseFloat(((totalAllCorrect / totalAllAttempts) * 100).toFixed(1)) : 0.0;
 
   return (
     <div className="w-full min-h-screen bg-[#0D121D] text-[#ECEFF4] font-lora selection:bg-[#A2B6CD]/30 selection:text-[#ECEFF4] relative overflow-hidden pb-16">
@@ -1105,73 +1587,109 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
               </div>
             )}
             
-            {/* INDICATORS CARD */}
+            {/* INDICATORS CARD -> CHỈ SỐ ĐÚNG SAI */}
             <div className="border border-[#2D3D54]/30 bg-[#151C28] p-4 rounded-xl relative shadow-lg text-[#ECEFF4]">
-              <div className="absolute top-1 right-2 p-1 text-[#A2B6CD]/20 font-alegreya text-3xl font-bold select-none pointer-events-none">
-                35.8°C
+              <div className="absolute top-1 right-2 p-1 text-[#A2B6CD]/20 font-alegreya text-2xl font-bold select-none pointer-events-none">
+                {selectedSubjectRate}%
               </div>
               <h2 className="text-xs font-lora tracking-widest text-[#A2B6CD] uppercase border-b border-[#2D3D54]/40 pb-2 mb-4 flex items-center gap-2 font-bold">
-                <Heart className="w-3.5 h-3.5 text-[#A2B6CD] animate-pulse" /> CHỈ SỐ SỨC KHỎE
+                <BarChart2 className="w-3.5 h-3.5 text-[#A2B6CD]" /> CHỈ SỐ ĐÚNG SAI
               </h2>
               
               <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#ECEFF4]/70 font-lora">Nhịp tim (Heart Rate):</span>
-                  <span className="text-sm font-lora font-bold text-[#ECEFF4] flex items-center gap-1">
-                    <Activity className="w-3.5 h-3.5 text-[#A2B6CD] animate-pulse" />
-                    {heartRate} BPM
-                  </span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-[#ECEFF4]/70 font-lora font-semibold">Môn đang chọn: {SUBJECTS.find(s => s.id === selectedSubject)?.name}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-1 text-[11px]">
+                    <span className="text-[#ECEFF4]/60">Đã làm: {selectedSubjectAttempts} câu</span>
+                    <span className="text-[#A2B6CD] font-bold">Tỉ lệ đúng: {selectedSubjectRate}%</span>
+                  </div>
                 </div>
-                <div className="w-full bg-[#101622]/40 h-1.5 rounded-full overflow-hidden">
+
+                {/* Thanh tỉ lệ đúng sai của môn đang chọn */}
+                <div className="w-full bg-red-950/40 h-2 rounded-full overflow-hidden flex">
                   <div 
-                    className="bg-[#A2B6CD] h-full transition-all duration-1000" 
-                    style={{ width: `${Math.min(Math.max((heartRate - 50) * 3, 20), 100)}%` }} 
+                    className="bg-[#A2B6CD] h-full transition-all duration-500" 
+                    style={{ width: `${selectedSubjectRate}%` }} 
+                    title={`Đúng: ${selectedSubjectRate}%`}
+                  />
+                  <div 
+                    className="bg-red-500/60 h-full transition-all duration-500" 
+                    style={{ width: `${selectedSubjectWrongRate}%` }} 
+                    title={`Sai: ${selectedSubjectWrongRate}%`}
                   />
                 </div>
 
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-[#ECEFF4]/70 font-lora">Thân nhiệt (Body Temp):</span>
-                  <span className="text-xs font-lora font-bold text-[#ECEFF4]">{bodyTemp.toFixed(1)}°C</span>
+                <div className="flex justify-between text-[10px] text-[#ECEFF4]/50 border-b border-[#2D3D54]/20 pb-2">
+                  <span className="flex items-center gap-1"><Check className="w-3 h-3 text-[#A2B6CD]" /> Đúng: {selectedSubjectCorrect}</span>
+                  <span className="flex items-center gap-1"><X className="w-3 h-3 text-red-400" /> Sai: {selectedSubjectWrong}</span>
                 </div>
 
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-xs text-[#ECEFF4]/70 font-lora">Thể trạng:</span>
-                  <span className="text-xs font-lora font-bold text-[#A2B6CD]">Duy trì ổn định</span>
+                {/* Tổng quan toàn bộ các môn */}
+                <div className="mt-1 flex flex-col gap-1">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-[#ECEFF4]/70">Tổng kết tất cả các môn:</span>
+                    <span className="font-bold text-[#ECEFF4]">{totalAllCorrect} / {totalAllAttempts} câu</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px] text-[#A2B6CD] font-semibold">
+                    <span>Độ chính xác toàn khóa:</span>
+                    <span>{totalAllRate}%</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* COMMERCE / INVESTMENT WATCH (THƯƠNG TRƯỜNG BIẾN ĐỘNG CỦA SĨ TỬ) */}
+            {/* COMMERCE / INVESTMENT WATCH (BIẾN ĐỘNG ĐIỂM SỐ CỦA SĨ TỬ) */}
             <div className="border border-[#2D3D54]/30 bg-[#151C28] p-4 rounded-xl relative shadow-lg text-[#ECEFF4]">
               <h2 className="text-xs font-lora tracking-widest text-[#A2B6CD] uppercase border-b border-[#2D3D54]/40 pb-2 mb-3.5 flex items-center gap-2 font-bold">
-                <TrendingUp className="w-4 h-4 text-[#A2B6CD]" /> THƯƠNG TRƯỜNG BIẾN ĐỘNG
+                <TrendingUp className="w-4 h-4 text-[#A2B6CD]" /> BIẾN ĐỘNG ĐIỂM SỐ
               </h2>
 
               <div className="flex flex-col gap-3 text-xs">
-                {marketPrices.map((stock) => (
-                  <div key={stock.code} className="flex flex-col gap-0.5 border-b border-[#2D3D54]/10 pb-2 last:border-0 last:pb-0">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-[#ECEFF4] font-lora flex items-center gap-1.5">
-                        <span className="text-[10px] bg-[#A2B6CD]/10 text-[#A2B6CD] border border-[#A2B6CD]/20 px-1 py-0.1 rounded font-bold">
-                          {stock.code}
+                {mainSubjectsList.map((item) => {
+                  const correct = (answeredMap[item.id] || []).length;
+                  const total = attemptsMap[item.id] || 0;
+                  const score = total > 0 ? parseFloat(((correct / total) * 10).toFixed(2)) : 0.0;
+                  const change = forecastTrends[item.id] || 0.0;
+                  
+                  // Mô tả dựa trên điểm trung bình
+                  let desc = "Chưa tham gia kiểm tra năng lực môn này.";
+                  if (total > 0) {
+                    if (score < 5.0) {
+                      desc = "Cần nỗ lực củng cố kiến thức căn bản gấp!";
+                    } else if (score < 8.0) {
+                      desc = "Phong độ khá tốt. Hãy rèn luyện thêm phản xạ.";
+                    } else {
+                      desc = "Tuyệt vời! Đang đạt trình độ của một Thủ Khoa.";
+                    }
+                  }
+
+                  return (
+                    <div key={item.id} className="flex flex-col gap-0.5 border-b border-[#2D3D54]/10 pb-2 last:border-0 last:pb-0">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[#ECEFF4] font-lora flex items-center gap-1.5">
+                          <span className="text-[10px] bg-[#A2B6CD]/10 text-[#A2B6CD] border border-[#A2B6CD]/20 px-1 py-0.1 rounded font-bold">
+                            {item.code}
+                          </span>
+                          {item.name}
                         </span>
-                        {stock.name}
-                      </span>
-                      <span className={`font-bold font-lora text-[11px] ${stock.change >= 0 ? "text-[#A2B6CD]" : "text-red-400"}`}>
-                        {stock.price.toFixed(2)} ({stock.change >= 0 ? "+" : ""}{stock.change}%)
+                        <span className={`font-bold font-lora text-[11px] ${change >= 0 ? "text-[#A2B6CD]" : "text-red-400"}`}>
+                          {score.toFixed(2)} đ ({change >= 0 ? "+" : ""}{change}%)
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-[#ECEFF4]/50 leading-normal">
+                        {desc}
                       </span>
                     </div>
-                    <span className="text-[10px] text-[#ECEFF4]/50 leading-normal">
-                      {stock.desc}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
 
                 <button
                   onClick={updateMarketPrice}
                   className="w-full mt-1.5 py-2 border border-[#2D3D54]/30 hover:border-[#A2B6CD] text-xs font-lora text-[#101622] bg-[#A2B6CD] hover:bg-[#ECEFF4] transition-all rounded uppercase font-bold"
                 >
-                  Cập nhật các chỉ số tự học
+                  Cập nhật xu hướng học tập
                 </button>
               </div>
             </div>
@@ -1312,53 +1830,27 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
               {/* Thông tin nhân vật */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mb-6 pt-5 border-t border-[#2D3D54]/30 text-left">
                 {/* Lê Dung */}
-                <div className="bg-[#101622] border border-[#2D3D54]/30 rounded-lg p-3.5 relative overflow-hidden group hover:border-[#A2B6CD]/30 transition-all duration-300">
-                  <div className="absolute top-0 right-0 bg-[#A2B6CD]/10 text-[#A2B6CD] text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-bl font-mono">
-                    Thụ
-                  </div>
-                  <h3 className="font-alegreya text-sm font-bold text-[#ECEFF4] mb-2 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#A2B6CD] animate-pulse"></span>
-                    Lê Dung
+                <div className="bg-[#101622] border border-[#2D3D54]/30 rounded-lg p-3.5">
+                  <h3 className="font-alegreya text-sm font-bold text-[#ECEFF4] mb-2">
+                    1. Lê Dung - thụ
                   </h3>
-                  <ul className="space-y-1 text-[11px] text-[#ECEFF4]/75">
-                    <li className="flex items-start gap-1">
-                      <span className="text-[#A2B6CD]/60 font-mono select-none">✦</span>
-                      <span>Thiên tài sinh học</span>
-                    </li>
-                    <li className="flex items-start gap-1">
-                      <span className="text-[#A2B6CD]/60 font-mono select-none">✦</span>
-                      <span>Cao quý lạnh lùng</span>
-                    </li>
-                    <li className="flex items-start gap-1">
-                      <span className="text-[#A2B6CD]/60 font-mono select-none">✦</span>
-                      <span>Yêu thích cuộc sống về đêm</span>
-                    </li>
-                  </ul>
+                  <div className="space-y-1 text-[11px] text-[#ECEFF4]/75">
+                    <p>Thiên tài sinh học</p>
+                    <p>Cao quý lạnh lùng</p>
+                    <p>Yêu thích cuộc sống về đêm</p>
+                  </div>
                 </div>
 
                 {/* Sầm Hào */}
-                <div className="bg-[#101622] border border-[#2D3D54]/30 rounded-lg p-3.5 relative overflow-hidden group hover:border-red-400/20 transition-all duration-300">
-                  <div className="absolute top-0 right-0 bg-red-950/20 text-red-400/70 border-l border-b border-red-950/30 text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-bl font-mono">
-                    Công
-                  </div>
-                  <h3 className="font-alegreya text-sm font-bold text-[#ECEFF4] mb-2 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-400/50"></span>
-                    Sầm Hào
+                <div className="bg-[#101622] border border-[#2D3D54]/30 rounded-lg p-3.5">
+                  <h3 className="font-alegreya text-sm font-bold text-[#ECEFF4] mb-2">
+                    2. Sầm Hào - công
                   </h3>
-                  <ul className="space-y-1 text-[11px] text-[#ECEFF4]/75">
-                    <li className="flex items-start gap-1">
-                      <span className="text-red-400/40 font-mono select-none">✦</span>
-                      <span>Chó dại cố chấp</span>
-                    </li>
-                    <li className="flex items-start gap-1">
-                      <span className="text-red-400/40 font-mono select-none">✦</span>
-                      <span>Ông lớn ẩn giấu thân phận</span>
-                    </li>
-                    <li className="flex items-start gap-1">
-                      <span className="text-red-400/40 font-mono select-none">✦</span>
-                      <span>Khuyên vợ phải tiết chế</span>
-                    </li>
-                  </ul>
+                  <div className="space-y-1 text-[11px] text-[#ECEFF4]/75">
+                    <p>Chó dại cố chấp</p>
+                    <p>Ông lớn ẩn giấu thân phận</p>
+                    <p>Khuyên vợ phải tiết chế</p>
+                  </div>
                 </div>
               </div>
 
@@ -1395,7 +1887,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     : 'border-transparent text-[#ECEFF4]/70 hover:text-[#A2B6CD] hover:bg-[#151C28]/50'
                 }`}
               >
-                <Users className="w-4 h-4" /> THẢO LUẬN THƯƠNG HỘI
+                <Users className="w-4 h-4" /> THẢO LUẬN HIỆP HỘI
               </button>
             </div>
 
@@ -1587,7 +2079,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     <textarea
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
-                      placeholder={isLoggedIn ? "Nhập ý kiến đóng góp cho thương hội tại đây..." : "Bạn cần đăng nhập để tham gia thảo luận!"}
+                      placeholder={isLoggedIn ? "Nhập ý kiến đóng góp cho hiệp hội tại đây..." : "Bạn cần đăng nhập để tham gia thảo luận!"}
                       rows={3}
                       disabled={!isLoggedIn}
                       className="w-full p-3 border border-[#2D3D54]/40 bg-black/25 text-[#ECEFF4] placeholder-[#4B5E78] focus:outline-none focus:border-[#A2B6CD] rounded-lg text-xs sm:text-sm resize-none transition-all disabled:opacity-40"
@@ -1612,7 +2104,7 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                 <div className="flex flex-col gap-4">
                   {comments.length === 0 ? (
                     <div className="text-center py-10 border border-dashed border-[#2D3D54]/30 rounded-xl bg-[#151C28]">
-                      <p className="text-[#ECEFF4]/70 text-xs font-alegreya italic font-bold">Thương hội chưa có công văn nào. Hãy là người đầu tiên đặt câu hỏi!</p>
+                      <p className="text-[#ECEFF4]/70 text-xs font-alegreya italic font-bold">Hiệp hội chưa có công văn nào. Hãy là người đầu tiên đặt câu hỏi!</p>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-4">
