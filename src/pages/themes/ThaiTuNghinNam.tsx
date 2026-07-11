@@ -72,11 +72,11 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
 
         <div className="flex items-center gap-2 select-none">
           <div className="w-2 h-2 rounded-full bg-[#741611] animate-ping" />
-          <span className="font-sans text-[10px] tracking-[0.25em] text-[#8c7b72] font-black uppercase hidden sm:inline">皇子復仇記 // THÁI TỬ NGỰ KIỆN</span>
+          <span className="font-sans text-[10px] tracking-[0.25em] text-[#8c7b72] font-black uppercase hidden sm:inline">太子千秋万载</span>
         </div>
 
         <div className="text-right">
-          <span className="font-sans text-[9px] tracking-[0.1em] text-[#8c7b72] uppercase font-bold">HOÀNG ĐỒ NGHIÊM CHỈNH</span>
+          <span className="font-sans text-[9px] tracking-[0.1em] text-[#8c7b72] uppercase font-bold">NGHÌN NĂM VẠN THUỞ</span>
         </div>
       </div>
 
