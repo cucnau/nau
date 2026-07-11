@@ -239,7 +239,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
             {/* Core Subjects Dossier - Characters Profiles */}
             <div className="w-full text-left relative z-10 font-reading-garamond border-t border-[#2e2a63]/40 pt-6">
               <div className="text-[11px] font-sans font-black tracking-[0.2em] text-[#bbee1f] uppercase mb-4 flex items-center justify-center lg:justify-start gap-2 select-none">
-                <Users className="w-4 h-4" /> HỒ SƠ ĐỐI TƯỢNG CỐT LÕI // KEY SUBJECT DOSSIERS
+                <Users className="w-4 h-4" /> HỒ SƠ ĐỐI TƯỢNG CỐT LÕI
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl w-full">
                 {/* Subject 1 */}
@@ -379,7 +379,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                 </div>
                 
                 <h3 className="text-[#bbee1f] uppercase text-xs font-sans font-black tracking-[0.3em] mb-6 flex items-center gap-3 select-none">
-                  <span className="w-6 h-[1px] bg-[#bbee1f]" /> BÁO CÁO THẨM ĐỊNH DOANH NGHIỆP // EXECUTIVE SUMMARY
+                  <span className="w-6 h-[1px] bg-[#bbee1f]" /> BÁO CÁO THẨM ĐỊNH DOANH NGHIỆP
                 </h3>
                 
                 <div className="text-base lg:text-lg leading-relaxed text-[#dbcec2] font-normal space-y-4 font-reading-garamond">
@@ -397,7 +397,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                 <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#bbee1f]" />
                 
                 <h3 className="text-[#bbee1f] uppercase text-xs font-sans font-black tracking-[0.3em] mb-6 flex items-center gap-3 select-none">
-                  <span className="w-6 h-[1px] bg-[#bbee1f]" /> DANH MỤC ĐẦU TƯ ĐỐI TÁC // AFFILIATED PORTFOLIOS
+                  <span className="w-6 h-[1px] bg-[#bbee1f]" /> DANH MỤC ĐẦU TƯ ĐỐI TÁC
                 </h3>
                 
                 <div className="text-base lg:text-lg leading-relaxed text-[#dbcec2] font-normal space-y-4 font-reading-garamond">
@@ -549,7 +549,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                   <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#bbee1f]" />
                   
                   <h3 className="text-[#bbee1f] uppercase tracking-[0.15em] font-sans text-xs font-black mb-5 flex items-center gap-2 select-none">
-                    <MessageSquare className="w-4 h-4" /> BẢN GHI NHỚ ĐỀ XUẤT CỦA CỔ ĐÔNG // MEMORANDUM OF COMMENTS
+                    <MessageSquare className="w-4 h-4" /> BẢN GHI NHỚ ĐỀ XUẤT CỦA CỔ ĐÔNG
                   </h3>
                   
                   {isLoggedIn ? (
