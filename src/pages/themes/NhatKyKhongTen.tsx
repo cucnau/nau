@@ -191,7 +191,7 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
             {/* Core Action Buttons - Styled like aged tabs */}
             <div className="flex flex-col gap-2 font-sans">
               <button 
-                onClick={() => chapters.length > 0 && navigate(`/doc/${story.id}/${chapters[0].id}`)}
+                onClick={() => chapters.length > 0 && navigate(`/doc/${story.slug || story.id}/chuong-${chapters[0].order + 1}`)}
                 className="w-full py-3.5 bg-[#BCA782] hover:bg-[#C9B695] text-[#2C1814] uppercase text-xs font-black tracking-widest transition-all duration-300 flex justify-center items-center gap-2.5 rounded-xl border-2 border-[#C9B695] shadow-[0_6px_15px_rgba(44,24,20,0.1)] cursor-pointer"
               >
                 MỞ TRANG ĐẦU TIÊN <BookOpen className="w-4 h-4 text-[#2C1814]" />
@@ -338,7 +338,7 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
                   displayedChapters.map((chap, idx) => (
                     <div 
                        key={chap.id}
-                       onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
+                       onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
                        className="group p-4 bg-[#E8DCC4] hover:bg-[#DFCEB4] border border-[#C9B695] hover:border-[#BCA782] rounded-xl cursor-pointer transition-all flex items-center justify-between shadow-[0_2px_8px_rgba(44,24,20,0.05)] hover:shadow-md"
                     >
                       <div className="flex items-center gap-4">
