@@ -198,9 +198,26 @@
         "pool3Star": { "type": "array" }
       },
       "required": ["name", "type", "active"]
+    },
+    "ExamScore": {
+      "title": "Exam Score",
+      "description": "User highscore for exams",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "avatarUrl": { "type": "string" },
+        "score": { "type": "number" },
+        "updatedAt": { "type": "object" }
+      },
+      "required": ["uid", "score"]
     }
   },
   "firestore": {
+    "exam_leaderboard/{userId}": {
+      "schema": { "$ref": "#/entities/ExamScore" },
+      "description": "Exam Leaderboard scores"
+    },
     "users/{userId}": {
       "schema": { "$ref": "#/entities/User" },
       "description": "User profiles"
