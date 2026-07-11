@@ -214,7 +214,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
               <span className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${
                  rinhrapMode === 'thotrang' ? 'bg-[#facaca]/40 border-[#facaca]' : 'bg-[#823323]/40 border-[#823323]'
               }`}>
-                <Gamepad2 className="w-4 h-4" /> TRẠNG THÁI: {story.completed ? 'PHÁ ĐẢO (HOÀN THÀNH)' : 'ĐANG KẾT NỐI...'}
+                <Gamepad2 className="w-4 h-4" /> TRẠNG THÁI: {story.completed ? 'ĐÃ PHÁ ĐẢO' : 'ĐANG KẾT NỐI...'}
               </span>
               <span className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${
                  rinhrapMode === 'thotrang' ? 'bg-[#facaca]/40 border-[#facaca]' : 'bg-[#780606]/40 border-[#780606]'
@@ -255,7 +255,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                         : 'bg-[#780606] hover:bg-[#9c0800] text-[#ffffff] border-[#780606]'
                   }`}
                 >
-                  <BookOpen className="w-5 h-5" /> BẮT ĐẦU TRÒ CHƠI
+                  <BookOpen className="w-5 h-5" /> START GAME
                 </button>
               )}
               <button
@@ -271,7 +271,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                 }`}
               >
                 <Bookmark className="w-5 h-5" fill={isSaved ? "currentColor" : "none"} />
-                {isSaved ? 'Đã lưu tiến trình' : 'Lưu tiến trình'}
+                {isSaved ? 'SAVED GAME' : 'SAVE GAME'}
               </button>
               
               <button
