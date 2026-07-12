@@ -357,6 +357,18 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                 <BookOpen className="w-4 h-4" /> MỞ SÁCH ĐỌC NGAY
               </button>
             )}
+
+            {story.externalUrl && (
+              <a 
+                href={story.externalUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full py-3 bg-[#473a36]/30 border border-[#741611]/40 text-[#d7cac1] hover:bg-[#741611]/25 hover:text-[#e8ded7] font-sans font-bold tracking-[0.15em] uppercase text-xs rounded transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-[#741611]" /> QUY HỒI NGUYÊN TÁC
+              </a>
+            )}
+
             <button 
               onClick={handleSaveToggle}
               className={`w-full py-3 font-sans font-bold tracking-[0.15em] uppercase text-xs rounded border transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
@@ -367,6 +379,13 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
             >
               <Bookmark className="w-3.5 h-3.5" fill={savedStories.includes(story.id) ? "currentColor" : "none"} />
               {savedStories.includes(story.id) ? 'ĐÃ LƯU TÀNG THƯ CÁC' : 'THU VÀO TÀNG THƯ CÁC'}
+            </button>
+
+            <button 
+              onClick={() => setShowGiftModal(true)}
+              className="w-full py-3 bg-[#a87f32]/15 border border-[#a87f32]/40 text-[#d7cac1] hover:bg-[#a87f32]/30 font-sans font-bold tracking-[0.15em] uppercase text-xs rounded transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Gift className="w-3.5 h-3.5 text-[#a87f32]" /> TIẾN CỐNG QUÂN VƯƠNG
             </button>
           </div>
 
@@ -422,9 +441,22 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                 <h4 className="text-[11px] font-sans font-black tracking-[0.25em] text-[#741611] uppercase mb-3 flex items-center gap-1.5 select-none">
                   <Scroll className="w-4 h-4 text-[#741611]" /> KHẢI TẤU TIẾN CỬ
                 </h4>
-                <div className="text-[13px] leading-relaxed text-[#d7cac1]/80 bg-[#14100e]/95 p-4 rounded border border-[#741611]/30 whitespace-pre-line font-serif italic relative">
+                <div 
+                  className="text-[13px] leading-relaxed text-[#d7cac1]/80 bg-[#14100e]/95 p-4 rounded border border-[#741611]/30 font-serif italic relative max-h-[320px] overflow-y-auto royal-scroll"
+                  style={{ scrollbarWidth: 'thin', scrollbarColor: '#741611 #221c19' }}
+                >
                   <div className="absolute top-2 right-2 text-[#741611]/20 font-sans text-4xl select-none font-bold">薦</div>
-                  {story.recommendations}
+                  <div className="relative z-10">
+                    {story.recommendations.split('\n').map((para: string, idx: number) => {
+                      const trimmed = para.trim();
+                      if (!trimmed) return null;
+                      return (
+                        <p key={idx} className="indent-8 text-justify leading-relaxed mb-4">
+                          {trimmed}
+                        </p>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
@@ -572,25 +604,6 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
             ) : (
               <div className="flex flex-col gap-6 animate-fade-in">
                 
-                {/* Gifting Section */}
-                <div className="border border-[#741611]/30 bg-[#741611]/5 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#741611]/15 rounded-full flex items-center justify-center text-[#741611]">
-                      <Gift className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-[#d7cac1] text-xs uppercase tracking-wider">TIẾN CỐNG QUÂN VƯƠNG</h4>
-                      <p className="text-[11px] text-[#8c7b72]">Dâng hiến Choco tiếp thêm động lực cho vị diện ngự bút.</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setShowGiftModal(true)}
-                    className="px-4 py-2 bg-[#741611] text-[#d7cac1] hover:bg-[#8e1d17] text-[10px] font-sans font-black uppercase tracking-wider rounded transition-all duration-300 cursor-pointer"
-                  >
-                    DÂNG CỐNG PHẨM
-                  </button>
-                </div>
-
                 {/* Submitting comments */}
                 <form onSubmit={handleSendComment} className="flex flex-col gap-3">
                   <h4 className="text-[11px] font-sans font-black tracking-[0.15em] text-[#8c7b72] uppercase select-none">
