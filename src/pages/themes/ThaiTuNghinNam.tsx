@@ -23,14 +23,59 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
 
   const totalGiftedChoco = comments.filter(c => c.type === 'choco_gift').reduce((acc, curr) => acc + (curr.giftAmount || 0), 0);
 
+  if (!chapters || chapters.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#14100e] text-[#d7cac1] flex flex-col items-center justify-center p-4 font-serif relative overflow-hidden">
+        <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#741611]/40 pointer-events-none" />
+        <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#741611]/40 pointer-events-none" />
+        <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#741611]/40 pointer-events-none" />
+        <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[#741611]/40 pointer-events-none" />
+        
+        <div className="flex flex-col items-center gap-5 relative z-10">
+          <div className="w-14 h-14 border-4 border-[#473a36] border-t-[#741611] rounded-full animate-spin shadow-[0_0_15px_rgba(116,22,17,0.3)]" />
+          <div className="text-xs uppercase tracking-[0.25em] text-[#741611] animate-pulse text-center px-4 font-sans font-black">
+            ĐANG KHAI MỞ SÁCH VĂN TRIỀU ĐÌNH...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Lọc bỏ chương "Cốt nhục tương liên" và "Văn án" theo yêu cầu tuyệt đối của người dùng
+  const filteredChapters = chapters.filter((chap: any) => {
+    const titleLower = (chap.title || '').toLowerCase();
+    if (titleLower.includes('cốt nhục tương liên') || titleLower.includes('cot nhuc tuong lien')) {
+      return false;
+    }
+    if (titleLower.includes('văn án') || titleLower.includes('van an')) {
+      return false;
+    }
+    return true;
+  });
+
   // Grouping chapters by specific volumes defined by user
   const [selectedVolume, setSelectedVolume] = useState(0);
 
   // Sort chapters first
-  const sortedChapters = [...chapters].sort((a, b) => {
+  const sortedChapters = [...filteredChapters].sort((a, b) => {
     const aNum = a.orderIndex !== undefined ? a.orderIndex : parseFloat(a.title?.match(/\d+/)?.[0] || '0');
     const bNum = b.orderIndex !== undefined ? b.orderIndex : parseFloat(b.title?.match(/\d+/)?.[0] || '0');
     return chapterSortDesc ? bNum - aNum : aNum - bNum;
+  });
+
+  // Tạo danh sách gốc luôn sắp xếp tăng dần để gán actualIndex cố định
+  const baseAscChapters = [...filteredChapters].sort((a, b) => {
+    const aNum = a.orderIndex !== undefined ? a.orderIndex : parseFloat(a.title?.match(/\d+/)?.[0] || '0');
+    const bNum = b.orderIndex !== undefined ? b.orderIndex : parseFloat(b.title?.match(/\d+/)?.[0] || '0');
+    return aNum - bNum;
+  });
+
+  const sortedChaptersWithActualIndex = sortedChapters.map((chap) => {
+    const idx = baseAscChapters.findIndex(c => c.id === chap.id);
+    return {
+      ...chap,
+      actualIndex: idx !== -1 ? idx : chap.order
+    };
   });
 
   const volumesConfig = [
@@ -38,20 +83,18 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
       id: 0,
       title: "Quyển một",
       subtitle: "Đêm đông sống lại",
-      filter: (chap: any) => chap.order >= 0 && chap.order <= 10,
-      rangeText: "Chương 1 - 11"
+      filter: (chap: any) => chap.actualIndex >= 0 && chap.actualIndex <= 10
     },
     {
       id: 1,
       title: "Quyển hai",
       subtitle: "Sóng ngầm Binh bộ",
-      filter: (chap: any) => chap.order >= 11 && chap.order <= 20,
-      rangeText: "Chương 12 - 21"
+      filter: (chap: any) => chap.actualIndex >= 11 && chap.actualIndex <= 20
     }
   ];
 
   const currentVolumeConfig = volumesConfig.find(v => v.id === selectedVolume) || volumesConfig[0];
-  const volumeChapters = sortedChapters.filter(currentVolumeConfig.filter);
+  const volumeChapters = sortedChaptersWithActualIndex.filter(currentVolumeConfig.filter);
 
   return (
     <div className="thai-tu-theme-container bg-[#14100e] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#382b26]/60 via-[#14100e] to-[#14100e] min-h-screen text-[#d7cac1] font-serif selection:bg-[#741611] selection:text-[#d7cac1] pb-24 relative overflow-x-hidden">
@@ -213,7 +256,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
             </h3>
             <div className="grid grid-cols-2 gap-3 font-sans relative z-10">
               <div className="bg-[#14100e]/90 border border-[#741611]/25 p-3 text-center rounded">
-                <span className="block text-[#d7cac1] text-lg font-black">{chapters.length}</span>
+                <span className="block text-[#d7cac1] text-lg font-black">{filteredChapters.length}</span>
                 <span className="text-[9px] text-[#8c7b72] font-black uppercase tracking-wider">SỐ HỒI</span>
               </div>
               <div className="bg-[#14100e]/90 border border-[#741611]/25 p-3 text-center rounded">
@@ -229,27 +272,86 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
             </div>
           </div>
 
-          {/* Verification / Blood Lineage Plot Widget */}
-          <div className="royal-box p-5 rounded-lg relative overflow-hidden">
+          {/* IMMERSIVE CHARACTER DOSSIERS (Moved from right panel) */}
+          <div className="royal-box p-5 rounded-lg relative overflow-hidden flex flex-col gap-4">
             <div className="royal-inner-border" />
-            <div className="absolute top-2 right-2 text-[#741611]/15 font-bold font-serif text-3xl select-none pointer-events-none">血</div>
-            <div className="absolute top-0 right-0 w-24 h-24 bg-[#741611]/5 rounded-full blur-2xl pointer-events-none" />
-            <h3 className="text-[11px] font-sans font-black tracking-[0.2em] text-[#741611] uppercase mb-2 flex items-center gap-2 select-none z-10 relative">
-              <Shield className="w-4 h-4" /> BÍ MẬT HOÀNG TỘC
+            <div className="absolute top-2 right-2 text-[#741611]/15 font-bold font-serif text-3xl select-none pointer-events-none">人</div>
+            <h3 className="text-[11px] font-sans font-black tracking-[0.2em] text-[#741611] uppercase flex items-center gap-2 select-none z-10 relative border-b border-[#741611]/25 pb-2">
+              <Users className="w-4 h-4" /> HỒ SƠ NHÂN VẬT
             </h3>
-            <p className="text-xs text-[#8c7b72] leading-relaxed mb-3 z-10 relative">
-              Mật bản ghi chép chi tiết về cuộc tráo đổi hoàng tộc. Thụ tôn quý là Thái tử thật bị đẩy ra chốn gian truân, sống lại thề quy hồi bảo tọa, trừng phạt kẻ giả mạo.
-            </p>
-            <div className="border border-[#741611]/30 bg-[#14100e]/95 p-3 rounded text-[11px] leading-relaxed font-serif text-[#d7cac1]/80 italic z-10 relative">
-              "Máu đỏ nhỏ vào giọt nước trong, cốt nhục tương liên tất hòa một. Gian xảo đánh tráo nghìn năm, nay linh hồn quy bặc lập hoàng triều."
+            
+            <div className="flex flex-col gap-4 relative z-10">
+              
+              {/* Uong Phu Thang (Thu) */}
+              <div className="slab-card p-4 rounded-md relative overflow-hidden group">
+                <div className="absolute bottom-2 right-2 text-[#741611]/15 font-black text-3xl select-none font-serif tracking-widest pointer-events-none transition-all duration-300 group-hover:scale-110">
+                  应浮昇
+                </div>
+                
+                <div className="flex items-start gap-3 mb-3">
+                  <div>
+                    <h4 className="font-bold text-[#d7cac1] text-sm font-serif tracking-wide">Ưng Phù Thăng</h4>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      <span className="text-[9px] font-sans text-[#741611] font-black uppercase tracking-widest bg-[#741611]/15 border border-[#741611]/35 px-1.5 py-0.5 rounded inline-block">
+                        Thái tử thật
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 text-[12px] text-[#d7cac1]/90 font-serif">
+                  <div className="flex items-center gap-2 border-b border-[#741611]/15 pb-1.5">
+                    <span className="text-[#8c7b72] w-12 text-[9px] font-sans uppercase tracking-wider">Vai trò:</span>
+                    <span className="text-[#741611] font-bold">Thụ</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#741611]" />
+                    <span>Dồn sức xây dựng sự nghiệp</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#741611]" />
+                    <span>Âm hiểm tàn độc</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Thich Han Chu (Cong) */}
+              <div className="slab-card p-4 rounded-md relative overflow-hidden group">
+                <div className="absolute bottom-2 right-2 text-[#8c7b72]/15 font-black text-3xl select-none font-serif tracking-widest pointer-events-none transition-all duration-300 group-hover:scale-110">
+                  戚寒舟
+                </div>
+
+                <div className="flex items-start gap-3 mb-3">
+                  <div>
+                    <h4 className="font-bold text-[#d7cac1] text-sm font-serif tracking-wide">Thích Hàn Chu</h4>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      <span className="text-[9px] font-sans text-[#8c7b72] font-black uppercase tracking-widest bg-[#8c7b72]/15 border border-[#8c7b72]/35 px-1 py-0.5 rounded inline-block">
+                        Quan võ lạnh lùng
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-[12px] text-[#d7cac1]/90 font-serif">
+                  <div className="flex items-center gap-2 border-b border-[#741611]/15 pb-1.5">
+                    <span className="text-[#8c7b72] w-12 text-[9px] font-sans uppercase tracking-wider">Vai trò:</span>
+                    <span className="text-[#8c7b72] font-bold">Công</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7b72]" />
+                    <span>Từng là kiếm khách tự tại</span>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
           {/* Quick Read Buttons */}
           <div className="flex flex-col gap-2">
-            {chapters.length > 0 && (
+            {filteredChapters.length > 0 && (
               <button 
-                onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chapters[0].order + 1}`)}
+                onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${filteredChapters[0].order + 1}`)}
                 className="w-full py-3 bg-[#741611] text-[#d7cac1] hover:bg-[#8e1d17] font-sans font-bold tracking-[0.15em] uppercase text-xs rounded transition-all duration-300 shadow-lg flex items-center justify-center gap-2 cursor-pointer"
               >
                 <BookOpen className="w-4 h-4" /> MỞ SÁCH ĐỌC NGAY
@@ -328,93 +430,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
             )}
           </div>
 
-          {/* IMMERSIVE CHARACTER DOSSIERS */}
-          <div className="royal-box royal-corners p-6 rounded-lg relative overflow-hidden shadow-2xl">
-            <div className="royal-inner-border" />
-            {/* Elegant Background flourish */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#741611]/5 rounded-full blur-3xl pointer-events-none" />
-            <h3 className="text-xs font-sans font-black tracking-[0.25em] text-[#741611] uppercase mb-6 flex items-center gap-2 select-none border-b border-[#741611]/30 pb-2.5 z-10 relative">
-              <Scroll className="w-4 h-4 text-[#741611]" /> HỒ SƠ NHÂN VẬT BẢN THẢO
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-              
-              {/* Uong Phu Thang (Thu) */}
-              <div className="slab-card p-5 rounded-md relative overflow-hidden group">
-                {/* Chinese characters watermarks */}
-                <div className="absolute bottom-2 right-2 text-[#741611]/15 font-black text-4xl select-none font-serif tracking-widest pointer-events-none transition-all duration-300 group-hover:scale-110">
-                  应浮昇
-                </div>
-                
-                <div className="flex items-start gap-3 mb-4">
-                  <div>
-                    <h4 className="font-bold text-[#d7cac1] text-base font-serif tracking-wide">Ưng Phù Thăng</h4>
-                    <div className="flex flex-wrap gap-1.5 mt-1">
-                      <span className="text-[10px] font-sans text-[#741611] font-black uppercase tracking-widest bg-[#741611]/15 border border-[#741611]/35 px-1.5 py-0.5 rounded inline-block">
-                        Thái tử thật
-                      </span>
-                      <span className="text-[10px] font-sans text-[#741611] font-black uppercase tracking-widest bg-[#741611]/15 border border-[#741611]/35 px-1.5 py-0.5 rounded inline-block">
-                        Thụ
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-3 text-[13px] text-[#d7cac1]/90 font-serif">
-                  <div className="flex items-center gap-2 border-b border-[#741611]/15 pb-2">
-                    <span className="text-[#8c7b72] w-16 text-[10px] font-sans uppercase tracking-wider">Vai trò:</span>
-                    <span className="text-[#741611] font-bold">Thụ</span>
-                  </div>
-                  <div className="flex items-center gap-2 border-b border-[#741611]/15 pb-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#741611]" />
-                    <span>Dồn sức xây dựng sự nghiệp</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#741611]" />
-                    <span>Âm hiểm tàn độc</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Thich Han Chu (Cong) */}
-              <div className="slab-card p-5 rounded-md relative overflow-hidden group">
-                {/* Chinese characters watermarks */}
-                <div className="absolute bottom-2 right-2 text-[#8c7b72]/15 font-black text-4xl select-none font-serif tracking-widest pointer-events-none transition-all duration-300 group-hover:scale-110">
-                  戚寒舟
-                </div>
-
-                <div className="flex items-start gap-3 mb-4">
-                  <div>
-                    <h4 className="font-bold text-[#d7cac1] text-base font-serif tracking-wide">Thích Hàn Chu</h4>
-                    <div className="flex flex-wrap gap-1.5 mt-1">
-                      <span className="text-[10px] font-sans text-[#8c7b72] font-black uppercase tracking-widest bg-[#8c7b72]/15 border border-[#8c7b72]/35 px-1.5 py-0.5 rounded inline-block">
-                        Quan võ lạnh lùng
-                      </span>
-                      <span className="text-[10px] font-sans text-[#8c7b72] font-black uppercase tracking-widest bg-[#8c7b72]/15 border border-[#8c7b72]/35 px-1.5 py-0.5 rounded inline-block">
-                        Công
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-3 text-[13px] text-[#d7cac1]/90 font-serif">
-                  <div className="flex items-center gap-2 border-b border-[#741611]/15 pb-2">
-                    <span className="text-[#8c7b72] w-16 text-[10px] font-sans uppercase tracking-wider">Vai trò:</span>
-                    <span className="text-[#8c7b72] font-bold">Công</span>
-                  </div>
-                  <div className="flex items-center gap-2 border-b border-[#741611]/15 pb-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7b72]" />
-                    <span>Thuở thiếu thời từng là kiếm khách</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#8c7b72]" />
-                    <span>Tiêu dao tự tại</span>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
+          {/* Section removed and character profiles moved to the left sidebar */}
 
           {/* TABS SELECTOR (CHAPTERS & COMMENTS) */}
           <div className="flex border-b border-[#473a36] bg-[#1b1715]/40 rounded-t-lg overflow-hidden select-none">
@@ -424,7 +440,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                 activeTab === 'chapters' ? 'text-[#741611] bg-[#221c19]/60' : 'text-[#8c7b72] hover:text-[#d7cac1] bg-transparent'
               }`}
             >
-              MỤC LỤC CHƯƠNG ({chapters.length})
+              MỤC LỤC CHƯƠNG ({filteredChapters.length})
               {activeTab === 'chapters' && (
                 <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#741611] rounded-t-full" />
               )}
@@ -513,7 +529,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[480px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#741611 #1b1715' }}>
                   {volumeChapters.length > 0 ? (
                     volumeChapters.map((chap, i) => {
-                      const absoluteIndex = chap.order + 1;
+                      const absoluteIndex = chap.actualIndex + 1;
                       const recordCode = `THƯ QUYỂN · ${absoluteIndex.toString().padStart(3, '0')}`;
                       return (
                         <div 
