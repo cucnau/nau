@@ -460,6 +460,23 @@ export function StoryView() {
           </div>
         </div>
       );
+    } else if (activeCustomTheme === 'thaitu') {
+      return (
+        <div className="min-h-screen bg-[#14100e] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#382b26]/60 via-[#14100e] to-[#14100e] text-[#d7cac1] flex flex-col items-center justify-center p-4 font-serif relative overflow-hidden">
+          {/* Decorative corner accents in loading */}
+          <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-[#741611]/40 pointer-events-none" />
+          <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-[#741611]/40 pointer-events-none" />
+          <div className="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-[#741611]/40 pointer-events-none" />
+          <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-[#741611]/40 pointer-events-none" />
+          
+          <div className="flex flex-col items-center gap-5 relative z-10">
+            <div className="w-14 h-14 border-4 border-[#473a36] border-t-[#741611] rounded-full animate-spin shadow-[0_0_15px_rgba(116,22,17,0.3)]" />
+            <div className="text-xs uppercase tracking-[0.25em] text-[#741611] animate-pulse text-center px-4 font-sans font-black">
+              ĐANG KHAI MỞ SÁCH VĂN TRIỀU ĐÌNH...
+            </div>
+          </div>
+        </div>
+      );
     }
     return (
       <div className="min-h-screen bg-[#1A1412] text-[#E0D4C3] flex flex-col items-center justify-center p-4 font-sans">
@@ -877,7 +894,7 @@ export function StoryView() {
                 {/* Interactive Action Row */}
                 <div className="mt-auto flex flex-wrap gap-3 pt-4">
                     <button 
-                      onClick={() => navigate(`/doc/${story.id}/${chapters[0]?.id}`)} 
+                      onClick={() => chapters.length > 0 && navigate(`/doc/${story.slug || story.id}/chuong-${chapters[0].order + 1}`)} 
                       className="bg-[#8D6E63] dark:bg-[#5D4037] hover:bg-[#5D4037] dark:hover:bg-[#4E342E] text-white px-5 py-2.5 text-xs rounded-xl font-black uppercase tracking-wider flex items-center justify-center gap-2 border-2 border-[#3E2723] dark:border-[#4E342E] shadow-[0_2px_0_0_#3E2723] dark:shadow-[0_2px_0_0_#0D0907] hover:-translate-y-0.5 active:translate-y-[2px] active:shadow-none transition-all"
                     >
                         <BookOpen className="w-4 h-4" />
@@ -1033,7 +1050,7 @@ export function StoryView() {
                   return (
                      <button 
                         key={chap.id}
-                        onClick={() => navigate(`/doc/${story.id}/${chap.id}`)}
+                        onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
                         className={cn(
                             "flex items-center justify-between p-4 border-[2px] border-dashed border-[#3E2723]/20 hover:border-solid hover:border-[#3E2723] hover:bg-[#FDF6EC] transition-all rounded-xl mb-2 text-left w-full",
                             isRead ? "text-[#A1887F]" : "text-[#3E2723]"
