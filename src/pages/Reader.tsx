@@ -22,6 +22,7 @@ const getThemeBorderClass = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "border-[#7F1D1D]/30";
   if (theme === 'thientai') return "border-[#9a858d]/30";
   if (theme === 'nguoidep') return "border-[#2D3D54]/40";
+  if (theme === 'thaitu') return "border-[#741611]/30";
   return "border-[#2e2a63]/20"; // giagoan
 };
 
@@ -33,6 +34,7 @@ const getThemeBgBorderTextClass = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#0B0505]/60 border-[#7F1D1D]/50 text-[#D8B4B4] shadow-[1px_1px_0_0_#450A0A]";
   if (theme === 'thientai') return "bg-[#060406]/60 border-[#9a858d]/50 text-[#d4c6c9] shadow-[1px_1px_0_0_#9a858d]";
   if (theme === 'nguoidep') return "bg-[#151C28]/80 border-[#2D3D54]/40 text-[#ECEFF4] shadow-[1px_1px_0_0_#2D3D54]";
+  if (theme === 'thaitu') return "bg-[#14100e] border-[#473a36]/50 text-[#d7cac1] shadow-[1px_1px_0_0_#741611]";
   return "bg-[#13120d]/50 border-[#2e2a63]/50 text-[#dbcec2] shadow-[1px_1px_0_0_#2e2a63]"; // giagoan
 };
 
@@ -44,6 +46,7 @@ const getThemeAvatarFallbackIconClass = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "w-4 h-4 text-[#EF4444]";
   if (theme === 'thientai') return "w-4 h-4 text-[#9a858d]";
   if (theme === 'nguoidep') return "w-4 h-4 text-[#A2B6CD]";
+  if (theme === 'thaitu') return "w-4 h-4 text-[#741611]";
   return "w-4 h-4 text-[#bbee1f]"; // giagoan
 };
 
@@ -55,6 +58,7 @@ const getThemeAvatarBorderClass = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "border border-[#7F1D1D]/50";
   if (theme === 'thientai') return "border border-[#9a858d]/50";
   if (theme === 'nguoidep') return "border border-[#2D3D54]/40";
+  if (theme === 'thaitu') return "border border-[#473a36]/50";
   return "border border-[#2e2a63]/50"; // giagoan
 };
 
@@ -66,6 +70,7 @@ const getThemeAvatarBgClass = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#0B0505]";
   if (theme === 'thientai') return "bg-[#060406]";
   if (theme === 'nguoidep') return "bg-[#151C28]";
+  if (theme === 'thaitu') return "bg-[#14100e]";
   return "bg-[#13120d]"; // giagoan
 };
 
@@ -77,6 +82,7 @@ const getThemeAccentTextColor = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "#EF4444";
   if (theme === 'thientai') return "#9a858d";
   if (theme === 'nguoidep') return "#A2B6CD";
+  if (theme === 'thaitu') return "#741611";
   return "#bbee1f"; // giagoan
 };
 
@@ -88,6 +94,7 @@ const getThemeTitleBadgeClass = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#7F1D1D] text-white border-[#EF4444]/40";
   if (theme === 'thientai') return "bg-[#9a858d]/20 text-[#9a858d] border-[#9a858d]/30";
   if (theme === 'nguoidep') return "bg-[#A2B6CD]/10 text-[#A2B6CD] border-[#2D3D54]/40";
+  if (theme === 'thaitu') return "bg-[#741611]/15 text-[#d7cac1] border-[#741611]/40";
   return "bg-[#2e2a63] text-[#bbee1f] border-[#695b7f]/40"; // giagoan
 };
 
@@ -99,6 +106,7 @@ const getThemeSubTextColor = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-[#991B1B]";
   if (theme === 'thientai') return "text-[#9a858d]/80";
   if (theme === 'nguoidep') return "text-[#A2B6CD]/70";
+  if (theme === 'thaitu') return "text-[#8c7b72]";
   return "text-[#695b7f]"; // giagoan
 };
 
@@ -110,6 +118,7 @@ const getThemeGiftBadgeClass = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-white bg-[#7F1D1D] border-[#7F1D1D]/50";
   if (theme === 'thientai') return "text-[#060406] bg-[#9a858d] border-[#9a858d]/50";
   if (theme === 'nguoidep') return "text-[#101622] bg-[#A2B6CD] border-[#2D3D54]/50";
+  if (theme === 'thaitu') return "text-[#d7cac1] bg-[#741611]/30 border-[#473a36]/50";
   return "text-[#13120d] bg-[#bbee1f] border-[#bbee1f]/50"; // giagoan
 };
 
@@ -121,6 +130,7 @@ const getThemeContentTextColor = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-[#D8B4B4]";
   if (theme === 'thientai') return "text-[#d4c6c9]";
   if (theme === 'nguoidep') return "text-[#ECEFF4]/90";
+  if (theme === 'thaitu') return "text-[#d7cac1]";
   return "text-[#dbcec2]"; // giagoan
 };
 
@@ -132,6 +142,7 @@ const getThemeReplyButtonClass = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "text-[#991B1B] hover:text-[#EF4444]";
   if (theme === 'thientai') return "text-[#9a858d]/70 hover:text-[#9a858d]";
   if (theme === 'nguoidep') return "text-[#A2B6CD] hover:text-[#ECEFF4]";
+  if (theme === 'thaitu') return "text-[#8c7b72] hover:text-[#741611]";
   return "text-[#695b7f] hover:text-[#bbee1f]"; // giagoan
 };
 
@@ -143,6 +154,7 @@ const getThemeInputClass = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#0B0505] border-[#7F1D1D] text-[#D8B4B4] focus:border-[#EF4444]";
   if (theme === 'thientai') return "bg-[#060406] border-[#9a858d]/30 text-[#d4c6c9] focus:border-[#9a858d]";
   if (theme === 'nguoidep') return "bg-black/35 border-[#2D3D54]/30 text-[#ECEFF4] focus:border-[#A2B6CD]";
+  if (theme === 'thaitu') return "bg-[#14100e] border-[#473a36]/50 text-[#d7cac1] focus:border-[#741611]";
   return "bg-[#13120d] border-[#2e2a63] text-[#dbcec2] focus:border-[#bbee1f]"; // giagoan
 };
 
@@ -154,6 +166,7 @@ const getThemeSendButtonClass = (theme: string) => {
   if (theme === 'rinhrap' || theme === 'rinhrap-thodo') return "bg-[#7F1D1D] hover:bg-[#991B1B] text-white border-[#450A0A] disabled:bg-[#7F1D1D]/20 disabled:text-white/40 disabled:border-[#450A0A]/50 disabled:shadow-none";
   if (theme === 'thientai') return "bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] border-[#34282d] disabled:bg-[#9a858d]/20 disabled:text-[#d4c6c9]/40 disabled:border-[#34282d]/50 disabled:shadow-none";
   if (theme === 'nguoidep') return "bg-[#A2B6CD] hover:bg-[#ECEFF4] text-[#101622] border-[#2D3D54]/30 disabled:opacity-30 disabled:shadow-none";
+  if (theme === 'thaitu') return "bg-[#741611] hover:bg-[#8d1c15] text-[#d7cac1] border-[#473a36] disabled:opacity-30 disabled:shadow-none";
   return "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] disabled:bg-[#bbee1f]/20 disabled:text-[#dbcec2]/40 disabled:border-[#2e2a63]/50 disabled:shadow-none"; // giagoan
 };
 
@@ -1486,7 +1499,7 @@ pComments.map(c => (
 
            {/* Comments Area (Counts for missions) */}
            <div className="mb-12">
-               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "border-[#47515f] bg-[#181f2d] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "border-[#BCA782] bg-[#E8DCC4] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "border-[#B6A996]/30 bg-[#12110F] text-[#B6A996] shadow-[2px_2px_0_0_#12110F]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "border-[#823323] bg-[#fff2f1] text-[#780606] shadow-[2px_2px_0_0_#facaca]" : "border-[#7F1D1D] bg-[#0B0505] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A]") : activeCustomTheme === 'thientai' ? "border-[#34282d] bg-[#060406] text-[#9a858d] shadow-[2px_2px_0_0_#34282d]" : activeCustomTheme === 'nguoidep' ? "border-[#2D3D54]/30 bg-[#101622] text-[#A2B6CD] shadow-[2px_2px_0_0_#2D3D54]" : "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]") : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>{tCommentAreaTitle}</h3>
+               <h3 className={cn("text-xs font-black uppercase tracking-wider mb-6 px-4 py-2 border-2 inline-block rounded-xl", isCustomThemeActive ? (activeCustomTheme === 'homer' ? "border-[#47515f] bg-[#181f2d] text-[#a0a6b3] shadow-[2px_2px_0_0_#47515f]" : activeCustomTheme === 'nhatky' ? "border-[#BCA782] bg-[#E8DCC4] text-[#2C1814] shadow-[2px_2px_0_0_#BCA782]" : activeCustomTheme === 'thuytien' ? "border-[#B6A996]/30 bg-[#12110F] text-[#B6A996] shadow-[2px_2px_0_0_#12110F]" : activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "border-[#823323] bg-[#fff2f1] text-[#780606] shadow-[2px_2px_0_0_#facaca]" : "border-[#7F1D1D] bg-[#0B0505] text-[#EF4444] shadow-[2px_2px_0_0_#450A0A]") : activeCustomTheme === 'thientai' ? "border-[#34282d] bg-[#060406] text-[#9a858d] shadow-[2px_2px_0_0_#34282d]" : activeCustomTheme === 'nguoidep' ? "border-[#2D3D54]/30 bg-[#101622] text-[#A2B6CD] shadow-[2px_2px_0_0_#2D3D54]" : activeCustomTheme === 'thaitu' ? "border-[#741611]/50 bg-[#14100e] text-[#d7cac1] shadow-[2px_2px_0_0_#741611]" : "border-[#2e2a63] bg-[#13120d] text-[#bbee1f] shadow-[2px_2px_0_0_#2e2a63]") : effectiveIsDark ? "border-[#3E2723] bg-[#2C221D] text-[#ECE5DC] shadow-[2px_2px_0_0_#3E2723]" : "border-[#3E2723] bg-[#F5E6D3]/65 text-[#3E2723] shadow-[2px_2px_0_0_#3E2723]")}>{tCommentAreaTitle}</h3>
                <form onSubmit={handleComment} className="flex flex-col gap-3 mb-8">
                   <textarea 
                      value={commentText}
