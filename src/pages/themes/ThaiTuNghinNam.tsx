@@ -23,9 +23,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
 
   const totalGiftedChoco = comments.filter(c => c.type === 'choco_gift').reduce((acc, curr) => acc + (curr.giftAmount || 0), 0);
 
-  // Grouping chapters by "Quyển" (Volume) - 30 chapters per Volume
-  const CHAPTERS_PER_VOLUME = 30;
-  const totalVolumes = Math.ceil(chapters.length / CHAPTERS_PER_VOLUME) || 1;
+  // Grouping chapters by specific volumes defined by user
   const [selectedVolume, setSelectedVolume] = useState(0);
 
   // Sort chapters first
@@ -35,14 +33,108 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
     return chapterSortDesc ? bNum - aNum : aNum - bNum;
   });
 
-  // Get chapters belonging to the currently selected Volume
-  const volumeChapters = sortedChapters.slice(
-    selectedVolume * CHAPTERS_PER_VOLUME,
-    (selectedVolume + 1) * CHAPTERS_PER_VOLUME
-  );
+  const volumesConfig = [
+    {
+      id: 0,
+      title: "Quyển một",
+      subtitle: "Đêm đông sống lại",
+      filter: (chap: any) => chap.order >= 0 && chap.order <= 10,
+      rangeText: "Chương 1 - 11"
+    },
+    {
+      id: 1,
+      title: "Quyển hai",
+      subtitle: "Sóng ngầm Binh bộ",
+      filter: (chap: any) => chap.order >= 11 && chap.order <= 20,
+      rangeText: "Chương 12 - 21"
+    }
+  ];
+
+  const currentVolumeConfig = volumesConfig.find(v => v.id === selectedVolume) || volumesConfig[0];
+  const volumeChapters = sortedChapters.filter(currentVolumeConfig.filter);
 
   return (
-    <div className="bg-[#1b1715] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#473a36]/50 via-[#1b1715] to-[#1b1715] min-h-screen text-[#d7cac1] font-serif selection:bg-[#741611] selection:text-[#d7cac1] pb-24 relative overflow-x-hidden">
+    <div className="thai-tu-theme-container bg-[#14100e] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#382b26]/60 via-[#14100e] to-[#14100e] min-h-screen text-[#d7cac1] font-serif selection:bg-[#741611] selection:text-[#d7cac1] pb-24 relative overflow-x-hidden">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .thai-tu-theme-container, 
+        .thai-tu-theme-container *, 
+        .thai-tu-theme-container .font-sans, 
+        .thai-tu-theme-container .font-mono, 
+        .thai-tu-theme-container .font-serif {
+          font-family: 'Cormorant Garamond', Georgia, serif !important;
+        }
+        
+        /* Royal ancient Chinese borders */
+        .royal-box {
+          position: relative;
+          background: rgba(20, 16, 14, 0.95);
+          border: 1px solid rgba(116, 22, 17, 0.45);
+          box-shadow: inset 0 0 30px rgba(116, 22, 17, 0.12), 0 12px 36px rgba(0, 0, 0, 0.65);
+        }
+        
+        .royal-inner-border {
+          position: absolute;
+          inset: 5px;
+          border: 1px solid rgba(171, 143, 101, 0.18);
+          pointer-events: none;
+        }
+
+        /* Delicate gold-crimson ornate corners - Royal Chinese meander and cloud fusion */
+        .royal-corners::before {
+          content: "";
+          position: absolute;
+          inset: -1px;
+          pointer-events: none;
+          z-index: 5;
+          background-image: 
+            /* Top-Left: Imperial court meander & refined cloud accent */
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M0 0h40v2H2v38H0V0zm6 6h28v2H8v26H6V6zm6 6h16v2H14v14h-2V12zm6 6h4v2h-2v2h-2v-4z' fill='%23741611'/%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23ab8f65'/%3E%3Ccircle cx='18' cy='10' r='1' fill='%23ab8f65'/%3E%3Ccircle cx='10' cy='18' r='1' fill='%23ab8f65'/%3E%3C/svg%3E"),
+            /* Top-Right */
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M40 0v40h-2V2H2V0h38zm-6 6v28h-2V8H12V6h22zm-6 6v16h-2V14H20v-2h12zm-6 6v4h-2v-2h-2v-2h4z' fill='%23741611'/%3E%3Ccircle cx='30' cy='10' r='1.5' fill='%23ab8f65'/%3E%3Ccircle cx='22' cy='10' r='1' fill='%23ab8f65'/%3E%3Ccircle cx='30' cy='18' r='1' fill='%23ab8f65'/%3E%3C/svg%3E"),
+            /* Bottom-Left */
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M0 40V0h2v38h38v2H0zm6-6V6h2v26h26v2H6zm6-6V12h2v14h14v2H12zm6-6v-4h2v2h2v2h-4z' fill='%23741611'/%3E%3Ccircle cx='10' cy='30' r='1.5' fill='%23ab8f65'/%3E%3Ccircle cx='18' cy='30' r='1' fill='%23ab8f65'/%3E%3Ccircle cx='10' cy='22' r='1' fill='%23ab8f65'/%3E%3C/svg%3E"),
+            /* Bottom-Right */
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='M40 40H0v-2h38V2h2v38zm-6-6H6v-2h26V12h2v22zm-6-6H12v-2h14V20h2v8zm-6-6h-4v-2h2v-2h2v4z' fill='%23741611'/%3E%3Ccircle cx='30' cy='30' r='1.5' fill='%23ab8f65'/%3E%3Ccircle cx='22' cy='30' r='1' fill='%23ab8f65'/%3E%3Ccircle cx='30' cy='22' r='1' fill='%23ab8f65'/%3E%3C/svg%3E");
+          background-position: top left, top right, bottom left, bottom right;
+          background-repeat: no-repeat;
+          opacity: 0.95;
+        }
+
+        /* Gold accents for important cards */
+        .gold-border-accent {
+          border-color: rgba(116, 22, 17, 0.5) !important;
+          background: linear-gradient(135deg, rgba(34, 28, 25, 0.9) 0%, rgba(20, 16, 14, 0.95) 100%);
+        }
+
+        /* Ancient slab effect for characters */
+        .slab-card {
+          position: relative;
+          background: #171311;
+          border: 1px solid rgba(116, 22, 17, 0.35);
+          box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 5px 15px rgba(0, 0, 0, 0.5);
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .slab-card:hover {
+          border-color: #741611;
+          transform: translateY(-3px);
+          box-shadow: inset 0 0 25px rgba(116, 22, 17, 0.2), 0 12px 28px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Royal Custom Scrollbar */
+        .royal-scroll::-webkit-scrollbar {
+          width: 5px;
+        }
+        .royal-scroll::-webkit-scrollbar-track {
+          background: #14100e;
+        }
+        .royal-scroll::-webkit-scrollbar-thumb {
+          background: #741611;
+          border-radius: 9px;
+        }
+        .royal-scroll::-webkit-scrollbar-thumb:hover {
+          background: #8e1d17;
+        }
+      ` }} />
       
       {/* Background Royal Seal Motif decoration */}
       <div className="absolute top-36 left-0 right-0 h-[500px] pointer-events-none opacity-[0.03] flex justify-between px-16 select-none">
@@ -86,28 +178,24 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
         <div className="lg:col-span-4 flex flex-col gap-6">
           
           {/* Main Book Emblem Frame */}
-          <div className="border-2 border-[#473a36] bg-[#221c19]/80 p-4 rounded-xl relative overflow-hidden shadow-2xl flex flex-col items-center">
-            {/* Elegant corner flourishes */}
-            <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#741611]" />
-            <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[#741611]" />
-            <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[#741611]" />
-            <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[#741611]" />
+          <div className="royal-box royal-corners p-6 rounded-lg relative overflow-hidden flex flex-col items-center">
+            <div className="royal-inner-border" />
             
-            <div className="relative w-48 md:w-full max-w-[240px] aspect-[2/3] bg-[#1b1715] overflow-hidden border border-[#473a36] rounded-lg shadow-xl mb-4 group">
+            <div className="relative w-48 md:w-full max-w-[220px] aspect-[2/3] bg-[#14100e] overflow-hidden border border-[#741611]/45 rounded shadow-2xl mb-4 group">
               <img 
                 src={story.coverUrl || 'https://via.placeholder.com/400x600'} 
                 alt={story.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1b1715]/90 via-transparent to-transparent opacity-60" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#14100e]/95 via-transparent to-transparent opacity-80" />
             </div>
 
-            <div className="text-center w-full">
-              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 bg-[#741611]/15 border border-[#741611]/50 text-[#d7cac1] text-[10px] font-sans font-bold tracking-[0.2em] mb-3 uppercase rounded">
+            <div className="text-center w-full z-10">
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 bg-[#741611]/15 border border-[#741611]/45 text-[#d7cac1] text-[10px] font-sans font-bold tracking-[0.2em] mb-3 uppercase rounded">
                 <Award className="w-3.5 h-3.5 text-[#741611]" />
                 {story.completed ? 'VĨNH KẾT HOÀNG TRIỀU' : 'ĐANG CHẤP BÚT'}
               </div>
-              <h1 className="text-2xl font-black text-[#d7cac1] tracking-wide mb-1 leading-snug">
+              <h1 className="text-2xl font-black text-[#d7cac1] tracking-wide mb-1.5 leading-snug">
                 {story.title}
               </h1>
               <p className="text-xs text-[#8c7b72] tracking-[0.15em] uppercase font-sans font-bold italic mb-2">
@@ -117,23 +205,24 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
           </div>
 
           {/* Stats card */}
-          <div className="border border-[#473a36] bg-[#221c19]/60 p-5 rounded-xl relative">
-            <div className="absolute top-2 right-2 text-[#741611]/10 font-bold font-serif text-3xl select-none pointer-events-none">考</div>
-            <h3 className="text-[11px] font-sans font-black tracking-[0.2em] text-[#8c7b72] uppercase mb-4 flex items-center gap-2 select-none border-b border-[#473a36]/50 pb-2">
-              <Scroll className="w-4 h-4 text-[#741611]" /> NGỰ THƯ THÔNG KHẢO
+          <div className="royal-box p-5 rounded-lg relative overflow-hidden">
+            <div className="royal-inner-border" />
+            <div className="absolute top-2 right-2 text-[#741611]/15 font-bold font-serif text-3xl select-none pointer-events-none">考</div>
+            <h3 className="text-[11px] font-sans font-black tracking-[0.2em] text-[#8c7b72] uppercase mb-4 flex items-center gap-2 select-none border-b border-[#741611]/25 pb-2 z-10 relative">
+              <Scroll className="w-4 h-4 text-[#741611]" /> SỔ GHI NGỰ THƯ
             </h3>
-            <div className="grid grid-cols-2 gap-3 font-sans">
-              <div className="bg-[#1b1715]/80 border border-[#473a36]/40 p-3 text-center rounded">
+            <div className="grid grid-cols-2 gap-3 font-sans relative z-10">
+              <div className="bg-[#14100e]/90 border border-[#741611]/25 p-3 text-center rounded">
                 <span className="block text-[#d7cac1] text-lg font-black">{chapters.length}</span>
-                <span className="text-[9px] text-[#8c7b72] font-black uppercase tracking-wider">CHƯƠNG TIẾT</span>
+                <span className="text-[9px] text-[#8c7b72] font-black uppercase tracking-wider">SỐ HỒI</span>
               </div>
-              <div className="bg-[#1b1715]/80 border border-[#473a36]/40 p-3 text-center rounded">
+              <div className="bg-[#14100e]/90 border border-[#741611]/25 p-3 text-center rounded">
                 <span className="block text-[#d7cac1] text-lg font-black">
                   {new Intl.NumberFormat('en-US', { notation: 'compact' }).format(story.viewCount || 0)}
                 </span>
-                <span className="text-[9px] text-[#8c7b72] font-black uppercase tracking-wider">THƯỞNG DUYỆT</span>
+                <span className="text-[9px] text-[#8c7b72] font-black uppercase tracking-wider">LƯỢT DUYỆT SÁCH</span>
               </div>
-              <div className="bg-[#1b1715]/80 border border-[#473a36]/40 p-3 text-center col-span-2 rounded">
+              <div className="bg-[#14100e]/90 border border-[#741611]/25 p-3 text-center col-span-2 rounded">
                 <span className="block text-[#741611] text-lg font-black">{totalGiftedChoco} Choco</span>
                 <span className="text-[9px] text-[#8c7b72] font-black uppercase tracking-wider">CỐNG PHẨM QUÂN VƯƠNG</span>
               </div>
@@ -141,16 +230,17 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
           </div>
 
           {/* Verification / Blood Lineage Plot Widget */}
-          <div className="border border-[#741611]/40 bg-[#741611]/5 p-5 rounded-xl relative overflow-hidden">
+          <div className="royal-box p-5 rounded-lg relative overflow-hidden">
+            <div className="royal-inner-border" />
             <div className="absolute top-2 right-2 text-[#741611]/15 font-bold font-serif text-3xl select-none pointer-events-none">血</div>
             <div className="absolute top-0 right-0 w-24 h-24 bg-[#741611]/5 rounded-full blur-2xl pointer-events-none" />
-            <h3 className="text-[11px] font-sans font-black tracking-[0.2em] text-[#741611] uppercase mb-2 flex items-center gap-2 select-none">
-              <Shield className="w-4 h-4" /> HUYẾT THỆ ĐẾ VƯƠNG
+            <h3 className="text-[11px] font-sans font-black tracking-[0.2em] text-[#741611] uppercase mb-2 flex items-center gap-2 select-none z-10 relative">
+              <Shield className="w-4 h-4" /> BÍ MẬT HOÀNG TỘC
             </h3>
-            <p className="text-xs text-[#8c7b72] leading-relaxed mb-3">
+            <p className="text-xs text-[#8c7b72] leading-relaxed mb-3 z-10 relative">
               Mật bản ghi chép chi tiết về cuộc tráo đổi hoàng tộc. Thụ tôn quý là Thái tử thật bị đẩy ra chốn gian truân, sống lại thề quy hồi bảo tọa, trừng phạt kẻ giả mạo.
             </p>
-            <div className="border border-[#473a36] bg-[#1b1715]/90 p-3 rounded text-[11px] leading-relaxed font-serif text-[#d7cac1]/80 italic">
+            <div className="border border-[#741611]/30 bg-[#14100e]/95 p-3 rounded text-[11px] leading-relaxed font-serif text-[#d7cac1]/80 italic z-10 relative">
               "Máu đỏ nhỏ vào giọt nước trong, cốt nhục tương liên tất hòa một. Gian xảo đánh tráo nghìn năm, nay linh hồn quy bặc lập hoàng triều."
             </div>
           </div>
@@ -162,7 +252,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                 onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chapters[0].order + 1}`)}
                 className="w-full py-3 bg-[#741611] text-[#d7cac1] hover:bg-[#8e1d17] font-sans font-bold tracking-[0.15em] uppercase text-xs rounded transition-all duration-300 shadow-lg flex items-center justify-center gap-2 cursor-pointer"
               >
-                <BookOpen className="w-4 h-4" /> KHỞI QUYỂN ĐỌC NGAY
+                <BookOpen className="w-4 h-4" /> MỞ SÁCH ĐỌC NGAY
               </button>
             )}
             <button 
@@ -174,7 +264,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
               }`}
             >
               <Bookmark className="w-3.5 h-3.5" fill={savedStories.includes(story.id) ? "currentColor" : "none"} />
-              {savedStories.includes(story.id) ? 'ĐÃ LƯU TRÊN NGỰ ÁN' : 'LƯU LẠI TIẾN TRÌNH'}
+              {savedStories.includes(story.id) ? 'ĐÃ LƯU TÀNG THƯ CÁC' : 'THU VÀO TÀNG THƯ CÁC'}
             </button>
           </div>
 
@@ -184,20 +274,21 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
         <div className="lg:col-span-8 flex flex-col gap-6">
           
           {/* Main Story Info Box */}
-          <div className="border border-[#473a36] bg-[#221c19]/40 p-6 lg:p-8 rounded-xl relative">
-            <div className="absolute top-0 right-0 w-16 h-16 pointer-events-none opacity-10">
+          <div className="royal-box royal-corners p-6 lg:p-8 rounded-lg relative overflow-hidden">
+            <div className="royal-inner-border" />
+            <div className="absolute top-0 right-0 w-16 h-16 pointer-events-none opacity-20">
               {/* Decorative corner */}
-              <svg viewBox="0 0 100 100" className="w-full h-full fill-[#d7cac1]">
+              <svg viewBox="0 0 100 100" className="w-full h-full fill-[#741611]">
                 <path d="M 100,0 L 100,100 L 90,100 L 90,10 L 0,10 L 0,0 Z" />
               </svg>
             </div>
 
             {/* Genres Tag */}
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="flex flex-wrap gap-2 mb-6 z-10 relative">
               {story.genres?.map?.((g: string) => (
                 <span 
                   key={g} 
-                  className="bg-[#741611]/10 text-[#d7cac1] px-3 py-1 text-[10px] font-sans font-extrabold uppercase tracking-widest rounded border border-[#741611]/30"
+                  className="bg-[#741611]/15 text-[#d7cac1] px-3 py-1 text-[10px] font-sans font-extrabold uppercase tracking-widest rounded border border-[#741611]/45"
                 >
                   {g}
                 </span>
@@ -205,12 +296,12 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
             </div>
 
             {/* Story Description */}
-            <div className="mb-6 relative">
+            <div className="mb-6 relative z-10">
               <div className="absolute top-0 right-0 text-[#741611]/10 font-bold font-serif text-3xl select-none pointer-events-none">卷</div>
               <h3 className="text-xs font-sans font-black tracking-[0.2em] text-[#741611] uppercase mb-3 select-none flex items-center gap-1.5">
-                <Scroll className="w-4 h-4 text-[#741611]" /> ĐIỂN TÍCH KHỞI NGUYÊN BẢN
+                <Scroll className="w-4 h-4 text-[#741611]" /> ĐIỂN TÍCH KHỞI NGUYÊN
               </h3>
-              <div className="text-[#d7cac1]/90 leading-relaxed text-[15px] font-serif pr-2 max-h-[320px] overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#741611 #221c19' }}>
+              <div className="text-[#d7cac1]/90 leading-relaxed text-[15px] font-serif pr-2 max-h-[320px] overflow-y-auto royal-scroll" style={{ scrollbarWidth: 'thin', scrollbarColor: '#741611 #221c19' }}>
                 {story.description?.split('\n').map((para: string, idx: number) => {
                   const trimmed = para.trim();
                   if (!trimmed) return null;
@@ -225,11 +316,11 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
 
             {/* RECOMMENDED STORIES - KHẢI TẤU TIẾN CỬ */}
             {story.recommendations && (
-              <div className="border-t border-[#473a36]/50 pt-5 mt-5">
+              <div className="border-t border-[#741611]/25 pt-5 mt-5 z-10 relative">
                 <h4 className="text-[11px] font-sans font-black tracking-[0.25em] text-[#741611] uppercase mb-3 flex items-center gap-1.5 select-none">
-                  <Scroll className="w-4 h-4 text-[#741611]" /> KHẢI TẤU TIẾN CỬ THƯ MỤC
+                  <Scroll className="w-4 h-4 text-[#741611]" /> KHẢI TẤU TIẾN CỬ
                 </h4>
-                <div className="text-[13px] leading-relaxed text-[#d7cac1]/80 bg-[#1b1715]/80 p-4 rounded border border-[#473a36]/40 whitespace-pre-line font-serif italic relative">
+                <div className="text-[13px] leading-relaxed text-[#d7cac1]/80 bg-[#14100e]/95 p-4 rounded border border-[#741611]/30 whitespace-pre-line font-serif italic relative">
                   <div className="absolute top-2 right-2 text-[#741611]/20 font-sans text-4xl select-none font-bold">薦</div>
                   {story.recommendations}
                 </div>
@@ -238,36 +329,43 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
           </div>
 
           {/* IMMERSIVE CHARACTER DOSSIERS */}
-          <div className="border-2 border-[#741611]/40 bg-[#221c19]/80 p-6 rounded-xl relative overflow-hidden shadow-2xl">
+          <div className="royal-box royal-corners p-6 rounded-lg relative overflow-hidden shadow-2xl">
+            <div className="royal-inner-border" />
             {/* Elegant Background flourish */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#741611]/5 rounded-full blur-3xl pointer-events-none" />
-            <h3 className="text-xs font-sans font-black tracking-[0.25em] text-[#741611] uppercase mb-6 flex items-center gap-2 select-none border-b-2 border-[#741611]/30 pb-2.5">
-              <Crown className="w-4 h-4 text-[#741611]" /> HOÀNG TÔNG MẬT QUYỂN · NHÂN VẬT THƯ SƠ
+            <h3 className="text-xs font-sans font-black tracking-[0.25em] text-[#741611] uppercase mb-6 flex items-center gap-2 select-none border-b border-[#741611]/30 pb-2.5 z-10 relative">
+              <Scroll className="w-4 h-4 text-[#741611]" /> HỒ SƠ NHÂN VẬT BẢN THẢO
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
               
               {/* Uong Phu Thang (Thu) */}
-              <div className="p-5 bg-[#1b1715]/90 border-t-4 border-[#741611] border-x border-b border-[#473a36]/50 rounded-b relative overflow-hidden group hover:border-[#741611] transition-all duration-300 shadow-lg">
+              <div className="slab-card p-5 rounded-md relative overflow-hidden group">
                 {/* Chinese characters watermarks */}
-                <div className="absolute bottom-2 right-2 text-[#741611]/10 font-black text-6xl select-none font-serif tracking-widest pointer-events-none">
-                  受
+                <div className="absolute bottom-2 right-2 text-[#741611]/15 font-black text-4xl select-none font-serif tracking-widest pointer-events-none transition-all duration-300 group-hover:scale-110">
+                  应浮昇
                 </div>
                 
                 <div className="flex items-start gap-3 mb-4">
-                  <div className="p-2 bg-[#741611]/15 rounded border border-[#741611]/40 text-[#741611]">
-                    <Crown className="w-5 h-5" />
-                  </div>
                   <div>
-                    <h4 className="font-bold text-[#d7cac1] text-base font-serif tracking-wide">Ưng Phù Thăng (thụ)</h4>
-                    <span className="text-[10px] font-sans text-[#741611] font-black uppercase tracking-widest bg-[#741611]/10 border border-[#741611]/30 px-1.5 py-0.5 rounded mt-1 inline-block">
-                      Thái tử thật
-                    </span>
+                    <h4 className="font-bold text-[#d7cac1] text-base font-serif tracking-wide">Ưng Phù Thăng</h4>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      <span className="text-[10px] font-sans text-[#741611] font-black uppercase tracking-widest bg-[#741611]/15 border border-[#741611]/35 px-1.5 py-0.5 rounded inline-block">
+                        Thái tử thật
+                      </span>
+                      <span className="text-[10px] font-sans text-[#741611] font-black uppercase tracking-widest bg-[#741611]/15 border border-[#741611]/35 px-1.5 py-0.5 rounded inline-block">
+                        Thụ
+                      </span>
+                    </div>
                   </div>
                 </div>
                 
                 <div className="space-y-3 text-[13px] text-[#d7cac1]/90 font-serif">
-                  <div className="flex items-center gap-2 border-b border-[#473a36]/30 pb-2">
+                  <div className="flex items-center gap-2 border-b border-[#741611]/15 pb-2">
+                    <span className="text-[#8c7b72] w-16 text-[10px] font-sans uppercase tracking-wider">Vai trò:</span>
+                    <span className="text-[#741611] font-bold">Thụ</span>
+                  </div>
+                  <div className="flex items-center gap-2 border-b border-[#741611]/15 pb-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#741611]" />
                     <span>Dồn sức xây dựng sự nghiệp</span>
                   </div>
@@ -279,26 +377,32 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
               </div>
 
               {/* Thich Han Chu (Cong) */}
-              <div className="p-5 bg-[#1b1715]/90 border-t-4 border-[#8c7b72] border-x border-b border-[#473a36]/50 rounded-b relative overflow-hidden group hover:border-[#8c7b72] transition-all duration-300 shadow-lg">
+              <div className="slab-card p-5 rounded-md relative overflow-hidden group">
                 {/* Chinese characters watermarks */}
-                <div className="absolute bottom-2 right-2 text-[#8c7b72]/10 font-black text-6xl select-none font-serif tracking-widest pointer-events-none">
-                  攻
+                <div className="absolute bottom-2 right-2 text-[#8c7b72]/15 font-black text-4xl select-none font-serif tracking-widest pointer-events-none transition-all duration-300 group-hover:scale-110">
+                  戚寒舟
                 </div>
 
                 <div className="flex items-start gap-3 mb-4">
-                  <div className="p-2 bg-[#8c7b72]/15 rounded border border-[#8c7b72]/40 text-[#8c7b72]">
-                    <Swords className="w-5 h-5" />
-                  </div>
                   <div>
-                    <h4 className="font-bold text-[#d7cac1] text-base font-serif tracking-wide">Thích Hàn Chu (công)</h4>
-                    <span className="text-[10px] font-sans text-[#8c7b72] font-black uppercase tracking-widest bg-[#8c7b72]/10 border border-[#8c7b72]/30 px-1.5 py-0.5 rounded mt-1 inline-block">
-                      Quan võ lạnh lùng
-                    </span>
+                    <h4 className="font-bold text-[#d7cac1] text-base font-serif tracking-wide">Thích Hàn Chu</h4>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      <span className="text-[10px] font-sans text-[#8c7b72] font-black uppercase tracking-widest bg-[#8c7b72]/15 border border-[#8c7b72]/35 px-1.5 py-0.5 rounded inline-block">
+                        Quan võ lạnh lùng
+                      </span>
+                      <span className="text-[10px] font-sans text-[#8c7b72] font-black uppercase tracking-widest bg-[#8c7b72]/15 border border-[#8c7b72]/35 px-1.5 py-0.5 rounded inline-block">
+                        Công
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 <div className="space-y-3 text-[13px] text-[#d7cac1]/90 font-serif">
-                  <div className="flex items-center gap-2 border-b border-[#473a36]/30 pb-2">
+                  <div className="flex items-center gap-2 border-b border-[#741611]/15 pb-2">
+                    <span className="text-[#8c7b72] w-16 text-[10px] font-sans uppercase tracking-wider">Vai trò:</span>
+                    <span className="text-[#8c7b72] font-bold">Công</span>
+                  </div>
+                  <div className="flex items-center gap-2 border-b border-[#741611]/15 pb-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#8c7b72]" />
                     <span>Thuở thiếu thời từng là kiếm khách</span>
                   </div>
@@ -320,7 +424,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                 activeTab === 'chapters' ? 'text-[#741611] bg-[#221c19]/60' : 'text-[#8c7b72] hover:text-[#d7cac1] bg-transparent'
               }`}
             >
-              CHƯƠNG TIẾT SÁCH VĂN ({chapters.length})
+              MỤC LỤC CHƯƠNG ({chapters.length})
               {activeTab === 'chapters' && (
                 <span className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#741611] rounded-t-full" />
               )}
@@ -344,37 +448,72 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
             {activeTab === 'chapters' ? (
               <div className="flex flex-col gap-4 animate-fade-in">
                 
-                {/* DYNAMIC VOLUME TABS SELECTOR (ANTI LONG SCROLL) */}
-                {totalVolumes > 1 && (
-                  <div className="flex flex-wrap gap-2 pb-4 border-b border-[#473a36]/30 select-none">
-                    <span className="text-[10px] font-sans font-black uppercase text-[#8c7b72] self-center tracking-wider mr-2">
-                      CHỌN QUYỂN CHƯƠNG:
+                {/* SELECTOR QUYỂN TRUYỆN CỔ KÍNH */}
+                <div className="pb-5 border-b border-[#741611]/30 select-none">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Feather className="w-4 h-4 text-[#741611]" />
+                    <span className="text-[11px] font-sans font-black uppercase text-[#8c7b72] tracking-[0.2em]">
+                      CHỌN CHI ĐỒNG THƯ QUYỂN:
                     </span>
-                    {Array.from({ length: totalVolumes }).map((_, vIdx) => {
-                      const startChap = vIdx * CHAPTERS_PER_VOLUME + 1;
-                      const endChap = Math.min((vIdx + 1) * CHAPTERS_PER_VOLUME, chapters.length);
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    {volumesConfig.map((vol) => {
+                      const isSelected = selectedVolume === vol.id;
                       return (
                         <button
-                          key={vIdx}
-                          onClick={() => setSelectedVolume(vIdx)}
-                          className={`px-3 py-1 text-[10px] font-sans font-bold uppercase rounded border transition-all duration-200 ${
-                            selectedVolume === vIdx
-                              ? 'bg-[#741611] border-[#741611] text-[#d7cac1]'
-                              : 'bg-[#1b1715]/65 border-[#473a36]/50 text-[#8c7b72] hover:text-[#d7cac1] hover:border-[#741611]/60'
+                          key={vol.id}
+                          onClick={() => setSelectedVolume(vol.id)}
+                          className={`relative p-3 text-left rounded transition-all duration-300 border cursor-pointer overflow-hidden ${
+                            isSelected
+                              ? 'bg-[#2a1714] border-[#741611]/80 text-[#d7cac1] shadow-[0_0_15px_rgba(116,22,17,0.15)]'
+                              : 'bg-[#1b1715]/80 border-[#473a36]/50 text-[#8c7b72] hover:text-[#d7cac1] hover:border-[#741611]/40'
                           }`}
                         >
-                          Quyển {vIdx + 1} ({startChap} - {endChap})
+                          {/* Inner corner decoration for selected Volume tab */}
+                          {isSelected && (
+                            <>
+                              <span className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-[#741611]" />
+                              <span className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-[#741611]" />
+                              <span className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-[#741611]" />
+                              <span className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#741611]" />
+                            </>
+                          )}
+                          
+                          <div className={`text-[10px] font-sans font-black uppercase tracking-widest ${isSelected ? 'text-[#741611]' : 'text-[#8c7b72]'}`}>
+                            {vol.title}
+                          </div>
+                          <div className="font-serif text-sm font-bold text-[#d7cac1] mt-0.5 tracking-wide truncate">
+                            {vol.subtitle}
+                          </div>
+                          <div className="text-[9px] font-sans text-[#8c7b72] mt-1 flex items-center justify-between">
+                            <span />
+                            {isSelected && <span className="text-[8px] tracking-wider px-1 bg-[#741611]/20 text-[#d7cac1] rounded">ĐANG XEM</span>}
+                          </div>
                         </button>
                       );
                     })}
+                    
+                    {/* NÚT CÒN TIẾP CỦA MỤC LỤC */}
+                    <div className="relative p-3 text-left rounded border bg-[#14100e]/35 border-[#473a36]/20 text-[#473a36] select-none flex flex-col justify-center">
+                      <div className="text-[10px] font-sans font-black uppercase tracking-widest text-[#473a36]/60">
+                        HỒI SAU...
+                      </div>
+                      <div className="font-serif text-sm font-bold mt-0.5 text-[#473a36]/70 italic">
+                        Đang mài mực viết tiếp
+                      </div>
+                      <div className="text-[9px] font-sans text-[#473a36]/50 mt-1">
+                        Còn tiếp...
+                      </div>
+                    </div>
                   </div>
-                )}
+                </div>
 
                 {/* Chapters list grid inside current selected Volume */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[480px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#741611 #1b1715' }}>
                   {volumeChapters.length > 0 ? (
                     volumeChapters.map((chap, i) => {
-                      const absoluteIndex = (selectedVolume * CHAPTERS_PER_VOLUME) + i + 1;
+                      const absoluteIndex = chap.order + 1;
                       const recordCode = `THƯ QUYỂN · ${absoluteIndex.toString().padStart(3, '0')}`;
                       return (
                         <div 
@@ -387,7 +526,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                               {recordCode}
                             </span>
                             <span className="px-1.5 py-0.5 border border-[#473a36]/30 bg-[#473a36]/10 rounded text-[8px] font-sans font-semibold text-[#8c7b72] group-hover:text-[#d7cac1] transition-colors">
-                              MẬT KHẢO
+                              CHƯƠNG TRUYỆN
                             </span>
                           </div>
 
@@ -397,10 +536,10 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
 
                           <div className="flex items-center justify-between pt-2 border-t border-[#473a36]/20">
                             <span className="text-[9px] text-[#8c7b72] font-sans uppercase tracking-wider group-hover:text-[#d7cac1]/70 transition-colors">
-                              BẢN IN SÁCH VĂN
+                              CHI TIẾT CHƯƠNG
                             </span>
                             <span className="text-[9px] font-sans font-black uppercase tracking-wider text-[#741611] group-hover:translate-x-1 transition-transform duration-200 flex items-center gap-0.5">
-                              KHAI QUYỂN <ChevronRight className="w-3 h-3" />
+                              VÀO ĐỌC <ChevronRight className="w-3 h-3" />
                             </span>
                           </div>
                         </div>
@@ -424,8 +563,8 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                       <Gift className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-bold text-[#d7cac1] text-xs uppercase tracking-wider">CỐNG HIẾN TẬP PHIẾU CHƯƠNG</h4>
-                      <p className="text-[11px] text-[#8c7b72]">Gửi tặng Choco tiếp thêm động lực cho vị diện ngự bút.</p>
+                      <h4 className="font-bold text-[#d7cac1] text-xs uppercase tracking-wider">TIẾN CỐNG QUÂN VƯƠNG</h4>
+                      <p className="text-[11px] text-[#8c7b72]">Dâng hiến Choco tiếp thêm động lực cho vị diện ngự bút.</p>
                     </div>
                   </div>
                   <button
@@ -484,17 +623,17 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                                 {comm.createdAt?.seconds ? format(new Date(comm.createdAt.seconds * 1000), 'dd/MM/yyyy HH:mm') : 'VỪA XONG'}
                               </span>
                             </div>
-
+ 
                             {activeTitle && (
                               <div className="mb-2 select-none">
-                                <span className="text-[8px] font-sans font-black tracking-widest bg-[#741611]/25 text-[#d7cac1] border border-[#741611]/50 px-1.5 py-0.5 rounded uppercase">
+                                <span className="text-[8px] font-sans font-black tracking-widest bg-[#741611]/20 text-[#d7cac1] border border-[#741611]/50 px-1.5 py-0.5 rounded uppercase">
                                   {activeTitle}
                                 </span>
                               </div>
                             )}
-
+ 
                             {comm.type === 'choco_gift' ? (
-                              <div className="mt-1 bg-[#741611]/10 border border-[#741611]/40 rounded-lg p-3 flex items-center gap-3 select-none">
+                              <div className="mt-1 bg-[#741611]/15 border border-[#741611]/40 rounded-lg p-3 flex items-center gap-3 select-none">
                                 <Gift className="w-4 h-4 text-[#741611]" />
                                 <div className="text-xs">
                                   Đã dâng hiến cống vật quân vương <strong className="text-[#741611] font-bold">{comm.giftAmount} Choco</strong>
