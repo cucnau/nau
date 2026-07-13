@@ -70,10 +70,42 @@ export function ChimHoangYenTheme(props: ThemeProps) {
     }
   };
 
+  // Web Audio Water Ripple Synthesizer (Tiếng giọt nước rơi nhẹ nhàng, tí tách)
+  const playWaterRippleSound = () => {
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass();
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+
+      // Tần số từ trầm lên bổng cực nhanh mô phỏng tiếng bong bóng nước vỡ nhẹ
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(780, now + 0.1);
+
+      // Âm lượng siêu bé và tắt dần nhanh chóng để tạo cảm giác tĩnh mịch, dịu mát
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.04, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } catch (e) {
+      console.warn('Web Audio is not supported yet', e);
+    }
+  };
+
   // Kích hoạt sóng nước lăn tăn trên toàn bộ mặt hồ giao diện khi chạm
   const handleTouchWater = (e: React.MouseEvent<HTMLDivElement>) => {
-    const x = e.pageX;
-    const y = e.pageY;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
     
     const newRipple = {
       id: Date.now(),
@@ -82,7 +114,7 @@ export function ChimHoangYenTheme(props: ThemeProps) {
     };
     
     setRipples(prev => [...prev, newRipple]);
-    playBirdChirp();
+    playWaterRippleSound();
 
     setTimeout(() => {
       setRipples(prev => prev.filter(r => r.id !== newRipple.id));
