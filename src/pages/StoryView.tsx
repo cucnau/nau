@@ -412,7 +412,7 @@ export function StoryView() {
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 border-4 border-[#cde8c6] border-t-[#f4d451] rounded-full animate-spin" />
             <div className="text-xs uppercase tracking-[0.2em] text-[#1b3a1e]/60 animate-pulse font-bold">
-              CHIM HOÀNG YẾN // ĐANG HOẠT ĐỘNG...
+              ĐANG CHẠM VÀO MẶT HỒ...
             </div>
           </div>
         </div>
