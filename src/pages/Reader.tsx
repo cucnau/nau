@@ -1101,7 +1101,7 @@ export function Reader() {
           <div className="flex flex-col items-center gap-4">
             <div className="w-12 h-12 border-4 border-[#cde8c6] border-t-[#f4d451] rounded-full animate-spin" />
             <div className="text-xs tracking-widest text-[#132e1a]/80 animate-pulse font-bold">
-              Đang chạm vào mặt hồ...
+              ĐANG RUNG CÂY BẠCH QUẢ...
             </div>
           </div>
         </div>
