@@ -72,9 +72,8 @@ export function ChimHoangYenTheme(props: ThemeProps) {
 
   // Kích hoạt sóng nước lăn tăn trên toàn bộ mặt hồ giao diện khi chạm
   const handleTouchWater = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = e.pageX;
+    const y = e.pageY;
     
     const newRipple = {
       id: Date.now(),
@@ -107,20 +106,46 @@ export function ChimHoangYenTheme(props: ThemeProps) {
     >
       
       {/* HIỆU ỨNG GỢN SÓNG NƯỚC TOÀN BỘ GIAO DIỆN (MẶT HỒ XANH MƯỚT) */}
-      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
         {ripples.map(ripple => (
-          <motion.div
-            key={ripple.id}
-            initial={{ width: 0, height: 0, opacity: 0.6 }}
-            animate={{ width: 350, height: 350, opacity: 0 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            className="absolute border-[1px] border-[#ddd289] rounded-full pointer-events-none"
-            style={{
-              left: ripple.x,
-              top: ripple.y,
-              transform: 'translate(-50%, -50%)',
-            }}
-          />
+          <React.Fragment key={ripple.id}>
+            {/* Vòng ngoài lan rộng */}
+            <motion.div
+              initial={{ width: 0, height: 0, opacity: 0.8 }}
+              animate={{ width: 240, height: 240, opacity: 0 }}
+              transition={{ duration: 1.1, ease: "easeOut" }}
+              className="absolute border-2 border-[#f4d451] bg-[#f4d451]/10 rounded-full pointer-events-none"
+              style={{
+                left: ripple.x,
+                top: ripple.y,
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
+            {/* Vòng trong tinh tế */}
+            <motion.div
+              initial={{ width: 0, height: 0, opacity: 0.9 }}
+              animate={{ width: 120, height: 120, opacity: 0 }}
+              transition={{ duration: 0.7, ease: "easeOut", delay: 0.08 }}
+              className="absolute border border-[#f4d451]/80 rounded-full pointer-events-none"
+              style={{
+                left: ripple.x,
+                top: ripple.y,
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
+            {/* Tâm chấn lung linh */}
+            <motion.div
+              initial={{ width: 0, height: 0, opacity: 1 }}
+              animate={{ width: 30, height: 30, opacity: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="absolute bg-white/65 rounded-full pointer-events-none"
+              style={{
+                left: ripple.x,
+                top: ripple.y,
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
+          </React.Fragment>
         ))}
 
         {/* Các gợn sóng nước tự nhiên lăn tăn khẽ khàng */}
