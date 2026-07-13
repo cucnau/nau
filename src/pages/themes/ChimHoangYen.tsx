@@ -95,14 +95,14 @@ export function ChimHoangYenTheme(props: ThemeProps) {
     }, 1200);
   };
 
-  // Lá bạch quả vàng úa rơi mượt mà dịu mát (tạo từ 5 mã màu vàng/xanh tinh tế)
-  const fallingLeaves = Array.from({ length: 14 }).map((_, i) => ({
+  // Cả lá bạch quả vàng úa và lông vũ hoàng yến mềm mại rơi lãng đãng trong gió nhẹ bên mặt hồ
+  const fallingElements = Array.from({ length: 18 }).map((_, i) => ({
     id: i,
-    delay: i * 1.5,
-    duration: 12 + i * 2.5,
-    left: `${5 + i * 7}%`,
-    scale: 0.4 + (i % 4) * 0.15,
-    isFeather: i % 3 === 0
+    delay: i * 1.2,
+    duration: 12 + i * 2.0,
+    left: `${3 + i * 5.3}%`,
+    scale: 0.42 + (i % 4) * 0.12,
+    elementType: i % 3 // 0: Lông vũ lượn sóng, 1: Lông vũ mảnh dẻ, 2: Lá bạch quả
   }));
 
   return (
@@ -146,40 +146,51 @@ export function ChimHoangYenTheme(props: ThemeProps) {
         />
       </div>
 
-      {/* 1. HIỆU ỨNG LÁ BẠCH QUẢ VÀ LÔNG VŨ RƠI MÀU SẮC SẢO */}
+      {/* 1. HIỆU ỨNG Lá BẠCH QUẢ VÀ LÔNG VŨ HOÀNG YẾN RƠI MÀU SẮC SẢO MỀM MẠI */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-20">
-        {fallingLeaves.map(leaf => (
+        {fallingElements.map(el => (
           <motion.div
-            key={leaf.id}
+            key={el.id}
             initial={{ y: -60, opacity: 0, rotate: 0 }}
             animate={{
               y: '105vh',
               opacity: [0, 0.9, 0.9, 0],
-              x: [0, 40, -30, 20],
-              rotate: [0, 140, 260, 360]
+              x: [0, 35, -25, 15],
+              rotate: [0, 120, 240, 360]
             }}
             transition={{
-              duration: leaf.duration,
+              duration: el.duration,
               repeat: Infinity,
-              delay: leaf.delay,
+              delay: el.delay,
               ease: 'linear'
             }}
             style={{
               position: 'absolute',
-              left: leaf.left,
-              transform: `scale(${leaf.scale})`
+              left: el.left,
+              transform: `scale(${el.scale})`
             }}
           >
-            {leaf.isFeather ? (
-              /* Lông vũ hoàng yến mềm mại vàng óng (#f4d451) nét vẽ rất mảnh và sắc sảo */
-              <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {el.elementType === 0 ? (
+              /* Mẫu lông vũ hoàng yến lãng mạn lượn sóng */
+              <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
-                  d="M15,85 Q42,58 52,28 Q54,12 44,4 Q56,10 62,22 Q72,52 85,62 Q68,68 48,72 Z"
+                  d="M20,80 Q45,55 52,30 Q54,15 44,6 Q56,12 62,24 Q70,50 82,60 Q66,66 48,70 Z"
                   fill="#f4d451"
                   stroke="#ddd289"
-                  strokeWidth="1"
+                  strokeWidth="0.8"
                 />
-                <path d="M44,4 Q48,40 15,85" stroke="#eff6f0" strokeWidth="1" />
+                <path d="M44,6 Q48,42 20,80" stroke="#ffffff" strokeWidth="0.8" strokeDasharray="1,1" />
+              </svg>
+            ) : el.elementType === 1 ? (
+              /* Mẫu lông vũ hoàng yến mảnh dẻ bay bổng */
+              <svg width="22" height="22" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M10,90 C35,68 45,45 42,20 C40,5 52,10 58,25 C65,48 55,75 10,90 Z"
+                  fill="#ddd289"
+                  stroke="#f4d451"
+                  strokeWidth="0.8"
+                />
+                <path d="M50,15 C45,48 10,90 10,90" stroke="#ffffff" strokeWidth="0.8" strokeDasharray="1,1" />
               </svg>
             ) : (
               /* Lá bạch quả hình quạt chân thực, thanh lịch (#ddd289 và #f4d451) nét viền mỏng tang cực sắc sảo */
@@ -371,26 +382,48 @@ export function ChimHoangYenTheme(props: ThemeProps) {
           </div>
 
           {/* CÁC NÚT ĐIỀU HƯỚNG NHANH - THIẾT KẾ MỎNG NHẸ, DỊU DÀNG */}
-          <div className="flex gap-3 w-full">
-            <button 
-              onClick={() => chapters.length > 0 && navigate(`/doc/${story.slug || story.id}/chuong-${chapters[0].order + 1}`)} 
-              className="flex-1 bg-[#aeed9a] hover:bg-[#f4d451] text-[#132e1a] py-3 text-xs rounded-xl font-semibold tracking-wider flex items-center justify-center gap-2 border-[1px] border-[#ddd289] transition-all duration-300 hover:shadow-md cursor-pointer"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-[#132e1a]" />
-              Rẽ nước thưởng văn
-            </button>
+          <div className="flex flex-col gap-3 w-full">
+            <div className="flex gap-3 w-full">
+              <button 
+                onClick={() => chapters.length > 0 && navigate(`/doc/${story.slug || story.id}/chuong-${chapters[0].order + 1}`)} 
+                className="flex-1 bg-[#aeed9a] hover:bg-[#f4d451] text-[#132e1a] py-3 text-xs rounded-xl font-semibold tracking-wider flex items-center justify-center gap-2 border-[1px] border-[#ddd289] transition-all duration-300 hover:shadow-md cursor-pointer"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-[#132e1a]" />
+                Rẽ nước thưởng văn
+              </button>
 
-            <button 
-              onClick={handleSaveToggle} 
-              className={`flex-1 py-3 text-xs rounded-xl font-semibold tracking-wider flex items-center justify-center gap-2 border-[1px] border-[#ddd289] transition-all duration-300 hover:shadow-md cursor-pointer ${
-                savedStories?.includes(story.id)
-                  ? "bg-[#f4d451] text-[#132e1a]" 
-                  : "bg-white/80 hover:bg-[#eff6f0] text-[#132e1a]"
-              }`}
-            >
-              <Bookmark className={`w-3.5 h-3.5 ${savedStories?.includes(story.id) ? "fill-[#132e1a]" : ""}`} />
-              {savedStories?.includes(story.id) ? 'Khắc lòng đáy nước' : 'Thả tim xuống hồ'}
-            </button>
+              <button 
+                onClick={handleSaveToggle} 
+                className={`flex-1 py-3 text-xs rounded-xl font-semibold tracking-wider flex items-center justify-center gap-2 border-[1px] border-[#ddd289] transition-all duration-300 hover:shadow-md cursor-pointer ${
+                  savedStories?.includes(story.id)
+                    ? "bg-[#f4d451] text-[#132e1a]" 
+                    : "bg-white/80 hover:bg-[#eff6f0] text-[#132e1a]"
+                }`}
+              >
+                <Bookmark className={`w-3.5 h-3.5 ${savedStories?.includes(story.id) ? "fill-[#132e1a]" : ""}`} />
+                {savedStories?.includes(story.id) ? 'Khắc lòng đáy nước' : 'Thả tim xuống hồ'}
+              </button>
+            </div>
+
+            <div className="flex gap-3 w-full">
+              <button 
+                onClick={() => setShowGiftModal(true)} 
+                className="flex-1 bg-[#f4d451] hover:bg-[#cde8c6] text-[#132e1a] py-3 text-xs rounded-xl font-semibold tracking-wider flex items-center justify-center gap-2 border-[1px] border-[#ddd289] transition-all duration-300 hover:shadow-md cursor-pointer"
+              >
+                <Gift className="w-3.5 h-3.5 text-[#132e1a]" />
+                Thả Choco nuôi hoàng yến
+              </button>
+
+              <a 
+                href={story.sourceUrl || story.originalUrl || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-white hover:bg-[#eff6f0] text-[#132e1a] py-3 text-xs rounded-xl font-semibold tracking-wider flex items-center justify-center gap-2 border-[1px] border-[#ddd289] transition-all duration-300 hover:shadow-md cursor-pointer text-center"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#f4d451]" />
+                Tìm về nguồn cội
+              </a>
+            </div>
           </div>
 
         </div>
@@ -411,9 +444,9 @@ export function ChimHoangYenTheme(props: ThemeProps) {
               {story.genres?.map?.((genre: string) => (
                 <span 
                   key={genre} 
-                  className="bg-[#eff6f0] text-[#132e1a] text-[10px] font-medium tracking-wide px-3 py-1 rounded border border-[#ddd289]/40"
+                  className="bg-[#eff6f0] text-[#132e1a] text-[10px] font-medium tracking-wide px-3 py-1 rounded border border-[#ddd289]/40 flex items-center gap-1"
                 >
-                  Dưới bóng bạch quả • {genre}
+                  🍃 {genre}
                 </span>
               ))}
             </div>
@@ -638,22 +671,7 @@ export function ChimHoangYenTheme(props: ThemeProps) {
             )}
           </div>
 
-          {/* QUÀ TẶNG CHOCO NGỌT NGÀO NHẸ NHÀNG */}
-          <div className="interactive-card bg-[#eff6f0]/90 text-[#132e1a] rounded-2xl border-[1px] border-[#ddd289] p-6 text-center shadow-sm relative overflow-hidden">
-            <h4 className="font-semibold text-sm tracking-wider text-[#132e1a] mb-2 flex items-center justify-center gap-2 relative z-10 font-serif">
-              <Gift className="w-4.5 h-4.5 animate-bounce text-[#f4d451]" />
-              Thả kẹo Choco xuống hồ
-            </h4>
-            <p className="text-[11px] text-[#132e1a]/80 mb-4 max-w-md mx-auto relative z-10 leading-relaxed font-serif">
-              Thả kẹo ngọt Choco dịu ngọt vào lòng hồ, nuôi dưỡng cánh chim hoàng yến nhỏ bé ca hát bên nhành bạch quả lãng mạn...
-            </p>
-            <button 
-              onClick={() => setShowGiftModal(true)} 
-              className="bg-[#f4d451] hover:bg-[#cde8c6] text-[#132e1a] px-6 py-2.5 text-xs rounded-xl font-semibold tracking-wide border-[1px] border-[#ddd289] hover:shadow transition-all cursor-pointer relative z-10"
-            >
-              🍫 Thả Choco nuôi hoàng yến
-            </button>
-          </div>
+
 
         </div>
 
