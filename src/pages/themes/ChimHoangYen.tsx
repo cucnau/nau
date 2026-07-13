@@ -358,10 +358,9 @@ export function ChimHoangYenTheme(props: ThemeProps) {
           </h2>
         </div>
 
-        {/* Choco Coin nhẹ nhàng */}
-        <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/50 border-[1px] border-[#ddd289] text-xs font-medium text-[#132e1a]">
-          <span>🍃 Sương hồ</span>
-          <span className="tracking-wide">{choco} giọt</span>
+        {/* Tác giả */}
+        <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/50 border-[1px] border-[#ddd289] text-xs font-medium text-[#132e1a] font-serif">
+          <span>作者：听原</span>
         </div>
       </div>
 
