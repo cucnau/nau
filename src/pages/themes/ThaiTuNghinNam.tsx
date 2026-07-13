@@ -18,8 +18,11 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
   const {
     equippedStickerComment, stickerPositionComment, displayName: storeDisplayName,
     avatarUrl: storeAvatarUrl, activeTitle: storeActiveTitle,
-    equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition
+    equippedAccessory: storeEquippedAccessory, accessoryPosition: storeAccessoryPosition,
+    email
   } = useStore();
+
+  const isAdmin = email?.toLowerCase() === 'cucnau01@gmail.com';
 
   const totalGiftedChoco = comments.filter(c => c.type === 'choco_gift').reduce((acc, curr) => acc + (curr.giftAmount || 0), 0);
 
@@ -322,28 +325,33 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                   {/* Portrait Area */}
                   <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
                     <div 
-                      onClick={() => setShowImgModal('thu')}
-                      className="relative w-16 h-22 bg-[#1b1715] border border-[#741611]/40 rounded overflow-hidden cursor-pointer group/portrait shadow-lg"
-                      title="Cung thỉnh chân dung"
+                      onClick={isAdmin ? () => setShowImgModal('thu') : undefined}
+                      className={`relative w-16 h-22 bg-[#1b1715] border border-[#741611]/40 rounded overflow-hidden shadow-lg ${
+                        isAdmin ? "cursor-pointer group/portrait" : "select-none"
+                      }`}
+                      title={isAdmin ? "Cung thỉnh bức họa" : undefined}
                     >
                       {thuImg ? (
-                        <img src={thuImg} alt="Ưng Phù Thăng" className="w-full h-full object-cover transition-transform duration-500 group-hover/portrait:scale-110" />
+                        <img src={thuImg} alt="Ưng Phù Thăng" className="w-full h-full object-cover transition-transform duration-500" />
                       ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center p-1 bg-gradient-to-b from-[#221c19] to-[#14100e] text-[#8c7b72]/40 hover:text-[#d7cac1]/60 transition-colors">
-                          <Image className="w-5 h-5 mb-1 text-[#741611]/45" />
-                          <span className="text-[8px] font-sans font-black text-center uppercase tracking-wider leading-none">Cung Thỉnh<br/>Chân Dung</span>
+                        isAdmin ? (
+                          <div className="w-full h-full flex flex-col items-center justify-center p-1 bg-gradient-to-b from-[#221c19] to-[#14100e] text-[#8c7b72]/40 hover:text-[#d7cac1]/60 transition-colors">
+                            <Image className="w-5 h-5 mb-1 text-[#741611]/45" />
+                            <span className="text-[8px] font-sans font-black text-center uppercase tracking-wider leading-none">Cung Thỉnh</span>
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center p-1 bg-gradient-to-b from-[#221c19] to-[#14100e] text-[#8c7b72]/40">
+                            <Crown className="w-5 h-5 mb-1 text-[#741611]/30" />
+                            <span className="text-[8px] font-sans font-black text-center uppercase tracking-wider leading-none">Bản Sắc<br/>Thần Bí</span>
+                          </div>
+                        )
+                      )}
+                      {isAdmin && (
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/portrait:opacity-100 flex items-center justify-center transition-all duration-300">
+                          <Upload className="w-3.5 h-3.5 text-[#d7cac1]" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/portrait:opacity-100 flex items-center justify-center transition-all duration-300">
-                        <Upload className="w-3.5 h-3.5 text-[#d7cac1]" />
-                      </div>
                     </div>
-                    <button
-                      onClick={() => setShowImgModal('thu')}
-                      className="text-[9px] font-sans font-black tracking-wider text-[#ab8f65] hover:text-[#d7cac1] uppercase transition-colors"
-                    >
-                      CHÂN DUNG
-                    </button>
                   </div>
 
                   {/* Character Info */}
@@ -383,28 +391,33 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                   {/* Portrait Area */}
                   <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
                     <div 
-                      onClick={() => setShowImgModal('cong')}
-                      className="relative w-16 h-22 bg-[#1b1715] border border-[#473a36]/50 rounded overflow-hidden cursor-pointer group/portrait shadow-lg"
-                      title="Cung thỉnh chân dung"
+                      onClick={isAdmin ? () => setShowImgModal('cong') : undefined}
+                      className={`relative w-16 h-22 bg-[#1b1715] border border-[#473a36]/50 rounded overflow-hidden shadow-lg ${
+                        isAdmin ? "cursor-pointer group/portrait" : "select-none"
+                      }`}
+                      title={isAdmin ? "Cung thỉnh bức họa" : undefined}
                     >
                       {congImg ? (
-                        <img src={congImg} alt="Thích Hàn Chu" className="w-full h-full object-cover transition-transform duration-500 group-hover/portrait:scale-110" />
+                        <img src={congImg} alt="Thích Hàn Chu" className="w-full h-full object-cover transition-transform duration-500" />
                       ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center p-1 bg-gradient-to-b from-[#221c19] to-[#14100e] text-[#8c7b72]/40 hover:text-[#d7cac1]/60 transition-colors">
-                          <Image className="w-5 h-5 mb-1 text-[#ab8f65]/45" />
-                          <span className="text-[8px] font-sans font-black text-center uppercase tracking-wider leading-none">Cung Thỉnh<br/>Chân Dung</span>
+                        isAdmin ? (
+                          <div className="w-full h-full flex flex-col items-center justify-center p-1 bg-gradient-to-b from-[#221c19] to-[#14100e] text-[#8c7b72]/40 hover:text-[#d7cac1]/60 transition-colors">
+                            <Image className="w-5 h-5 mb-1 text-[#ab8f65]/45" />
+                            <span className="text-[8px] font-sans font-black text-center uppercase tracking-wider leading-none">Cung Thỉnh</span>
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center p-1 bg-gradient-to-b from-[#221c19] to-[#14100e] text-[#8c7b72]/40">
+                            <Swords className="w-5 h-5 mb-1 text-[#ab8f65]/30" />
+                            <span className="text-[8px] font-sans font-black text-center uppercase tracking-wider leading-none">Bản Sắc<br/>Thần Bí</span>
+                          </div>
+                        )
+                      )}
+                      {isAdmin && (
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/portrait:opacity-100 flex items-center justify-center transition-all duration-300">
+                          <Upload className="w-3.5 h-3.5 text-[#d7cac1]" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/portrait:opacity-100 flex items-center justify-center transition-all duration-300">
-                        <Upload className="w-3.5 h-3.5 text-[#d7cac1]" />
-                      </div>
                     </div>
-                    <button
-                      onClick={() => setShowImgModal('cong')}
-                      className="text-[9px] font-sans font-black tracking-wider text-[#ab8f65] hover:text-[#d7cac1] uppercase transition-colors"
-                    >
-                      CHÂN DUNG
-                    </button>
                   </div>
 
                   {/* Character Info */}
@@ -874,7 +887,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
       )}
 
       {/* PORTRAIT UPLOAD MODAL */}
-      {showImgModal && (
+      {isAdmin && showImgModal && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in font-serif">
           <div className="relative w-full max-w-md p-6 bg-[#14100e] border-2 border-[#741611]/60 shadow-[0_0_40px_rgba(116,22,17,0.35)] rounded royal-corners">
             <div className="absolute inset-1.5 border border-[#ab8f65]/15 pointer-events-none" />
@@ -883,7 +896,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
             <div className="flex items-center justify-between border-b border-[#741611]/30 pb-4 mb-5 select-none relative z-10">
               <h3 className="text-sm font-sans font-black text-[#d7cac1] uppercase tracking-[0.2em] flex items-center gap-2">
                 <Image className="w-4 h-4 text-[#ab8f65]" />
-                CUNG THỈNH CHÂN DUNG
+                CUNG THỈNH BỨC HỌA
               </h3>
               <button 
                 onClick={() => { setShowImgModal(null); setImgInputUrl(''); }}
@@ -894,7 +907,7 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
             </div>
 
             <p className="text-xs text-[#8c7b72] italic mb-4 leading-relaxed">
-              Quý nhân có thể tải lên tập tin chân dung vẽ tay từ thiết bị hoặc dán đường dẫn (link) họa bức trực tiếp dưới đây để hiển thị trong Hồ Sơ Nhân Vật.
+              Quý nhân có thể tải lên tập tin bức họa vẽ tay từ thiết bị hoặc dán đường dẫn (link) họa bức trực tiếp dưới đây để hiển thị trong Hồ Sơ Nhân Vật.
             </p>
 
             {/* File Upload Option */}
@@ -940,14 +953,14 @@ export function ThaiTuNghinNamTheme(props: ThemeProps) {
                 }}
                 className="flex-1 border border-[#741611]/30 text-[#741611] hover:text-[#d7cac1] hover:bg-[#741611]/10 font-sans font-black uppercase text-[10px] tracking-wider py-3 rounded transition-all cursor-pointer"
               >
-                XÓA CHÂN DUNG
+                XÓA BỨC HỌA
               </button>
               <button
                 onClick={() => handleSaveImg(showImgModal, imgInputUrl)}
                 disabled={!imgInputUrl.trim()}
                 className="flex-1 bg-[#741611] text-[#d7cac1] hover:bg-[#8e1d17] hover:text-[#e8ded7] font-sans font-black uppercase text-[10px] tracking-wider py-3 rounded transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer border border-[#741611] shadow-lg shadow-[#741611]/15"
               >
-                XÁC NHẬN CHÂN DUNG
+                XÁC NHẬN BỨC HỌA
               </button>
             </div>
           </div>
