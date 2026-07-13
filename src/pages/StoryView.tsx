@@ -18,6 +18,7 @@ import { RinhRapTheme } from './themes/RinhRap';
 import { ThienTaiThaoTacTheme } from './themes/ThienTaiThaoTac';
 import { NguoiDepOmYeuTheme } from './themes/NguoiDepOmYeu';
 import { ThaiTuNghinNamTheme } from './themes/ThaiTuNghinNam';
+import { ChimHoangYenTheme } from './themes/ChimHoangYen';
 import { detectStoryTheme } from '../lib/themeHelper';
 
 interface CommentNodeProps {
@@ -405,6 +406,17 @@ export function StoryView() {
           </div>
         </div>
       );
+    } else if (activeCustomTheme === 'hoangyen') {
+      return (
+        <div className="min-h-screen bg-[#eff6f0] text-[#1b3a1e] flex flex-col items-center justify-center p-4 font-reading-quicksand">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-12 h-12 border-4 border-[#cde8c6] border-t-[#f4d451] rounded-full animate-spin" />
+            <div className="text-xs uppercase tracking-[0.2em] text-[#1b3a1e]/60 animate-pulse font-bold">
+              CHIM HOÀNG YẾN // ĐANG HOẠT ĐỘNG...
+            </div>
+          </div>
+        </div>
+      );
     } else if (activeCustomTheme === 'giagoan') {
       return (
         <div className="min-h-screen bg-[#13120d] text-[#dbcec2] flex flex-col items-center justify-center p-4 font-sans">
@@ -784,7 +796,7 @@ export function StoryView() {
   }
 
   const currentTheme = detectStoryTheme(story.title, id);
-  if (currentTheme === 'nhatky' || currentTheme === 'thuytien' || currentTheme === 'rinhrap' || currentTheme === 'thientai' || currentTheme === 'nguoidep' || currentTheme === 'thaitu') {
+  if (currentTheme === 'hoangyen' || currentTheme === 'nhatky' || currentTheme === 'thuytien' || currentTheme === 'rinhrap' || currentTheme === 'thientai' || currentTheme === 'nguoidep' || currentTheme === 'thaitu') {
     const themeProps: ThemeProps = {
       story,
       actualStoryId,
@@ -828,6 +840,9 @@ export function StoryView() {
       getTitleColor,
       navigate,
     };
+    if (currentTheme === 'hoangyen') {
+      return <ChimHoangYenTheme {...themeProps} />;
+    }
     if (currentTheme === 'thuytien') {
       return <TinhYeuThuyTienTheme {...themeProps} />;
     }
