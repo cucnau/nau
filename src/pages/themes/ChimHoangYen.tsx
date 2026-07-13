@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, ArrowLeft, Sparkles, Feather, Star } from 'lucide-react';
+import { BookOpen, Gift, Send, Bookmark, ArrowLeft, Sparkles, Feather, Star, Compass } from 'lucide-react';
 import { UserAvatar } from '../../components/UserAvatar';
 import { motion } from 'motion/react';
 
@@ -72,11 +72,6 @@ export function ChimHoangYenTheme(props: ThemeProps) {
 
   // Kích hoạt sóng nước lăn tăn trên toàn bộ mặt hồ giao diện khi chạm
   const handleTouchWater = (e: React.MouseEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLElement;
-    if (target.closest('button') || target.closest('a') || target.closest('textarea') || target.closest('input') || target.closest('.interactive-card')) {
-      return;
-    }
-
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -373,11 +368,16 @@ export function ChimHoangYenTheme(props: ThemeProps) {
               </div>
             </div>
 
-            {/* Câu cảm thán bay nhè nhẹ ở chân bìa truyện */}
-            <div className="mt-4 text-center pointer-events-none">
-              <span className="text-[11px] text-[#132e1a]/70 font-serif italic block px-2 leading-relaxed">
-                “Mặt hồ gợn sóng xanh trong, khẽ lung lay bóng dừa và nhành bạch quả cổ phong lãng đãng...”
-              </span>
+            {/* Thể loại của truyện chuyển xuống chân bìa */}
+            <div className="mt-4 flex flex-wrap gap-1.5 justify-center z-10 w-full">
+              {story.genres?.map?.((genre: string) => (
+                <span 
+                  key={genre} 
+                  className="bg-[#eff6f0] text-[#132e1a] text-[10px] font-medium tracking-wide px-3 py-1 rounded border border-[#ddd289]/40 flex items-center gap-1 hover:bg-[#cde8c6] transition-all cursor-pointer"
+                >
+                  🍃 {genre}
+                </span>
+              ))}
             </div>
           </div>
 
@@ -415,12 +415,12 @@ export function ChimHoangYenTheme(props: ThemeProps) {
               </button>
 
               <a 
-                href={story.sourceUrl || story.originalUrl || '#'}
+                href={story.externalUrl || '#'}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 bg-white hover:bg-[#eff6f0] text-[#132e1a] py-3 text-xs rounded-xl font-semibold tracking-wider flex items-center justify-center gap-2 border-[1px] border-[#ddd289] transition-all duration-300 hover:shadow-md cursor-pointer text-center"
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#f4d451]" />
+                <Compass className="w-3.5 h-3.5 text-[#f4d451]" />
                 Tìm về nguồn cội
               </a>
             </div>
@@ -438,18 +438,6 @@ export function ChimHoangYenTheme(props: ThemeProps) {
             <div className="absolute top-3 right-3 w-6 h-6 border-t-[1px] border-r-[1px] border-[#ddd289]" />
             <div className="absolute bottom-3 left-3 w-6 h-6 border-b-[1px] border-l-[1px] border-[#ddd289]" />
             <div className="absolute bottom-3 right-3 w-6 h-6 border-b-[1px] border-r-[1px] border-[#ddd289]" />
-
-            {/* Thể loại của truyện dịu dàng */}
-            <div className="flex flex-wrap gap-1.5 mb-5 relative z-10">
-              {story.genres?.map?.((genre: string) => (
-                <span 
-                  key={genre} 
-                  className="bg-[#eff6f0] text-[#132e1a] text-[10px] font-medium tracking-wide px-3 py-1 rounded border border-[#ddd289]/40 flex items-center gap-1"
-                >
-                  🍃 {genre}
-                </span>
-              ))}
-            </div>
 
             {/* TIÊU ĐỀ LÃNG MẠN */}
             <div className="border-b-[1px] border-dashed border-[#ddd289] pb-3 mb-5 relative z-10">
