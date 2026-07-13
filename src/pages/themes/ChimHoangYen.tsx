@@ -483,6 +483,107 @@ export function ChimHoangYenTheme(props: ThemeProps) {
             </div>
           </div>
 
+          {/* TIẾNG LÒNG GỬI SÓNG - BÌNH LUẬN KIỂU THƯ PHÁP NHẸ NHÀNG */}
+          <div className="interactive-card bg-white/95 rounded-2xl border-[1px] border-[#ddd289] p-5 shadow-[0_10px_30px_rgba(0,0,0,0.02)] flex flex-col gap-4 relative overflow-hidden mt-1">
+            <div className="border-b-[1px] border-dashed border-[#ddd289] pb-2">
+              <h3 className="font-semibold text-xs tracking-wider text-[#132e1a]/80 flex items-center gap-1.5 font-serif">
+                💬 Tiếng lòng gửi sóng ({comments.length})
+              </h3>
+            </div>
+            {isLoggedIn ? (
+              <form onSubmit={handleSendComment} className="flex flex-col gap-2 relative z-10">
+                <textarea
+                  rows={3}
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  placeholder="Ném một viên sỏi xuống lòng hồ xanh mướt, viết vài dòng gửi lại cùng ngọn gió thu dịu dàng..."
+                  className="w-full bg-[#eff6f0]/40 border-[1px] border-[#ddd289]/70 focus:border-[#ddd289] text-[#132e1a] text-xs rounded-xl p-3 focus:outline-none placeholder-stone-400/80 font-medium leading-relaxed"
+                />
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={submittingComment || !commentText.trim()}
+                    className="bg-[#aeed9a] hover:bg-[#f4d451] disabled:bg-stone-200 disabled:text-stone-400 text-[#132e1a] font-semibold text-[11px] tracking-wider px-4 py-1.5 rounded-lg border-[1px] border-[#ddd289] transition-all cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Send className="w-2.5 h-2.5 text-[#132e1a]" />
+                    Thả trôi tâm tình
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="p-4 bg-[#eff6f0]/40 border-[1px] border-dashed border-[#ddd289] rounded-xl text-center text-[10px] font-medium text-[#132e1a]/70 tracking-wide">
+                Soi gương mặt hồ để cùng các tri âm đàm đạo tiếng lòng dịu dàng...
+              </div>
+            )}
+
+            {/* Danh sách bình luận dịu dàng tao nhã */}
+            <div className="flex flex-col gap-3 max-h-[350px] overflow-y-auto pr-1">
+              {comments.length > 0 ? (
+                comments.map((comment: any) => {
+                  const isGift = comment.type === 'choco_gift';
+                  return (
+                    <div 
+                      key={comment.id}
+                      className={`p-3 rounded-xl border-[1px] transition-all relative overflow-hidden ${
+                        isGift
+                          ? "bg-[#f4d451]/5 border-[#f4d451]/60"
+                          : "bg-white border-[#ddd289]/30 hover:border-[#ddd289]"
+                      }`}
+                    >
+                      <div className="flex gap-2 relative z-10">
+                        <UserAvatar 
+                          avatarUrl={comment.avatarUrl} 
+                          equippedAccessory={comment.equippedAccessory}
+                          accessoryPosition={comment.accessoryPosition}
+                          className="w-8 h-8 shrink-0 border-[1px] border-[#ddd289]/40" 
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1 mb-1">
+                            <span 
+                              className="font-semibold text-[11px] truncate"
+                              style={{ color: getTitleColor?.(comment.activeTitle) || '#132e1a' }}
+                            >
+                              {comment.displayName || 'Khách soi bóng nước'}
+                              {comment.activeTitle && (
+                                <span className="ml-1.5 px-1.5 py-0.5 bg-[#f4d451]/40 text-[#132e1a] text-[7px] font-medium rounded tracking-wide border border-[#ddd289]/30">
+                                  {comment.activeTitle}
+                                </span>
+                              )}
+                            </span>
+                            <span className="text-[8px] text-stone-400 font-mono">
+                              {comment.createdAt?.toDate 
+                                ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
+                                : 'Vừa xong'}
+                            </span>
+                          </div>
+                          
+                          {isGift && (
+                            <div className="mb-1 inline-flex items-center gap-1 bg-[#aeed9a]/50 text-[#132e1a] text-[8px] font-semibold px-2 py-0.5 rounded-full border border-[#ddd289]/50">
+                              🍫 Thả {comment.giftAmount} kẹo Choco
+                            </div>
+                          )}
+
+                          <p className="text-[11px] text-stone-700 leading-relaxed text-justify break-words font-medium font-serif">
+                            {comment.content}
+                          </p>
+                        </div>
+                      </div>
+                      {isGift && (
+                        <div className="absolute top-1 right-2 opacity-5 pointer-events-none">
+                          <Gift className="w-10 h-10 text-[#f4d451]" />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="py-8 text-center text-[10px] text-stone-400 font-medium tracking-wide">
+                  Mặt hồ phẳng lặng chưa có gợn sóng tri âm.
+                </div>
+              )}
+            </div>
+          </div>
+
         </div>
 
         {/* ===================== CỘT PHẢI (COL-SPAN 7): KHUNG SÁCH THƯ PHÁP TRƯNG BÀY NỘI DUNG VƯƠNG GIẢ ===================== */}
@@ -514,206 +615,87 @@ export function ChimHoangYenTheme(props: ThemeProps) {
             </div>
           </div>
 
-          {/* KHUNG GIẤY TỔNG HỢP: MỤC LỤC & ĐÀM ĐẠO KIỂU TRẠM THƯ */}
+          {/* KHUNG GIẤY TỔNG HỢP: MỤC LỤC */}
           <div className="interactive-card bg-white/95 rounded-2xl border-[1px] border-[#ddd289] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
             
-            {/* TABS MENU SANG TRỌNG MÀU SẮC SẢO MỎNG MANH */}
-            <div className="flex border-b-[1px] border-[#ddd289]/60 mb-6 font-semibold text-xs tracking-wider font-serif">
-              <button
-                onClick={() => setActiveTab('chapters')}
-                className={`flex-1 py-3 text-center relative transition-all cursor-pointer rounded-t-lg ${
-                  activeTab === 'chapters' ? "text-[#132e1a] bg-[#eff6f0]" : "text-stone-400 hover:text-[#132e1a]"
-                }`}
-              >
+            <div className="border-b-[1px] border-[#ddd289]/60 pb-3 mb-6 flex justify-between items-center">
+              <h3 className="font-semibold text-xs tracking-wider font-serif text-[#132e1a] flex items-center gap-2">
                 📜 Cuộn thư bạch quả rủ ({chapters.length})
-                {activeTab === 'chapters' && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#f4d451] rounded-t-full"></span>
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab('comments')}
-                className={`flex-1 py-3 text-center relative transition-all cursor-pointer rounded-t-lg ${
-                  activeTab === 'comments' ? "text-[#132e1a] bg-[#eff6f0]" : "text-stone-400 hover:text-[#132e1a]"
-                }`}
-              >
-                💬 Tiếng lòng gửi sóng ({comments.length})
-                {activeTab === 'comments' && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#f4d451] rounded-t-full"></span>
-                )}
-              </button>
+              </h3>
             </div>
 
-            {/* NỘI DUNG TAB MỤC LỤC */}
-            {activeTab === 'chapters' ? (
-              <div className="flex flex-col gap-4">
-                {/* Sắp xếp biên niên sử dịu dàng */}
-                <div className="flex justify-between items-center bg-[#eff6f0] p-3 rounded-xl border-[1px] border-[#ddd289]/60">
-                  <span className="text-xs font-medium text-[#132e1a] tracking-wide">
-                    Dòng chảy con nước
-                  </span>
-                  <button
-                    onClick={() => setChapterSortDesc(!chapterSortDesc)}
-                    className="text-[10px] font-semibold tracking-wide px-3.5 py-1 bg-white hover:bg-[#cde8c6] text-[#132e1a] border-[1px] border-[#ddd289] rounded-lg transition-all cursor-pointer"
-                  >
-                    {chapterSortDesc ? 'Sóng trào sau cùng' : 'Sóng khởi ban sơ'}
-                  </button>
-                </div>
+            <div className="flex flex-col gap-4">
+              {/* Sắp xếp biên niên sử dịu dàng */}
+              <div className="flex justify-between items-center bg-[#eff6f0] p-3 rounded-xl border-[1px] border-[#ddd289]/60">
+                <span className="text-xs font-medium text-[#132e1a] tracking-wide">
+                  Dòng chảy con nước
+                </span>
+                <button
+                  onClick={() => setChapterSortDesc(!chapterSortDesc)}
+                  className="text-[10px] font-semibold tracking-wide px-3.5 py-1 bg-white hover:bg-[#cde8c6] text-[#132e1a] border-[1px] border-[#ddd289] rounded-lg transition-all cursor-pointer"
+                >
+                  {chapterSortDesc ? 'Sóng trào sau cùng' : 'Sóng khởi ban sơ'}
+                </button>
+              </div>
 
-                {/* Danh sách chương truyện nhẹ nhàng sắc sảo */}
-                {displayedChapters.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {displayedChapters.map((ch: any) => (
-                      <div
-                        key={ch.id}
-                        onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${ch.order + 1}`)}
-                        className="p-4 bg-white/80 hover:bg-[#eff6f0]/60 rounded-xl border-[1px] border-[#ddd289]/40 hover:border-[#ddd289] transition-all cursor-pointer flex justify-between items-center group relative overflow-hidden"
-                      >
-                        <div className="min-w-0 z-10">
-                          <p className="font-semibold text-sm text-[#132e1a] truncate font-serif">
-                            {ch.title}
-                          </p>
-                          <p className="text-[9px] text-[#132e1a]/60 font-medium uppercase tracking-widest mt-1">
-                            Lá bạch quả thứ {ch.order + 1}
-                          </p>
-                        </div>
-                        {ch.isPasswordProtected ? (
-                          <span className="text-[10px] bg-[#f4d451]/70 text-[#132e1a] px-2.5 py-0.5 rounded font-medium border border-[#ddd289]">
-                            SÓNG KHÓA
-                          </span>
-                        ) : (
-                          <span className="text-xs text-[#ddd289] font-medium group-hover:translate-x-1 transition-transform">
-                            ➔
-                          </span>
-                        )}
-                        {/* Họa tiết ẩn nhẹ nhàng */}
-                        <div className="absolute -bottom-1 -right-1 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-                          <Feather className="w-10 h-10 text-[#f4d451]" />
-                        </div>
+              {/* Danh sách chương truyện nhẹ nhàng sắc sảo */}
+              {displayedChapters.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {displayedChapters.map((ch: any) => (
+                    <div
+                      key={ch.id}
+                      onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${ch.order + 1}`)}
+                      className="p-4 bg-white/80 hover:bg-[#eff6f0]/60 rounded-xl border-[1px] border-[#ddd289]/40 hover:border-[#ddd289] transition-all cursor-pointer flex justify-between items-center group relative overflow-hidden"
+                    >
+                      <div className="min-w-0 z-10">
+                        <p className="font-semibold text-sm text-[#132e1a] truncate font-serif">
+                          {ch.title}
+                        </p>
+                        <p className="text-[9px] text-[#132e1a]/60 font-medium uppercase tracking-widest mt-1">
+                          Lá bạch quả thứ {ch.order + 1}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="py-12 text-center text-xs text-stone-400 font-medium uppercase tracking-widest">
-                    Mặt nước im lìm chờ đợi lá vàng rơi...
-                  </div>
-                )}
-
-                {/* Phân trang */}
-                {chapters.length > CHAPTERS_PER_PAGE && (
-                  <div className="flex justify-center gap-2 mt-6">
-                    {Array.from({ length: Math.ceil(chapters.length / CHAPTERS_PER_PAGE) }).map((_, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setChapterPage(idx)}
-                        className={`w-8 h-8 rounded-lg text-xs font-semibold border-[1px] transition-all cursor-pointer ${
-                          chapterPage === idx
-                            ? "bg-[#f4d451] text-[#132e1a] border-[#ddd289] shadow-sm"
-                            : "bg-white text-[#132e1a]/60 border-[#ddd289]/40 hover:bg-[#eff6f0]"
-                        }`}
-                      >
-                        {idx + 1}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              /* TAB ĐÀM ĐẠO KIỂU THƯ PHÁP NHẸ NHÀNG */
-              <div className="flex flex-col gap-6">
-                {isLoggedIn ? (
-                  <form onSubmit={handleSendComment} className="flex flex-col gap-3">
-                    <textarea
-                      rows={3}
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      placeholder="Ném một viên sỏi xuống lòng hồ xanh mướt, viết vài dòng gửi lại cùng ngọn gió thu dịu dàng..."
-                      className="w-full bg-[#eff6f0]/40 border-[1px] border-[#ddd289]/70 focus:border-[#ddd289] text-[#132e1a] text-sm rounded-xl p-4 focus:outline-none placeholder-stone-400/80 font-medium"
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        disabled={submittingComment || !commentText.trim()}
-                        className="bg-[#aeed9a] hover:bg-[#f4d451] disabled:bg-stone-200 disabled:text-stone-400 text-[#132e1a] font-semibold text-xs tracking-wider px-5 py-2 rounded-lg border-[1px] border-[#ddd289] transition-all cursor-pointer flex items-center gap-2"
-                      >
-                        <Send className="w-3 h-3 text-[#132e1a]" />
-                        Thả trôi tâm tình
-                      </button>
+                      {ch.isPasswordProtected ? (
+                        <span className="text-[10px] bg-[#f4d451]/70 text-[#132e1a] px-2.5 py-0.5 rounded font-medium border border-[#ddd289]">
+                          SÓNG KHÓA
+                        </span>
+                      ) : (
+                        <span className="text-xs text-[#ddd289] font-medium group-hover:translate-x-1 transition-transform">
+                          ➔
+                        </span>
+                      )}
+                      {/* Họa tiết ẩn nhẹ nhàng */}
+                      <div className="absolute -bottom-1 -right-1 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
+                        <Feather className="w-10 h-10 text-[#f4d451]" />
+                      </div>
                     </div>
-                  </form>
-                ) : (
-                  <div className="p-6 bg-[#eff6f0]/40 border-[1px] border-dashed border-[#ddd289] rounded-xl text-center text-xs font-medium text-[#132e1a]/70 tracking-wide">
-                    Soi gương mặt hồ để cùng các tri âm đàm đạo tiếng lòng dịu dàng...
-                  </div>
-                )}
-
-                {/* Danh sách bình luận dịu dàng tao nhã */}
-                <div className="flex flex-col gap-4 max-h-[450px] overflow-y-auto pr-2">
-                  {comments.length > 0 ? (
-                    comments.map((comment: any) => {
-                      const isGift = comment.type === 'choco_gift';
-                      return (
-                        <div 
-                          key={comment.id}
-                          className={`p-4 rounded-xl border-[1px] transition-all relative overflow-hidden ${
-                            isGift
-                              ? "bg-[#f4d451]/5 border-[#f4d451]/60"
-                              : "bg-white border-[#ddd289]/30 hover:border-[#ddd289]"
-                          }`}
-                        >
-                          <div className="flex gap-3 relative z-10">
-                            <UserAvatar 
-                              avatarUrl={comment.avatarUrl} 
-                              equippedAccessory={comment.equippedAccessory}
-                              accessoryPosition={comment.accessoryPosition}
-                              className="w-9 h-9 shrink-0 border-[1px] border-[#ddd289]/40" 
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-2 mb-2">
-                                <span 
-                                  className="font-semibold text-xs truncate"
-                                  style={{ color: getTitleColor?.(comment.activeTitle) || '#132e1a' }}
-                                >
-                                  {comment.displayName || 'Khách soi bóng nước'}
-                                  {comment.activeTitle && (
-                                    <span className="ml-2 px-2 py-0.5 bg-[#f4d451]/40 text-[#132e1a] text-[8px] font-medium rounded tracking-wide border border-[#ddd289]/30">
-                                      {comment.activeTitle}
-                                    </span>
-                                  )}
-                                </span>
-                                <span className="text-[9px] text-stone-400 font-mono">
-                                  {comment.createdAt?.toDate 
-                                    ? new Date(comment.createdAt.toDate()).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
-                                    : 'Vừa xong'}
-                                </span>
-                              </div>
-                              
-                              {isGift && (
-                                <div className="mb-2 inline-flex items-center gap-1.5 bg-[#aeed9a]/50 text-[#132e1a] text-[9px] font-semibold px-2.5 py-0.5 rounded-full border border-[#ddd289]/50">
-                                  🍫 Thả vào lòng hồ {comment.giftAmount} kẹo ngọt Choco
-                                </div>
-                              )}
-
-                              <p className="text-xs md:text-sm text-stone-800 leading-relaxed text-justify break-words font-medium font-serif">
-                                {comment.content}
-                              </p>
-                            </div>
-                          </div>
-                          {isGift && (
-                            <div className="absolute top-1 right-2 opacity-5 pointer-events-none">
-                              <Gift className="w-12 h-12 text-[#f4d451]" />
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="py-12 text-center text-xs text-stone-400 font-medium tracking-wide">
-                      Mặt hồ phẳng lặng chưa có gợn sóng tri âm.
-                    </div>
-                  )}
+                  ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="py-12 text-center text-xs text-stone-400 font-medium uppercase tracking-widest">
+                  Mặt nước im lìm chờ đợi lá vàng rơi...
+                </div>
+              )}
+
+              {/* Phân trang */}
+              {chapters.length > CHAPTERS_PER_PAGE && (
+                <div className="flex justify-center gap-2 mt-6">
+                  {Array.from({ length: Math.ceil(chapters.length / CHAPTERS_PER_PAGE) }).map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setChapterPage(idx)}
+                      className={`w-8 h-8 rounded-lg text-xs font-semibold border-[1px] transition-all cursor-pointer ${
+                        chapterPage === idx
+                          ? "bg-[#f4d451] text-[#132e1a] border-[#ddd289] shadow-sm"
+                          : "bg-white text-[#132e1a]/60 border-[#ddd289]/40 hover:bg-[#eff6f0]"
+                      }`}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
 
