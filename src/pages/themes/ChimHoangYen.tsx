@@ -354,7 +354,7 @@ export function ChimHoangYenTheme(props: ThemeProps) {
         <div className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-white/60 border-[1px] border-[#ddd289]/40">
           <Feather className="w-3.5 h-3.5 text-[#f4d451] animate-pulse" />
           <h2 className="font-medium text-xs md:text-sm tracking-wider uppercase font-serif">
-            Gió lay mặt hồ • Nhánh bạch quả rủ soi bóng hoàng yến
+            二爷家的麻雀成精了
           </h2>
         </div>
 
@@ -396,9 +396,6 @@ export function ChimHoangYenTheme(props: ThemeProps) {
 
             {/* Tiêu đề tác phẩm dịu dàng */}
             <div className="mt-6 z-10">
-              <span className="text-[9px] bg-[#eff6f0] text-[#132e1a]/80 font-medium uppercase tracking-wider px-3 py-1 rounded border border-[#ddd289]/50 inline-block mb-3.5">
-                Bóng nước nhà họ Hoắc
-              </span>
               <h1 className="text-lg md:text-xl font-bold text-[#132e1a] tracking-tight leading-snug uppercase font-serif px-2">
                 {story.title}
               </h1>
