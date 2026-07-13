@@ -268,29 +268,6 @@ export function ChimHoangYenTheme(props: ThemeProps) {
                 <p className="text-base font-black text-[#852221]">{totalGiftedChoco}</p>
               </div>
             </div>
-
-            {/* HỘP TƯƠNG TÁC CHIM HOÀNG YẾN KHÁNH HỶ (Web Audio Chirp) */}
-            <div className="w-full mt-6 bg-[#e8f1e9]/60 border-2 border-[#dca842]/50 rounded-2xl p-4 relative z-10">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-black uppercase text-[#132e1a] tracking-wider flex items-center gap-1">
-                  <Volume2 className="w-3.5 h-3.5 text-[#dca842]" />
-                  Hoàng Yến Lê Phi Phàm hót
-                </span>
-                <span className="text-[9px] text-[#852221] font-bold">Đã ăn: {fedCount} 🍒</span>
-              </div>
-
-              {/* Khu vực bấm kêu chim hót */}
-              <button
-                onClick={feedCherry}
-                className="w-full py-3 bg-[#dca842] hover:bg-[#b88626] text-white rounded-xl font-black text-xs uppercase tracking-widest border-2 border-[#132e1a] shadow-[3px_3px_0_0_#132e1a] hover:-translate-y-0.5 active:translate-y-px active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
-              >
-                <span>🍒 CHO CHIM ĂN CHERRY & HÓT</span>
-              </button>
-
-              <p className="text-[10px] text-[#132e1a]/60 mt-2 italic">
-                * Bấm để trải nghiệm âm thanh chim hoàng yến hót lảnh lót bằng công nghệ âm thanh thời gian thực!
-              </p>
-            </div>
           </div>
 
           {/* CÁC NÚT ĐIỀU HƯỚNG NHANH KIỂU LUXURY */}
@@ -358,34 +335,37 @@ export function ChimHoangYenTheme(props: ThemeProps) {
               ))}
             </div>
 
-            {/* GÓC TỰ TRẦM BÊN HỒ HỌ HOẮC (HỒ NƯỚC TƯƠNG TÁC ĐỘC LẠ) */}
+            {/* BỨC TRANH PHONG CẢNH HỒ NƯỚC BẠCH QUẢ VÀ HOÀNG YẾN TƯƠNG TÁC ĐỘC LẠ */}
             <div className="mt-8 bg-gradient-to-br from-[#e8f1e9] to-white rounded-3xl border-2 border-[#dca842] p-5 text-center relative overflow-hidden shadow-inner">
-              <div className="absolute top-0 right-0 w-24 h-24 opacity-10 pointer-events-none">
-                <svg viewBox="0 0 100 100" className="w-full h-full text-[#132e1a]">
-                  <path d="M0,50 C30,20 70,80 100,50" stroke="currentColor" strokeWidth="2" fill="none" />
-                </svg>
-              </div>
-
               <h4 className="font-black text-xs uppercase tracking-[0.15em] text-[#132e1a] mb-1.5 flex items-center justify-center gap-1.5">
-                🌊 Tĩnh Tâm Bên Hồ Thủy Tạ
+                🍃 Nhánh Bạch Quả Rủ Bên Hồ Hoắc Gia
               </h4>
               <p className="text-[10px] text-stone-500 mb-4 font-medium">
-                (Chạm tay lên hồ nước gợn sóng xanh ngọc bích để cảm nhận tiếng lòng hoàng yến bay bổng)
+                (Chạm nhẹ lên mặt hồ xanh mướt hoặc chú chim hoàng yến để tạo gợn nước và nghe tiếng hót ngọt ngào)
               </p>
 
-              {/* Mặt hồ tương tác */}
+              {/* Mặt hồ tương tác xanh mướt lung linh */}
               <div 
                 onClick={handleTouchLake}
-                className="w-full h-32 bg-gradient-to-b from-[#b9dfbe]/40 to-[#e8f1e9]/60 rounded-2xl border-2 border-[#dca842]/50 relative cursor-pointer overflow-hidden flex items-center justify-center p-4 transition-all hover:border-[#132e1a]"
+                className="w-full h-48 bg-gradient-to-br from-[#1b3a1e] via-[#2d5a37] to-[#0f2c18] rounded-2xl border-2 border-[#dca842]/60 relative cursor-pointer overflow-hidden p-4 transition-all hover:border-[#132e1a] shadow-inner"
               >
-                {/* Gợn sóng gợn nước chân thật */}
+                {/* Lớp ánh sáng mặt hồ phản chiếu lung linh */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(252,230,154,0.15)_0%,transparent_60%)] pointer-events-none" />
+
+                {/* Sóng nước gợn nhẹ liên tục tự nhiên */}
+                <div className="absolute inset-0 opacity-20 pointer-events-none">
+                  <div className="absolute w-full h-full border-t border-b border-white/10 rounded-full animate-pulse" style={{ animationDuration: '6s' }} />
+                  <div className="absolute w-full h-full border-l border-r border-white/5 rounded-full animate-pulse" style={{ animationDuration: '8s' }} />
+                </div>
+
+                {/* Gợn sóng gợn nước lan tỏa khi chạm tay */}
                 {ripples.map(ripple => (
                   <motion.div
                     key={ripple.id}
                     initial={{ width: 0, height: 0, opacity: 0.9 }}
-                    animate={{ width: 280, height: 280, opacity: 0 }}
-                    transition={{ duration: 1.1, ease: "easeOut" }}
-                    className="absolute border-2 border-[#dca842] rounded-full pointer-events-none"
+                    animate={{ width: 300, height: 300, opacity: 0 }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
+                    className="absolute border-2 border-[#fce69a]/55 rounded-full pointer-events-none"
                     style={{
                       left: ripple.x,
                       top: ripple.y,
@@ -394,10 +374,68 @@ export function ChimHoangYenTheme(props: ThemeProps) {
                   />
                 ))}
 
-                {/* Trích dẫn hiển thị */}
-                <p className="text-xs md:text-sm font-black text-[#132e1a] italic relative z-10 px-4 select-none font-serif leading-relaxed text-center">
-                  “ Hồ nước thủy tạ lung linh, khẽ khàng lay động bóng hình hoàng yến nhỏ... ”
-                </p>
+                {/* SVG Vẽ Nhánh cây bạch quả rủ rợp và chú chim hoàng yến đậu thơ mộng */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 200" preserveAspectRatio="none">
+                  {/* Thân cành bạch quả rủ từ trên phải xuống */}
+                  <path d="M400,0 Q320,40 240,75 T110,120" fill="none" stroke="#5c4033" strokeWidth="3" />
+                  <path d="M310,25 Q230,70 160,95" fill="none" stroke="#5c4033" strokeWidth="1.8" />
+                  <path d="M220,55 Q160,90 100,105" fill="none" stroke="#5c4033" strokeWidth="1.2" />
+
+                  {/* Các nhóm lá bạch quả vàng đung đưa */}
+                  <motion.g animate={{ rotate: [-2, 3, -2] }} transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }} transform="translate(180, 85)">
+                    <path d="M0,0 Q-15,-20 -25,-12 Q-28,5 -12,12 Q-5,8 0,0" fill="#fbe183" stroke="#dca842" strokeWidth="0.8" />
+                  </motion.g>
+                  <motion.g animate={{ rotate: [3, -3, 3] }} transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut" }} transform="translate(250, 55)">
+                    <path d="M0,0 Q-12,-18 -22,-10 Q-25,5 -10,10 Q-4,6 0,0" fill="#fbe183" stroke="#dca842" strokeWidth="0.8" />
+                  </motion.g>
+                  <motion.g animate={{ rotate: [-4, 4, -4] }} transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }} transform="translate(130, 105)">
+                    <path d="M0,0 Q-10,-15 -20,-8 Q-22,4 -8,8 Q-3,5 0,0" fill="#fbe183" stroke="#dca842" strokeWidth="0.8" />
+                  </motion.g>
+                  <motion.g animate={{ rotate: [2, -2, 2] }} transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }} transform="translate(90, 115)">
+                    <path d="M0,0 Q-12,-12 -18,-5 Q-18,12 -5,8 Q-2,4 0,0" fill="#fce69a" stroke="#dca842" strokeWidth="0.8" />
+                  </motion.g>
+
+                  {/* Chú chim hoàng yến nhỏ màu vàng tươi ngộ nghĩnh đậu trên cành */}
+                  <motion.g
+                    whileHover={{ scale: 1.15 }}
+                    animate={{ y: [0, -3, 0] }}
+                    transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+                    onClick={(e: any) => {
+                      e.stopPropagation();
+                      playBirdChirp();
+                    }}
+                    className="cursor-pointer pointer-events-auto"
+                    transform="translate(150, 80)"
+                  >
+                    {/* Thân chim */}
+                    <ellipse cx="12" cy="0" rx="15" ry="10" fill="#fce69a" stroke="#dca842" strokeWidth="1.2" />
+                    {/* Đầu chim */}
+                    <circle cx="23" cy="-7" r="7.5" fill="#fce69a" stroke="#dca842" strokeWidth="1.2" />
+                    {/* Mỏ chim */}
+                    <polygon points="30,-9 36,-7 30,-5" fill="#dca842" />
+                    {/* Mắt chim nhỏ lém lỉnh */}
+                    <circle cx="25" cy="-8" r="1.2" fill="#132e1a" />
+                    {/* Cánh chim vẫy nhẹ dập dờn */}
+                    <motion.path 
+                      d="M6,-3 Q-2,-8 -8,-2 Q-4,8 6,0" 
+                      fill="#dca842" 
+                      animate={{ rotate: [-4, 8, -4] }}
+                      transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                    />
+                    {/* Đuôi chim điệu đà */}
+                    <path d="M-3,3 L-16,11 L-10,4 Z" fill="#dca842" />
+                    {/* Chân chim nhỏ đậu chắc chắn */}
+                    <line x1="8" y1="9" x2="6" y2="15" stroke="#5c4033" strokeWidth="1.2" />
+                    <line x1="13" y1="9" x2="13" y2="15" stroke="#5c4033" strokeWidth="1.2" />
+                  </motion.g>
+                </svg>
+
+                {/* Dòng chữ tâm sự nhỏ bay bay khẽ ở mép dưới mặt hồ */}
+                <div className="absolute bottom-2 left-0 right-0 text-center pointer-events-none">
+                  <span className="text-[10px] text-[#fce69a]/70 font-serif italic">
+                    “ Mặt hồ xanh mọc rêu phong trầm mặc, chao lượn bóng chim yến nhỏ tinh ranh... ”
+                  </span>
+                </div>
               </div>
             </div>
           </div>
