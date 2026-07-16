@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, ExternalLink, Radio, Globe, Zap, Compass, Crosshair, Terminal, Cpu, HardDrive, ArrowUpRight } from 'lucide-react';
+import { BookOpen, Gift, Send, Bookmark, ExternalLink, Radio, Globe, Zap, Compass, Crosshair, Terminal, Cpu, HardDrive, ArrowUpRight, Lock, Unlock } from 'lucide-react';
 import { format } from 'date-fns';
 import { useStore } from '../../store';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -12,7 +12,7 @@ export function CanhCuaHomerTheme(props: ThemeProps) {
     showGiftModal, setShowGiftModal, giftAmount, setGiftAmount, giftMessage, setGiftMessage, handleGiftSubmit,
     commentText, setCommentText, submittingComment, handleSendComment,
     isLoggedIn, savedStories, handleSaveToggle, choco, navigate,
-    profilesCache = {}, getTitleColor, uid
+    profilesCache = {}, getTitleColor, uid, unlockedPassChapters, unlockedEarlyAccessChapters
   } = props;
 
   const {
@@ -231,20 +231,64 @@ export function CanhCuaHomerTheme(props: ThemeProps) {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {displayedChapters.map((chap, i) => (
-                    <button
-                      key={chap.id}
-                      onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
-                      className="flex items-center text-left p-3 bg-[#2d3745] border border-[#47515f] hover:border-[#a0a6b3] transition-colors group"
-                    >
-                      <div className="w-12 text-[#67707e] group-hover:text-[#a0a6b3] text-xl font-light border-r border-[#47515f] mr-3 pr-3 text-center">
-                        {((chapterPage * CHAPTERS_PER_PAGE) + i + 1).toString().padStart(2, '0')}
-                      </div>
-                      <div className="flex-1 line-clamp-2 text-sm text-[#a0a6b3]">
-                        {chap.title}
-                      </div>
-                    </button>
-                  ))}
+                  {displayedChapters.map((chap, i) => {
+                    const isPassRequired = chap.requiresPass;
+                    const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
+                    const isEarlyAccess = chap.requiresEarlyAccess;
+                    const chapTime = chap.createdAt?.toMillis ? chap.createdAt.toMillis() : (typeof chap.createdAt === 'number' ? chap.createdAt : 0);
+                    const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+                    const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(chap.id);
+                    const isLockedRead = !!chap.isLockedRead;
+
+                    return (
+                      <button
+                        key={chap.id}
+                        onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
+                        className="flex items-center text-left p-3 bg-[#2d3745] border border-[#47515f] hover:border-[#a0a6b3] transition-colors group"
+                      >
+                        <div className="w-12 text-[#67707e] group-hover:text-[#a0a6b3] text-xl font-light border-r border-[#47515f] mr-3 pr-3 text-center">
+                          {((chapterPage * CHAPTERS_PER_PAGE) + i + 1).toString().padStart(2, '0')}
+                        </div>
+                        <div className="flex-1 line-clamp-2 text-sm text-[#a0a6b3] min-w-0">
+                          {chap.title}
+                        </div>
+                        <div className="flex items-center gap-2 pl-2 shrink-0">
+                          {isPassRequired && (
+                            hasPassUnlocked ? (
+                              <span className="text-[9px] bg-emerald-950/40 text-emerald-400 px-1.5 py-0.5 border border-emerald-900/50 flex items-center gap-1 font-mono">
+                                <Unlock className="w-3 h-3" /> PASS OK
+                              </span>
+                            ) : (
+                              <span className="text-[9px] bg-amber-950/40 text-amber-400 px-1.5 py-0.5 border border-amber-900/50 flex items-center gap-1 font-mono">
+                                <Lock className="w-3 h-3" /> SYS.PASS
+                              </span>
+                            )
+                          )}
+                          {isEarlyAccess && isStillEarlyAccess && (
+                            hasEarlyAccessUnlocked ? (
+                              <span className="text-[9px] bg-teal-950/40 text-teal-400 px-1.5 py-0.5 border border-teal-900/50 flex items-center gap-1 font-mono">
+                                <Zap className="w-3 h-3 text-teal-400 fill-teal-900" /> SECURE_OK
+                              </span>
+                            ) : (
+                              <span className="text-[9px] bg-amber-950/40 text-amber-400 px-1.5 py-0.5 border border-amber-900/50 flex items-center gap-1 font-mono animate-pulse">
+                                <Zap className="w-3 h-3 text-amber-400 fill-amber-900" /> SYS.ZAP
+                              </span>
+                            )
+                          )}
+                          {isEarlyAccess && !isStillEarlyAccess && (
+                            <span className="text-[9px] bg-[#1e2530] text-[#67707e] px-1.5 py-0.5 border border-[#374151] font-mono">
+                              SYS.FREE
+                            </span>
+                          )}
+                          {isLockedRead && (
+                            <span className="text-[9px] bg-red-950/40 text-red-400 px-1.5 py-0.5 border border-red-900/50 font-mono">
+                              SYS.LOCKED
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {chapters.length > CHAPTERS_PER_PAGE && (
