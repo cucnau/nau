@@ -996,6 +996,23 @@ export function Reader() {
      }
   };
 
+  const handleUnlockBoth = () => {
+    if (!isLoggedIn) { alert("Vui lòng đăng nhập!"); return; }
+    if (ownedPassTickets >= 1 && ownedPriorityTickets >= 1) {
+      const passSuccess = consumePassTicket(currentChapter.id);
+      const prioritySuccess = consumePriorityTicket(currentChapter.id);
+      if (passSuccess && prioritySuccess) {
+         setIsPassUnlockedLocal(true);
+         setIsEarlyAccessUnlockedLocal(true);
+         alert("Đã mở khoá chương thành công bằng cả 2 loại vé!");
+      } else {
+         alert("Có lỗi xảy ra khi tiêu vé!");
+      }
+    } else {
+      alert("Bạn không đủ vé!");
+    }
+  };
+
   const isPassRequired = currentChapter?.requiresPass;
   const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(currentChapter?.id);
   const needsPass = isPassRequired && !hasPassUnlocked && !isPassUnlockedLocal;
@@ -1272,6 +1289,266 @@ export function Reader() {
   const tCommentSubmit = activeCustomTheme === 'hoangyen' ? "Hót líu lo" : activeCustomTheme === 'homer' ? "Phát sóng" : activeCustomTheme === 'giagoan' ? "Trình ý kiến" : activeCustomTheme === 'nhatky' ? "Khắc ghi bút tích" : activeCustomTheme === 'thuytien' ? "Khắc lời tự chiêm" : activeCustomTheme === 'rinhrap' ? "Ghi dấu vết" : activeCustomTheme === 'thientai' ? "Gửi chiến thuật" : activeCustomTheme === 'nguoidep' ? "Nộp nhận xét" : activeCustomTheme === 'thaitu' ? "Dâng tấu" : "Gửi bình luận";
   const tNoComment = activeCustomTheme === 'hoangyen' ? "Mặt hồ phẳng lặng yên tĩnh, chưa ai hót tiếng nào..." : activeCustomTheme === 'homer' ? "Chưa có phản hồi nào." : activeCustomTheme === 'giagoan' ? "Chưa có đề xuất và ý kiến nào cho tài liệu này." : activeCustomTheme === 'nhatky' ? "Trang ký ức này chưa lưu lại nét bút nào." : activeCustomTheme === 'thuytien' ? "Mặt hồ phẳng lặng chưa ghi nhận lời tự chiêm ngưỡng nào..." : activeCustomTheme === 'rinhrap' ? "Không có dấu vết nào được để lại..." : activeCustomTheme === 'thientai' ? "Chưa có báo cáo chiến thuật nào cho phó bản này." : activeCustomTheme === 'nguoidep' ? "Chưa có báo cáo tiến độ nào cho bài ôn này." : activeCustomTheme === 'thaitu' ? "Án văn chương này phẳng lặng, chưa có tấu thảo." : "Chưa có bình luận nào cho chương này.";
 
+  const renderLockedBox = () => {
+    return (
+      <div className={cn(
+         "my-8 p-6 sm:p-8 rounded-3xl border-2 flex flex-col items-center text-center shadow-lg transition-all max-w-xl mx-auto",
+         isCustomThemeActive ? (
+            activeCustomTheme === 'hoangyen' ? "bg-[#f4faf5] border-[#cde8c6] text-[#1b3a1e] font-reading-quicksand" :
+            activeCustomTheme === 'homer' ? "bg-[#1f2838] border-[#47515f] text-[#a0a6b3] font-reading-iosevka" :
+            activeCustomTheme === 'nhatky' ? "bg-[#E0D3BC] border-[#BCA782] text-[#2C1814] font-reading-cormorant" :
+            activeCustomTheme === 'thuytien' ? "bg-[#1c1a17] border-[#B6A996]/30 text-[#EADDC9] font-reading-cormorant" :
+            activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#fff2f1] border-[#facaca] text-[#780606] font-reading-quicksand" : "bg-[#140b0b] border-[#7F1D1D] text-[#D8B4B4] font-reading-quicksand") :
+            activeCustomTheme === 'thientai' ? "bg-[#0f0a10] border-[#34282d] text-[#d4c6c9] font-reading-iosevka" :
+            activeCustomTheme === 'nguoidep' ? "bg-[#151d2e] border-[#2D3D54]/40 text-[#ECEFF4] font-reading-lora" :
+            activeCustomTheme === 'thaitu' ? "bg-[#27211e] border-[#473a36] text-[#d7cac1] font-reading-cormorant" :
+            "bg-[#1b1915] border-[#2e2a63] text-[#dbcec2] font-reading-garamond"
+         ) : effectiveIsDark ? "bg-[#251D19] border-[#3E2723] text-[#ECE5DC]" : "bg-[#FFFDF9] border-[#3E2723] text-[#3E2723]"
+      )}>
+         <div className={cn(
+            "w-16 h-16 rounded-full flex items-center justify-center mb-6 border-2 shadow-inner animate-pulse",
+            isCustomThemeActive ? (
+               activeCustomTheme === 'hoangyen' ? "bg-[#eff6f0] border-[#cde8c6] text-[#1b3a1e]" :
+               activeCustomTheme === 'homer' ? "bg-[#181f2d] border-[#47515f] text-[#a0a6b3]" :
+               activeCustomTheme === 'nhatky' ? "bg-[#E8DCC4] border-[#BCA782] text-[#2C1814]" :
+               activeCustomTheme === 'thuytien' ? "bg-[#12110F] border-[#B6A996]/40 text-[#B6A996]" :
+               activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#FFF2F1] border-[#facaca] text-[#780606]" : "bg-[#0B0505] border-[#7F1D1D] text-[#EF4444]") :
+               activeCustomTheme === 'thientai' ? "bg-[#060406] border-[#34282d] text-[#9a858d]" :
+               activeCustomTheme === 'nguoidep' ? "bg-[#101622] border-[#2D3D54]/40 text-[#A2B6CD]" :
+               activeCustomTheme === 'thaitu' ? "bg-[#1b1715] border-[#741611]/40 text-[#741611]" :
+               "bg-[#13120d] border-[#2e2a63] text-[#bbee1f]"
+            ) : effectiveIsDark ? "bg-[#1A1412] border-[#3E2723] text-[#8D6E63]" : "bg-[#FDF6EC] border-[#3E2723] text-[#8D6E63]"
+         )}>
+            <Lock className="w-8 h-8" />
+         </div>
+
+         <h3 className={cn(
+            "text-lg sm:text-xl font-black uppercase tracking-wider mb-3",
+            isCustomThemeActive ? (
+               activeCustomTheme === 'hoangyen' ? "text-[#1b3a1e]" :
+               activeCustomTheme === 'homer' ? "text-white" :
+               activeCustomTheme === 'nhatky' ? "text-[#2C1814]" :
+               activeCustomTheme === 'thuytien' ? "text-[#B6A996]" :
+               activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "text-[#780606]" : "text-[#EF4444]") :
+               activeCustomTheme === 'thientai' ? "text-[#9a858d]" :
+               activeCustomTheme === 'nguoidep' ? "text-[#A2B6CD]" :
+               activeCustomTheme === 'thaitu' ? "text-[#741611]" :
+               "text-[#bbee1f]"
+            ) : effectiveIsDark ? "text-[#D7CCC8]" : "text-[#8D6E63]"
+         )}>
+            {tChapterLocked}
+         </h3>
+
+         {currentChapter?.isLockedRead ? (
+            <>
+               <p className="text-sm leading-relaxed mb-6 opacity-90 max-w-md font-semibold">
+                  Chương này đã được thiết lập khóa chương trong quản trị (yêu cầu đọc từ nguồn liên kết gốc của tác giả). Vui lòng nhấn nút bên dưới để chuyển hướng đọc tại trang gốc.
+               </p>
+               {(currentChapter.externalUrl || story?.externalUrl) ? (
+                  <a 
+                     href={currentChapter.externalUrl || story?.externalUrl} 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className={cn(
+                        "px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest border-2 transition-all cursor-pointer inline-flex items-center gap-2 shadow-[3px_3px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none",
+                        isCustomThemeActive ? (
+                           activeCustomTheme === 'hoangyen' ? "bg-[#aeed9a] hover:bg-[#aeed9a]/80 text-[#1b3a1e] border-[#1b3a1e] shadow-[3px_3px_0_0_#cde8c6]" :
+                           activeCustomTheme === 'homer' ? "bg-[#a0a6b3] hover:bg-white text-[#181f2d] border-[#47515f] shadow-[3px_3px_0_0_#47515f]" :
+                           activeCustomTheme === 'nhatky' ? "bg-[#BCA782] hover:bg-[#C9B695] text-[#2C1814] border-[#C9B695] shadow-[3px_3px_0_0_#C9B695]" :
+                           activeCustomTheme === 'thuytien' ? "bg-[#B6A996] hover:bg-[#F2E6D0] text-[#12110F] border-[#B6A996] shadow-[3px_3px_0_0_#12110F]" :
+                           activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#facaca] hover:bg-[#FFF2F1] text-[#780606] border-[#823323] shadow-[3px_3px_0_0_#facaca]" : "bg-[#991B1B] hover:bg-[#DC2626] text-white border-[#7F1D1D] shadow-[3px_3px_0_0_#450A0A]") :
+                           activeCustomTheme === 'thientai' ? "bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] border-[#34282d] shadow-[3px_3px_0_0_#34282d]" :
+                           activeCustomTheme === 'nguoidep' ? "bg-[#A2B6CD] hover:bg-[#ECEFF4] text-[#101622] border-[#2D3D54]/40 shadow-[3px_3px_0_0_#2D3D54]" :
+                           activeCustomTheme === 'thaitu' ? "bg-[#741611] hover:bg-[#8d1c15] text-[#d7cac1] border-[#473a36] shadow-[3px_3px_0_0_#473a36]" :
+                           "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63]"
+                        ) : "bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
+                     )}
+                  >
+                     <ExternalLink className="w-4 h-4" />
+                     Đọc tại link gốc
+                  </a>
+               ) : (
+                  <p className="text-xs italic text-red-500 font-bold">
+                     (Chưa cấu hình liên kết nguồn cho chương hoặc bộ truyện này trong quản trị)
+                  </p>
+               )}
+            </>
+         ) : (needsPass && needsEarlyAccess) ? (
+             <>
+                <p className="text-sm leading-relaxed mb-6 opacity-90 max-w-md font-semibold">
+                   Chương này yêu cầu sử dụng đồng thời cả <b>1 Vé Pass Truyện</b> và <b>1 Vé Ưu Tiên (Đọc Sớm)</b> để mở khóa nội dung đọc tiếp.
+                </p>
+                {isLoggedIn ? (
+                   <div className="flex flex-col items-center gap-4 w-full max-w-md mx-auto">
+                      <div className="grid grid-cols-2 gap-3 w-full text-center">
+                         <div className="p-3 rounded-xl border border-dashed border-amber-500/40 bg-amber-500/5">
+                            <p className="text-[10px] font-bold uppercase tracking-wider opacity-75">Vé Pass của bạn</p>
+                            <p className="text-base font-black text-amber-500">{ownedPassTickets} vé</p>
+                         </div>
+                         <div className="p-3 rounded-xl border border-dashed border-yellow-500/40 bg-yellow-500/5">
+                            <p className="text-[10px] font-bold uppercase tracking-wider opacity-75">Vé Ưu Tiên của bạn</p>
+                            <p className="text-base font-black text-[#D4AF37]">{ownedPriorityTickets} vé</p>
+                         </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3 w-full justify-center mt-2">
+                         {ownedPassTickets >= 1 && ownedPriorityTickets >= 1 ? (
+                            <button 
+                               onClick={handleUnlockBoth}
+                               className={cn(
+                                  "px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest border-2 transition-all cursor-pointer inline-flex items-center justify-center gap-2 shadow-[3px_3px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-white border-amber-600"
+                               )}
+                            >
+                               <Unlock className="w-4 h-4 animate-bounce" />
+                               Mở khóa nhanh bằng cả 2 vé
+                            </button>
+                         ) : null}
+                         
+                         <div className="flex flex-col gap-2 w-full">
+                            <div className="flex gap-2 w-full">
+                               <button
+                                  disabled={ownedPassTickets < 1}
+                                  onClick={handleUnlockPass}
+                                  className={cn(
+                                     "px-3 py-2.5 rounded-xl font-bold text-[11px] border transition-all flex-1 inline-flex items-center justify-center gap-1.5",
+                                     ownedPassTickets >= 1 
+                                        ? "bg-amber-500 hover:bg-amber-600 text-white border-amber-600 cursor-pointer"
+                                        : "bg-gray-300 dark:bg-zinc-800 text-gray-500 border-gray-400 dark:border-zinc-700 cursor-not-allowed opacity-50"
+                                  )}
+                               >
+                                  <Unlock className="w-3.5 h-3.5" />
+                                  Tiêu 1 Vé Pass
+                               </button>
+
+                               <button
+                                  disabled={ownedPriorityTickets < 1}
+                                  onClick={handleUnlockEarlyAccess}
+                                  className={cn(
+                                     "px-3 py-2.5 rounded-xl font-bold text-[11px] border transition-all flex-1 inline-flex items-center justify-center gap-1.5",
+                                     ownedPriorityTickets >= 1 
+                                        ? "bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600 cursor-pointer"
+                                        : "bg-gray-300 dark:bg-zinc-800 text-gray-500 border-gray-400 dark:border-zinc-700 cursor-not-allowed opacity-50"
+                                  )}
+                               >
+                                  <Unlock className="w-3.5 h-3.5" />
+                                  Tiêu 1 Vé Ưu Tiên
+                               </button>
+                            </div>
+
+                            {(ownedPassTickets < 1 || ownedPriorityTickets < 1) && (
+                               <button 
+                                  onClick={() => setStoreOpen(true)}
+                                  className="px-6 py-3 mt-1 rounded-2xl font-black uppercase text-xs tracking-widest border-2 transition-all cursor-pointer inline-flex items-center justify-center gap-2 shadow-[3px_3px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none bg-red-500 hover:bg-red-600 text-white border-red-600"
+                               >
+                                  Mua thêm vé tại Cửa Hàng
+                               </button>
+                            )}
+                         </div>
+                      </div>
+                   </div>
+                ) : (
+                   <p className="text-xs italic opacity-75 font-semibold">
+                      Vui lòng đăng nhập bằng nút ở góc trên bên phải thanh điều hướng để mở khóa chương.
+                   </p>
+                )}
+             </>
+          ) : needsPass ? (
+            <>
+               <p className="text-sm leading-relaxed mb-6 opacity-90 max-w-md font-semibold">
+                  Chương này yêu cầu sử dụng <b>1 Vé Pass Truyện</b> để mở khóa nội dung đọc tiếp.
+               </p>
+               {isLoggedIn ? (
+                  <div className="flex flex-col items-center gap-4 w-full">
+                     <p className="text-xs font-bold uppercase tracking-wider opacity-75">
+                        Số Vé Pass của bạn: <span className="text-sm font-black text-amber-500">{ownedPassTickets} vé</span>
+                     </p>
+                     {ownedPassTickets > 0 ? (
+                        <button 
+                           onClick={handleUnlockPass}
+                           className={cn(
+                              "px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest border-2 transition-all cursor-pointer inline-flex items-center gap-2 shadow-[3px_3px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none",
+                              isCustomThemeActive ? (
+                                 activeCustomTheme === 'hoangyen' ? "bg-[#aeed9a] hover:bg-[#aeed9a]/80 text-[#1b3a1e] border-[#1b3a1e] shadow-[3px_3px_0_0_#cde8c6]" :
+                                 activeCustomTheme === 'homer' ? "bg-[#a0a6b3] hover:bg-white text-[#181f2d] border-[#47515f] shadow-[3px_3px_0_0_#47515f]" :
+                                 activeCustomTheme === 'nhatky' ? "bg-[#BCA782] hover:bg-[#C9B695] text-[#2C1814] border-[#C9B695] shadow-[3px_3px_0_0_#C9B695]" :
+                                 activeCustomTheme === 'thuytien' ? "bg-[#B6A996] hover:bg-[#F2E6D0] text-[#12110F] border-[#B6A996] shadow-[3px_3px_0_0_#12110F]" :
+                                 activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#facaca] hover:bg-[#FFF2F1] text-[#780606] border-[#823323] shadow-[3px_3px_0_0_#facaca]" : "bg-[#991B1B] hover:bg-[#DC2626] text-white border-[#7F1D1D] shadow-[3px_3px_0_0_#450A0A]") :
+                                 activeCustomTheme === 'thientai' ? "bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] border-[#34282d] shadow-[3px_3px_0_0_#34282d]" :
+                                 activeCustomTheme === 'nguoidep' ? "bg-[#A2B6CD] hover:bg-[#ECEFF4] text-[#101622] border-[#2D3D54]/40 shadow-[3px_3px_0_0_#2D3D54]" :
+                                 activeCustomTheme === 'thaitu' ? "bg-[#741611] hover:bg-[#8d1c15] text-[#d7cac1] border-[#473a36] shadow-[3px_3px_0_0_#473a36]" :
+                                 "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63]"
+                              ) : "bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
+                           )}
+                        >
+                           <Unlock className="w-4 h-4" />
+                           Sử dụng 1 Vé Pass để mở
+                        </button>
+                     ) : (
+                        <button 
+                           onClick={() => setStoreOpen(true)}
+                           className="px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest border-2 transition-all cursor-pointer inline-flex items-center gap-2 shadow-[3px_3px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none bg-amber-500 hover:bg-amber-600 text-white border-amber-600"
+                        >
+                           Mua thêm Vé Pass tại Cửa Hàng
+                        </button>
+                     )}
+                  </div>
+               ) : (
+                  <p className="text-xs italic opacity-75 font-semibold">
+                     Vui lòng đăng nhập bằng nút ở góc trên bên phải thanh điều hướng để mở khóa chương.
+                  </p>
+               )}
+            </>
+         ) : needsEarlyAccess ? (
+            <>
+               <p className="text-sm leading-relaxed mb-6 opacity-90 max-w-md font-semibold">
+                  Chương này thuộc chế độ Đọc Sớm. Yêu cầu sử dụng <b>1 Vé Ưu Tiên</b> để đọc trước.
+               </p>
+               {isLoggedIn ? (
+                  <div className="flex flex-col items-center gap-4 w-full">
+                     <p className="text-xs font-bold uppercase tracking-wider opacity-75">
+                        Số Vé Ưu Tiên của bạn: <span className="text-sm font-black text-[#D4AF37]">{ownedPriorityTickets} vé</span>
+                     </p>
+                     {ownedPriorityTickets > 0 ? (
+                        <button 
+                           onClick={handleUnlockEarlyAccess}
+                           className={cn(
+                              "px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest border-2 transition-all cursor-pointer inline-flex items-center gap-2 shadow-[3px_3px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none",
+                              isCustomThemeActive ? (
+                                 activeCustomTheme === 'hoangyen' ? "bg-[#aeed9a] hover:bg-[#aeed9a]/80 text-[#1b3a1e] border-[#1b3a1e] shadow-[3px_3px_0_0_#cde8c6]" :
+                                 activeCustomTheme === 'homer' ? "bg-[#a0a6b3] hover:bg-white text-[#181f2d] border-[#47515f] shadow-[3px_3px_0_0_#47515f]" :
+                                 activeCustomTheme === 'nhatky' ? "bg-[#BCA782] hover:bg-[#C9B695] text-[#2C1814] border-[#C9B695] shadow-[3px_3px_0_0_#C9B695]" :
+                                 activeCustomTheme === 'thuytien' ? "bg-[#B6A996] hover:bg-[#F2E6D0] text-[#12110F] border-[#B6A996] shadow-[3px_3px_0_0_#12110F]" :
+                                 activeCustomTheme === 'rinhrap' ? (rinhrapMode === 'thotrang' ? "bg-[#facaca] hover:bg-[#FFF2F1] text-[#780606] border-[#823323] shadow-[3px_3px_0_0_#facaca]" : "bg-[#991B1B] hover:bg-[#DC2626] text-white border-[#7F1D1D] shadow-[3px_3px_0_0_#450A0A]") :
+                                 activeCustomTheme === 'thientai' ? "bg-[#9a858d] hover:bg-[#d4c6c9] text-[#060406] border-[#34282d] shadow-[3px_3px_0_0_#34282d]" :
+                                 activeCustomTheme === 'nguoidep' ? "bg-[#A2B6CD] hover:bg-[#ECEFF4] text-[#101622] border-[#2D3D54]/40 shadow-[3px_3px_0_0_#2D3D54]" :
+                                 activeCustomTheme === 'thaitu' ? "bg-[#741611] hover:bg-[#8d1c15] text-[#d7cac1] border-[#473a36] shadow-[3px_3px_0_0_#473a36]" :
+                                 "bg-[#bbee1f] hover:bg-white text-[#13120d] border-[#2e2a63] shadow-[3px_3px_0_0_#2e2a63]"
+                              ) : "bg-[#8D6E63] hover:bg-[#5D4037] text-white border-[#3E2723]"
+                           )}
+                        >
+                           <Unlock className="w-4 h-4" />
+                           Sử dụng 1 Vé Ưu Tiên để mở
+                        </button>
+                     ) : (
+                        <button 
+                           onClick={() => setStoreOpen(true)}
+                           className="px-6 py-3 rounded-2xl font-black uppercase text-xs tracking-widest border-2 transition-all cursor-pointer inline-flex items-center gap-2 shadow-[3px_3px_0_0_#3E2723] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-none bg-[#D4AF37] hover:bg-[#B3922E] text-white border-[#B3922E]"
+                        >
+                           Mua thêm Vé Ưu Tiên tại Cửa Hàng
+                        </button>
+                     )}
+                  </div>
+               ) : (
+                  <p className="text-xs italic opacity-75 font-semibold">
+                     Vui lòng đăng nhập bằng nút ở góc trên bên phải thanh điều hướng để mở khóa chương Đọc Sớm.
+                  </p>
+               )}
+            </>
+         ) : null}
+      </div>
+    );
+  };
+
   return (
     <div className={cn(
       "min-h-screen transition-colors duration-500 pb-32 font-medium flex flex-col items-center",
@@ -1442,7 +1719,7 @@ export function Reader() {
               )}
              style={{ fontSize: `${fontSize}px` }}
          >
-                 {paragraphs.map((p: string, idx: number) => {
+                 {isLocked ? renderLockedBox() : paragraphs.map((p: string, idx: number) => {
                     const pComments = comments.filter(c => c.type === 'paragraph' && c.paragraphIdx === idx && !c.parentId);
                     return (
                         <div key={idx} className="relative group/para">
