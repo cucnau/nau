@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, ExternalLink, Gift, Send, Bookmark, Heart, ArrowLeft, Sparkles, Terminal, Cpu, Shield, Zap, Sword, Award, Layers, User } from 'lucide-react';
+import { BookOpen, ExternalLink, Gift, Send, Bookmark, Heart, ArrowLeft, Sparkles, Terminal, Cpu, Shield, Zap, Sword, Award, Layers, User, Lock, Unlock } from 'lucide-react';
 import { format } from 'date-fns';
 import { useStore } from '../../store';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -27,7 +27,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
     showGiftModal, setShowGiftModal, giftAmount, setGiftAmount, giftMessage, setGiftMessage, handleGiftSubmit,
     commentText, setCommentText, submittingComment, handleSendComment,
     isLoggedIn, savedStories, handleSaveToggle, choco, navigate,
-    profilesCache = {}, getTitleColor, uid
+    profilesCache = {}, getTitleColor, uid, unlockedPassChapters, unlockedEarlyAccessChapters
   } = props;
 
   const {
@@ -55,7 +55,7 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
     { name: "Khám phá · Thị Trấn Mê Cung Gương", desc: "Chương 29-37", diff: "★★★★★★", boss: "Thần Sương", min: 29, max: 37 },
     { name: "Thần Thụ Thiên Không · Thị Trấn Lưu Ly", desc: "Chương 38-44", diff: "Không rõ", boss: "Không rõ", min: 38, max: 44 },
     { name: "Trận chiến liên minh bang hội · Bạch Thủy Cốc", desc: "Chương 45-55", diff: "★★★★★★", boss: "Thú dữ trấn giữ thung lũng", min: 45, max: 55 },
-    { name: "Khám phá · Trại Nhà Trần", desc: "Chương 56-69", diff: "★★★★★★", boss: "Thần Cổ", min: 56, max: 69 },
+    { name: "Khám phá · Trại Nhà Trần", desc: "Chương 56-69", diff: "★★★★★★", boss: "Đại ca Trần", min: 56, max: 69 },
     { name: "Lối chơi đặc biệt · Tỉ Thí Kén Rể", desc: "Chương 70-90", diff: "★★★★★★", boss: "Thần Giả", min: 70, max: 90 },
     { name: "Khám phá · Lĩnh Vực Thần Tài", desc: "Chương 91-114", diff: "★★★★★★★", boss: "Thần Dục", min: 91, max: 114 },
     { name: "Khám phá · Vùng Đất Sụp Đổ", desc: "Chương 115-135", diff: "★★★★★★★", boss: "Thần Ảo", min: 115, max: 135 },
@@ -382,23 +382,71 @@ export function ThienTaiThaoTacTheme(props: ThemeProps) {
                     const match = chap.title.match(/(\d+)/);
                     const chapNum = match ? parseInt(match[1], 10) : 0;
                     return chapNum >= dungeons[selectedDungeon].min && chapNum <= dungeons[selectedDungeon].max;
-                  }).map((chap, idx) => (
-                    <button
-                      key={chap.id}
-                      onClick={() => navigate(`/doc/${story.slug || actualStoryId}/chuong-${chap.order + 1}`)}
-                      className="group relative p-3 border border-[#645a6c]/40 bg-[#060406] hover:border-[#9a858d] hover:bg-[#9a858d]/10 transition-all text-left flex flex-col gap-1 cursor-pointer overflow-hidden"
-                    >
-                      {/* Scanline hover */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#9a858d]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                      
-                      <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-[#9a858d]">
-                        STAGE {idx + 1}
-                      </span>
-                      <span className="font-bold text-xs text-[#d4c6c9] group-hover:text-white line-clamp-1 font-mono">
-                        {chap.title}
-                      </span>
-                    </button>
-                  ))}
+                  }).map((chap, idx) => {
+                    const isPassRequired = chap.requiresPass;
+                    const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
+                    const isEarlyAccess = chap.requiresEarlyAccess;
+                    const chapTime = chap.createdAt?.toMillis ? chap.createdAt.toMillis() : (typeof chap.createdAt === 'number' ? chap.createdAt : 0);
+                    const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+                    const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(chap.id);
+                    const isLockedRead = !!chap.isLockedRead;
+
+                    return (
+                      <button
+                        key={chap.id}
+                        onClick={() => navigate(`/doc/${story.slug || actualStoryId}/chuong-${chap.order + 1}`)}
+                        className="group relative p-3 border border-[#645a6c]/40 bg-[#060406] hover:border-[#9a858d] hover:bg-[#9a858d]/10 transition-all text-left flex flex-col gap-1 cursor-pointer overflow-hidden"
+                      >
+                        {/* Scanline hover */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#9a858d]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                        
+                        <div className="flex justify-between items-center w-full gap-1 z-10">
+                          <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-[#9a858d]">
+                            STAGE {idx + 1}
+                          </span>
+                          
+                          <div className="flex items-center gap-1 shrink-0">
+                            {isPassRequired && (
+                              hasPassUnlocked ? (
+                                <span className="text-[8px] font-mono px-1 rounded bg-emerald-950/40 border border-emerald-900/50 text-emerald-400 flex items-center gap-0.5">
+                                  <Unlock className="w-2.5 h-2.5" /> KEY_OK
+                                </span>
+                              ) : (
+                                <span className="text-[8px] font-mono px-1 rounded bg-amber-950/40 border border-amber-900/50 text-amber-400 flex items-center gap-0.5">
+                                  <Lock className="w-2.5 h-2.5" /> REQ_KEY
+                                </span>
+                              )
+                            )}
+                            {isEarlyAccess && isStillEarlyAccess && (
+                              hasEarlyAccessUnlocked ? (
+                                <span className="text-[8px] font-mono px-1 rounded bg-teal-950/40 border border-teal-900/50 text-teal-400 flex items-center gap-0.5">
+                                  <Zap className="w-2.5 h-2.5 text-teal-400 fill-teal-950" /> EARLY_OK
+                                </span>
+                              ) : (
+                                <span className="text-[8px] font-mono px-1 rounded bg-amber-950/40 border border-amber-900/30 text-amber-400 flex items-center gap-0.5 animate-pulse">
+                                  <Zap className="w-2.5 h-2.5 text-amber-400 fill-amber-950" /> EARLY_ACC
+                                </span>
+                              )
+                            )}
+                            {isEarlyAccess && !isStillEarlyAccess && (
+                              <span className="text-[8px] font-mono px-1 rounded bg-stone-950/40 border border-stone-900 text-stone-500">
+                                FREE
+                              </span>
+                            )}
+                            {isLockedRead && (
+                              <span className="text-[8px] font-mono px-1 rounded bg-red-950/40 border border-red-900/50 text-red-400">
+                                LOCKED
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <span className="font-bold text-xs text-[#d4c6c9] group-hover:text-white line-clamp-1 font-mono z-10">
+                          {chap.title}
+                        </span>
+                      </button>
+                    );
+                  })}
                   {chapters.filter(chap => {
                     const match = chap.title.match(/(\d+)/);
                     const chapNum = match ? parseInt(match[1], 10) : 0;
