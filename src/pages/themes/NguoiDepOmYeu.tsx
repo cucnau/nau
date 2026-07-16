@@ -35,7 +35,10 @@ import {
   User,
   Users,
   Check,
-  X
+  X,
+  Lock,
+  Unlock,
+  Zap
 } from 'lucide-react';
 
 interface Subject {
@@ -2153,8 +2156,13 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 md:gap-2.5">
                       {displayedChapters.map((chap) => {
                         const absoluteIndex = chapters.findIndex(c => c.id === chap.id) + 1;
-                        const isLocked = chap.isLocked && !unlockedPassChapters.includes(chap.id);
-                        const isEarly = chap.isEarlyAccess && !unlockedEarlyAccessChapters.includes(chap.id);
+                        const isPassRequired = chap.requiresPass;
+                        const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
+                        const isEarlyAccess = chap.requiresEarlyAccess;
+                        const chapTime = chap.createdAt?.toMillis ? chap.createdAt.toMillis() : (typeof chap.createdAt === 'number' ? chap.createdAt : 0);
+                        const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+                        const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(chap.id);
+                        const isLockedRead = !!chap.isLockedRead;
                         
                         return (
                           <button
@@ -2163,15 +2171,29 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                             className="group text-left p-2.5 rounded-lg border border-[#2D3D54]/15 hover:border-[#A2B6CD]/80 bg-[#151C28] hover:bg-[#233145]/20 transition-all flex flex-col justify-between h-[66px] relative overflow-hidden shadow-sm"
                             title={chap.title}
                           >
-                            <div className="flex justify-between items-center w-full">
-                              <span className="text-[8px] md:text-[9px] font-mono text-[#A2B6CD]/80 font-bold tracking-wider">
+                            <div className="flex justify-between items-center w-full gap-1">
+                              <span className="text-[8px] md:text-[9px] font-mono text-[#A2B6CD]/80 font-bold tracking-wider truncate">
                                 MÃ ĐỀ {absoluteIndex.toString().padStart(2, '0')}
                               </span>
-                              {isLocked ? (
-                                <span className="text-[8px] bg-red-900/30 px-1 rounded text-red-300 scale-90 origin-right">KHÓA</span>
-                              ) : isEarly ? (
-                                <span className="text-[8px] bg-[#A2B6CD]/20 px-1 rounded text-[#A2B6CD] scale-90 origin-right">SỚM</span>
-                              ) : null}
+                              <div className="flex gap-1 shrink-0">
+                                {isLockedRead && (
+                                  <span className="text-[8px] bg-red-950/40 border border-red-900/50 px-1 rounded text-red-400">KHÓA</span>
+                                )}
+                                {isPassRequired && (
+                                  hasPassUnlocked ? (
+                                    <span className="text-[8px] bg-emerald-950/40 border border-emerald-900/50 px-1 rounded text-emerald-400">PASS_OK</span>
+                                  ) : (
+                                    <span className="text-[8px] bg-amber-950/40 border border-amber-900/50 px-1 rounded text-amber-400">PASS</span>
+                                  )
+                                )}
+                                {isEarlyAccess && isStillEarlyAccess && (
+                                  hasEarlyAccessUnlocked ? (
+                                    <span className="text-[8px] bg-teal-950/40 border border-teal-900/50 px-1 rounded text-teal-400">SỚM_OK</span>
+                                  ) : (
+                                    <span className="text-[8px] bg-amber-950/40 border border-[#A2B6CD]/30 px-1 rounded text-[#A2B6CD]">SỚM</span>
+                                  )
+                                )}
+                              </div>
                             </div>
 
                             <div className="text-[11px] md:text-xs font-alegreya font-bold text-[#ECEFF4] group-hover:text-[#A2B6CD] transition-colors truncate mt-1 leading-tight w-full">
@@ -2188,8 +2210,13 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                       {displayedChapters.map((chap) => {
                         const absoluteIndex = chapters.findIndex(c => c.id === chap.id) + 1;
-                        const isLocked = chap.isLocked && !unlockedPassChapters.includes(chap.id);
-                        const isEarly = chap.isEarlyAccess && !unlockedEarlyAccessChapters.includes(chap.id);
+                        const isPassRequired = chap.requiresPass;
+                        const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
+                        const isEarlyAccess = chap.requiresEarlyAccess;
+                        const chapTime = chap.createdAt?.toMillis ? chap.createdAt.toMillis() : (typeof chap.createdAt === 'number' ? chap.createdAt : 0);
+                        const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+                        const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(chap.id);
+                        const isLockedRead = !!chap.isLockedRead;
                         
                         return (
                           <button
@@ -2203,15 +2230,40 @@ export function NguoiDepOmYeuTheme(props: ThemeProps) {
                                 MÃ ĐỀ LUYỆN {absoluteIndex.toString().padStart(2, '0')}
                               </span>
                               
-                              {isLocked ? (
-                                <span className="text-[9px] font-lora px-1.5 py-0.5 rounded bg-[#233145]/50 border border-[#233145] text-[#ECEFF4]/70">
-                                  CHƯA PHÊ DUYỆT
-                                </span>
-                              ) : isEarly ? (
-                                <span className="text-[9px] font-lora px-1.5 py-0.5 rounded bg-[#A2B6CD]/20 border border-[#A2B6CD]/30 text-[#A2B6CD]">
-                                  ĐỌC SỚM
-                                </span>
-                              ) : null}
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                {isPassRequired && (
+                                  hasPassUnlocked ? (
+                                    <span className="text-[9px] font-lora px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-900/50 text-emerald-400 flex items-center gap-0.5">
+                                      <Unlock className="w-2.5 h-2.5" /> PASS OK
+                                    </span>
+                                  ) : (
+                                    <span className="text-[9px] font-lora px-1.5 py-0.5 rounded bg-amber-950/40 border border-amber-900/50 text-amber-400 flex items-center gap-0.5">
+                                      <Lock className="w-2.5 h-2.5" /> CẦN PASS
+                                    </span>
+                                  )
+                                )}
+                                {isEarlyAccess && isStillEarlyAccess && (
+                                  hasEarlyAccessUnlocked ? (
+                                    <span className="text-[9px] font-lora px-1.5 py-0.5 rounded bg-teal-950/40 border border-teal-900/50 text-teal-400 flex items-center gap-0.5">
+                                      <Zap className="w-2.5 h-2.5 text-teal-400 fill-teal-950" /> ĐÃ MỞ SỚM
+                                    </span>
+                                  ) : (
+                                    <span className="text-[9px] font-lora px-1.5 py-0.5 rounded bg-amber-950/40 border border-[#A2B6CD]/30 text-amber-400 flex items-center gap-0.5 animate-pulse">
+                                      <Zap className="w-2.5 h-2.5 text-amber-400 fill-amber-950" /> ĐỌC SỚM
+                                    </span>
+                                  )
+                                )}
+                                {isEarlyAccess && !isStillEarlyAccess && (
+                                  <span className="text-[9px] font-lora px-1.5 py-0.5 rounded bg-gray-950/40 border border-gray-900 text-gray-500">
+                                    MIỄN PHÍ
+                                  </span>
+                                )}
+                                {isLockedRead && (
+                                  <span className="text-[9px] font-lora px-1.5 py-0.5 rounded bg-red-950/40 border border-red-900/50 text-red-400">
+                                    ĐÃ KHÓA
+                                  </span>
+                                )}
+                              </div>
                             </div>
 
                             {/* Chapter Title */}
