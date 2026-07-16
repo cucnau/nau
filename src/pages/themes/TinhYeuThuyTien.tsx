@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, Scroll, Heart, ArrowLeft, Sparkles } from 'lucide-react';
+import { BookOpen, Gift, Send, Bookmark, Scroll, Heart, ArrowLeft, Sparkles, Lock, Unlock, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { useStore } from '../../store';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -12,7 +12,7 @@ export function TinhYeuThuyTienTheme(props: ThemeProps) {
     showGiftModal, setShowGiftModal, giftAmount, setGiftAmount, giftMessage, setGiftMessage, handleGiftSubmit,
     commentText, setCommentText, submittingComment, handleSendComment,
     isLoggedIn, savedStories, handleSaveToggle, choco, navigate,
-    profilesCache = {}, getTitleColor, uid
+    profilesCache = {}, getTitleColor, uid, unlockedPassChapters, unlockedEarlyAccessChapters
   } = props;
 
   const {
@@ -364,32 +364,77 @@ export function TinhYeuThuyTienTheme(props: ThemeProps) {
                   Các trang thư tịch cổ đang được thần cai quản bảo hộ hoặc chưa ghi chép.
                 </div>
               ) : (
-                displayedChapters.map((chap) => (
-                  <div 
-                    key={chap.id}
-                    onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
-                    className="group p-4 bg-[#3D362E]/50 hover:bg-[#3D362E] border border-[#B6A996]/10 hover:border-[#B6A996] rounded-xl cursor-pointer transition-all duration-300 flex items-center justify-between shadow-md"
-                  >
-                    <div className="flex items-center gap-4 min-w-0 flex-1 mr-3">
-                      <div className="w-10 h-10 rounded-lg bg-[#12110F] flex items-center justify-center text-xs text-[#B6A996] border border-[#B6A996]/20 group-hover:border-[#B6A996] transition-all font-serif font-black flex-shrink-0">
-                        {chap.order}
+                displayedChapters.map((chap) => {
+                  const isPassRequired = chap.requiresPass;
+                  const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
+                  const isEarlyAccess = chap.requiresEarlyAccess;
+                  const chapTime = chap.createdAt?.toMillis ? chap.createdAt.toMillis() : (typeof chap.createdAt === 'number' ? chap.createdAt : 0);
+                  const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+                  const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(chap.id);
+                  const isLockedRead = !!chap.isLockedRead;
+
+                  return (
+                    <div 
+                      key={chap.id}
+                      onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
+                      className="group p-4 bg-[#3D362E]/50 hover:bg-[#3D362E] border border-[#B6A996]/10 hover:border-[#B6A996] rounded-xl cursor-pointer transition-all duration-300 flex items-center justify-between shadow-md"
+                    >
+                      <div className="flex items-center gap-4 min-w-0 flex-1 mr-3">
+                        <div className="w-10 h-10 rounded-lg bg-[#12110F] flex items-center justify-center text-xs text-[#B6A996] border border-[#B6A996]/20 group-hover:border-[#B6A996] transition-all font-serif font-black flex-shrink-0">
+                          {chap.order}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-serif font-bold text-sm md:text-base text-[#F2E6D0] group-hover:text-[#B6A996] transition-colors truncate">
+                            {chap.title}
+                          </h4>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            <span className="text-[9px] text-[#B6A996]/50 uppercase tracking-widest font-sans font-bold">
+                              TRANG CHÉP CỔ TỰ
+                            </span>
+                            
+                            {isPassRequired && (
+                              hasPassUnlocked ? (
+                                <span className="text-[8px] font-sans px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-900/50 text-emerald-400 flex items-center gap-0.5 font-bold uppercase">
+                                  <Unlock className="w-2 h-2" /> PASS OK
+                                </span>
+                              ) : (
+                                <span className="text-[8px] font-sans px-1.5 py-0.5 rounded bg-amber-950/40 border border-amber-900/50 text-amber-400 flex items-center gap-0.5 font-bold uppercase">
+                                  <Lock className="w-2 h-2" /> KHÓA PASS
+                                </span>
+                              )
+                            )}
+                            {isEarlyAccess && isStillEarlyAccess && (
+                              hasEarlyAccessUnlocked ? (
+                                <span className="text-[8px] font-sans px-1.5 py-0.5 rounded bg-teal-950/40 border border-teal-900/50 text-teal-400 flex items-center gap-0.5 font-bold uppercase">
+                                  <Zap className="w-2 h-2 text-teal-400 fill-teal-950" /> ĐỌC TRƯỚC OK
+                                </span>
+                              ) : (
+                                <span className="text-[8px] font-sans px-1.5 py-0.5 rounded bg-amber-950/40 border border-amber-900/30 text-amber-400 flex items-center gap-0.5 font-bold uppercase animate-pulse">
+                                  <Zap className="w-2 h-2 text-amber-400 fill-amber-100" /> ĐỌC SỚM
+                                </span>
+                              )
+                            )}
+                            {isEarlyAccess && !isStillEarlyAccess && (
+                              <span className="text-[8px] font-sans px-1.5 py-0.5 rounded bg-stone-950/40 border border-stone-900 text-stone-500 font-bold uppercase">
+                                KHAI HỮU
+                              </span>
+                            )}
+                            {isLockedRead && (
+                              <span className="text-[8px] font-sans px-1.5 py-0.5 rounded bg-red-950/40 border border-red-900/50 text-red-400 font-bold uppercase">
+                                NIÊM PHONG
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-serif font-bold text-sm md:text-base text-[#F2E6D0] group-hover:text-[#B6A996] transition-colors truncate">
-                          {chap.title}
-                        </h4>
-                        <span className="text-[9px] text-[#B6A996]/50 block mt-0.5 uppercase tracking-widest font-sans font-bold">
-                          TRANG CHÉP CỔ TỰ
-                        </span>
+                      
+                      {/* Ancient Arrow design */}
+                      <div className="w-7 h-7 rounded-full bg-[#12110F]/30 flex items-center justify-center border border-[#B6A996]/10 group-hover:border-[#B6A996]/50 transition-all flex-shrink-0">
+                        <span className="text-[#B6A996] text-xs font-sans font-bold group-hover:translate-x-0.5 transition-transform">→</span>
                       </div>
                     </div>
-                    
-                    {/* Ancient Arrow design */}
-                    <div className="w-7 h-7 rounded-full bg-[#12110F]/30 flex items-center justify-center border border-[#B6A996]/10 group-hover:border-[#B6A996]/50 transition-all flex-shrink-0">
-                      <span className="text-[#B6A996] text-xs font-sans font-bold group-hover:translate-x-0.5 transition-transform">→</span>
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
 
