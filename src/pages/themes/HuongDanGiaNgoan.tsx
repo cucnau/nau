@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, Briefcase, TrendingUp, MessageSquare, ArrowUpRight, Quote, ExternalLink, Activity, Shield, FileText, ChevronRight, BarChart2, DollarSign, Users, Award } from 'lucide-react';
+import { BookOpen, Gift, Send, Bookmark, Briefcase, TrendingUp, MessageSquare, ArrowUpRight, Quote, ExternalLink, Activity, Shield, FileText, ChevronRight, BarChart2, DollarSign, Users, Award, Lock, Unlock, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { useStore } from '../../store';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -20,7 +20,7 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
     showGiftModal, setShowGiftModal, giftAmount, setGiftAmount, giftMessage, setGiftMessage, handleGiftSubmit,
     commentText, setCommentText, submittingComment, handleSendComment,
     isLoggedIn, savedStories, handleSaveToggle, choco, navigate,
-    profilesCache = {}, getTitleColor, uid
+    profilesCache = {}, getTitleColor, uid, unlockedPassChapters, unlockedEarlyAccessChapters
   } = props;
 
   const {
@@ -463,6 +463,14 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                     {displayedChapters.map((chap, i) => {
                       const absoluteIndex = (chapterPage * CHAPTERS_PER_PAGE) + i + 1;
                       const recordCode = `SEC-GNC-${absoluteIndex.toString().padStart(3, '0')}`;
+                      const isPassRequired = chap.requiresPass;
+                      const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
+                      const isEarlyAccess = chap.requiresEarlyAccess;
+                      const chapTime = chap.createdAt?.toMillis ? chap.createdAt.toMillis() : (typeof chap.createdAt === 'number' ? chap.createdAt : 0);
+                      const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+                      const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(chap.id);
+                      const isLockedRead = !!chap.isLockedRead;
+
                       return (
                         <div 
                           key={chap.id} 
@@ -474,9 +482,45 @@ export function HuongDanGiaNgoanTheme(props: ThemeProps) {
                             <span className="text-[10px] font-mono font-bold text-[#695b7f] group-hover:text-[#bbee1f] transition-colors">
                               {recordCode}
                             </span>
-                            <span className="px-1.5 py-0.5 border border-[#2e2a63] bg-[#2e2a63]/30 rounded text-[8px] font-semibold text-[#695b7f] group-hover:text-[#dbcec2] group-hover:border-[#bbee1f]/40 transition-colors">
-                              SECURED PDF
-                            </span>
+                            <div className="flex items-center gap-1.5">
+                              {isPassRequired && (
+                                hasPassUnlocked ? (
+                                  <span className="px-1.5 py-0.5 border border-emerald-900 bg-emerald-950/30 rounded text-[8px] font-mono font-bold text-emerald-400 flex items-center gap-1">
+                                    <Unlock className="w-2.5 h-2.5" /> PASS OK
+                                  </span>
+                                ) : (
+                                  <span className="px-1.5 py-0.5 border border-amber-900 bg-amber-950/30 rounded text-[8px] font-mono font-bold text-amber-400 flex items-center gap-1">
+                                    <Lock className="w-2.5 h-2.5" /> REQ.PASS
+                                  </span>
+                                )
+                              )}
+                              {isEarlyAccess && isStillEarlyAccess && (
+                                hasEarlyAccessUnlocked ? (
+                                  <span className="px-1.5 py-0.5 border border-teal-900 bg-teal-950/30 rounded text-[8px] font-mono font-bold text-teal-400 flex items-center gap-1">
+                                    <Zap className="w-2.5 h-2.5 text-teal-400 fill-teal-950" /> EARLY_OK
+                                  </span>
+                                ) : (
+                                  <span className="px-1.5 py-0.5 border border-amber-900 bg-amber-950/30 rounded text-[8px] font-mono font-bold text-amber-400 flex items-center gap-1 animate-pulse">
+                                    <Zap className="w-2.5 h-2.5 text-amber-400 fill-amber-950" /> EARLY_ACC
+                                  </span>
+                                )
+                              )}
+                              {isEarlyAccess && !isStillEarlyAccess && (
+                                <span className="px-1.5 py-0.5 border border-[#2e2a63] bg-[#2e2a63]/20 rounded text-[8px] font-mono text-[#695b7f]">
+                                  FREE_PUB
+                                </span>
+                              )}
+                              {isLockedRead && (
+                                <span className="px-1.5 py-0.5 border border-red-900 bg-red-950/30 rounded text-[8px] font-mono font-bold text-red-400">
+                                  LOCKED
+                                </span>
+                              )}
+                              {!isPassRequired && !(isEarlyAccess && isStillEarlyAccess) && !isLockedRead && (
+                                <span className="px-1.5 py-0.5 border border-[#2e2a63] bg-[#2e2a63]/30 rounded text-[8px] font-semibold text-[#695b7f] group-hover:text-[#dbcec2] group-hover:border-[#bbee1f]/40 transition-colors">
+                                  SECURED PDF
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           {/* Chapter Title */}
