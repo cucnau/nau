@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, ArrowLeft, Sparkles, Feather, Star, Compass } from 'lucide-react';
+import { BookOpen, Gift, Send, Bookmark, ArrowLeft, Sparkles, Feather, Star, Compass, Lock, Unlock, Zap } from 'lucide-react';
 import { UserAvatar } from '../../components/UserAvatar';
 import { motion } from 'motion/react';
 
@@ -11,7 +11,7 @@ export function ChimHoangYenTheme(props: ThemeProps) {
     showGiftModal, setShowGiftModal, giftAmount, setGiftAmount, giftMessage, setGiftMessage, handleGiftSubmit,
     commentText, setCommentText, submittingComment, handleSendComment,
     isLoggedIn, savedStories, handleSaveToggle, choco, navigate,
-    getTitleColor
+    getTitleColor, unlockedPassChapters, unlockedEarlyAccessChapters
   } = props;
 
   const totalGiftedChoco = comments.filter(c => c.type === 'choco_gift').reduce((acc, curr) => acc + (curr.giftAmount || 0), 0);
@@ -637,35 +637,75 @@ export function ChimHoangYenTheme(props: ThemeProps) {
               {/* Danh sách chương truyện nhẹ nhàng sắc sảo */}
               {displayedChapters.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {displayedChapters.map((ch: any) => (
-                    <div
-                      key={ch.id}
-                      onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${ch.order + 1}`)}
-                      className="p-4 bg-white/80 hover:bg-[#eff6f0]/60 rounded-xl border-[1px] border-[#ddd289]/40 hover:border-[#ddd289] transition-all cursor-pointer flex justify-between items-center group relative overflow-hidden"
-                    >
-                      <div className="min-w-0 z-10">
-                        <p className="font-semibold text-sm text-[#132e1a] truncate font-serif">
-                          {ch.title}
-                        </p>
-                        <p className="text-[9px] text-[#132e1a]/60 font-medium uppercase tracking-widest mt-1">
-                          Lá bạch quả thứ {ch.order + 1}
-                        </p>
+                  {displayedChapters.map((ch: any) => {
+                    const isPassRequired = ch.requiresPass;
+                    const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(ch.id);
+                    const isEarlyAccess = ch.requiresEarlyAccess;
+                    const chapTime = ch.createdAt?.toMillis ? ch.createdAt.toMillis() : (typeof ch.createdAt === 'number' ? ch.createdAt : 0);
+                    const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+                    const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(ch.id);
+                    const isLockedRead = ch.isLockedRead || ch.isPasswordProtected;
+
+                    return (
+                      <div
+                        key={ch.id}
+                        onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${ch.order + 1}`)}
+                        className="p-4 bg-white/80 hover:bg-[#eff6f0]/60 rounded-xl border-[1px] border-[#ddd289]/40 hover:border-[#ddd289] transition-all cursor-pointer flex justify-between items-center group relative overflow-hidden"
+                      >
+                        <div className="min-w-0 z-10">
+                          <p className="font-semibold text-sm text-[#132e1a] truncate font-serif">
+                            {ch.title}
+                          </p>
+                          <p className="text-[9px] text-[#132e1a]/60 font-medium uppercase tracking-widest mt-1">
+                            Lá bạch quả thứ {ch.order + 1}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 z-10">
+                          {isPassRequired && (
+                            hasPassUnlocked ? (
+                              <span className="text-[9px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1 font-bold">
+                                <Unlock className="w-3 h-3" /> PASS OK
+                              </span>
+                            ) : (
+                              <span className="text-[9px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-amber-200 flex items-center gap-1 font-bold">
+                                <Lock className="w-3 h-3" /> VÉ PASS
+                              </span>
+                            )
+                          )}
+                          {isEarlyAccess && isStillEarlyAccess && (
+                            hasEarlyAccessUnlocked ? (
+                              <span className="text-[9px] bg-teal-50 text-teal-700 px-2 py-0.5 rounded border border-teal-200 flex items-center gap-1 font-bold">
+                                <Zap className="w-3 h-3 text-teal-600 fill-teal-100" /> ĐỌC SỚM
+                              </span>
+                            ) : (
+                              <span className="text-[9px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded border border-[#ddd289] flex items-center gap-1 font-bold">
+                                <Zap className="w-3 h-3 text-amber-600 fill-amber-100 animate-pulse" /> ĐỌC SỚM
+                              </span>
+                            )
+                          )}
+                          {isEarlyAccess && !isStillEarlyAccess && (
+                            <span className="text-[9px] bg-gray-50 text-gray-500 px-2 py-0.5 rounded border border-gray-200 font-bold">
+                              MIỄN PHÍ
+                            </span>
+                          )}
+                          {isLockedRead && (
+                            <span className="text-[10px] bg-[#f4d451]/70 text-[#132e1a] px-2.5 py-0.5 rounded font-medium border border-[#ddd289]">
+                              SÓNG KHÓA
+                            </span>
+                          )}
+                          {!isPassRequired && !(isEarlyAccess && isStillEarlyAccess) && !isLockedRead && (
+                            <span className="text-xs text-[#ddd289] font-medium group-hover:translate-x-1 transition-transform">
+                              ➔
+                            </span>
+                          )}
+                        </div>
+                        {/* Họa tiết ẩn nhẹ nhàng */}
+                        <div className="absolute -bottom-1 -right-1 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
+                          <Feather className="w-10 h-10 text-[#f4d451]" />
+                        </div>
                       </div>
-                      {ch.isPasswordProtected ? (
-                        <span className="text-[10px] bg-[#f4d451]/70 text-[#132e1a] px-2.5 py-0.5 rounded font-medium border border-[#ddd289]">
-                          SÓNG KHÓA
-                        </span>
-                      ) : (
-                        <span className="text-xs text-[#ddd289] font-medium group-hover:translate-x-1 transition-transform">
-                          ➔
-                        </span>
-                      )}
-                      {/* Họa tiết ẩn nhẹ nhàng */}
-                      <div className="absolute -bottom-1 -right-1 opacity-5 pointer-events-none group-hover:opacity-10 transition-opacity">
-                        <Feather className="w-10 h-10 text-[#f4d451]" />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="py-12 text-center text-xs text-stone-400 font-medium uppercase tracking-widest">
