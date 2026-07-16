@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, Scroll, Heart, ArrowLeft, Sparkles, Rabbit, Skull, Ghost, Gamepad2 } from 'lucide-react';
+import { BookOpen, Gift, Send, Bookmark, Scroll, Heart, ArrowLeft, Sparkles, Rabbit, Skull, Ghost, Gamepad2, Lock, Unlock, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { useStore } from '../../store';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -34,7 +34,7 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
     showGiftModal, setShowGiftModal, giftAmount, setGiftAmount,
     giftMessage, setGiftMessage, handleGiftSubmit, commentText, setCommentText,
     submittingComment, handleSendComment, isLoggedIn, savedStories, handleSaveToggle, choco, navigate,
-    profilesCache = {}, getTitleColor, uid
+    profilesCache = {}, getTitleColor, uid, unlockedPassChapters, unlockedEarlyAccessChapters
   } = props;
 
   const {
@@ -342,40 +342,86 @@ export const RinhRapTheme: React.FC<ThemeProps> = (props) => {
                     Chưa có màn chơi nào được tải lên...
                   </p>
                 ) : (
-                  chapters.slice(chapterPage * CHAPTERS_PER_PAGE, (chapterPage + 1) * CHAPTERS_PER_PAGE).map((chap, idx) => (
-                    <button
-                      key={chap.id}
-                      onClick={() => navigate(`/doc/${story.slug || actualStoryId}/chuong-${chap.order + 1}`)}
-                      className={`group relative p-4 rounded-2xl transition-all text-left flex justify-between items-center overflow-hidden border-2 ${
-                         rinhrapMode === 'thotrang'
-                            ? 'bg-[#facaca]/20 border-[#facaca] hover:bg-[#facaca]/40 hover:border-[#823323]'
-                            : 'bg-[#823323]/20 border-[#780606] hover:bg-[#780606]/40 hover:border-[#facaca]'
-                      }`}
-                    >
-                      <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(250,202,202,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px] pointer-events-none"></div>
-                      <div className="relative z-10 flex flex-col gap-1 pr-4">
-                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md inline-block w-max border transition-all ${
+                  chapters.slice(chapterPage * CHAPTERS_PER_PAGE, (chapterPage + 1) * CHAPTERS_PER_PAGE).map((chap, idx) => {
+                    const isPassRequired = chap.requiresPass;
+                    const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
+                    const isEarlyAccess = chap.requiresEarlyAccess;
+                    const chapTime = chap.createdAt?.toMillis ? chap.createdAt.toMillis() : (typeof chap.createdAt === 'number' ? chap.createdAt : 0);
+                    const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+                    const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(chap.id);
+                    const isLockedRead = !!chap.isLockedRead;
+
+                    return (
+                      <button
+                        key={chap.id}
+                        onClick={() => navigate(`/doc/${story.slug || actualStoryId}/chuong-${chap.order + 1}`)}
+                        className={`group relative p-4 rounded-2xl transition-all text-left flex justify-between items-center overflow-hidden border-2 ${
                            rinhrapMode === 'thotrang'
-                              ? 'text-[#780606] bg-[#ffffff] border-[#facaca]'
-                              : 'text-[#facaca] bg-[#000000] border-[#780606]'
-                        }`}>
-                          STAGE {chapterSortDesc ? chapters.length - (chapterPage * CHAPTERS_PER_PAGE) - idx : (chapterPage * CHAPTERS_PER_PAGE) + idx + 1}
-                        </span>
-                        <span className={`font-bold text-sm line-clamp-1 transition-all ${
-                           rinhrapMode === 'thotrang'
-                              ? 'text-[#000000] group-hover:text-[#780606]'
-                              : 'text-[#ffffff] group-hover:text-[#facaca]'
-                        }`}>
-                          {chap.title}
-                        </span>
-                      </div>
-                      <RabbitMask className={`w-5 h-5 transition-colors relative z-10 ${
-                         rinhrapMode === 'thotrang'
-                            ? 'text-[#823323] group-hover:text-[#780606]'
-                            : 'text-[#9c0800] group-hover:text-[#facaca]'
-                      }`} />
-                    </button>
-                  ))
+                              ? 'bg-[#facaca]/20 border-[#facaca] hover:bg-[#facaca]/40 hover:border-[#823323]'
+                              : 'bg-[#823323]/20 border-[#780606] hover:bg-[#780606]/40 hover:border-[#facaca]'
+                        }`}
+                      >
+                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(250,202,202,0.05)_50%,transparent_75%,transparent_100%)] bg-[length:20px_20px] pointer-events-none"></div>
+                        <div className="relative z-10 flex flex-col gap-1 pr-4 min-w-0">
+                          <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md inline-block w-max border transition-all ${
+                             rinhrapMode === 'thotrang'
+                                ? 'text-[#780606] bg-[#ffffff] border-[#facaca]'
+                                : 'text-[#facaca] bg-[#000000] border-[#780606]'
+                          }`}>
+                            STAGE {chapterSortDesc ? chapters.length - (chapterPage * CHAPTERS_PER_PAGE) - idx : (chapterPage * CHAPTERS_PER_PAGE) + idx + 1}
+                          </span>
+                          <span className={`font-bold text-sm line-clamp-1 transition-all ${
+                             rinhrapMode === 'thotrang'
+                                ? 'text-[#000000] group-hover:text-[#780606]'
+                                : 'text-[#ffffff] group-hover:text-[#facaca]'
+                          }`}>
+                            {chap.title}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0 z-10">
+                          {isPassRequired && (
+                            hasPassUnlocked ? (
+                              <span className="text-[9px] bg-emerald-950/60 text-emerald-400 border border-emerald-900/50 px-1.5 py-0.5 rounded font-mono font-bold flex items-center gap-0.5">
+                                <Unlock className="w-2.5 h-2.5" /> KEY_OK
+                              </span>
+                            ) : (
+                              <span className="text-[9px] bg-amber-950/60 text-amber-400 border border-amber-900/50 px-1.5 py-0.5 rounded font-mono font-bold flex items-center gap-0.5">
+                                <Lock className="w-2.5 h-2.5" /> REQ_KEY
+                              </span>
+                            )
+                          )}
+                          {isEarlyAccess && isStillEarlyAccess && (
+                            hasEarlyAccessUnlocked ? (
+                              <span className="text-[9px] bg-teal-950/60 text-teal-400 border border-teal-900/50 px-1.5 py-0.5 rounded font-mono font-bold flex items-center gap-0.5">
+                                <Zap className="w-2.5 h-2.5 text-teal-400 fill-teal-950" /> VIP_OK
+                              </span>
+                            ) : (
+                              <span className="text-[9px] bg-amber-950/60 text-amber-400 border border-amber-900/30 px-1.5 py-0.5 rounded font-mono font-bold flex items-center gap-0.5 animate-pulse">
+                                <Zap className="w-2.5 h-2.5 text-amber-400 fill-amber-100" /> VIP_STAGE
+                              </span>
+                            )
+                          )}
+                          {isEarlyAccess && !isStillEarlyAccess && (
+                            <span className="text-[9px] bg-gray-950/60 text-gray-500 border border-gray-900 px-1.5 py-0.5 rounded font-mono">
+                              PUB_FREE
+                            </span>
+                          )}
+                          {isLockedRead && (
+                            <span className="text-[9px] bg-red-950/60 text-red-400 border border-red-900/50 px-1.5 py-0.5 rounded font-mono">
+                              LOCKED
+                            </span>
+                          )}
+                          {!isPassRequired && !(isEarlyAccess && isStillEarlyAccess) && !isLockedRead && (
+                            <RabbitMask className={`w-5 h-5 transition-colors relative z-10 ${
+                               rinhrapMode === 'thotrang'
+                                  ? 'text-[#823323] group-hover:text-[#780606]'
+                                  : 'text-[#9c0800] group-hover:text-[#facaca]'
+                            }`} />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })
                 )}
               </div>
             </div>
