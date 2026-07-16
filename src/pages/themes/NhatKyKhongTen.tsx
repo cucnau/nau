@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProps } from './ThemeProps';
-import { BookOpen, Gift, Send, Bookmark, PenTool, Scroll, MessageSquare, Heart, Activity, ArrowLeft, Scissors } from 'lucide-react';
+import { BookOpen, Gift, Send, Bookmark, PenTool, Scroll, MessageSquare, Heart, Activity, ArrowLeft, Scissors, Lock, Unlock, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import { useStore } from '../../store';
 import { UserAvatar } from '../../components/UserAvatar';
@@ -12,7 +12,7 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
     showGiftModal, setShowGiftModal, giftAmount, setGiftAmount, giftMessage, setGiftMessage, handleGiftSubmit,
     commentText, setCommentText, submittingComment, handleSendComment,
     isLoggedIn, savedStories, handleSaveToggle, choco, navigate,
-    profilesCache = {}, getTitleColor, uid
+    profilesCache = {}, getTitleColor, uid, unlockedPassChapters, unlockedEarlyAccessChapters
   } = props;
 
   const {
@@ -335,28 +335,75 @@ export function NhatKyKhongTenTheme(props: ThemeProps) {
                     Bản thảo hiện đang được bảo vệ hoặc chưa được ghi chép.
                   </div>
                 ) : (
-                  displayedChapters.map((chap, idx) => (
-                    <div 
-                       key={chap.id}
-                       onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
-                       className="group p-4 bg-[#E8DCC4] hover:bg-[#DFCEB4] border border-[#C9B695] hover:border-[#BCA782] rounded-xl cursor-pointer transition-all flex items-center justify-between shadow-[0_2px_8px_rgba(44,24,20,0.05)] hover:shadow-md"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-[#DFCEB4] flex items-center justify-center text-xs text-[#2C1814] border border-[#C9B695] font-bold group-hover:border-[#BCA782] transition-colors">
-                          {chap.order}
+                  displayedChapters.map((chap, idx) => {
+                    const isPassRequired = chap.requiresPass;
+                    const hasPassUnlocked = isPassRequired && (unlockedPassChapters || []).includes(chap.id);
+                    const isEarlyAccess = chap.requiresEarlyAccess;
+                    const chapTime = chap.createdAt?.toMillis ? chap.createdAt.toMillis() : (typeof chap.createdAt === 'number' ? chap.createdAt : 0);
+                    const isStillEarlyAccess = isEarlyAccess && (Date.now() - chapTime < 24 * 60 * 60 * 1000);
+                    const hasEarlyAccessUnlocked = isEarlyAccess && (unlockedEarlyAccessChapters || []).includes(chap.id);
+                    const isLockedRead = !!chap.isLockedRead;
+
+                    return (
+                      <div 
+                         key={chap.id}
+                         onClick={() => navigate(`/doc/${story.slug || story.id}/chuong-${chap.order + 1}`)}
+                         className="group p-4 bg-[#E8DCC4] hover:bg-[#DFCEB4] border border-[#C9B695] hover:border-[#BCA782] rounded-xl cursor-pointer transition-all flex items-center justify-between shadow-[0_2px_8px_rgba(44,24,20,0.05)] hover:shadow-md"
+                      >
+                        <div className="flex items-center gap-4 min-w-0">
+                          <div className="w-10 h-10 rounded-lg bg-[#DFCEB4] flex items-center justify-center text-xs text-[#2C1814] border border-[#C9B695] font-bold group-hover:border-[#BCA782] transition-colors shrink-0">
+                            {chap.order}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-serif font-bold text-sm md:text-base text-[#2C1814] transition-colors truncate">
+                              {chap.title}
+                            </h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-[9px] text-[#2C1814]/70 uppercase tracking-wider font-semibold">
+                                CHƯƠNG NHẬT KÝ ĐÃ LÊN TRANG
+                              </span>
+                              
+                              {isPassRequired && (
+                                hasPassUnlocked ? (
+                                  <span className="text-[8px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-1 rounded flex items-center gap-0.5 font-bold">
+                                    <Unlock className="w-2 h-2" /> PASS OK
+                                  </span>
+                                ) : (
+                                  <span className="text-[8px] bg-amber-100 text-amber-800 border border-amber-200 px-1 rounded flex items-center gap-0.5 font-bold">
+                                    <Lock className="w-2 h-2" /> CẦN PASS
+                                  </span>
+                                )
+                              )}
+                              {isEarlyAccess && isStillEarlyAccess && (
+                                hasEarlyAccessUnlocked ? (
+                                  <span className="text-[8px] bg-teal-100 text-teal-800 border border-teal-200 px-1 rounded flex items-center gap-0.5 font-bold">
+                                    <Zap className="w-2 h-2 text-teal-700 fill-teal-100" /> ĐÃ MỞ SỚM
+                                  </span>
+                                ) : (
+                                  <span className="text-[8px] bg-amber-100 text-amber-800 border border-[#C9B695]/30 px-1 rounded flex items-center gap-0.5 font-bold animate-pulse">
+                                    <Zap className="w-2 h-2 text-amber-700 fill-amber-100" /> ĐỌC SỚM
+                                  </span>
+                                )
+                              )}
+                              {isEarlyAccess && !isStillEarlyAccess && (
+                                <span className="text-[8px] bg-stone-100 text-stone-500 border border-stone-200 px-1 rounded font-bold">
+                                  MIỄN PHÍ
+                                </span>
+                              )}
+                              {isLockedRead && (
+                                <span className="text-[8px] bg-red-100 text-red-800 border border-red-200 px-1 rounded font-bold">
+                                  ĐÃ KHÓA
+                                </span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-serif font-bold text-sm md:text-base text-[#2C1814] transition-colors">
-                            {chap.title}
-                          </h4>
-                          <span className="text-[9px] text-[#2C1814]/70 block mt-0.5 uppercase tracking-wider font-semibold">
-                            CHƯƠNG NHẬT KÝ ĐÃ LÊN TRANG
-                          </span>
-                        </div>
+                        <span className="text-xs text-[#2C1814] group-hover:text-[#5C3627] transition-all transform group-hover:translate-x-1 font-bold">
+                          ➔
+                        </span>
                       </div>
-                      <ChevronRightIcon className="w-4 h-4 text-[#2C1814] group-hover:text-[#5C3627] transition-all transform group-hover:translate-x-1" />
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 
