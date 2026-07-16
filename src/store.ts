@@ -966,18 +966,6 @@ export const useStore = create<UserState>()(
                       m.completed = true;
                    }
                 }
-                if (m.id === 'w1') {
-                   const isStreakActive = data.lastCheckInDate || state.lastCheckInDate ? true : false;
-                   if (isStreakActive && rawStreak > 0) {
-                      const d = getGMT7Date();
-                      const day = d.getDay();
-                      const dayOfWeek = day === 0 ? 7 : day;
-                      const estimatedWeeklyCheckins = Math.min(dayOfWeek, rawStreak);
-                      const progress = Math.max(m.progress || 0, estimatedWeeklyCheckins);
-                      const completed = progress >= m.target;
-                      return { ...m, progress, completed };
-                   }
-                }
                 return m;
              });
 
